@@ -13,10 +13,12 @@ export default function Home() {
           height={50}
           priority
         />
-        <a href="#waitlist" 
-        className="text-[#E8D5B0] hover:text-white text-sm font-semibold 
-        tracking-wide transition-colors border border-[#E8D5B0]/30 
-        hover:border-[#E8D5B0] px-4 py-2 rounded-lg">
+        <a 
+          href="https://tally.so/r/Pd4aLx"
+          target="_blank"
+          className="text-[#E8D5B0] hover:text-white text-sm font-semibold 
+          tracking-wide transition-colors border border-[#E8D5B0]/30 
+          hover:border-[#E8D5B0] px-4 py-2 rounded-lg">
           Join waitlist →
         </a>
       </nav>
@@ -42,30 +44,21 @@ export default function Home() {
           you're actually falling behind.
         </p>
 
-        <div id="waitlist" 
-        className="flex flex-col sm:flex-row gap-3 w-full max-w-md mb-5">
-          <input
-            type="email"
-            placeholder="your@email.com"
-            className="flex-1 px-5 py-4 rounded-xl font-medium 
-            outline-none text-base border-2 border-white/20
-            focus:border-[#E8D5B0] transition-colors"
-            style={{
-              background: 'rgba(255,255,255,0.1)',
-              color: 'white',
-            }}
-          />
-          <button 
-          className="font-bold px-7 py-4 rounded-xl active:scale-95 
-          transition-all text-base whitespace-nowrap text-[#1a4a35]"
-          style={{background: 'linear-gradient(135deg, #E8D5B0 0%, #d4bc8e 100%)'}}>
-            Get early access
-          </button>
+        {/* CTA Button */}
+        <div id="waitlist" className="flex flex-col items-center gap-4 mb-5">
+          <a 
+            href="https://tally.so/r/Pd4aLx"
+            target="_blank"
+            className="font-bold px-12 py-5 rounded-xl active:scale-95 
+            transition-all text-lg text-[#1a4a35] hover:opacity-90 
+            shadow-lg"
+            style={{background: 'linear-gradient(135deg, #E8D5B0 0%, #d4bc8e 100%)'}}>
+            Get early access →
+          </a>
+          <p className="text-white/40 text-sm">
+            Free during beta · No credit card needed · No spam
+          </p>
         </div>
-
-        <p className="text-white/40 text-sm">
-          Free during beta · No credit card needed · No spam
-        </p>
       </section>
 
       {/* Stats bar */}
@@ -112,7 +105,7 @@ export default function Home() {
           {[
             {
               emoji: '🗺️',
-              title: 'Mapping out your syllabus.',
+              title: 'Your syllabus. Every topic.',
               desc: "Every topic and subtopic from your official curriculum in one place. No guessing what's on the exam."
             },
             {
@@ -168,6 +161,18 @@ export default function Home() {
             </div>
           ))}
         </div>
+
+        {/* CTA inside comparison */}
+        <div className="flex justify-center mt-12">
+          <a 
+            href="https://tally.so/r/Pd4aLx"
+            target="_blank"
+            className="font-bold px-10 py-4 rounded-xl active:scale-95 
+            transition-all text-base text-[#1a4a35] hover:opacity-90"
+            style={{background: 'linear-gradient(135deg, #E8D5B0 0%, #d4bc8e 100%)'}}>
+            Join the waitlist →
+          </a>
+        </div>
       </section>
 
       {/* Founder note */}
@@ -175,13 +180,36 @@ export default function Home() {
         <div className="text-5xl mb-8">✍️</div>
         <p className="text-white/70 text-lg leading-relaxed mb-8">
           "I built this because I was about to start IB with Math AA HL, 
-          Economics HL, and CS HL and every tool I tried either gave me 
+          Economics HL, and CS HL — and every tool I tried either gave me 
           random questions or charged me $500 for content that wasn't even 
           on the current syllabus. So I built what I actually needed."
         </p>
         <p className="text-white font-bold text-lg">Talal Al-Raisi</p>
         <p className="text-[#E8D5B0] text-sm mt-1">
           Founder · IB Student · Muscat, Oman
+        </p>
+      </section>
+
+      {/* Final CTA */}
+      <section className="px-6 py-24 flex flex-col items-center text-center"
+      style={{background: 'rgba(0,0,0,0.2)'}}>
+        <h2 className="text-white text-4xl font-bold mb-4">
+          Be the first to know<br />when we launch.
+        </h2>
+        <p className="text-white/60 mb-10 text-lg max-w-md">
+          Join students across Oman, the GCC, and beyond 
+          who are done guessing what to study.
+        </p>
+        <a 
+          href="https://tally.so/r/Pd4aLx"
+          target="_blank"
+          className="font-bold px-12 py-5 rounded-xl active:scale-95 
+          transition-all text-lg text-[#1a4a35] hover:opacity-90 shadow-lg"
+          style={{background: 'linear-gradient(135deg, #E8D5B0 0%, #d4bc8e 100%)'}}>
+          Get early access →
+        </a>
+        <p className="text-white/30 text-xs mt-5">
+          Free during beta · No spam · Unsubscribe anytime
         </p>
       </section>
 
