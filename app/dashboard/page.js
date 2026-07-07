@@ -1,174 +1,152 @@
 'use client'
+
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import AppHeader from '@/components/AppHeader'
-import {
-  getSlugForSubject,
-  hasSyllabusData,
-} from '@/lib/subject-map'
-
-function StudyToday({ supabase }) {
-  const [items, setItems] = useState([])
-  const [loaded, setLoaded] = useState(false)
-
-  useEffect(() => {
-    async function load() {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-
-      const { data: progress } = await supabase
-        .from('user_topic_progress')
-        .select('confidence, topics(title, topic_type)')
-        .eq('user_id', user.id)
-        .lte('confidence', 3)
-        .order('confidence')
-
-      const weak = (progress || [])
-        .filter((p) => p.topics?.topic_type === 'subtopic')
-        .slice(0, 3)
-
-      setItems(weak)
-      setLoaded(true)
-    }
-    load()
-  }, [supabase])
-
-  if (!loaded) return null
-
-  return (
-    <div className="mt-6 pt-6 divider">
-      <p className="section-label mb-3">Study today</p>
-      {items.length === 0 ? (
-        <p className="text-text-muted text-sm">
-          Rate topics on your syllabus to get a daily plan.
-        </p>
-      ) : (
-        <div className="space-y-2">
-          {items.map((item, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <span className="text-text-faint text-sm font-bold w-4">{i + 1}.</span>
-              <span className="text-sm text-text flex-1">{item.topics.title}</span>
-              <span className="text-xs font-medium text-weak">weak</span>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
+import DashboardLayout from '@/components/DashboardLayout'
+import ProgressRing from '@/components/ProgressRing'
+import Heatmap from '@/components/Heatmap'
+import { getSlugForSubject } from '@/lib/subject-map'
+import { buildProgressMap, computeCompletionPercent, mergeSyllabusWithProgress } from '@/lib/progress'
 
 export default function Dashboard() {
   const [profile, setProfile] = useState(null)
+  const [heatmapItems, setHeatmapItems] = useState([])
+  const [subjectStats, setSubjectStats] = useState({})
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
-    async function loadProfile() {
+    async function loadData() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) {
         router.push('/login')
         return
       }
 
-      const { data, error } = await supabase
+      const { data: profileData } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single()
 
-      if (error || !data) {
+      if (!profileData) {
         router.push('/onboarding')
         return
       }
 
-      setProfile(data)
+      setProfile(profileData)
+
+      const subjects = profileData.subjects || []
+
+      const [{ data: syllabusRows }, { data: progressRows }] = await Promise.all([
+        subjects.length
+          ? supabase
+              .from('syllabus_content')
+              .select('*')
+              .in('subject', subjects)
+          : { data: [] },
+        supabase.from('progress').select('*').eq('user_id', user.id),
+      ])
+
+      const stats = {}
+      for (const subject of subjects) {
+        const subtopics = (syllabusRows || []).filter((r) => r.subject === subject)
+        const progressMap = buildProgressMap(
+          (progressRows || []).filter((p) => p.subject === subject)
+        )
+        stats[subject] = computeCompletionPercent(subtopics, progressMap, subject)
+      }
+
+      const heatmap = mergeSyllabusWithProgress(syllabusRows || [], buildProgressMap(progressRows))
+      heatmap.sort((a, b) => {
+        const si = subjects.indexOf(a.subject) - subjects.indexOf(b.subject)
+        if (si !== 0) return si
+        if (a.topic !== b.topic) return a.topic.localeCompare(b.topic)
+        return a.subtopic.localeCompare(b.subtopic)
+      })
+
+      setSubjectStats(stats)
+      setHeatmapItems(heatmap)
       setLoading(false)
     }
-    loadProfile()
+    loadData()
   }, [router, supabase])
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
-    router.push('/login')
-  }
 
   if (loading) {
     return (
-      <main className="page page-center">
-        <p className="text-text-muted text-sm">Loading your dashboard…</p>
-      </main>
+      <div className="min-h-screen bg-[#f8f6f1] flex items-center justify-center">
+        <p className="text-[#1a2e1e]">Loading your dashboard…</p>
+      </div>
     )
   }
 
-  const firstName = profile.full_name?.split(' ')[0]
+  const firstName = profile.full_name?.split(' ')[0] || 'there'
+  const subjects = profile.subjects || []
 
   return (
-    <main className="page px-6 py-8">
-      <div className="container-narrow">
-        <AppHeader
-          rightAction={
-            <div className="flex items-center gap-3">
-              <Link href="/dashboard/profile" className="link text-sm">
-                Profile
-              </Link>
-              <button onClick={handleLogout} className="btn-ghost">
-                Sign out
-              </button>
-            </div>
-          }
-        />
-
-        <div className="card card-pad mb-6">
-          <h1 className="text-2xl font-bold text-text mb-1">
-            Welcome back{firstName ? `, ${firstName}` : ''}
-          </h1>
-          <p className="text-text-muted text-sm">
-            {profile.curriculum} · Class of {profile.grad_year}
+    <DashboardLayout profile={profile}>
+      <div className="p-8 max-w-6xl mx-auto">
+        <header className="mb-10">
+          <p className="text-sm font-medium text-[#2D6A4F] uppercase tracking-wide mb-1">
+            Dashboard
           </p>
-          <StudyToday supabase={supabase} />
-        </div>
+          <h1 className="text-3xl font-bold text-[#1a2e1e]">
+            Welcome back, {firstName} 👋
+          </h1>
+          <p className="text-[#6b7280] mt-2">
+            Class of {profile.grad_year} · {profile.curriculum} · {subjects.length} subject{subjects.length !== 1 ? 's' : ''}
+          </p>
+        </header>
 
-        <div className="card card-pad">
-          <h2 className="font-bold text-lg text-text mb-6">Your subjects</h2>
+        <section className="mb-12">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-bold text-[#1a2e1e]">Your Subjects</h2>
+            <Link
+              href="/dashboard/subjects"
+              className="text-sm font-medium text-[#2D6A4F] hover:underline"
+            >
+              View all →
+            </Link>
+          </div>
 
-          {profile.subjects?.length > 0 ? (
-            <div className="space-y-3">
-              {profile.subjects.map((subject) => {
-                const slug = getSlugForSubject(subject)
-                const available = hasSyllabusData(subject)
-                return (
-                  <div
-                    key={subject}
-                    className="flex items-center justify-between gap-4 p-4 rounded-[var(--radius-sm)] border border-border bg-bg-subtle"
-                  >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {subjects.map((subject) => {
+              const progressPercent = subjectStats[subject] ?? 0
+              const targetGrade = profile.target_grades?.[subject] || '—'
+              const slug = getSlugForSubject(subject)
+
+              return (
+                <div
+                  key={subject}
+                  className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md hover:border-[#E8D5B0] transition-all group"
+                >
+                  <div className="flex items-start justify-between gap-4 mb-5">
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-text truncate">{subject}</p>
-                      <p className="text-xs text-text-muted mt-0.5">
-                        Target: {profile.target_grades?.[subject] || '—'}
-                      </p>
+                      <h3 className="font-semibold text-[#1a2e1e] text-lg leading-snug">{subject}</h3>
+                      <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#E8D5B0]/50 px-3 py-1">
+                        <span className="text-xs text-[#6b7280]">Target grade</span>
+                        <span className="text-sm font-bold text-[#1a2e1e]">{targetGrade}</span>
+                      </div>
                     </div>
-                    {available ? (
-                      <Link
-                        href={`/dashboard/syllabus/${slug}`}
-                        className="btn-primary text-xs px-4 py-2 flex-shrink-0"
-                      >
-                        Open syllabus
-                      </Link>
-                    ) : (
-                      <span className="text-xs text-text-faint flex-shrink-0">Coming soon</span>
-                    )}
+                    <ProgressRing progress={progressPercent} />
                   </div>
-                )
-              })}
-            </div>
-          ) : (
-            <p className="text-text-muted text-sm">No subjects found.</p>
-          )}
-        </div>
+                  <Link
+                    href={`/dashboard/syllabus/${slug}`}
+                    className="block w-full text-center py-3 bg-[#2D6A4F] text-white rounded-xl font-medium hover:bg-[#245a42] transition group-hover:shadow-sm"
+                  >
+                    Open syllabus
+                  </Link>
+                </div>
+              )
+            })}
+          </div>
+        </section>
+
+        <Heatmap items={heatmapItems} subjects={subjects} />
       </div>
-    </main>
+    </DashboardLayout>
   )
 }

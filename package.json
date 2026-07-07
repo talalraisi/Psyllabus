@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "import-ib": "node scripts/import-ib.js \"data/PSyllabus - IB DP.csv\""
+    "import-ib": "node scripts/import-ib.js \"data/PSyllabus - IB DP.csv\"",
+    "import-syllabus": "node scripts/import-syllabus-content.js \"data/PSyllabus - IB DP.csv\""
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.0",
