@@ -1,17 +1,27 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Logo from '@/components/Logo'
+import { getAuthCallbackUrl, getSafeNextPath } from '@/lib/auth'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [nextPath, setNextPath] = useState('/dashboard')
   const router = useRouter()
   const supabase = createClient()
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    setNextPath(getSafeNextPath(params.get('next')))
+    if (params.get('error') === 'auth') {
+      setError('Sign in failed. Please try again.')
+    }
+  }, [])
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -35,18 +45,18 @@ export default function Login() {
       .eq('id', data.user.id)
       .single()
 
-    router.push(profile ? '/dashboard' : '/onboarding')
+    router.push(profile ? nextPath : '/onboarding')
   }
 
   const handleGoogleLogin = async () => {
     setLoading(true)
     setError('')
-    
-    const { data, error } = await supabase.auth.signInWithOAuth({
+
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: 'https://lufbhwgzuzpilgeaants.supabase.co/auth/v1/callback'
-      }
+        redirectTo: getAuthCallbackUrl(nextPath),
+      },
     })
 
     if (error) {

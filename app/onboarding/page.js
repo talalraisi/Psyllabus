@@ -263,7 +263,7 @@ export default function Onboarding() {
       
       const { error } = await supabase.from('profiles').upsert({
         id: user.id,
-        full_name: user.user_metadata?.full_name || null,
+        full_name: user.user_metadata?.full_name || user.user_metadata?.name || null,
         curriculum,
         grad_year: gradYear,
         subjects: selectedSubjects,

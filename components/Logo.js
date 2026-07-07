@@ -5,7 +5,7 @@ export default function Logo({ width = 300, height = 90, className = '', priorit
   return (
     <Image
       src={logo}
-      alt="PSyllabus"
+      alt="Psyllabus"
       width={width}
       height={height}
       priority={priority}

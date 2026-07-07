@@ -23,7 +23,17 @@ export async function middleware(request) {
     }
   )
 
-  await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const path = request.nextUrl.pathname
+  const isProtected =
+    path.startsWith('/dashboard') || path.startsWith('/onboarding')
+
+  if (isProtected && !user) {
+    const loginUrl = new URL('/login', request.url)
+    loginUrl.searchParams.set('next', path)
+    return NextResponse.redirect(loginUrl)
+  }
 
   return supabaseResponse
 }
