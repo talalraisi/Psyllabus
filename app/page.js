@@ -7,18 +7,20 @@ export default function Home() {
       <nav className="flex items-center justify-between px-8 py-4 border-b border-border bg-bg-elevated">
         <Logo width={350} height={105} priority />
         <div className="flex items-center gap-3">
-          <Link href="/login" className="btn-ghost text-sm px-4 py-2.5">
-            Sign in
-          </Link>
-          <Link href="/signup" className="btn-primary text-sm px-5 py-2.5">
-            Get started free
-          </Link>
+          <a
+            href="https://tally.so/r/Pd4aLx"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary text-sm px-5 py-2.5"
+          >
+            Join waitlist
+          </a>
         </div>
       </nav>
 
       <section className="marketing-hero-grid px-6 pt-20 pb-24 text-center">
         <div className="max-w-3xl mx-auto">
-          <span className="badge mb-8">Now in beta · Free to use</span>
+          <span className="badge mb-8">Coming Soon · Join the Waitlist</span>
 
           <h1 className="text-4xl sm:text-6xl font-extrabold text-text leading-[1.1] mb-6 tracking-tight">
             Stop guessing.<br />
@@ -32,25 +34,16 @@ export default function Home() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
-            <Link href="/signup" className="btn-primary text-base px-10 py-4">
-              Get started free
-            </Link>
-            <Link href="/login" className="btn-secondary text-base px-10 py-4">
-              Sign in
-            </Link>
-          </div>
-          <p className="text-text-faint text-sm">
-            Or{' '}
             <a
               href="https://tally.so/r/Pd4aLx"
               target="_blank"
               rel="noopener noreferrer"
-              className="link"
+              className="btn-primary text-base px-10 py-4"
             >
-              join the waitlist
-            </a>{' '}
-            for launch updates
-          </p>
+              Join waitlist
+            </a>
+          </div>
+          <p className="text-text-faint text-sm">Be the first to know when we launch</p>
         </div>
       </section>
 
@@ -98,12 +91,12 @@ export default function Home() {
             {
               num: '02',
               title: 'A heatmap of your gaps.',
-              desc: 'Take mini-quizzes on each subtopic. Red means tested and weak. Grey means untested. No guessing.',
+              desc: "Rate each subtopic weak, review, solid, or mastered. See exactly where you're behind.",
             },
             {
               num: '03',
               title: "Today's plan. Built for you.",
-              desc: 'We surface your weakest quiz-verified topics so you know exactly what to study today.',
+              desc: 'We surface your weakest topics so you know what to study today.',
             },
           ].map((item) => (
             <div key={item.num} className="card card-pad">
@@ -127,14 +120,19 @@ export default function Home() {
 
       <section className="px-6 py-20 flex flex-col items-center text-center bg-bg-subtle border-t border-border">
         <h2 className="text-text text-3xl font-bold mb-4">
-          Ready to stop guessing?
+          Be the first to know when we launch
         </h2>
         <p className="text-text-muted mb-8 max-w-md">
-          Map your syllabus, take mini-quizzes, and get a daily study plan built around your gaps.
+          Join students who are done guessing what to study.
         </p>
-        <Link href="/signup" className="btn-primary text-lg px-12 py-4">
-          Get started free
-        </Link>
+        <a
+          href="https://tally.so/r/Pd4aLx"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-primary text-lg px-12 py-4"
+        >
+          Join waitlist
+        </a>
       </section>
 
       <footer className="px-8 py-8 flex items-center justify-between border-t border-border">

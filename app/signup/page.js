@@ -4,7 +4,6 @@ import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Logo from '@/components/Logo'
-import { getAuthCallbackUrl } from '@/lib/auth'
 
 export default function Signup() {
   const [email, setEmail] = useState('')
@@ -41,11 +40,11 @@ export default function Signup() {
     setLoading(true)
     setError('')
     
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: getAuthCallbackUrl('/onboarding'),
-      },
+        redirectTo: 'https://lufbhwgzuzpilgeaants.supabase.co/auth/v1/callback'
+      }
     })
 
     if (error) {
