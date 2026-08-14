@@ -183,14 +183,31 @@ export default function SyllabusPage() {
                         {subtopics.length} subtopic{subtopics.length !== 1 ? 's' : ''} · {topicMastered} mastered
                       </p>
                     </div>
-                    <span
-                      className={`text-[#9ca3af] text-xs transition-transform duration-150 ${
-                        expanded ? 'rotate-90' : ''
-                      }`}
-                      aria-hidden="true"
-                    >
-                      ▶
-                    </span>
+                    <div className="flex items-center gap-3 shrink-0">
+                      {hasQuestions && (
+                        <span
+                          role="link"
+                          tabIndex={0}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            router.push(
+                              `/dashboard/quiz?subject=${encodeURIComponent(subjectName)}&topic=${encodeURIComponent(topic)}&mode=topic&back=${encodeURIComponent(slugPath)}`
+                            )
+                          }}
+                          className="text-xs font-medium px-3 py-1.5 rounded-lg border border-[#2D6A4F] text-[#2D6A4F] hover:bg-[#f0fdf4] transition-colors cursor-pointer"
+                        >
+                          Topic test
+                        </span>
+                      )}
+                      <span
+                        className={`text-[#9ca3af] text-xs transition-transform duration-150 ${
+                          expanded ? 'rotate-90' : ''
+                        }`}
+                        aria-hidden="true"
+                      >
+                        ▶
+                      </span>
+                    </div>
                   </button>
 
                   {expanded && (

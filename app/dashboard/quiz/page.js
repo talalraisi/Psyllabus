@@ -18,6 +18,10 @@ function QuizPageInner() {
   const subtopic = searchParams.get('subtopic') || ''
   const mode = searchParams.get('mode') || 'subtopic'
   const backHref = searchParams.get('back') || '/dashboard'
+  const count = parseInt(searchParams.get('count') || '0', 10) || undefined
+  const topicsParam = searchParams.get('topics')
+  const topics = topicsParam ? topicsParam.split('~~') : undefined
+  const timed = searchParams.get('timed') === '1'
 
   useEffect(() => {
     async function load() {
@@ -67,6 +71,9 @@ function QuizPageInner() {
           topic={topic}
           subtopic={subtopic}
           mode={mode}
+          count={count}
+          topics={topics}
+          timed={timed}
           backHref={backHref}
         />
       </div>

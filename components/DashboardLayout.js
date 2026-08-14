@@ -22,6 +22,12 @@ const NAV_ITEMS = [
     match: (p) => p === '/dashboard/study-plan',
   },
   {
+    href: '/dashboard/test',
+    label: 'Build a Test',
+    icon: '🧪',
+    match: (p) => p === '/dashboard/test' || p.startsWith('/dashboard/quiz'),
+  },
+  {
     href: '/dashboard/progress',
     label: 'Progress',
     icon: '📈',

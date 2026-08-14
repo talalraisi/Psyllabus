@@ -62,7 +62,16 @@ function Spinner() {
   )
 }
 
-export default function QuizRunner({ subject, topic, subtopic, mode = 'subtopic', backHref = '/dashboard' }) {
+export default function QuizRunner({
+  subject,
+  topic,
+  subtopic,
+  mode = 'subtopic',
+  count,
+  topics,
+  timed: timedProp = false,
+  backHref = '/dashboard',
+}) {
   const [phase, setPhase] = useState(PHASE.loading)
   const [emptyMessage, setEmptyMessage] = useState('')
   const [questions, setQuestions] = useState([])
@@ -77,7 +86,7 @@ export default function QuizRunner({ subject, topic, subtopic, mode = 'subtopic'
   const router = useRouter()
   const supabase = createClient()
 
-  const timed = mode === 'mock'
+  const timed = mode === 'mock' || timedProp
   const timeLimitRef = useRef(null)
   const questionTimesRef = useRef({})
   const lastSwitchRef = useRef(null)
@@ -124,7 +133,10 @@ export default function QuizRunner({ subject, topic, subtopic, mode = 'subtopic'
         .select('*')
         .eq('subject', subject)
         .eq('verified', true)
+
       if (mode === 'subtopic') query = query.eq('subtopic', subtopic)
+      else if (mode === 'topic') query = query.eq('topic', topic)
+      else if (mode === 'custom' && topics?.length) query = query.in('topic', topics)
 
       const { data: questionRows } = await query
 
@@ -134,16 +146,14 @@ export default function QuizRunner({ subject, topic, subtopic, mode = 'subtopic'
         return
       }
 
-      const picked = shuffle(questionRows).slice(
-        0,
-        mode === 'mock' ? MOCK_COUNT : SUBTOPIC_COUNT
-      )
-      setQuestions(picked)
+      const target =
+        count || (mode === 'mock' ? MOCK_COUNT : mode === 'topic' ? 15 : SUBTOPIC_COUNT)
+      setQuestions(shuffle(questionRows).slice(0, target))
       setPhase(PHASE.predict)
     }
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subject, subtopic, mode])
+  }, [subject, topic, subtopic, mode, count, topics?.join('|')])
 
   const startQuiz = () => {
     questionTimesRef.current = {}
@@ -230,7 +240,8 @@ export default function QuizRunner({ subject, topic, subtopic, mode = 'subtopic'
         subject: subject || null,
         topic: topic || questions[0]?.topic || null,
         subtopic: mode === 'subtopic' ? subtopic : null,
-        quiz_type: mode,
+        // DB constraint allows subtopic|topic|mock|mistakes
+        quiz_type: mode === 'custom' ? (timed ? 'mock' : 'topic') : mode,
         predicted_score: prediction,
         score,
         total_questions: total,
@@ -337,10 +348,22 @@ export default function QuizRunner({ subject, topic, subtopic, mode = 'subtopic'
     return (
       <div className="bg-white rounded-xl p-6 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
         <p className="text-[13px] font-semibold uppercase tracking-[0.06em] text-[#9ca3af] mb-2">
-          {mode === 'mock' ? 'Timed Mock' : mode === 'mistakes' ? 'Mistake Review' : 'Mini-Quiz'}
+          {mode === 'mock'
+            ? 'Timed Mock'
+            : mode === 'mistakes'
+              ? 'Mistake Review'
+              : mode === 'custom'
+                ? 'Custom Test'
+                : mode === 'topic'
+                  ? 'Topic Test'
+                  : 'Mini-Quiz'}
         </p>
         <h1 className="text-xl font-bold text-[#1a2e1e] mb-1">
-          {mode === 'mistakes' ? 'Your past mistakes' : subtopic || subject}
+          {mode === 'mistakes'
+            ? 'Your past mistakes'
+            : mode === 'topic'
+              ? topic
+              : subtopic || subject}
         </h1>
         <p className="text-sm text-[#6b7280] mb-6">
           {questions.length} question{questions.length !== 1 ? 's' : ''} · auto-graded
