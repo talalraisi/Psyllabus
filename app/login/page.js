@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Logo from '@/components/Logo'
+import { getAuthCallbackUrl } from '@/lib/auth'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -45,7 +46,7 @@ export default function Login() {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: 'https://lufbhwgzuzpilgeaants.supabase.co/auth/v1/callback'
+        redirectTo: getAuthCallbackUrl('/dashboard')
       }
     })
 
