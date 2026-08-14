@@ -1,16 +1,29 @@
-import { Plus_Jakarta_Sans } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import './globals.css'
 
-const jakarta = Plus_Jakarta_Sans({
+const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap',
 })
 
+export const viewport = {
+  themeColor: '#2D6A4F',
+}
+
 export const metadata = {
   title: {
     default: 'PSyllabus',
     template: '%s · PSyllabus',
+  },
+  manifest: '/manifest.json',
+  icons: {
+    apple: '/apple-touch-icon.png',
+  },
+  appleWebApp: {
+    capable: true,
+    title: 'PSyllabus',
+    statusBarStyle: 'default',
   },
   description:
     'Track your IB, A-Level, or AP syllabus topic by topic. See where you are weak and know exactly what to study today.',
@@ -28,7 +41,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${jakarta.variable} h-full`}>
+    <html lang="en" className={`${inter.variable} h-full`}>
       <body className="min-h-full flex flex-col bg-[var(--bg,#FAFAF8)] text-[var(--text,#1C1917)] font-sans antialiased">
         {children}
       </body>

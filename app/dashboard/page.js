@@ -6,14 +6,21 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import ProgressRing from '@/components/ProgressRing'
-import Heatmap from '@/components/Heatmap'
 import { getSlugForSubject } from '@/lib/subject-map'
-import { buildProgressMap, computeCompletionPercent, mergeSyllabusWithProgress } from '@/lib/progress'
+import { computeCompletionPercent, progressKey } from '@/lib/progress'
+import { buildEffectiveProgressMap } from '@/lib/decay'
+
+function greeting() {
+  const hour = new Date().getHours()
+  if (hour < 12) return 'Good morning'
+  if (hour < 18) return 'Good afternoon'
+  return 'Good evening'
+}
 
 export default function Dashboard() {
   const [profile, setProfile] = useState(null)
-  const [heatmapItems, setHeatmapItems] = useState([])
   const [subjectStats, setSubjectStats] = useState({})
+  const [overall, setOverall] = useState(0)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const supabase = createClient()
@@ -43,33 +50,25 @@ export default function Dashboard() {
 
       const [{ data: syllabusRows }, { data: progressRows }] = await Promise.all([
         subjects.length
-          ? supabase
-              .from('syllabus_content')
-              .select('*')
-              .in('subject', subjects)
+          ? supabase.from('syllabus_content').select('*').in('subject', subjects)
           : { data: [] },
         supabase.from('progress').select('*').eq('user_id', user.id),
       ])
 
+      const progressMap = buildEffectiveProgressMap(progressRows)
       const stats = {}
       for (const subject of subjects) {
         const subtopics = (syllabusRows || []).filter((r) => r.subject === subject)
-        const progressMap = buildProgressMap(
-          (progressRows || []).filter((p) => p.subject === subject)
-        )
         stats[subject] = computeCompletionPercent(subtopics, progressMap, subject)
       }
 
-      const heatmap = mergeSyllabusWithProgress(syllabusRows || [], buildProgressMap(progressRows))
-      heatmap.sort((a, b) => {
-        const si = subjects.indexOf(a.subject) - subjects.indexOf(b.subject)
-        if (si !== 0) return si
-        if (a.topic !== b.topic) return a.topic.localeCompare(b.topic)
-        return a.subtopic.localeCompare(b.subtopic)
-      })
+      const total = (syllabusRows || []).length
+      const mastered = (syllabusRows || []).filter(
+        (r) => progressMap[progressKey(r.subject, r.subtopic)] === 'mastered'
+      ).length
 
       setSubjectStats(stats)
-      setHeatmapItems(heatmap)
+      setOverall(total ? Math.round((mastered / total) * 100) : 0)
       setLoading(false)
     }
     loadData()
@@ -78,7 +77,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#f8f6f1] flex items-center justify-center">
-        <p className="text-[#1a2e1e]">Loading your dashboard…</p>
+        <p className="text-sm text-[#6b7280]">Loading your dashboard…</p>
       </div>
     )
   }
@@ -88,22 +87,33 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout profile={profile}>
-      <div className="p-8 max-w-6xl mx-auto">
-        <header className="mb-10">
-          <p className="text-sm font-medium text-[#2D6A4F] uppercase tracking-wide mb-1">
-            Dashboard
-          </p>
-          <h1 className="text-3xl font-bold text-[#1a2e1e]">
-            Welcome back, {firstName} 👋
+      <div className="px-5 py-6 md:px-12 md:py-10 max-w-6xl mx-auto">
+        <header className="mb-8">
+          <h1 className="text-[28px] font-bold text-[#1a2e1e] mb-1">
+            {greeting()}, {firstName}
           </h1>
-          <p className="text-[#6b7280] mt-2">
-            Class of {profile.grad_year} · {profile.curriculum} · {subjects.length} subject{subjects.length !== 1 ? 's' : ''}
+          <p className="text-sm text-[#6b7280]">
+            {profile.curriculum} · Class of {profile.grad_year} · {subjects.length} subject{subjects.length !== 1 ? 's' : ''}
           </p>
         </header>
 
-        <section className="mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold text-[#1a2e1e]">Your Subjects</h2>
+        <div className="mb-10 flex items-center gap-4">
+          <div className="flex-1 h-2 bg-[#f3f4f6] rounded-full overflow-hidden">
+            <div
+              className="h-full bg-[#2D6A4F] rounded-full transition-all duration-500"
+              style={{ width: `${overall}%` }}
+            />
+          </div>
+          <span className="text-sm font-semibold text-[#2D6A4F] shrink-0">
+            {overall}% mastered
+          </span>
+        </div>
+
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-[13px] font-semibold uppercase tracking-[0.06em] text-[#9ca3af]">
+              Your Subjects
+            </h2>
             <Link
               href="/dashboard/subjects"
               className="text-sm font-medium text-[#2D6A4F] hover:underline"
@@ -112,7 +122,7 @@ export default function Dashboard() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {subjects.map((subject) => {
               const progressPercent = subjectStats[subject] ?? 0
               const targetGrade = profile.target_grades?.[subject] || '—'
@@ -121,21 +131,22 @@ export default function Dashboard() {
               return (
                 <div
                   key={subject}
-                  className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md hover:border-[#E8D5B0] transition-all group"
+                  className="bg-white rounded-xl p-5 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] hover:border-[#e0e0e0] transition-all flex flex-col"
                 >
-                  <div className="flex items-start justify-between gap-4 mb-5">
+                  <div className="flex items-start justify-between gap-3 mb-4">
                     <div className="min-w-0">
-                      <h3 className="font-semibold text-[#1a2e1e] text-lg leading-snug">{subject}</h3>
-                      <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-[#E8D5B0]/50 px-3 py-1">
-                        <span className="text-xs text-[#6b7280]">Target grade</span>
-                        <span className="text-sm font-bold text-[#1a2e1e]">{targetGrade}</span>
-                      </div>
+                      <h3 className="text-base font-semibold text-[#1a2e1e] leading-snug">
+                        {subject}
+                      </h3>
+                      <span className="inline-block mt-2 rounded-full bg-[#E8D5B0] px-2.5 py-0.5 text-xs font-medium text-[#1a2e1e]">
+                        Target grade {targetGrade}
+                      </span>
                     </div>
-                    <ProgressRing progress={progressPercent} />
+                    <ProgressRing progress={progressPercent} size={60} />
                   </div>
                   <Link
                     href={`/dashboard/syllabus/${slug}`}
-                    className="block w-full text-center py-3 bg-[#2D6A4F] text-white rounded-xl font-medium hover:bg-[#245a42] transition group-hover:shadow-sm"
+                    className="mt-auto block w-full text-center py-2.5 bg-[#2D6A4F] text-white rounded-lg text-sm font-medium hover:bg-[#245a42] transition-colors"
                   >
                     Open syllabus
                   </Link>
@@ -144,8 +155,6 @@ export default function Dashboard() {
             })}
           </div>
         </section>
-
-        <Heatmap items={heatmapItems} subjects={subjects} />
       </div>
     </DashboardLayout>
   )

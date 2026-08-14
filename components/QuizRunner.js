@@ -1,16 +1,9 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
-import {
-  gradeAnswer,
-  computeAccuracy,
-  buildProgressUpdate,
-  pickQuestions,
-  SUBTOPIC_QUESTION_COUNT,
-} from '@/lib/quiz'
-import { statusLabel } from '@/lib/quiz-status'
 
 const PHASE = {
   loading: 'loading',
@@ -20,19 +13,76 @@ const PHASE = {
   results: 'results',
 }
 
-export default function QuizRunner({ topicId, quizType = 'subtopic', backHref }) {
+const SUBTOPIC_COUNT = 10
+const MOCK_COUNT = 15
+const MISTAKES_COUNT = 15
+// Spaced-repetition intervals in days, indexed by consecutive correct reviews
+const REVIEW_INTERVALS = [1, 3, 7, 14, 30, 60]
+const DAY_MS = 24 * 60 * 60 * 1000
+
+function shuffle(list) {
+  const copy = [...list]
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[copy[i], copy[j]] = [copy[j], copy[i]]
+  }
+  return copy
+}
+
+function formatClock(totalSeconds) {
+  const s = Math.max(0, totalSeconds)
+  const m = Math.floor(s / 60)
+  return `${m}:${String(s % 60).padStart(2, '0')}`
+}
+
+function statusFromAccuracy(accuracy) {
+  if (accuracy >= 0.75) return 'mastered'
+  if (accuracy >= 0.5) return 'confident'
+  return 'in_progress'
+}
+
+function Skeleton() {
+  return (
+    <div className="bg-white rounded-xl p-6 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] animate-pulse space-y-4">
+      <div className="h-4 w-24 bg-[#f3f4f6] rounded" />
+      <div className="h-6 w-2/3 bg-[#f3f4f6] rounded" />
+      <div className="h-10 w-full bg-[#f3f4f6] rounded-lg" />
+      <div className="h-10 w-full bg-[#f3f4f6] rounded-lg" />
+      <div className="h-10 w-full bg-[#f3f4f6] rounded-lg" />
+    </div>
+  )
+}
+
+function Spinner() {
+  return (
+    <span
+      className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin align-middle"
+      aria-hidden="true"
+    />
+  )
+}
+
+export default function QuizRunner({ subject, topic, subtopic, mode = 'subtopic', backHref = '/dashboard' }) {
   const [phase, setPhase] = useState(PHASE.loading)
-  const [topic, setTopic] = useState(null)
-  const [allQuestions, setAllQuestions] = useState([])
+  const [emptyMessage, setEmptyMessage] = useState('')
   const [questions, setQuestions] = useState([])
+  const [mistakeRowsById, setMistakeRowsById] = useState({})
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState({})
   const [predictedScore, setPredictedScore] = useState('')
   const [results, setResults] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [userId, setUserId] = useState(null)
+  const [secondsLeft, setSecondsLeft] = useState(null)
   const router = useRouter()
   const supabase = createClient()
+
+  const timed = mode === 'mock'
+  const timeLimitRef = useRef(null)
+  const questionTimesRef = useRef({})
+  const lastSwitchRef = useRef(null)
+  const finishRef = useRef(null)
+  const answersRef = useRef({})
 
   useEffect(() => {
     async function load() {
@@ -43,187 +93,283 @@ export default function QuizRunner({ topicId, quizType = 'subtopic', backHref })
       }
       setUserId(user.id)
 
-      const { data: topicData } = await supabase
-        .from('topics')
-        .select('id, title, topic_type, subject_id')
-        .eq('id', topicId)
-        .single()
+      if (mode === 'mistakes') {
+        const { data: rows } = await supabase
+          .from('mistakes')
+          .select('*, questions(*)')
+          .eq('user_id', user.id)
+          .lte('next_review_at', new Date().toISOString())
+          .order('next_review_at', { ascending: true })
+          .limit(MISTAKES_COUNT)
 
-      if (!topicData) {
-        setPhase(PHASE.empty)
+        const withQuestions = (rows || []).filter((r) => r.questions)
+        if (!withQuestions.length) {
+          setEmptyMessage('No reviews due right now. Mistakes you make in quizzes will queue up here.')
+          setPhase(PHASE.empty)
+          return
+        }
+        setMistakeRowsById(
+          withQuestions.reduce((acc, r) => {
+            acc[r.question_id] = r
+            return acc
+          }, {})
+        )
+        setQuestions(shuffle(withQuestions.map((r) => r.questions)))
+        setPhase(PHASE.predict)
         return
       }
-      setTopic(topicData)
 
-      const { data: questionRows } = await supabase
+      let query = supabase
         .from('questions')
         .select('*')
-        .eq('topic_id', topicId)
+        .eq('subject', subject)
         .eq('verified', true)
+      if (mode === 'subtopic') query = query.eq('subtopic', subtopic)
+
+      const { data: questionRows } = await query
 
       if (!questionRows?.length) {
+        setEmptyMessage('We are still building the question bank for this area. Check back soon.')
         setPhase(PHASE.empty)
         return
       }
 
-      setAllQuestions(questionRows)
+      const picked = shuffle(questionRows).slice(
+        0,
+        mode === 'mock' ? MOCK_COUNT : SUBTOPIC_COUNT
+      )
+      setQuestions(picked)
       setPhase(PHASE.predict)
     }
     load()
-  }, [topicId, router, supabase])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subject, subtopic, mode])
 
-  const startQuiz = useCallback(() => {
-    const picked = pickQuestions(allQuestions, SUBTOPIC_QUESTION_COUNT)
-    setQuestions(picked)
+  const startQuiz = () => {
+    questionTimesRef.current = {}
+    lastSwitchRef.current = Date.now()
+    if (timed) {
+      const limit = questions.reduce((sum, q) => sum + (q.time_budget_seconds || 90), 0)
+      timeLimitRef.current = limit
+      setSecondsLeft(limit)
+    }
     setCurrentIndex(0)
     setAnswers({})
     setPhase(PHASE.quiz)
-  }, [allQuestions])
+  }
+
+  // Countdown for timed mocks — auto-submits at zero.
+  useEffect(() => {
+    if (phase !== PHASE.quiz || !timed) return
+    const interval = setInterval(() => {
+      setSecondsLeft((s) => {
+        if (s <= 1) {
+          clearInterval(interval)
+          finishRef.current?.()
+          return 0
+        }
+        return s - 1
+      })
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [phase, timed])
+
+  const commitTime = useCallback((questionId) => {
+    const now = Date.now()
+    if (lastSwitchRef.current != null && questionId) {
+      const elapsed = Math.round((now - lastSwitchRef.current) / 1000)
+      questionTimesRef.current[questionId] =
+        (questionTimesRef.current[questionId] || 0) + elapsed
+    }
+    lastSwitchRef.current = now
+  }, [])
+
+  const goTo = (nextIndex) => {
+    commitTime(questions[currentIndex]?.id)
+    setCurrentIndex(nextIndex)
+  }
 
   const selectAnswer = (questionId, optionId) => {
-    setAnswers((prev) => ({ ...prev, [questionId]: optionId }))
+    setAnswers((prev) => {
+      const next = { ...prev, [questionId]: optionId }
+      answersRef.current = next
+      return next
+    })
   }
 
-  const goNext = () => {
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex((i) => i + 1)
-    }
-  }
-
-  const goPrev = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex((i) => i - 1)
-    }
-  }
-
-  const finishQuiz = async () => {
+  const finishQuiz = useCallback(async () => {
     if (!userId || submitting) return
     setSubmitting(true)
+    commitTime(questions[currentIndex]?.id)
 
+    const currentAnswers = answersRef.current
     const graded = questions.map((q) => {
-      const selected = answers[q.id]
-      const correct = gradeAnswer(selected, q.correct_answer)
-      return { question: q, selected, correct }
+      const selected = currentAnswers[q.id] ?? null
+      const correct = selected != null && String(selected) === String(q.correct_answer)
+      return {
+        question: q,
+        selected,
+        correct,
+        timeSpent: questionTimesRef.current[q.id] || 0,
+      }
     })
 
     const score = graded.filter((g) => g.correct).length
     const total = questions.length
-    const accuracy = computeAccuracy(score, total)
+    const accuracy = total ? score / total : 0
+    const totalMarks = questions.reduce((sum, q) => sum + (q.marks || 1), 0)
+    const elapsed = timed
+      ? timeLimitRef.current - Math.max(0, secondsLeft ?? 0)
+      : graded.reduce((sum, g) => sum + g.timeSpent, 0)
     const prediction = predictedScore !== '' ? parseInt(predictedScore, 10) : null
 
-    const { data: attempt, error: attemptError } = await supabase
+    const { data: attempt } = await supabase
       .from('quiz_attempts')
       .insert({
         user_id: userId,
-        topic_id: topicId,
-        subject_id: topic.subject_id,
-        quiz_type: quizType,
+        subject: subject || null,
+        topic: topic || questions[0]?.topic || null,
+        subtopic: mode === 'subtopic' ? subtopic : null,
+        quiz_type: mode,
         predicted_score: prediction,
         score,
         total_questions: total,
+        total_marks: totalMarks,
         accuracy,
+        timed,
+        time_limit_seconds: timed ? timeLimitRef.current : null,
+        elapsed_seconds: elapsed,
         completed_at: new Date().toISOString(),
       })
       .select('id')
       .single()
 
-    if (attemptError || !attempt) {
-      setSubmitting(false)
-      return
+    if (attempt) {
+      await supabase.from('question_responses').insert(
+        graded.map((g) => ({
+          attempt_id: attempt.id,
+          question_id: g.question.id,
+          selected_answer: g.selected,
+          is_correct: g.correct,
+          time_spent_seconds: g.timeSpent,
+        }))
+      )
     }
 
-    const responses = graded.map((g) => ({
-      attempt_id: attempt.id,
-      question_id: g.question.id,
-      selected_answer: g.selected,
-      is_correct: g.correct,
-    }))
-    await supabase.from('question_responses').insert(responses)
-
-    const { data: existing } = await supabase
-      .from('user_topic_progress')
-      .select('attempt_count')
-      .eq('user_id', userId)
-      .eq('topic_id', topicId)
-      .maybeSingle()
-
-    const attemptCount = (existing?.attempt_count || 0) + 1
-    const progressUpdate = buildProgressUpdate({ accuracy, attemptCount })
-
-    await supabase.from('user_topic_progress').upsert({
-      user_id: userId,
-      topic_id: topicId,
-      ...progressUpdate,
-    })
-
-    const wrongAnswers = graded.filter((g) => !g.correct)
-    if (wrongAnswers.length) {
-      const mistakeRows = wrongAnswers.map((g) => ({
-        user_id: userId,
-        question_id: g.question.id,
-        attempt_id: attempt.id,
-        next_review_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      }))
-      await supabase.from('mistakes').upsert(mistakeRows, {
-        onConflict: 'user_id,question_id',
-        ignoreDuplicates: false,
-      })
+    if (mode === 'subtopic' && subject && subtopic) {
+      await supabase.from('progress').upsert(
+        {
+          user_id: userId,
+          subject,
+          topic: topic || questions[0]?.topic || '',
+          subtopic,
+          status: statusFromAccuracy(accuracy),
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id,subject,subtopic' }
+      )
     }
 
-    setResults({ score, total, accuracy, prediction, graded })
+    if (mode === 'mistakes') {
+      await Promise.all(
+        graded.map((g) => {
+          const row = mistakeRowsById[g.question.id]
+          if (!row) return null
+          const reviewCount = g.correct ? (row.review_count || 0) + 1 : 0
+          const intervalDays =
+            REVIEW_INTERVALS[Math.min(reviewCount, REVIEW_INTERVALS.length - 1)]
+          return supabase
+            .from('mistakes')
+            .update({
+              review_count: reviewCount,
+              next_review_at: new Date(Date.now() + intervalDays * DAY_MS).toISOString(),
+            })
+            .eq('id', row.id)
+        })
+      )
+    } else {
+      const wrong = graded.filter((g) => !g.correct)
+      if (wrong.length) {
+        await supabase.from('mistakes').upsert(
+          wrong.map((g) => ({
+            user_id: userId,
+            question_id: g.question.id,
+            attempt_id: attempt?.id || null,
+            subject: g.question.subject,
+            review_count: 0,
+            next_review_at: new Date(Date.now() + DAY_MS).toISOString(),
+          })),
+          { onConflict: 'user_id,question_id' }
+        )
+      }
+    }
+
+    setResults({ score, total, accuracy, prediction, graded, totalMarks, elapsed })
     setPhase(PHASE.results)
     setSubmitting(false)
-  }
+  }, [userId, submitting, questions, currentIndex, secondsLeft, predictedScore, mode, subject, topic, subtopic, timed, mistakeRowsById, commitTime, supabase])
 
-  if (phase === PHASE.loading) {
-    return <p className="text-text-muted text-sm py-12 text-center">Loading quiz…</p>
-  }
+  finishRef.current = finishQuiz
+
+  if (phase === PHASE.loading) return <Skeleton />
 
   if (phase === PHASE.empty) {
     return (
-      <div className="card card-pad text-center">
-        <p className="text-text font-semibold mb-2">Questions coming soon</p>
-        <p className="text-text-muted text-sm mb-6">
-          We&apos;re building the question bank for this subtopic. Check back soon.
-        </p>
-        {backHref && (
-          <Link href={backHref} className="btn-primary text-sm px-5 py-2.5">
-            Back to syllabus
-          </Link>
-        )}
+      <div className="bg-white rounded-xl p-10 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-center">
+        <h2 className="text-base font-semibold text-[#1a2e1e]">
+          {mode === 'mistakes' ? 'Nothing to review' : 'Questions coming soon'}
+        </h2>
+        <p className="text-sm text-[#6b7280] mt-2">{emptyMessage}</p>
+        <Link
+          href={backHref}
+          className="inline-block mt-6 px-5 py-2 bg-[#2D6A4F] text-white rounded-lg text-sm font-medium hover:bg-[#245a42] transition-colors"
+        >
+          Go back
+        </Link>
       </div>
     )
   }
 
   if (phase === PHASE.predict) {
+    const totalMinutes = timed
+      ? Math.round(questions.reduce((s, q) => s + (q.time_budget_seconds || 90), 0) / 60)
+      : null
     return (
-      <div className="card card-pad">
-        <p className="section-label mb-2">Mini-quiz</p>
-        <h1 className="text-xl font-bold text-text mb-2">{topic?.title}</h1>
-        <p className="text-text-muted text-sm mb-6">
-          {Math.min(allQuestions.length, SUBTOPIC_QUESTION_COUNT)} questions · auto-graded
+      <div className="bg-white rounded-xl p-6 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <p className="text-[13px] font-semibold uppercase tracking-[0.06em] text-[#9ca3af] mb-2">
+          {mode === 'mock' ? 'Timed Mock' : mode === 'mistakes' ? 'Mistake Review' : 'Mini-Quiz'}
+        </p>
+        <h1 className="text-xl font-bold text-[#1a2e1e] mb-1">
+          {mode === 'mistakes' ? 'Your past mistakes' : subtopic || subject}
+        </h1>
+        <p className="text-sm text-[#6b7280] mb-6">
+          {questions.length} question{questions.length !== 1 ? 's' : ''} · auto-graded
+          {timed ? ` · ${totalMinutes} min limit` : ''}
         </p>
 
-        <div className="mb-6 p-4 rounded-[var(--radius-sm)] border border-border bg-bg-subtle">
-          <label className="block text-sm font-medium text-text mb-2">
-            How many do you think you&apos;ll get right? (optional)
+        <div className="mb-6 p-4 rounded-lg border border-[#f0f0f0] bg-[#f9fafb]">
+          <label className="block text-sm font-medium text-[#1a2e1e] mb-2">
+            How many will you get right? (optional)
           </label>
           <input
             type="number"
             min={0}
-            max={SUBTOPIC_QUESTION_COUNT}
+            max={questions.length}
             value={predictedScore}
             onChange={(e) => setPredictedScore(e.target.value)}
-            placeholder={`0–${SUBTOPIC_QUESTION_COUNT}`}
-            className="w-full px-3 py-2 rounded-[var(--radius-sm)] border border-border bg-bg-elevated text-sm"
+            placeholder={`0–${questions.length}`}
+            className="w-full px-3 py-2 rounded-lg border border-[#e5e7eb] bg-white text-sm outline-none focus:border-[#2D6A4F]"
           />
-          <p className="text-text-faint text-xs mt-2">
-            This helps track your confidence calibration over time.
+          <p className="text-xs text-[#9ca3af] mt-2">
+            Tracks your confidence calibration over time.
           </p>
         </div>
 
-        <button onClick={startQuiz} className="btn-primary w-full py-3">
-          Start quiz
+        <button
+          onClick={startQuiz}
+          className="w-full py-2.5 bg-[#2D6A4F] text-white rounded-lg text-sm font-medium hover:bg-[#245a42] transition-colors"
+        >
+          {timed ? 'Start timed mock' : 'Start quiz'}
         </button>
       </div>
     )
@@ -233,72 +379,88 @@ export default function QuizRunner({ topicId, quizType = 'subtopic', backHref })
     const q = questions[currentIndex]
     const options = q.options || []
     const selected = answers[q.id]
-    const allAnswered = questions.every((question) => answers[question.id] != null)
+    const answeredCount = questions.filter((question) => answers[question.id] != null).length
+
+    let paceBlock = null
+    if (timed && secondsLeft != null) {
+      const totalMarks = questions.reduce((s, x) => s + (x.marks || 1), 0)
+      const requiredPace = totalMarks / (timeLimitRef.current / 60)
+      const elapsedSec = timeLimitRef.current - secondsLeft
+      const marksAnswered = questions
+        .filter((x) => answers[x.id] != null)
+        .reduce((s, x) => s + (x.marks || 1), 0)
+      const actualPace = elapsedSec >= 30 ? marksAnswered / (elapsedSec / 60) : null
+      const behind = actualPace != null && actualPace < requiredPace
+      paceBlock = (
+        <div className="flex items-center justify-between mb-4 px-4 py-2 rounded-lg bg-[#f9fafb] border border-[#f0f0f0] text-sm">
+          <span className={`font-semibold tabular-nums ${secondsLeft < 60 ? 'text-[#dc2626]' : 'text-[#1a2e1e]'}`}>
+            {formatClock(secondsLeft)} left
+          </span>
+          <span className={behind ? 'text-[#d97706] font-medium' : 'text-[#6b7280]'}>
+            {actualPace != null
+              ? `Pace ${actualPace.toFixed(1)} marks/min · target ${requiredPace.toFixed(1)}`
+              : `Target pace ${requiredPace.toFixed(1)} marks/min`}
+            {behind ? ' · behind' : ''}
+          </span>
+        </div>
+      )
+    }
 
     return (
-      <div className="card card-pad">
+      <div className="bg-white rounded-xl p-6 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        {paceBlock}
+
         <div className="flex items-center justify-between mb-4">
-          <p className="text-text-muted text-sm">
+          <p className="text-sm text-[#6b7280]">
             Question {currentIndex + 1} of {questions.length}
           </p>
-          <div className="flex gap-1">
-            {questions.map((_, i) => (
-              <div
-                key={i}
-                className="w-2 h-2 rounded-full"
-                style={{
-                  background: answers[questions[i].id] != null
-                    ? 'var(--accent)'
-                    : i === currentIndex
-                      ? 'var(--border-strong)'
-                      : 'var(--border)',
-                }}
-              />
-            ))}
-          </div>
+          <p className="text-xs text-[#9ca3af]">
+            {q.marks || 1} mark{(q.marks || 1) !== 1 ? 's' : ''} · {answeredCount}/{questions.length} answered
+          </p>
         </div>
 
-        <p className="text-text font-medium mb-6 leading-relaxed">{q.stem}</p>
+        <p className="text-sm text-[#1a2e1e] font-medium mb-6 leading-relaxed">{q.stem}</p>
 
         <div className="space-y-2 mb-6">
           {options.map((opt) => (
             <button
               key={opt.id}
               onClick={() => selectAnswer(q.id, opt.id)}
-              className="w-full text-left p-3 rounded-[var(--radius-sm)] border transition-all text-sm"
-              style={{
-                borderColor: selected === opt.id ? 'var(--accent)' : 'var(--border)',
-                background: selected === opt.id ? 'var(--accent-soft)' : 'var(--bg-subtle)',
-              }}
+              className={`w-full text-left px-4 py-3 rounded-lg border text-sm transition-colors duration-150 ${
+                selected === opt.id
+                  ? 'border-[#2D6A4F] bg-[#f0fdf4] text-[#1a2e1e]'
+                  : 'border-[#e5e7eb] bg-white text-[#374151] hover:border-[#d1d5db]'
+              }`}
             >
               {opt.text}
             </button>
           ))}
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <button
-            onClick={goPrev}
+            onClick={() => goTo(currentIndex - 1)}
             disabled={currentIndex === 0}
-            className="btn-ghost flex-1 py-2.5 disabled:opacity-40"
+            className="flex-1 py-2.5 rounded-lg border border-[#e5e7eb] text-sm font-medium text-[#374151] hover:bg-[#f9fafb] transition-colors disabled:opacity-40"
           >
             Back
           </button>
           {currentIndex < questions.length - 1 ? (
             <button
-              onClick={goNext}
+              onClick={() => goTo(currentIndex + 1)}
               disabled={selected == null}
-              className="btn-primary flex-1 py-2.5 disabled:opacity-40"
+              className="flex-1 py-2.5 rounded-lg bg-[#2D6A4F] text-white text-sm font-medium hover:bg-[#245a42] transition-colors disabled:opacity-40"
             >
               Next
             </button>
           ) : (
             <button
               onClick={finishQuiz}
-              disabled={!allAnswered || submitting}
-              className="btn-primary flex-1 py-2.5 disabled:opacity-40"
+              disabled={(!timed && answeredCount < questions.length) || submitting}
+              className="flex-1 py-2.5 rounded-lg bg-[#2D6A4F] text-white text-sm font-medium hover:bg-[#245a42] transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
             >
-              {submitting ? 'Submitting…' : 'Finish'}
+              {submitting ? <Spinner /> : null}
+              {submitting ? 'Submitting' : 'Finish'}
             </button>
           )}
         </div>
@@ -308,50 +470,94 @@ export default function QuizRunner({ topicId, quizType = 'subtopic', backHref })
 
   if (phase === PHASE.results && results) {
     const pct = Math.round(results.accuracy * 100)
-    const status = statusLabel(
-      results.accuracy < 0.5 ? 'weak' : results.accuracy < 0.75 ? 'shaky' : 'solid'
+    const overBudget = results.graded.filter(
+      (g) => g.timeSpent > (g.question.time_budget_seconds || 90)
     )
 
     return (
-      <div className="card card-pad">
-        <p className="section-label mb-2">Quiz complete</p>
-        <h1 className="text-3xl font-extrabold text-text mb-1">
+      <div className="bg-white rounded-xl p-6 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <p className="text-[13px] font-semibold uppercase tracking-[0.06em] text-[#9ca3af] mb-2">
+          Quiz Complete
+        </p>
+        <h1 className="text-[32px] font-bold text-[#2D6A4F] leading-tight">
           {results.score}/{results.total}
         </h1>
-        <p className="text-text-muted text-sm mb-1">{pct}% accuracy · {status}</p>
+        <p className="text-sm text-[#6b7280] mt-1">{pct}% accuracy</p>
         {results.prediction != null && (
-          <p className="text-text-faint text-xs mb-6">
-            You predicted {results.prediction} — actual: {results.score}
+          <p className="text-xs text-[#9ca3af] mt-1">
+            You predicted {results.prediction} — {results.prediction > results.score
+              ? 'slightly overconfident this time'
+              : results.prediction < results.score
+                ? 'you underestimated yourself'
+                : 'perfectly calibrated'}
           </p>
         )}
 
-        <div className="space-y-3 mb-6">
-          {results.graded.map((g, i) => (
-            <div
-              key={g.question.id}
-              className="p-3 rounded-[var(--radius-sm)] border border-border bg-bg-subtle"
-            >
-              <div className="flex items-start gap-2 mb-1">
-                <span
-                  className="text-xs font-bold mt-0.5"
-                  style={{ color: g.correct ? 'var(--solid)' : 'var(--weak)' }}
-                >
-                  {g.correct ? '✓' : '✗'}
-                </span>
-                <p className="text-sm text-text">{g.question.stem}</p>
+        {timed && (
+          <div className="mt-5 p-4 rounded-lg border border-[#f0f0f0] bg-[#f9fafb]">
+            <p className="text-sm font-semibold text-[#1a2e1e] mb-1">Pacing</p>
+            <p className="text-sm text-[#6b7280]">
+              Finished in {formatClock(results.elapsed)} of {formatClock(timeLimitRef.current)} ·{' '}
+              {(results.totalMarks / (timeLimitRef.current / 60)).toFixed(1)} marks/min required
+            </p>
+            {overBudget.length > 0 ? (
+              <p className="text-sm text-[#d97706] mt-1">
+                Pacing penalty: {overBudget.length} question{overBudget.length !== 1 ? 's' : ''} went
+                over the exam time budget.
+              </p>
+            ) : (
+              <p className="text-sm text-[#16a34a] mt-1">
+                All questions inside the exam time budget.
+              </p>
+            )}
+          </div>
+        )}
+
+        <div className="mt-5 space-y-2">
+          {results.graded.map((g) => {
+            const budget = g.question.time_budget_seconds || 90
+            const slow = g.timeSpent > budget
+            return (
+              <div
+                key={g.question.id}
+                className="p-4 rounded-lg border border-[#f0f0f0] bg-[#f9fafb]"
+              >
+                <div className="flex items-start gap-2">
+                  <span
+                    className={`text-xs font-bold mt-0.5 ${g.correct ? 'text-[#16a34a]' : 'text-[#dc2626]'}`}
+                    aria-label={g.correct ? 'Correct' : 'Incorrect'}
+                  >
+                    {g.correct ? '✓' : '✗'}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm text-[#1a2e1e]">{g.question.stem}</p>
+                    {!g.correct && g.question.explanation && (
+                      <p className="text-xs text-[#6b7280] mt-1">{g.question.explanation}</p>
+                    )}
+                    <p className={`text-xs mt-1 ${slow && timed ? 'text-[#d97706]' : 'text-[#9ca3af]'}`}>
+                      {g.timeSpent}s spent · {budget}s budget{slow && timed ? ' · over budget' : ''}
+                    </p>
+                  </div>
+                </div>
               </div>
-              {!g.correct && g.question.explanation && (
-                <p className="text-xs text-text-muted ml-5">{g.question.explanation}</p>
-              )}
-            </div>
-          ))}
+            )
+          })}
         </div>
 
-        {backHref && (
-          <Link href={backHref} className="btn-primary w-full py-3 text-center block">
-            Back to syllabus
+        <div className="mt-6 flex gap-2">
+          <Link
+            href={backHref}
+            className="flex-1 text-center py-2.5 rounded-lg border border-[#e5e7eb] text-sm font-medium text-[#374151] hover:bg-[#f9fafb] transition-colors"
+          >
+            Done
           </Link>
-        )}
+          <Link
+            href="/dashboard/mistakes"
+            className="flex-1 text-center py-2.5 rounded-lg bg-[#2D6A4F] text-white text-sm font-medium hover:bg-[#245a42] transition-colors"
+          >
+            Open Mistake Bank
+          </Link>
+        </div>
       </div>
     )
   }

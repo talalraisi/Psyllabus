@@ -6,11 +6,14 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import { getSlugForSubject } from '@/lib/subject-map'
-import { buildProgressMap, STATUS_LABELS } from '@/lib/progress'
+import { progressKey, topicSortKey, STATUS_LABELS } from '@/lib/progress'
+import { buildEffectiveProgressMap } from '@/lib/decay'
+
+const QUEUE_PRIORITY = { decaying: 0, in_progress: 1, not_started: 2 }
 
 export default function StudyPlanPage() {
   const [profile, setProfile] = useState(null)
-  const [recommendations, setRecommendations] = useState([])
+  const [groups, setGroups] = useState([])
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const supabase = createClient()
@@ -44,19 +47,31 @@ export default function StudyPlanPage() {
         supabase.from('progress').select('*').eq('user_id', user.id),
       ])
 
-      const progressMap = buildProgressMap(progressRows)
-      const priority = { not_started: 0, in_progress: 1, confident: 2, mastered: 3 }
+      const progressMap = buildEffectiveProgressMap(progressRows)
 
-      const items = (syllabusRows || [])
+      const todo = (syllabusRows || [])
         .map((row) => ({
           ...row,
-          status: progressMap[`${row.subject}::${row.subtopic}`] || 'not_started',
+          status: progressMap[progressKey(row.subject, row.subtopic)] || 'not_started',
         }))
-        .filter((row) => row.status !== 'mastered')
-        .sort((a, b) => priority[a.status] - priority[b.status])
-        .slice(0, 12)
+        .filter((row) => row.status in QUEUE_PRIORITY)
 
-      setRecommendations(items)
+      const grouped = subjects
+        .map((subject) => ({
+          subject,
+          items: todo
+            .filter((row) => row.subject === subject)
+            .sort((a, b) => {
+              const pi = QUEUE_PRIORITY[a.status] - QUEUE_PRIORITY[b.status]
+              if (pi !== 0) return pi
+              const ti = topicSortKey(a.topic) - topicSortKey(b.topic)
+              if (ti !== 0) return ti
+              return a.subtopic.localeCompare(b.subtopic)
+            }),
+        }))
+        .filter((g) => g.items.length > 0)
+
+      setGroups(grouped)
       setLoading(false)
     }
     loadData()
@@ -65,56 +80,65 @@ export default function StudyPlanPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#f8f6f1] flex items-center justify-center">
-        <p className="text-[#1a2e1e]">Building your study plan…</p>
+        <p className="text-sm text-[#6b7280]">Building your study plan…</p>
       </div>
     )
   }
 
   return (
     <DashboardLayout profile={profile}>
-      <div className="p-8 max-w-4xl mx-auto">
-        <header className="mb-10">
-          <p className="text-sm font-medium text-[#2D6A4F] uppercase tracking-wide mb-1">
-            Study Plan
-          </p>
-          <h1 className="text-3xl font-bold text-[#1a2e1e]">What to study today</h1>
-          <p className="text-[#6b7280] mt-2">
-            Subtopics that need attention — not started and in progress come first
+      <div className="px-5 py-6 md:px-12 md:py-10 max-w-4xl mx-auto">
+        <header className="mb-8">
+          <h1 className="text-[28px] font-bold text-[#1a2e1e] mb-1">Study Plan</h1>
+          <p className="text-sm text-[#6b7280]">
+            Decaying skills first, then in progress, then not started
           </p>
         </header>
 
-        {recommendations.length === 0 ? (
-          <div className="bg-white rounded-xl p-10 shadow-sm border border-gray-100 text-center">
-            <p className="text-4xl mb-4">🎉</p>
-            <h2 className="text-xl font-bold text-[#1a2e1e]">All caught up!</h2>
-            <p className="text-[#6b7280] mt-2">
-              Every subtopic is marked mastered. Keep reviewing to stay sharp.
+        {groups.length === 0 ? (
+          <div className="bg-white rounded-xl p-10 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-center">
+            <h2 className="text-base font-semibold text-[#1a2e1e]">All caught up</h2>
+            <p className="text-sm text-[#6b7280] mt-2">
+              Nothing left to start — keep reviewing to stay sharp.
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {recommendations.map((item, idx) => (
-              <div
-                key={item.id}
-                className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center gap-4"
-              >
-                <span className="w-8 h-8 rounded-full bg-[#E8D5B0] flex items-center justify-center text-sm font-bold text-[#1a2e1e] shrink-0">
-                  {idx + 1}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs text-[#6b7280]">{item.subject} · {item.topic}</p>
-                  <p className="font-medium text-[#1a2e1e] truncate">{item.subtopic}</p>
+          <div className="space-y-8">
+            {groups.map(({ subject, items }) => (
+              <section key={subject}>
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-[13px] font-semibold uppercase tracking-[0.06em] text-[#9ca3af]">
+                    {subject}
+                  </h2>
+                  <Link
+                    href={`/dashboard/syllabus/${getSlugForSubject(subject)}`}
+                    className="text-sm font-medium text-[#2D6A4F] hover:underline"
+                  >
+                    Open syllabus →
+                  </Link>
                 </div>
-                <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-[#f8f6f1] text-[#6b7280] shrink-0">
-                  {STATUS_LABELS[item.status]}
-                </span>
-                <Link
-                  href={`/dashboard/syllabus/${getSlugForSubject(item.subject)}`}
-                  className="text-sm font-medium text-[#2D6A4F] hover:underline shrink-0"
-                >
-                  Go →
-                </Link>
-              </div>
+                <div className="bg-white rounded-xl border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] divide-y divide-[#f3f4f6]">
+                  {items.map((item) => (
+                    <div key={item.id} className="px-5 py-3 flex items-center gap-4">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-[#9ca3af]">{item.topic}</p>
+                        <p className="text-sm text-[#374151] truncate">{item.subtopic}</p>
+                      </div>
+                      <span
+                        className={`shrink-0 text-xs font-medium px-2.5 py-1 rounded-full ${
+                          item.status === 'decaying'
+                            ? 'bg-[#f59e0b] text-white'
+                            : item.status === 'in_progress'
+                              ? 'bg-[#fef3c7] text-[#d97706]'
+                              : 'bg-[#f3f4f6] text-[#6b7280]'
+                        }`}
+                      >
+                        {STATUS_LABELS[item.status]}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </section>
             ))}
           </div>
         )}
