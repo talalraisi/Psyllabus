@@ -10,7 +10,7 @@ const CURRICULUMS = {
   'IB': {
     groups: [
       {
-        name: 'Group 1 — Language A',
+        name: 'Group 1: Language A',
         required: 1,
         subjects: [
           'English A: Literature HL', 'English A: Literature SL',
@@ -21,7 +21,7 @@ const CURRICULUMS = {
         ]
       },
       {
-        name: 'Group 2 — Language Acquisition',
+        name: 'Group 2: Language Acquisition',
         required: 1,
         subjects: [
           'English B HL', 'English B SL',
@@ -32,7 +32,7 @@ const CURRICULUMS = {
         ]
       },
       {
-        name: 'Group 3 — Individuals & Societies',
+        name: 'Group 3: Individuals & Societies',
         required: 1,
         subjects: [
           'Economics HL', 'Economics SL',
@@ -46,7 +46,7 @@ const CURRICULUMS = {
         ]
       },
       {
-        name: 'Group 4 — Sciences',
+        name: 'Group 4: Sciences',
         required: 1,
         subjects: [
           'Biology HL', 'Biology SL',
@@ -59,7 +59,7 @@ const CURRICULUMS = {
         ]
       },
       {
-        name: 'Group 5 — Mathematics',
+        name: 'Group 5: Mathematics',
         required: 1,
         subjects: [
           'Math Analysis & Approaches HL',
@@ -69,7 +69,7 @@ const CURRICULUMS = {
         ]
       },
       {
-        name: 'Group 6 — The Arts',
+        name: 'Group 6: The Arts',
         required: 0,
         subjects: [
           'Visual Arts HL', 'Visual Arts SL',
@@ -466,7 +466,7 @@ export default function Onboarding() {
               Set your target grades
             </h1>
             <p className="text-text-muted text-sm mb-8">
-              What are you aiming for? Be ambitious — the planner adjusts to your goals.
+              What are you aiming for? Be ambitious. The planner adjusts to your goals.
             </p>
 
             <div className="space-y-4 mb-8 max-h-96 overflow-y-auto pr-1">

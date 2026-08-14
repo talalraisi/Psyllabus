@@ -30,7 +30,7 @@ export const metadata = {
   keywords: ['IB', 'A-Level', 'AP', 'syllabus', 'study planner', 'exam prep'],
   authors: [{ name: 'Talal Al-Raisi' }],
   openGraph: {
-    title: 'PSyllabus — Know exactly what to study next',
+    title: 'PSyllabus: Know exactly what to study next',
     description:
       'Syllabus-mapped progress tracking for IB, A-Level, and AP students.',
     siteName: 'PSyllabus',

@@ -485,7 +485,7 @@ export default function QuizRunner({ subject, topic, subtopic, mode = 'subtopic'
         <p className="text-sm text-[#6b7280] mt-1">{pct}% accuracy</p>
         {results.prediction != null && (
           <p className="text-xs text-[#9ca3af] mt-1">
-            You predicted {results.prediction} — {results.prediction > results.score
+            You predicted {results.prediction}: {results.prediction > results.score
               ? 'slightly overconfident this time'
               : results.prediction < results.score
                 ? 'you underestimated yourself'

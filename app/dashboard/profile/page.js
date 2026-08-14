@@ -75,7 +75,7 @@ export default function Profile() {
     if (uploadError) {
       setError(
         uploadError.message.includes('Bucket not found')
-          ? 'Photo storage is not set up yet — run scripts/005-avatars.sql in Supabase first.'
+          ? 'Photo storage is not set up yet. Run scripts/005-avatars.sql in Supabase first.'
           : uploadError.message
       )
       setUploading(false)

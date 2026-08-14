@@ -91,7 +91,7 @@ export default function StudyPlanPage() {
         <header className="mb-8">
           <h1 className="text-[28px] font-bold text-[#1a2e1e] mb-1">Study Plan</h1>
           <p className="text-sm text-[#6b7280]">
-            Decaying skills first, then in progress, then not started
+            Decaying skills first, then weak, then untested
           </p>
         </header>
 
@@ -99,7 +99,7 @@ export default function StudyPlanPage() {
           <div className="bg-white rounded-xl p-10 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-center">
             <h2 className="text-base font-semibold text-[#1a2e1e]">All caught up</h2>
             <p className="text-sm text-[#6b7280] mt-2">
-              Nothing left to start — keep reviewing to stay sharp.
+              Nothing left to start. Keep reviewing to stay sharp.
             </p>
           </div>
         ) : (
@@ -129,7 +129,7 @@ export default function StudyPlanPage() {
                           item.status === 'decaying'
                             ? 'bg-[#f59e0b] text-white'
                             : item.status === 'in_progress'
-                              ? 'bg-[#fef3c7] text-[#d97706]'
+                              ? 'bg-[#fef2f2] text-[#dc2626]'
                               : 'bg-[#f3f4f6] text-[#6b7280]'
                         }`}
                       >

@@ -88,8 +88,8 @@ export default function MistakeBankPage() {
         <header className="mb-8">
           <h1 className="text-[28px] font-bold text-[#1a2e1e] mb-1">Mistake Bank</h1>
           <p className="text-sm text-[#6b7280]">
-            Every wrong answer becomes a spaced-repetition review — drill your own failures, not
-            generic flashcards
+            Every wrong answer becomes a spaced-repetition review, so you drill your own
+            failures instead of generic flashcards
           </p>
         </header>
 
@@ -113,7 +113,7 @@ export default function MistakeBankPage() {
           </Link>
         ) : mistakes.length > 0 ? (
           <p className="mb-10 text-sm text-[#6b7280]">
-            Nothing due right now — your next review unlocks automatically.
+            Nothing due right now. Your next review unlocks automatically.
           </p>
         ) : null}
 
@@ -121,7 +121,7 @@ export default function MistakeBankPage() {
           <div className="bg-white rounded-xl p-10 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-center">
             <h2 className="text-base font-semibold text-[#1a2e1e]">No mistakes logged yet</h2>
             <p className="text-sm text-[#6b7280] mt-2">
-              Take a quiz from any syllabus subtopic — wrong answers land here automatically.
+              Take a quiz from any syllabus subtopic and wrong answers land here automatically.
             </p>
           </div>
         ) : (

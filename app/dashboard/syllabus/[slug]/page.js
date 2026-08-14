@@ -8,9 +8,9 @@ import DashboardLayout from '@/components/DashboardLayout'
 import ResourceHubDrawer from '@/components/ResourceHubDrawer'
 import { resolveOnboardingNameFromSlug } from '@/lib/subject-map'
 import {
-  STATUS_PILL_ACTIVE,
+  STATUS_COLORS,
   STATUS_LABELS,
-  STATUS_VALUES,
+  STATUS_TEXT_COLORS,
   buildProgressMap,
   computeCompletionPercent,
   progressKey,
@@ -29,7 +29,6 @@ export default function SyllabusPage() {
   const [progress, setProgress] = useState({})
   const [loading, setLoading] = useState(true)
   const [expandedTopics, setExpandedTopics] = useState({})
-  const [saving, setSaving] = useState(null)
   const [progressDetail, setProgressDetail] = useState({})
   const [hasQuestions, setHasQuestions] = useState(false)
   const [drawerItem, setDrawerItem] = useState(null)
@@ -95,34 +94,6 @@ export default function SyllabusPage() {
 
   const toggleTopic = (topic) => {
     setExpandedTopics((prev) => ({ ...prev, [topic]: !prev[topic] }))
-  }
-
-  const updateStatus = async (topic, subtopic, newStatus) => {
-    const key = progressKey(subjectName, subtopic)
-    setSaving(key)
-
-    const { data: { user } } = await supabase.auth.getUser()
-
-    const { error } = await supabase.from('progress').upsert(
-      {
-        user_id: user.id,
-        subject: subjectName,
-        topic,
-        subtopic,
-        status: newStatus,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'user_id,subject,subtopic' }
-    )
-
-    if (!error) {
-      setProgress((prev) => ({ ...prev, [key]: newStatus }))
-      setProgressDetail((prev) => ({
-        ...prev,
-        [key]: { status: newStatus, updatedAt: new Date().toISOString() },
-      }))
-    }
-    setSaving(null)
   }
 
   if (loading) {
@@ -226,8 +197,12 @@ export default function SyllabusPage() {
                     <div className="divide-y divide-[#f3f4f6]">
                       {subtopics.map((item) => {
                         const key = progressKey(subjectName, item.subtopic)
-                        const currentStatus = progress[key] || 'not_started'
-                        const isSaving = saving === key
+                        const currentStatus = isDecayed(
+                          progressDetail[key]?.status,
+                          progressDetail[key]?.updatedAt
+                        )
+                          ? 'decaying'
+                          : progress[key] || 'not_started'
 
                         return (
                           <div
@@ -242,40 +217,30 @@ export default function SyllabusPage() {
                               >
                                 {item.subtopic}
                               </button>
-                              <div className="flex flex-wrap gap-1.5 mt-1">
-                                {item.hl_only && (
-                                  <span className="rounded-full bg-[#E8D5B0] px-2 py-0.5 text-[11px] font-medium text-[#1a2e1e]">
-                                    HL only
-                                  </span>
-                                )}
-                                {isDecayed(
-                                  progressDetail[key]?.status,
-                                  progressDetail[key]?.updatedAt
-                                ) && (
-                                  <span
-                                    className="rounded-full bg-[#f59e0b] px-2 py-0.5 text-[11px] font-medium text-white"
-                                    title={`Mastered ${daysSince(progressDetail[key]?.updatedAt)} days ago — retest within ${DECAY_DAYS}-day window to keep it green`}
-                                  >
-                                    Decaying
-                                  </span>
-                                )}
-                              </div>
+                              {item.hl_only && (
+                                <span className="inline-block mt-1 rounded-full bg-[#E8D5B0] px-2 py-0.5 text-[11px] font-medium text-[#1a2e1e]">
+                                  HL only
+                                </span>
+                              )}
                             </div>
-                            <div className="flex flex-wrap gap-1.5 shrink-0">
-                              {STATUS_VALUES.map((status) => (
-                                <button
-                                  key={status}
-                                  disabled={isSaving}
-                                  onClick={() => updateStatus(item.topic, item.subtopic, status)}
-                                  className={`px-3 py-1 rounded-full text-xs font-medium transition-colors duration-150 ${
-                                    currentStatus === status
-                                      ? STATUS_PILL_ACTIVE[status]
-                                      : 'bg-white text-[#9ca3af] border border-[#e5e7eb] hover:border-[#d1d5db]'
-                                  } ${isSaving ? 'opacity-50' : ''}`}
-                                >
-                                  {STATUS_LABELS[status]}
-                                </button>
-                              ))}
+                            <div className="flex items-center gap-3 shrink-0">
+                              <span
+                                className={`flex items-center gap-1.5 text-xs font-medium ${STATUS_TEXT_COLORS[currentStatus]}`}
+                                title={
+                                  currentStatus === 'decaying'
+                                    ? `Mastered ${daysSince(progressDetail[key]?.updatedAt)} days ago. Retest within the ${DECAY_DAYS}-day window to keep it green.`
+                                    : 'Status is set by quiz results only'
+                                }
+                              >
+                                <span className={`w-2.5 h-2.5 rounded-full ${STATUS_COLORS[currentStatus]}`} />
+                                {STATUS_LABELS[currentStatus]}
+                              </span>
+                              <Link
+                                href={`/dashboard/quiz?subject=${encodeURIComponent(subjectName)}&topic=${encodeURIComponent(item.topic)}&subtopic=${encodeURIComponent(item.subtopic)}&back=${encodeURIComponent(slugPath)}`}
+                                className="text-xs font-medium px-3 py-1.5 rounded-lg border border-[#2D6A4F] text-[#2D6A4F] hover:bg-[#f0fdf4] transition-colors"
+                              >
+                                Practice quiz
+                              </Link>
                             </div>
                           </div>
                         )

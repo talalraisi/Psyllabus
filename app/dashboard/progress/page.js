@@ -12,8 +12,8 @@ const STAT_CARDS = [
   { key: 'total', label: 'Total tracked', color: 'text-[#1a2e1e]' },
   { key: 'mastered', label: 'Mastered', color: 'text-[#2D6A4F]' },
   { key: 'decaying', label: 'Decaying', color: 'text-[#f59e0b]' },
-  { key: 'confident', label: 'Confident', color: 'text-[#16a34a]' },
-  { key: 'inProgress', label: 'In progress', color: 'text-[#d97706]' },
+  { key: 'confident', label: 'Shaky', color: 'text-[#d97706]' },
+  { key: 'inProgress', label: 'Weak', color: 'text-[#dc2626]' },
 ]
 
 export default function ProgressPage() {

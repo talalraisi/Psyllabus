@@ -71,7 +71,7 @@ export default function Heatmap({ items, subjects }) {
                   <div
                     key={item.id || `${item.topic}-${item.subtopic}`}
                     className={`w-3.5 h-3.5 rounded-[3px] ${STATUS_COLORS[item.status] || STATUS_COLORS.not_started} transition-colors`}
-                    title={`${item.subtopic} — ${STATUS_LABELS[item.status] || 'Not Started'}`}
+                    title={`${item.subtopic}: ${STATUS_LABELS[item.status] || 'Untested'}`}
                   />
                 ))}
               </div>
