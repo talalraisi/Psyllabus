@@ -22,8 +22,11 @@ export default function Profile() {
 
   useEffect(() => {
     async function loadProfile() {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
+      // Defensive: an expired or partially-restored session can return a null
+      // data payload, which would throw on destructuring.
+      const auth = await supabase.auth.getUser().catch(() => null)
+      const user = auth?.data?.user
+      if (!user?.id) {
         router.push('/login')
         return
       }
@@ -39,7 +42,7 @@ export default function Profile() {
         return
       }
 
-      setProfile({ ...data, email: user.email })
+      setProfile({ ...data, id: data.id || user.id, email: user.email })
       setFullName(data.full_name || '')
       setAvatarUrl(data.avatar_url || '')
       setLoading(false)
@@ -121,7 +124,7 @@ export default function Profile() {
     setSaving(false)
   }
 
-  if (loading) {
+  if (loading || !profile) {
     return (
       <div className="min-h-screen bg-[#f8f6f1] flex items-center justify-center">
         <p className="text-sm text-[#6b7280]">Loading profile…</p>
@@ -129,7 +132,9 @@ export default function Profile() {
     )
   }
 
-  const initial = (profile.full_name || profile.email || 'S')[0].toUpperCase()
+  const initial = String(profile.full_name || profile.email || 'S')
+    .charAt(0)
+    .toUpperCase()
 
   return (
     <DashboardLayout profile={profile}>

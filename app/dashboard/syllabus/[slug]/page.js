@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
+import { getCurrentUser } from '@/lib/auth'
 import DashboardLayout from '@/components/DashboardLayout'
 import ResourceHubDrawer from '@/components/ResourceHubDrawer'
 import { resolveOnboardingNameFromSlug } from '@/lib/subject-map'
@@ -35,7 +36,7 @@ export default function SyllabusPage() {
 
   useEffect(() => {
     async function loadData() {
-      const { data: { user } } = await supabase.auth.getUser()
+      const user = await getCurrentUser(supabase)
       if (!user) {
         router.push('/login')
         return

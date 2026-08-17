@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
+import { getCurrentUser } from '@/lib/auth'
 
 const PHASE = {
   loading: 'loading',
@@ -95,7 +96,7 @@ export default function QuizRunner({
 
   useEffect(() => {
     async function load() {
-      const { data: { user } } = await supabase.auth.getUser()
+      const user = await getCurrentUser(supabase)
       if (!user) {
         router.push('/login')
         return
@@ -148,7 +149,29 @@ export default function QuizRunner({
 
       const target =
         count || (mode === 'mock' ? MOCK_COUNT : mode === 'topic' ? 15 : SUBTOPIC_COUNT)
-      setQuestions(shuffle(questionRows).slice(0, target))
+
+      // Serve unseen questions first so repeats only happen once this pool is
+      // exhausted. Falls back to seen ones (oldest-seen first) to fill the paper.
+      const { data: seenRows } = await supabase
+        .from('question_responses')
+        .select('question_id, created_at')
+        .in(
+          'question_id',
+          questionRows.slice(0, 1000).map((q) => q.id)
+        )
+        .order('created_at', { ascending: false })
+
+      const lastSeenAt = new Map()
+      for (const r of seenRows || []) {
+        if (!lastSeenAt.has(r.question_id)) lastSeenAt.set(r.question_id, r.created_at)
+      }
+
+      const unseen = shuffle(questionRows.filter((q) => !lastSeenAt.has(q.id)))
+      const seen = questionRows
+        .filter((q) => lastSeenAt.has(q.id))
+        .sort((a, b) => new Date(lastSeenAt.get(a.id)) - new Date(lastSeenAt.get(b.id)))
+
+      setQuestions([...unseen, ...seen].slice(0, target))
       setPhase(PHASE.predict)
     }
     load()

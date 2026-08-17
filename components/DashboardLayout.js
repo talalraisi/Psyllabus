@@ -144,6 +144,14 @@ export default function DashboardLayout({ children, profile }) {
         >
           Sign out
         </button>
+        <div className="flex gap-3 px-3 pt-2">
+          <Link href="/privacy" className="text-[11px] text-[#9ca3af] hover:text-[#6b7280]">
+            Privacy
+          </Link>
+          <Link href="/terms" className="text-[11px] text-[#9ca3af] hover:text-[#6b7280]">
+            Terms
+          </Link>
+        </div>
       </div>
     </>
   )

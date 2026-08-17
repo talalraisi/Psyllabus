@@ -1,18 +1,30 @@
 /**
  * Question bank generation pipeline.
  *
- * For every subtopic of a subject, generates verified MCQs with Claude until the
- * subtopic reaches the target count, verifies each batch in an independent pass,
- * and inserts only questions that survive verification into Supabase.
+ * For every subtopic of a subject, generates original exam-style MCQs, verifies
+ * each batch in an independent second pass, and inserts only the questions that
+ * survive verification. Duplicate questions are rejected by the database
+ * (unique stem fingerprint from 006-question-dedup.sql), so the bank grows
+ * without ever repeating itself.
+ *
+ * COPYRIGHT: questions are generated fresh in the *style* of exam-board
+ * questions. Past papers are never copied or reproduced. Do not change the
+ * prompts to request verbatim past-paper content.
+ *
+ * TWO PROVIDERS:
+ *   --provider ollama   free, unlimited, runs locally (default)
+ *                       install: https://ollama.com  then: ollama pull qwen2.5:14b
+ *   --provider claude   highest quality, costs API credits
  *
  * Requirements (in .env.local or the environment):
  *   NEXT_PUBLIC_SUPABASE_URL
  *   SUPABASE_SERVICE_ROLE_KEY   (Supabase dashboard -> Settings -> API; never commit it)
- *   ANTHROPIC_API_KEY           (console.anthropic.com; or `ant auth login`)
+ *   ANTHROPIC_API_KEY           (only for --provider claude)
  *
  * Usage:
  *   node scripts/generate-questions.mjs --subject "Math Analysis & Approaches HL" --per-subtopic 100
- *   node scripts/generate-questions.mjs --subject "Physics SL" --per-subtopic 50 --limit-subtopics 5
+ *   node scripts/generate-questions.mjs --subject "Physics SL" --per-subtopic 50 --provider claude
+ *   node scripts/generate-questions.mjs --subject "Economics HL" --limit-subtopics 3 --per-subtopic 10
  */
 
 import fs from "node:fs";
@@ -33,7 +45,10 @@ function arg(name, fallback) {
 const SUBJECT = arg("subject", "Math Analysis & Approaches HL");
 const PER_SUBTOPIC = parseInt(arg("per-subtopic", "100"), 10);
 const LIMIT_SUBTOPICS = parseInt(arg("limit-subtopics", "0"), 10); // 0 = all
-const BATCH_SIZE = 20; // questions per API call
+const PROVIDER = arg("provider", "ollama"); // ollama (free) | claude
+const OLLAMA_MODEL = arg("ollama-model", "qwen2.5:14b");
+const OLLAMA_URL = arg("ollama-url", "http://localhost:11434");
+const BATCH_SIZE = PROVIDER === "ollama" ? 8 : 20; // local models do better with smaller batches
 const MODEL = "claude-opus-5";
 
 // Load .env.local without a dotenv dependency
@@ -55,7 +70,8 @@ if (!supabaseUrl || !serviceKey) {
 }
 
 const supabase = createClient(supabaseUrl, serviceKey);
-const anthropic = new Anthropic(); // resolves ANTHROPIC_API_KEY / ant profile
+// Only constructed when actually using Claude, so Ollama runs need no API key.
+const anthropic = PROVIDER === "claude" ? new Anthropic() : null;
 
 // ---------------------------------------------------------------------------
 // Schemas for structured outputs
@@ -152,6 +168,73 @@ async function callClaude(prompt, schema, maxTokens = 16000) {
   return JSON.parse(text);
 }
 
+/** Free local generation via Ollama's JSON-schema-constrained output. */
+async function callOllama(prompt, schema) {
+  const res = await fetch(`${OLLAMA_URL}/api/chat`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      model: OLLAMA_MODEL,
+      stream: false,
+      format: schema, // Ollama constrains output to this JSON schema
+      options: { temperature: 0.8 }, // variety across batches
+      messages: [{ role: "user", content: prompt }],
+    }),
+  });
+
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    if (res.status === 404) {
+      throw new Error(
+        `Model "${OLLAMA_MODEL}" not found. Run: ollama pull ${OLLAMA_MODEL}`
+      );
+    }
+    throw new Error(`Ollama ${res.status}: ${body.slice(0, 200)}`);
+  }
+
+  const data = await res.json();
+  const content = data?.message?.content;
+  if (!content) throw new Error("Empty response from Ollama");
+  return JSON.parse(content);
+}
+
+async function callModel(prompt, schema, maxTokens) {
+  return PROVIDER === "claude"
+    ? callClaude(prompt, schema, maxTokens)
+    : callOllama(prompt, schema);
+}
+
+async function preflight() {
+  if (PROVIDER === "claude") {
+    if (!process.env.ANTHROPIC_API_KEY) {
+      console.log("No ANTHROPIC_API_KEY set; relying on an `ant auth login` profile.");
+    }
+    return;
+  }
+  try {
+    const res = await fetch(`${OLLAMA_URL}/api/tags`);
+    const { models } = await res.json();
+    const names = (models || []).map((m) => m.name);
+    if (!names.some((n) => n === OLLAMA_MODEL || n.startsWith(`${OLLAMA_MODEL}:`))) {
+      console.error(
+        `Ollama is running but "${OLLAMA_MODEL}" is not installed.\n` +
+          `Installed: ${names.join(", ") || "(none)"}\n` +
+          `Fix: ollama pull ${OLLAMA_MODEL}`
+      );
+      process.exit(1);
+    }
+  } catch {
+    console.error(
+      `Cannot reach Ollama at ${OLLAMA_URL}.\n` +
+        `1. Install it from https://ollama.com\n` +
+        `2. ollama pull ${OLLAMA_MODEL}\n` +
+        `3. Re-run this script (Ollama serves automatically once installed).\n` +
+        `Or use paid generation instead: --provider claude`
+    );
+    process.exit(1);
+  }
+}
+
 async function generateBatch(subtopic, topic, count, existingStems) {
   const avoid =
     existingStems.length > 0
@@ -171,7 +254,7 @@ Write ${count} multiple-choice questions testing this exact subtopic at IB exam 
 - Plain text math only (x^2, 3/4, sqrt(x)); no LaTeX.
 - Explanations show the key working in one or two sentences.${avoid}`;
 
-  const data = await callClaude(prompt, QUESTIONS_SCHEMA);
+  const data = await callModel(prompt, QUESTIONS_SCHEMA);
   return (data.questions || []).filter(
     (q) =>
       q.options?.length === 4 &&
@@ -195,7 +278,7 @@ Mark sound=false if ANY of these hold: the marked answer is wrong; more than one
 
 Questions:\n\n${listing}`;
 
-  const data = await callClaude(prompt, VERDICTS_SCHEMA);
+  const data = await callModel(prompt, VERDICTS_SCHEMA);
   const badIndices = new Set(
     (data.verdicts || []).filter((v) => !v.sound).map((v) => v.index)
   );
@@ -210,7 +293,9 @@ Questions:\n\n${listing}`;
 // ---------------------------------------------------------------------------
 
 async function main() {
-  console.log(`Subject: ${SUBJECT} | target ${PER_SUBTOPIC}/subtopic | model ${MODEL}`);
+  const modelLabel = PROVIDER === "claude" ? MODEL : `${OLLAMA_MODEL} (local, free)`;
+  console.log(`Subject: ${SUBJECT} | target ${PER_SUBTOPIC}/subtopic | ${modelLabel}`);
+  await preflight();
 
   const { data: subtopics, error } = await supabase
     .from("syllabus_content")
@@ -237,7 +322,14 @@ async function main() {
     let have = existingStems.length;
     console.log(`\n${subtopic}: ${have}/${PER_SUBTOPIC}`);
 
+    let consecutiveNoProgress = 0;
     while (have < PER_SUBTOPIC) {
+      if (consecutiveNoProgress >= 3) {
+        console.log(
+          `  no new unique questions after 3 attempts; moving on at ${have}/${PER_SUBTOPIC}`
+        );
+        break;
+      }
       const want = Math.min(BATCH_SIZE, PER_SUBTOPIC - have);
       try {
         const generated = await generateBatch(subtopic, topic, want, existingStems);
@@ -261,13 +353,30 @@ async function main() {
             source: "ai-generated",
             verified: true,
           }));
-          const { error: insertError } = await supabase.from("questions").insert(rows);
-          if (insertError) throw insertError;
-          have += rows.length;
-          totalInserted += rows.length;
-          existingStems.push(...rows.map((r) => r.stem));
+          // Insert individually so one duplicate (rejected by the unique stem
+          // fingerprint) doesn't discard the whole batch.
+          let inserted = 0;
+          let duplicates = 0;
+          for (const row of rows) {
+            const { error: insertError } = await supabase.from("questions").insert(row);
+            if (!insertError) {
+              inserted++;
+              existingStems.push(row.stem);
+            } else if (insertError.code === "23505") {
+              duplicates++;
+            } else {
+              throw insertError;
+            }
+          }
+          have += inserted;
+          totalInserted += inserted;
+          console.log(
+            `  inserted ${inserted}${duplicates ? `, ${duplicates} duplicate(s) skipped` : ""} → ${have}/${PER_SUBTOPIC}`
+          );
+          consecutiveNoProgress = inserted === 0 ? consecutiveNoProgress + 1 : 0;
         } else {
           console.log("  batch fully rejected, retrying");
+          consecutiveNoProgress++;
         }
       } catch (err) {
         console.error(`  batch failed: ${err.message}; waiting 20s`);

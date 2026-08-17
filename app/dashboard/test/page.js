@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
+import { getCurrentUser } from '@/lib/auth'
 import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 import { sortTopics } from '@/lib/progress'
@@ -23,7 +24,7 @@ export default function TestBuilderPage() {
 
   useEffect(() => {
     async function load() {
-      const { data: { user } } = await supabase.auth.getUser()
+      const user = await getCurrentUser(supabase)
       if (!user) {
         router.push('/login')
         return

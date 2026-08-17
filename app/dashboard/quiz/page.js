@@ -3,6 +3,7 @@
 import { Suspense, useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
+import { getCurrentUser } from '@/lib/auth'
 import DashboardLayout from '@/components/DashboardLayout'
 import QuizRunner from '@/components/QuizRunner'
 
@@ -25,7 +26,7 @@ function QuizPageInner() {
 
   useEffect(() => {
     async function load() {
-      const { data: { user } } = await supabase.auth.getUser()
+      const user = await getCurrentUser(supabase)
       if (!user) {
         router.push('/login')
         return

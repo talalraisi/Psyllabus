@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
+import { getCurrentUser } from '@/lib/auth'
 import { STATUS_LEVELS, dotColorForStatus, statusFromAccuracy } from '@/lib/quiz-status'
 
 export default function SyllabusViewer({ subjectName, subjectSlug, syllabusYear = '26/27' }) {
@@ -14,7 +15,7 @@ export default function SyllabusViewer({ subjectName, subjectSlug, syllabusYear 
 
   useEffect(() => {
     async function loadSyllabus() {
-      const { data: { user } } = await supabase.auth.getUser()
+      const user = await getCurrentUser(supabase)
       if (!user) return
 
       const { data: subject } = await supabase
