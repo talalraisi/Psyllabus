@@ -6,6 +6,8 @@ import { getCurrentUser } from '@/lib/auth'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
+import { Page, PageHeader, Section, EmptyState, PageLoading } from '@/components/PageShell'
+import { IconChevronRight, IconArrowRight } from '@/components/Icons'
 import { getSlugForSubject } from '@/lib/subject-map'
 import {
   computeCompletionPercent,
@@ -95,17 +97,18 @@ export default function Dashboard() {
       })
       setOverall(merged.length ? Math.round((mastered / merged.length) * 100) : 0)
 
-      const focusItems = merged
-        .filter((r) => r.status in FOCUS_PRIORITY)
-        .sort((a, b) => {
-          const pi = FOCUS_PRIORITY[a.status] - FOCUS_PRIORITY[b.status]
-          if (pi !== 0) return pi
-          const si = subjects.indexOf(a.subject) - subjects.indexOf(b.subject)
-          if (si !== 0) return si
-          return topicSortKey(a.topic) - topicSortKey(b.topic)
-        })
-        .slice(0, 5)
-      setFocus(focusItems)
+      setFocus(
+        merged
+          .filter((r) => r.status in FOCUS_PRIORITY)
+          .sort((a, b) => {
+            const pi = FOCUS_PRIORITY[a.status] - FOCUS_PRIORITY[b.status]
+            if (pi !== 0) return pi
+            const si = subjects.indexOf(a.subject) - subjects.indexOf(b.subject)
+            if (si !== 0) return si
+            return topicSortKey(a.topic) - topicSortKey(b.topic)
+          })
+          .slice(0, 5)
+      )
 
       setSubjectStats(stats)
       setLoading(false)
@@ -115,145 +118,175 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f8f6f1] flex items-center justify-center">
-        <p className="text-sm text-[#6b7280]">Loading your dashboard…</p>
-      </div>
+      <DashboardLayout profile={null}>
+        <PageLoading title="Dashboard" width="wide" stats rows={5} />
+      </DashboardLayout>
     )
   }
 
   const firstName = profile.full_name?.split(' ')[0] || 'there'
   const subjects = profile.subjects || []
 
-  const statCards = [
-    { label: 'Mastered', value: counts.mastered, color: 'text-[#2D6A4F]' },
-    { label: 'Decaying', value: counts.decaying, color: 'text-[#f59e0b]' },
-    { label: 'Weak', value: counts.weak, color: 'text-[#dc2626]' },
-    { label: 'Reviews due', value: counts.due, color: 'text-[#d97706]', href: '/dashboard/mistakes' },
+  const stats = [
+    { label: 'Mastered', value: counts.mastered, color: 'text-[var(--status-mastered)]' },
+    { label: 'Decaying', value: counts.decaying, color: 'text-[var(--status-decaying)]' },
+    { label: 'Weak', value: counts.weak, color: 'text-[var(--status-weak)]' },
+    {
+      label: 'Reviews due',
+      value: counts.due,
+      color: 'text-[var(--warning-text)]',
+      href: '/dashboard/mistakes',
+    },
   ]
 
   return (
     <DashboardLayout profile={profile}>
-      <div className="px-5 py-6 md:px-12 md:py-10 max-w-6xl mx-auto">
-        <header className="mb-8">
-          <h1 className="text-[28px] font-bold text-[#1a2e1e] mb-1">
-            {greeting()}, {firstName}
-          </h1>
-          <p className="text-sm text-[#6b7280]">
-            {profile.curriculum} · Class of {profile.grad_year} · {subjects.length} subject{subjects.length !== 1 ? 's' : ''}
-          </p>
-        </header>
+      <Page width="wide">
+        <PageHeader
+          title={`${greeting()}, ${firstName}`}
+          subtitle={`${profile.curriculum} · Class of ${profile.grad_year} · ${subjects.length} subject${subjects.length === 1 ? '' : 's'}`}
+        />
 
         <div className="mb-8 flex items-center gap-4">
-          <div className="flex-1 h-2 bg-[#f3f4f6] rounded-full overflow-hidden">
+          <div
+            className="h-2 flex-1 overflow-hidden rounded-full bg-[#f3f4f6]"
+            role="progressbar"
+            aria-valuenow={overall}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label="Overall syllabus mastered"
+          >
             <div
-              className="h-full bg-[#2D6A4F] rounded-full transition-all duration-500"
+              className="h-full rounded-full bg-[var(--brand)] transition-[width] duration-500 ease-out"
               style={{ width: `${overall}%` }}
             />
           </div>
-          <span className="text-sm font-semibold text-[#2D6A4F] shrink-0">
+          <span className="shrink-0 text-sm font-semibold tabular-nums text-[var(--brand)]">
             {overall}% mastered
           </span>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
-          {statCards.map((stat) => {
-            const card = (
-              <div className="bg-white rounded-xl p-4 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] h-full">
-                <p className={`text-[28px] font-bold leading-tight ${stat.color}`}>{stat.value}</p>
-                <p className="text-sm text-[#6b7280] mt-0.5">{stat.label}</p>
-              </div>
+        <div className="mb-10 grid grid-cols-2 gap-3 md:grid-cols-4">
+          {stats.map(({ label, value, color, href }) => {
+            const body = (
+              <>
+                <p className={`t-stat ${color}`}>{value}</p>
+                <p className="t-small mt-1">{label}</p>
+              </>
             )
-            return stat.href ? (
-              <Link key={stat.label} href={stat.href} className="block hover:opacity-80 transition-opacity">
-                {card}
+            return href ? (
+              <Link key={label} href={href} className="surface surface-interactive block p-5">
+                {body}
               </Link>
             ) : (
-              <div key={stat.label}>{card}</div>
+              <div key={label} className="surface p-5">
+                {body}
+              </div>
             )
           })}
         </div>
 
-        <section className="mb-10">
-          <h2 className="text-[13px] font-semibold uppercase tracking-[0.06em] text-[#9ca3af] mb-3">
-            Today&apos;s Focus
-          </h2>
+        <Section title="Today's focus">
           {focus.length === 0 ? (
-            <div className="bg-white rounded-xl p-8 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-center">
-              <p className="text-sm text-[#6b7280]">
-                Nothing queued yet. Open a syllabus and take your first quiz.
-              </p>
-            </div>
+            <EmptyState
+              title="Nothing queued yet"
+              description="Take a quiz on any subtopic and the ones needing work will appear here, most urgent first."
+              action={
+                <Link href="/dashboard/subjects" className="btn btn-solid control-md">
+                  Browse subjects
+                </Link>
+              }
+            />
           ) : (
-            <div className="bg-white rounded-xl border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] divide-y divide-[#f3f4f6]">
-              {focus.map((item) => (
-                <div key={item.id} className="px-5 py-3 flex items-center gap-3">
-                  <span
-                    className={`w-2.5 h-2.5 rounded-full shrink-0 ${STATUS_COLORS[item.status]}`}
-                    title={STATUS_LABELS[item.status]}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-[#9ca3af] truncate">
-                      {item.subject} · {item.topic}
-                    </p>
-                    <p className="text-sm text-[#374151] truncate">{item.subtopic}</p>
+            <ul className="surface">
+              {focus.map((item, i) => (
+                <li
+                  key={item.id}
+                  className={i > 0 ? 'border-t border-[var(--border)]' : undefined}
+                >
+                  <div className="flex items-center gap-3 px-5 py-4">
+                    <span
+                      className={`h-2 w-2 shrink-0 rounded-full ${STATUS_COLORS[item.status]}`}
+                      aria-hidden="true"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="t-caption truncate">
+                        {item.subject} · {item.topic}
+                      </p>
+                      <p className="truncate text-sm text-[var(--text-body)]">{item.subtopic}</p>
+                    </div>
+                    <span
+                      className={`hidden shrink-0 text-xs font-medium sm:block ${STATUS_TEXT_COLORS[item.status]}`}
+                    >
+                      {STATUS_LABELS[item.status]}
+                    </span>
+                    <Link
+                      href={`/dashboard/quiz?subject=${encodeURIComponent(item.subject)}&topic=${encodeURIComponent(item.topic)}&subtopic=${encodeURIComponent(item.subtopic)}&back=/dashboard`}
+                      className="btn btn-outline control-sm shrink-0 text-xs"
+                    >
+                      Quiz
+                    </Link>
                   </div>
-                  <span className={`hidden sm:block text-xs font-medium shrink-0 ${STATUS_TEXT_COLORS[item.status]}`}>
-                    {STATUS_LABELS[item.status]}
-                  </span>
-                  <Link
-                    href={`/dashboard/quiz?subject=${encodeURIComponent(item.subject)}&topic=${encodeURIComponent(item.topic)}&subtopic=${encodeURIComponent(item.subtopic)}&back=/dashboard`}
-                    className="text-xs font-medium px-3 py-1.5 rounded-lg border border-[#2D6A4F] text-[#2D6A4F] hover:bg-[#f0fdf4] transition-colors shrink-0"
-                  >
-                    Quiz
-                  </Link>
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
           )}
-        </section>
+        </Section>
 
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-[13px] font-semibold uppercase tracking-[0.06em] text-[#9ca3af]">
-              Your Subjects
-            </h2>
+        <Section
+          title="Your subjects"
+          action={
             <Link
               href="/dashboard/subjects"
-              className="text-sm font-medium text-[#2D6A4F] hover:underline"
+              className="inline-flex items-center gap-2 text-sm font-medium text-[var(--brand)] hover:underline"
             >
-              View all →
+              View all
+              <IconArrowRight width={16} height={16} />
             </Link>
-          </div>
-          <div className="bg-white rounded-xl border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] divide-y divide-[#f3f4f6]">
-            {subjects.map((subject) => {
+          }
+        >
+          <ul className="surface">
+            {subjects.map((subject, i) => {
               const pct = subjectStats[subject] ?? 0
               return (
-                <Link
+                <li
                   key={subject}
-                  href={`/dashboard/syllabus/${getSlugForSubject(subject)}`}
-                  className="px-5 py-3 flex items-center gap-4 hover:bg-[#f9fafb] transition-colors"
+                  className={i > 0 ? 'border-t border-[var(--border)]' : undefined}
                 >
-                  <span className="w-52 shrink-0 text-sm text-[#1a2e1e] font-medium truncate">
-                    {subject}
-                  </span>
-                  <div className="flex-1 h-2 bg-[#f3f4f6] rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-[#2D6A4F] rounded-full"
-                      style={{ width: `${pct}%` }}
+                  <Link
+                    href={`/dashboard/syllabus/${getSlugForSubject(subject)}`}
+                    className="flex items-center gap-4 px-5 py-4 transition-colors duration-150 hover:bg-[var(--surface-sunken)]"
+                  >
+                    <span className="w-48 shrink-0 truncate text-sm font-medium text-[var(--text)]">
+                      {subject}
+                    </span>
+                    <span
+                      className="hidden h-2 flex-1 overflow-hidden rounded-full bg-[#f3f4f6] sm:block"
+                      role="progressbar"
+                      aria-valuenow={pct}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                    >
+                      <span
+                        className="block h-full rounded-full bg-[var(--brand)]"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </span>
+                    <span className="ml-auto w-10 shrink-0 text-right text-sm font-semibold tabular-nums text-[var(--brand)] sm:ml-0">
+                      {pct}%
+                    </span>
+                    <IconChevronRight
+                      width={16}
+                      height={16}
+                      className="shrink-0 text-[var(--text-faint)]"
                     />
-                  </div>
-                  <span className="w-10 shrink-0 text-right text-sm font-semibold text-[#2D6A4F]">
-                    {pct}%
-                  </span>
-                  <span className="text-[#9ca3af] text-xs shrink-0" aria-hidden="true">
-                    ▶
-                  </span>
-                </Link>
+                  </Link>
+                </li>
               )
             })}
-          </div>
-        </section>
-      </div>
+          </ul>
+        </Section>
+      </Page>
     </DashboardLayout>
   )
 }

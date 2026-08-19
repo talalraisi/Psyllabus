@@ -24,7 +24,7 @@ export default function GlobalError({ error, reset }) {
 
   return (
     <div className="min-h-screen bg-[#f8f6f1] flex items-center justify-center px-5">
-      <div className="bg-white rounded-xl p-8 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] max-w-md w-full text-center">
+      <div className="surface p-8 max-w-md w-full text-center">
         <h1 className="text-xl font-bold text-[#1a2e1e] mb-2">Something went wrong</h1>
         <p className="text-sm text-[#6b7280] mb-6">
           This is usually a cached file from an older version of the app. Reloading normally
@@ -38,13 +38,13 @@ export default function GlobalError({ error, reset }) {
         <div className="flex gap-2">
           <button
             onClick={reset}
-            className="flex-1 py-2.5 rounded-lg border border-[#e5e7eb] text-sm font-medium text-[#374151] hover:bg-[#f9fafb] transition-colors"
+            className="flex-1 btn btn-quiet control-md"
           >
             Try again
           </button>
           <button
             onClick={hardReload}
-            className="flex-1 py-2.5 rounded-lg bg-[#2D6A4F] text-white text-sm font-medium hover:bg-[#245a42] transition-colors"
+            className="flex-1 btn btn-solid control-md"
           >
             Reload page
           </button>

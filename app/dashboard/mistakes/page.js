@@ -87,7 +87,7 @@ export default function MistakeBankPage() {
     <DashboardLayout profile={profile}>
       <div className="px-5 py-6 md:px-12 md:py-10 max-w-4xl mx-auto">
         <header className="mb-8">
-          <h1 className="text-[28px] font-bold text-[#1a2e1e] mb-1">Mistake Bank</h1>
+          <h1 className="t-page-title mb-1">Mistake Bank</h1>
           <p className="text-sm text-[#6b7280]">
             Every wrong answer becomes a spaced-repetition review, so you drill your own
             failures instead of generic flashcards
@@ -95,12 +95,12 @@ export default function MistakeBankPage() {
         </header>
 
         <div className="grid grid-cols-2 gap-3 mb-8 max-w-md">
-          <div className="bg-white rounded-xl p-5 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-            <p className="text-[32px] font-bold leading-tight text-[#d97706]">{due.length}</p>
+          <div className="surface p-5">
+            <p className="t-stat text-[#d97706]">{due.length}</p>
             <p className="text-sm text-[#6b7280] mt-1">Due for review</p>
           </div>
-          <div className="bg-white rounded-xl p-5 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-            <p className="text-[32px] font-bold leading-tight text-[#1a2e1e]">{mistakes.length}</p>
+          <div className="surface p-5">
+            <p className="t-stat text-[#1a2e1e]">{mistakes.length}</p>
             <p className="text-sm text-[#6b7280] mt-1">Total logged</p>
           </div>
         </div>
@@ -108,7 +108,7 @@ export default function MistakeBankPage() {
         {due.length > 0 ? (
           <Link
             href="/dashboard/quiz?mode=mistakes&back=/dashboard/mistakes"
-            className="inline-block mb-10 px-6 py-2.5 bg-[#2D6A4F] text-white rounded-lg text-sm font-medium hover:bg-[#245a42] transition-colors"
+            className="inline-block mb-10 px-6 btn btn-solid control-md"
           >
             Review {due.length} due mistake{due.length !== 1 ? 's' : ''}
           </Link>
@@ -119,7 +119,7 @@ export default function MistakeBankPage() {
         ) : null}
 
         {mistakes.length === 0 ? (
-          <div className="bg-white rounded-xl p-10 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-center">
+          <div className="surface p-10 text-center">
             <h2 className="text-base font-semibold text-[#1a2e1e]">No mistakes logged yet</h2>
             <p className="text-sm text-[#6b7280] mt-2">
               Take a quiz from any syllabus subtopic and wrong answers land here automatically.
@@ -129,10 +129,10 @@ export default function MistakeBankPage() {
           <div className="space-y-8">
             {Object.entries(bySubject).map(([subject, items]) => (
               <section key={subject}>
-                <h2 className="text-[13px] font-semibold uppercase tracking-[0.06em] text-[#9ca3af] mb-3">
+                <h2 className="t-overline mb-3">
                   {subject}
                 </h2>
-                <div className="bg-white rounded-xl border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] divide-y divide-[#f3f4f6]">
+                <div className="surface divide-y divide-[#f3f4f6]">
                   {items.map((m) => {
                     const isDue = new Date(m.next_review_at).getTime() <= now
                     return (
@@ -147,7 +147,7 @@ export default function MistakeBankPage() {
                             : 'Not yet recovered'}
                         </span>
                         <span
-                          className={`shrink-0 text-xs font-medium px-2.5 py-1 rounded-full ${
+                          className={`shrink-0 text-xs font-medium px-3 py-1 rounded-full ${
                             isDue
                               ? 'bg-[#fef3c7] text-[#d97706]'
                               : 'bg-[#f3f4f6] text-[#6b7280]'

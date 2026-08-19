@@ -1,226 +1,427 @@
 @import "tailwindcss";
 
+/* ===========================================================================
+   PSyllabus design tokens
+   One scale for spacing, one type ramp, one radius set, two shadows.
+   Nothing outside these tokens should appear in components.
+   =========================================================================== */
+
 :root {
-  --bg: #fafaf8;
-  --bg-subtle: #f3f2ef;
-  --bg-elevated: #ffffff;
-  --text: #1c1917;
-  --text-muted: #78716c;
-  --text-faint: #a8a29e;
-  --accent: #2d6a4f;
-  --accent-hover: #1a4a35;
-  --accent-soft: #e8f0eb;
-  --weak: #dc2626;
-  --review: #d97706;
-  --solid: #16a34a;
-  --mastered: #7c3aed;
-  --border: #e7e5e4;
-  --border-strong: #d6d3d1;
-  --radius: 10px;
-  --radius-sm: 6px;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+  /* --- Brand palette. Five colors, each with a defined job. ---------------- */
+  --brand: #2d6a4f;          /* primary actions, mastered state, active nav */
+  --brand-hover: #245a42;
+  --brand-tint: #f0fdf4;     /* selected rows, active nav background */
+  --sand: #e8d5b0;           /* accent badges only, never alongside brand */
+
+  --bg: #f8f6f1;             /* page canvas */
+  --surface: #ffffff;        /* cards */
+  --surface-sunken: #f9fafb; /* table headers, inset panels */
+
+  --text: #1a2e1e;           /* headings */
+  --text-body: #374151;      /* body copy */
+  --text-muted: #6b7280;     /* supporting copy */
+  --text-faint: #9ca3af;     /* labels, metadata */
+
+  --border: #f0f0f0;         /* card edges */
+  --border-strong: #e5e7eb;  /* inputs, controls */
+  --border-hover: #d1d5db;
+
+  /* --- Status. Only these four carry semantic color. ----------------------- */
+  --status-mastered: #2d6a4f;
+  --status-decaying: #f59e0b;
+  --status-shaky: #fbbf24;
+  --status-weak: #ef4444;
+  --status-untested: #e5e7eb;
+
+  --danger: #dc2626;
+  --danger-bg: #fef2f2;
+  --danger-border: #fecaca;
+  --warning-text: #d97706;
+  --success-text: #16a34a;
+
+  /* --- Radius. Three steps, assigned by component size. -------------------- */
+  --r-sm: 6px;   /* pills, checkboxes, swatches */
+  --r-md: 8px;   /* buttons, inputs, list rows */
+  --r-lg: 12px;  /* cards, panels, drawers */
+
+  /* --- Elevation. Two levels. Never tinted, never stacked. ----------------- */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-raised: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  /* --- Motion. One duration, one easing. ---------------------------------- */
+  --ease: cubic-bezier(0.2, 0, 0.2, 1);
+  --dur: 150ms;
+
+  /* Legacy aliases kept so the marketing and auth pages keep rendering. */
+  --bg-subtle: var(--surface-sunken);
+  --bg-elevated: var(--surface);
+  --accent: var(--brand);
+  --accent-hover: var(--brand-hover);
+  --accent-soft: var(--brand-tint);
+  --radius: var(--r-lg);
+  --radius-sm: var(--r-md);
+  --shadow-sm: var(--shadow-card);
+  --shadow-md: var(--shadow-raised);
+  --weak: var(--status-weak);
+  --review: var(--status-decaying);
+  --solid: var(--success-text);
+  --mastered: var(--status-mastered);
 }
 
 @theme inline {
   --font-sans: var(--font-sans), system-ui, sans-serif;
   --color-bg: var(--bg);
-  --color-bg-subtle: var(--bg-subtle);
-  --color-bg-elevated: var(--bg-elevated);
+  --color-bg-subtle: var(--surface-sunken);
+  --color-bg-elevated: var(--surface);
   --color-text: var(--text);
   --color-text-muted: var(--text-muted);
   --color-text-faint: var(--text-faint);
-  --color-accent: #2d6a4f;
-  --color-accent-hover: #1a4a35;
-  --color-accent-soft: #e8f0eb;
-  --color-border: var(--border);
-  --color-weak: var(--weak);
-  --color-review: var(--review);
-  --color-solid: var(--solid);
-  --color-mastered: var(--mastered);
+  --color-accent: var(--brand);
+  --color-accent-hover: var(--brand-hover);
+  --color-accent-soft: var(--brand-tint);
+  --color-border: var(--border-strong);
+  --color-weak: var(--status-weak);
+  --color-review: var(--status-decaying);
+  --color-solid: var(--success-text);
+  --color-mastered: var(--status-mastered);
 }
 
 body {
   background: var(--bg);
-  color: var(--text);
+  color: var(--text-body);
   font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-.page {
-  min-height: 100vh;
-  background: var(--bg);
+/* ===========================================================================
+   Type ramp
+   Every size pairs with a line height on the 4pt grid. Components use these
+   classes instead of ad-hoc font sizes.
+   =========================================================================== */
+
+.t-page-title {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
 }
+
+.t-section {
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.t-card-title {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.t-body {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  color: var(--text-body);
+}
+
+.t-small {
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.t-caption {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  color: var(--text-faint);
+}
+
+/* Group label above a section. Short by rule — never a sentence. */
+.t-overline {
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+/* Large figures in stat cards. Tabular so columns of numbers align. */
+.t-stat {
+  font-size: 28px;
+  line-height: 32px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* ===========================================================================
+   Surfaces and controls
+   =========================================================================== */
+
+.surface {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-card);
+}
+
+/* Cards that navigate somewhere lift on hover. Static cards never move. */
+.surface-interactive {
+  transition: box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+
+.surface-interactive:hover {
+  box-shadow: var(--shadow-raised);
+  border-color: var(--border-hover);
+}
+
+/* Control heights are fixed rather than derived from padding, which keeps
+   every button, input, and pill on the 4pt grid regardless of its label. */
+.control-sm { height: 32px; }
+.control-md { height: 40px; }
+.control-lg { height: 44px; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding-inline: 16px;
+  border-radius: var(--r-md);
+  font-size: 14px;
+  font-weight: 500;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-solid {
+  background: var(--brand);
+  color: #fff;
+}
+
+.btn-solid:hover:not(:disabled) {
+  background: var(--brand-hover);
+}
+
+.btn-outline {
+  background: var(--surface);
+  color: var(--brand);
+  border: 1px solid var(--brand);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: var(--brand-tint);
+}
+
+.btn-quiet {
+  background: var(--surface);
+  color: var(--text-body);
+  border: 1px solid var(--border-strong);
+}
+
+.btn-quiet:hover:not(:disabled) {
+  background: var(--surface-sunken);
+  border-color: var(--border-hover);
+}
+
+.field {
+  width: 100%;
+  height: 40px;
+  padding-inline: 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--text-body);
+  font-size: 14px;
+  outline: none;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+
+.field:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-tint);
+}
+
+/* Visible focus for keyboard users on every interactive element. */
+:where(a, button, [role='button'], input, select, textarea):focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+/* ===========================================================================
+   Skeletons — every async surface uses this same pulse.
+   =========================================================================== */
+
+.skeleton {
+  background: #f3f4f6;
+  border-radius: var(--r-md);
+  animation: skeleton-pulse 1.6s var(--ease) infinite;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===========================================================================
+   Legacy classes used by the marketing, auth, and onboarding pages.
+   Retained so those routes keep rendering; values now read from the tokens.
+   =========================================================================== */
+
+.page { min-height: 100vh; background: var(--bg); }
 
 .page-center {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem;
+  padding: 24px;
 }
 
-.container-narrow {
-  width: 100%;
-  max-width: 42rem;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.container-wide {
-  width: 100%;
-  max-width: 56rem;
-  margin-left: auto;
-  margin-right: auto;
-}
+.container-narrow { width: 100%; max-width: 42rem; margin-inline: auto; }
+.container-wide { width: 100%; max-width: 56rem; margin-inline: auto; }
 
 .card {
-  background: var(--bg-elevated);
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-card);
 }
 
-.card-pad {
-  padding: 2rem;
-}
+.card-pad { padding: 32px; }
 
 .btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--accent);
-  color: white;
+  background: var(--brand);
+  color: #fff;
   font-weight: 600;
-  border-radius: var(--radius-sm);
-  transition: background 0.15s, opacity 0.15s;
+  border-radius: var(--r-md);
+  transition: background var(--dur) var(--ease);
 }
 
-.btn-primary:hover:not(:disabled) {
-  background: var(--accent-hover);
-}
-
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+.btn-primary:hover:not(:disabled) { background: var(--brand-hover); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .btn-secondary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   background: transparent;
-  color: var(--text);
+  color: var(--text-body);
   font-weight: 600;
   border: 1px solid var(--border-strong);
-  border-radius: var(--radius-sm);
-  transition: border-color 0.15s, background 0.15s;
+  border-radius: var(--r-md);
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
 }
 
-.btn-secondary:hover {
-  background: var(--bg-subtle);
-}
+.btn-secondary:hover { background: var(--surface-sunken); border-color: var(--border-hover); }
 
 .btn-ghost {
   color: var(--text-muted);
-  font-size: 0.875rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 0.5rem 1rem;
-  transition: color 0.15s, border-color 0.15s;
+  font-size: 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  padding: 8px 16px;
+  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
 }
 
-.btn-ghost:hover {
-  color: var(--text);
-  border-color: var(--border-strong);
-}
+.btn-ghost:hover { color: var(--text); border-color: var(--border-hover); }
 
 .input {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--bg-elevated);
-  color: var(--text);
-  font-size: 1rem;
+  padding: 12px 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  color: var(--text-body);
+  font-size: 16px;
   outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
 }
 
-.input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-soft);
-}
-
-.input::placeholder {
-  color: var(--text-faint);
-}
+.input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-tint); }
+.input::placeholder { color: var(--text-faint); }
 
 .label {
   display: block;
-  font-size: 0.875rem;
+  font-size: 14px;
   font-weight: 500;
   color: var(--text-muted);
-  margin-bottom: 0.5rem;
+  margin-bottom: 8px;
 }
 
 .badge {
   display: inline-block;
-  font-size: 0.6875rem;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--accent);
-  background: var(--accent-soft);
+  color: var(--brand);
+  background: var(--brand-tint);
   border-radius: 9999px;
-  padding: 0.375rem 0.875rem;
+  padding: 4px 12px;
 }
 
 .chip {
-  font-size: 0.75rem;
-  padding: 0.375rem 0.75rem;
+  font-size: 12px;
+  padding: 4px 12px;
   border-radius: 9999px;
-  background: var(--bg-subtle);
+  background: var(--surface-sunken);
   color: var(--text-muted);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
 }
 
-.chip-active {
-  background: var(--accent);
-  color: white;
-  border-color: var(--accent);
-}
+.chip-active { background: var(--brand); color: #fff; border-color: var(--brand); }
 
 .error-box {
-  background: #fef2f2;
-  border: 1px solid #fecaca;
-  border-radius: var(--radius-sm);
-  padding: 0.75rem 1rem;
-  color: #dc2626;
-  font-size: 0.875rem;
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  border-radius: var(--r-md);
+  padding: 12px 16px;
+  color: var(--danger);
+  font-size: 14px;
 }
 
-.link {
-  color: var(--accent);
-  font-weight: 500;
-}
-
-.link:hover {
-  text-decoration: underline;
-}
+.link { color: var(--brand); font-weight: 500; }
+.link:hover { text-decoration: underline; }
 
 .section-label {
-  font-size: 0.6875rem;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-muted);
 }
 
-.divider {
-  border-top: 1px solid var(--border);
-}
+.divider { border-top: 1px solid var(--border-strong); }
 
 .marketing-hero-grid {
-  background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+  background-image: radial-gradient(circle, var(--border-strong) 1px, transparent 1px);
   background-size: 24px 24px;
 }

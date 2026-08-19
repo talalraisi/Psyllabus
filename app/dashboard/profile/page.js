@@ -140,11 +140,11 @@ export default function Profile() {
     <DashboardLayout profile={profile}>
       <div className="px-5 py-6 md:px-12 md:py-10 max-w-2xl mx-auto">
         <header className="mb-8">
-          <h1 className="text-[28px] font-bold text-[#1a2e1e] mb-1">Profile</h1>
+          <h1 className="t-page-title mb-1">Profile</h1>
           <p className="text-sm text-[#6b7280]">Your personal information</p>
         </header>
 
-        <div className="bg-white rounded-xl p-6 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] mb-4">
+        <div className="surface p-6 mb-4">
           <div className="flex items-center gap-5">
             {avatarUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -169,7 +169,7 @@ export default function Profile() {
               <button
                 onClick={pickPhoto}
                 disabled={uploading}
-                className="px-4 py-2 bg-[#2D6A4F] text-white rounded-lg text-sm font-medium hover:bg-[#245a42] transition-colors disabled:opacity-50"
+                className="btn btn-solid control-md disabled:opacity-50"
               >
                 {uploading ? 'Uploading…' : avatarUrl ? 'Change photo' : 'Upload photo'}
               </button>
@@ -180,7 +180,7 @@ export default function Profile() {
 
         <form
           onSubmit={handleSave}
-          className="bg-white rounded-xl p-6 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] space-y-5"
+          className="surface p-6 space-y-5"
         >
           <div>
             <label className="block text-sm font-medium text-[#1a2e1e] mb-2">Full name</label>
@@ -201,7 +201,7 @@ export default function Profile() {
             ].map((f) => (
               <div key={f.label} className="p-3 rounded-lg bg-[#f9fafb] border border-[#f0f0f0]">
                 <p className="text-xs text-[#9ca3af]">{f.label}</p>
-                <p className="text-sm text-[#374151] mt-0.5 truncate">{f.value}</p>
+                <p className="text-sm text-[#374151] mt-1 truncate">{f.value}</p>
               </div>
             ))}
           </div>
@@ -216,7 +216,7 @@ export default function Profile() {
           <button
             type="submit"
             disabled={saving}
-            className="w-full py-2.5 bg-[#2D6A4F] text-white rounded-lg text-sm font-medium hover:bg-[#245a42] transition-colors disabled:opacity-50"
+            className="w-full btn btn-solid control-md disabled:opacity-50"
           >
             {saving ? 'Saving…' : 'Save changes'}
           </button>

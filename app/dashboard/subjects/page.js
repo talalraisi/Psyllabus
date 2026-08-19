@@ -80,7 +80,7 @@ export default function SubjectsPage() {
     <DashboardLayout profile={profile}>
       <div className="px-5 py-6 md:px-12 md:py-10 max-w-6xl mx-auto">
         <header className="mb-8">
-          <h1 className="text-[28px] font-bold text-[#1a2e1e] mb-1">My Subjects</h1>
+          <h1 className="t-page-title mb-1">My Subjects</h1>
           <p className="text-sm text-[#6b7280]">
             Track every topic and subtopic across your {profile.curriculum} programme
           </p>
@@ -96,7 +96,7 @@ export default function SubjectsPage() {
             return (
               <div
                 key={subject}
-                className="bg-white rounded-xl p-5 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] hover:border-[#e0e0e0] transition-all flex gap-5"
+                className="surface p-5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] hover:border-[#e0e0e0] transition-all flex gap-5"
               >
                 <ProgressRing progress={progressPercent} size={72} />
                 <div className="flex-1 min-w-0">
@@ -106,7 +106,7 @@ export default function SubjectsPage() {
                   </p>
                   <Link
                     href={`/dashboard/syllabus/${slug}`}
-                    className="inline-block mt-4 px-5 py-2 bg-[#2D6A4F] text-white rounded-lg text-sm font-medium hover:bg-[#245a42] transition-colors"
+                    className="inline-block mt-4 btn btn-solid control-md"
                   >
                     Open syllabus
                   </Link>

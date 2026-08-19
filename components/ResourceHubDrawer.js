@@ -33,9 +33,9 @@ export default function ResourceHubDrawer({ open, onClose, subject, topic, subto
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
               <p className="text-xs text-[#9ca3af]">{topic}</p>
-              <h2 className="text-base font-semibold text-[#1a2e1e] mt-0.5">{subtopic}</h2>
+              <h2 className="text-base font-semibold text-[#1a2e1e] mt-1">{subtopic}</h2>
               {hlOnly && (
-                <span className="inline-block mt-2 rounded-full bg-[#E8D5B0] px-2 py-0.5 text-[11px] font-medium text-[#1a2e1e]">
+                <span className="inline-block mt-2 rounded-full bg-[#E8D5B0] px-2 py-1 text-[11px] font-medium text-[#1a2e1e]">
                   HL only
                 </span>
               )}
@@ -51,7 +51,7 @@ export default function ResourceHubDrawer({ open, onClose, subject, topic, subto
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 space-y-3">
-          <p className="text-[13px] font-semibold uppercase tracking-[0.06em] text-[#9ca3af]">
+          <p className="t-overline">
             Resources
           </p>
           {resources.map((r) => (
@@ -75,7 +75,7 @@ export default function ResourceHubDrawer({ open, onClose, subject, topic, subto
           <div className="p-6 border-t border-[#f3f4f6]">
             <Link
               href={quizHref}
-              className="block w-full text-center py-2.5 bg-[#2D6A4F] text-white rounded-lg text-sm font-medium hover:bg-[#245a42] transition-colors"
+              className="block w-full text-center btn btn-solid control-md"
             >
               Practice quiz on this subtopic
             </Link>

@@ -6,37 +6,49 @@ import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import logoMark from '@/public/logo-mark.png'
+import {
+  IconDashboard,
+  IconSubjects,
+  IconStudyPlan,
+  IconTest,
+  IconProgress,
+  IconReview,
+  IconUser,
+  IconLogout,
+  IconMenu,
+  IconClose,
+} from '@/components/Icons'
 
 const NAV_ITEMS = [
-  { href: '/dashboard', label: 'Dashboard', icon: '📊', match: (p) => p === '/dashboard' },
+  { href: '/dashboard', label: 'Dashboard', Icon: IconDashboard, match: (p) => p === '/dashboard' },
   {
     href: '/dashboard/subjects',
     label: 'My Subjects',
-    icon: '📚',
+    Icon: IconSubjects,
     match: (p) => p.startsWith('/dashboard/syllabus') || p === '/dashboard/subjects',
   },
   {
     href: '/dashboard/study-plan',
     label: 'Study Plan',
-    icon: '📝',
+    Icon: IconStudyPlan,
     match: (p) => p === '/dashboard/study-plan',
   },
   {
     href: '/dashboard/test',
     label: 'Build a Test',
-    icon: '🧪',
+    Icon: IconTest,
     match: (p) => p === '/dashboard/test' || p.startsWith('/dashboard/quiz'),
   },
   {
     href: '/dashboard/progress',
     label: 'Progress',
-    icon: '📈',
+    Icon: IconProgress,
     match: (p) => p === '/dashboard/progress' || p === '/dashboard/Heatmap',
   },
   {
     href: '/dashboard/mistakes',
     label: 'Mistake Bank',
-    icon: '🔁',
+    Icon: IconReview,
     match: (p) => p === '/dashboard/mistakes',
   },
 ]
@@ -49,15 +61,16 @@ function Avatar({ profile, size = 32 }) {
         src={profile.avatar_url}
         alt=""
         style={{ width: size, height: size }}
-        className="rounded-full object-cover border border-[#f0f0f0] shrink-0"
+        className="rounded-full object-cover border border-[var(--border)] shrink-0"
       />
     )
   }
-  const initial = (profile?.full_name || 'S')[0].toUpperCase()
+  const initial = String(profile?.full_name || 'S').charAt(0).toUpperCase()
   return (
     <div
       style={{ width: size, height: size }}
-      className="rounded-full bg-[#f0fdf4] border border-[#f0f0f0] flex items-center justify-center text-sm font-bold text-[#2D6A4F] shrink-0"
+      className="rounded-full bg-[var(--brand-tint)] border border-[var(--border)] flex items-center justify-center text-[13px] font-semibold text-[var(--brand)] shrink-0"
+      aria-hidden="true"
     >
       {initial}
     </div>
@@ -69,86 +82,109 @@ export default function DashboardLayout({ children, profile }) {
   const router = useRouter()
   const supabase = createClient()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [signingOut, setSigningOut] = useState(false)
 
   useEffect(() => {
     setMobileOpen(false)
   }, [pathname])
 
+  // Lock body scroll while the mobile drawer is open.
+  useEffect(() => {
+    if (!mobileOpen) return
+    const onKey = (e) => e.key === 'Escape' && setMobileOpen(false)
+    document.addEventListener('keydown', onKey)
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = ''
+    }
+  }, [mobileOpen])
+
   const handleLogout = async () => {
+    if (signingOut) return
+    setSigningOut(true)
     await supabase.auth.signOut()
     router.push('/login')
   }
 
-  const sidebarContent = (
+  const sidebar = (
     <>
-      <div className="pt-5 px-4 pb-6">
-        <Link href="/" className="inline-block">
-          <Image src={logoMark} alt="PSyllabus" style={{ height: '28px', width: 'auto' }} />
+      <div className="px-4 pt-5 pb-6">
+        <Link href="/" className="inline-block" aria-label="PSyllabus home">
+          <Image src={logoMark} alt="PSyllabus" style={{ height: 28, width: 'auto' }} />
         </Link>
       </div>
 
-      <div className="border-t border-[#f3f4f6] mx-3" />
+      <div className="mx-4 border-t border-[var(--border)]" />
 
-      <nav className="flex-1 px-3 pt-2 overflow-y-auto">
-        <p className="text-[10px] uppercase tracking-wider text-[#9ca3af] font-medium px-3 pt-2 pb-1">
-          Menu
-        </p>
-        <div className="space-y-0.5">
-          {NAV_ITEMS.map((item) => {
-            const active = item.match(pathname)
+      <nav className="flex-1 overflow-y-auto px-3 pt-4" aria-label="Main">
+        <p className="t-overline px-3 pb-2">Menu</p>
+        <ul className="flex flex-col gap-1">
+          {NAV_ITEMS.map(({ href, label, Icon, match }) => {
+            const active = match(pathname)
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center h-9 px-3 rounded-md text-sm transition-colors border-l-[3px] ${
-                  active
-                    ? 'bg-[#f0fdf4] text-[#2D6A4F] font-semibold border-[#2D6A4F]'
-                    : 'text-[#374151] font-medium border-transparent hover:bg-[#f9fafb]'
-                }`}
-              >
-                <span className="text-base mr-2.5 opacity-70" aria-hidden="true">
-                  {item.icon}
-                </span>
-                {item.label}
-              </Link>
+              <li key={href}>
+                <Link
+                  href={href}
+                  aria-current={active ? 'page' : undefined}
+                  className={`control-md flex items-center gap-3 rounded-[var(--r-md)] px-3 text-sm transition-colors duration-150 ${
+                    active
+                      ? 'bg-[var(--brand-tint)] text-[var(--brand)] font-semibold'
+                      : 'text-[var(--text-body)] font-medium hover:bg-[var(--surface-sunken)]'
+                  }`}
+                >
+                  <Icon
+                    width={18}
+                    height={18}
+                    className={active ? 'text-[var(--brand)]' : 'text-[var(--text-faint)]'}
+                  />
+                  {label}
+                </Link>
+              </li>
             )
           })}
-        </div>
+        </ul>
       </nav>
 
-      <div className="border-t border-[#f3f4f6] mx-3" />
+      <div className="mx-4 border-t border-[var(--border)]" />
 
       <div className="p-3">
         {profile && (
-          <div className="rounded-lg bg-[#f9fafb] p-3 mb-2 flex items-center gap-3">
+          <div className="mb-2 flex items-center gap-3 rounded-[var(--r-md)] bg-[var(--surface-sunken)] p-3">
             <Avatar profile={profile} size={32} />
             <div className="min-w-0">
-              <p className="text-[13px] font-bold text-[#1a2e1e] truncate">
+              <p className="truncate text-[13px] font-semibold text-[var(--text)]">
                 {profile.full_name || 'Student'}
               </p>
-              <p className="text-xs text-[#6b7280] mt-0.5">
+              <p className="t-caption truncate">
                 {profile.curriculum} · Class of {profile.grad_year}
               </p>
             </div>
           </div>
         )}
+
         <Link
           href="/dashboard/profile"
-          className="flex items-center h-9 px-3 rounded-md text-sm font-medium text-[#374151] hover:bg-[#f9fafb] transition-colors"
+          className="control-md flex items-center gap-3 rounded-[var(--r-md)] px-3 text-sm font-medium text-[var(--text-body)] transition-colors duration-150 hover:bg-[var(--surface-sunken)]"
         >
+          <IconUser width={18} height={18} className="text-[var(--text-faint)]" />
           Profile
         </Link>
+
         <button
           onClick={handleLogout}
-          className="w-full flex items-center h-9 px-3 rounded-md text-sm font-medium text-[#374151] hover:bg-[#f9fafb] transition-colors"
+          disabled={signingOut}
+          className="control-md flex w-full items-center gap-3 rounded-[var(--r-md)] px-3 text-sm font-medium text-[var(--text-body)] transition-colors duration-150 hover:bg-[var(--surface-sunken)] disabled:opacity-50"
         >
-          Sign out
+          <IconLogout width={18} height={18} className="text-[var(--text-faint)]" />
+          {signingOut ? 'Signing out…' : 'Sign out'}
         </button>
-        <div className="flex gap-3 px-3 pt-2">
-          <Link href="/privacy" className="text-[11px] text-[#9ca3af] hover:text-[#6b7280]">
+
+        <div className="flex gap-4 px-3 pt-3">
+          <Link href="/privacy" className="t-caption hover:text-[var(--text-muted)]">
             Privacy
           </Link>
-          <Link href="/terms" className="text-[11px] text-[#9ca3af] hover:text-[#6b7280]">
+          <Link href="/terms" className="t-caption hover:text-[var(--text-muted)]">
             Terms
           </Link>
         </div>
@@ -157,46 +193,48 @@ export default function DashboardLayout({ children, profile }) {
   )
 
   return (
-    <div className="min-h-screen bg-[#f8f6f1] flex flex-col md:flex-row">
-      {/* Mobile top bar */}
-      <header className="md:hidden sticky top-0 z-40 bg-white border-b border-[#f3f4f6] flex items-center justify-between px-4 h-14">
-        <Link href="/" className="inline-block">
-          <Image src={logoMark} alt="PSyllabus" style={{ height: '24px', width: 'auto' }} />
+    <div className="flex min-h-screen flex-col bg-[var(--bg)] md:flex-row">
+      {/* Mobile bar */}
+      <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-[var(--border)] bg-[var(--surface)] px-4 md:hidden">
+        <Link href="/" className="inline-block" aria-label="PSyllabus home">
+          <Image src={logoMark} alt="PSyllabus" style={{ height: 24, width: 'auto' }} />
         </Link>
         <button
           onClick={() => setMobileOpen(true)}
           aria-label="Open menu"
-          className="w-10 h-10 rounded-lg flex flex-col items-center justify-center gap-1 hover:bg-[#f9fafb] transition-colors"
+          aria-expanded={mobileOpen}
+          className="control-md -mr-2 flex w-10 items-center justify-center rounded-[var(--r-md)] text-[var(--text)] transition-colors duration-150 hover:bg-[var(--surface-sunken)]"
         >
-          <span className="block w-5 h-0.5 bg-[#1a2e1e] rounded" />
-          <span className="block w-5 h-0.5 bg-[#1a2e1e] rounded" />
-          <span className="block w-5 h-0.5 bg-[#1a2e1e] rounded" />
+          <IconMenu />
         </button>
       </header>
 
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="md:hidden fixed inset-0 z-50">
-          <div className="absolute inset-0 bg-black/20" onClick={() => setMobileOpen(false)} />
-          <aside className="absolute left-0 top-0 h-full w-[260px] bg-white border-r border-[#f3f4f6] flex flex-col">
+        <div className="fixed inset-0 z-50 md:hidden" role="dialog" aria-modal="true">
+          <div
+            className="absolute inset-0 bg-black/20"
+            onClick={() => setMobileOpen(false)}
+          />
+          <aside className="absolute left-0 top-0 flex h-full w-[264px] flex-col border-r border-[var(--border)] bg-[var(--surface)]">
             <button
               onClick={() => setMobileOpen(false)}
               aria-label="Close menu"
-              className="absolute top-4 right-3 w-8 h-8 rounded-lg text-[#6b7280] hover:bg-[#f9fafb] transition-colors text-lg leading-none"
+              className="absolute right-3 top-4 flex h-8 w-8 items-center justify-center rounded-[var(--r-md)] text-[var(--text-muted)] transition-colors duration-150 hover:bg-[var(--surface-sunken)]"
             >
-              ×
+              <IconClose width={18} height={18} />
             </button>
-            {sidebarContent}
+            {sidebar}
           </aside>
         </div>
       )}
 
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex w-[220px] shrink-0 bg-white border-r border-[#f3f4f6] flex-col sticky top-0 h-screen">
-        {sidebarContent}
+      <aside className="sticky top-0 hidden h-screen w-[240px] shrink-0 flex-col border-r border-[var(--border)] bg-[var(--surface)] md:flex">
+        {sidebar}
       </aside>
 
-      <main className="flex-1 min-w-0">{children}</main>
+      <main className="min-w-0 flex-1">{children}</main>
     </div>
   )
 }

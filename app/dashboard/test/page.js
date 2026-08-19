@@ -108,14 +108,14 @@ export default function TestBuilderPage() {
     <DashboardLayout profile={profile}>
       <div className="px-5 py-6 md:px-12 md:py-10 max-w-3xl mx-auto">
         <header className="mb-8">
-          <h1 className="text-[28px] font-bold text-[#1a2e1e] mb-1">Build a Test</h1>
+          <h1 className="t-page-title mb-1">Build a Test</h1>
           <p className="text-sm text-[#6b7280]">
             Mix any topics into an exam-style paper. Choose the length and whether to run it
             under timed conditions.
           </p>
         </header>
 
-        <div className="bg-white rounded-xl p-5 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] mb-4">
+        <div className="surface p-5 mb-4">
           <label className="block text-sm font-medium text-[#1a2e1e] mb-2">Subject</label>
           <select
             value={subject}
@@ -130,7 +130,7 @@ export default function TestBuilderPage() {
           </select>
         </div>
 
-        <div className="bg-white rounded-xl p-5 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] mb-4">
+        <div className="surface p-5 mb-4">
           <div className="flex items-center justify-between mb-3">
             <label className="text-sm font-medium text-[#1a2e1e]">Topics</label>
             <button
@@ -158,7 +158,7 @@ export default function TestBuilderPage() {
               No syllabus loaded for this subject yet.
             </p>
           ) : (
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               {topics.map((topic) => {
                 const n = available[topic] || 0
                 const isSelected = selected.includes(topic)
@@ -197,7 +197,7 @@ export default function TestBuilderPage() {
           )}
         </div>
 
-        <div className="bg-white rounded-xl p-5 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] mb-4">
+        <div className="surface p-5 mb-4">
           <label className="block text-sm font-medium text-[#1a2e1e] mb-3">Length</label>
           <div className="flex flex-wrap gap-2 mb-5">
             {LENGTHS.map((n) => (
@@ -236,7 +236,7 @@ export default function TestBuilderPage() {
           </label>
         </div>
 
-        <div className="bg-white rounded-xl p-5 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+        <div className="surface p-5">
           {canStart ? (
             <>
               <p className="text-sm text-[#6b7280] mb-4">
@@ -249,7 +249,7 @@ export default function TestBuilderPage() {
               </p>
               <button
                 onClick={startTest}
-                className="w-full py-2.5 bg-[#2D6A4F] text-white rounded-lg text-sm font-medium hover:bg-[#245a42] transition-colors"
+                className="w-full btn btn-solid control-md"
               >
                 Start test
               </button>

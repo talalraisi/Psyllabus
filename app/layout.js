@@ -29,13 +29,21 @@ export const metadata = {
     'Track your IB, A-Level, or AP syllabus topic by topic. See where you are weak and know exactly what to study today.',
   keywords: ['IB', 'A-Level', 'AP', 'syllabus', 'study planner', 'exam prep'],
   authors: [{ name: 'Talal Al-Raisi' }],
+  metadataBase: new URL('https://www.psyllabus.app'),
   openGraph: {
     title: 'PSyllabus: Know exactly what to study next',
     description:
-      'Syllabus-mapped progress tracking for IB, A-Level, and AP students.',
+      'Syllabus-mapped progress tracking for IB, A-Level, and AP students. Status is set by testing, never self-rating.',
     siteName: 'PSyllabus',
     locale: 'en_GB',
     type: 'website',
+    url: 'https://www.psyllabus.app',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'PSyllabus: Know exactly what to study next',
+    description:
+      'Syllabus-mapped progress tracking for IB, A-Level, and AP students.',
   },
 }
 

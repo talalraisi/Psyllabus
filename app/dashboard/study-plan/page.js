@@ -90,14 +90,14 @@ export default function StudyPlanPage() {
     <DashboardLayout profile={profile}>
       <div className="px-5 py-6 md:px-12 md:py-10 max-w-4xl mx-auto">
         <header className="mb-8">
-          <h1 className="text-[28px] font-bold text-[#1a2e1e] mb-1">Study Plan</h1>
+          <h1 className="t-page-title mb-1">Study Plan</h1>
           <p className="text-sm text-[#6b7280]">
             Decaying skills first, then weak, then untested
           </p>
         </header>
 
         {groups.length === 0 ? (
-          <div className="bg-white rounded-xl p-10 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-center">
+          <div className="surface p-10 text-center">
             <h2 className="text-base font-semibold text-[#1a2e1e]">All caught up</h2>
             <p className="text-sm text-[#6b7280] mt-2">
               Nothing left to start. Keep reviewing to stay sharp.
@@ -108,7 +108,7 @@ export default function StudyPlanPage() {
             {groups.map(({ subject, items }) => (
               <section key={subject}>
                 <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-[13px] font-semibold uppercase tracking-[0.06em] text-[#9ca3af]">
+                  <h2 className="t-overline">
                     {subject}
                   </h2>
                   <Link
@@ -118,7 +118,7 @@ export default function StudyPlanPage() {
                     Open syllabus →
                   </Link>
                 </div>
-                <div className="bg-white rounded-xl border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] divide-y divide-[#f3f4f6]">
+                <div className="surface divide-y divide-[#f3f4f6]">
                   {items.map((item) => (
                     <div key={item.id} className="px-5 py-3 flex items-center gap-4">
                       <div className="flex-1 min-w-0">
@@ -126,7 +126,7 @@ export default function StudyPlanPage() {
                         <p className="text-sm text-[#374151] truncate">{item.subtopic}</p>
                       </div>
                       <span
-                        className={`shrink-0 text-xs font-medium px-2.5 py-1 rounded-full ${
+                        className={`shrink-0 text-xs font-medium px-3 py-1 rounded-full ${
                           item.status === 'decaying'
                             ? 'bg-[#f59e0b] text-white'
                             : item.status === 'in_progress'

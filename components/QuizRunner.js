@@ -44,7 +44,7 @@ function statusFromAccuracy(accuracy) {
 
 function Skeleton() {
   return (
-    <div className="bg-white rounded-xl p-6 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] animate-pulse space-y-4">
+    <div className="surface p-6 animate-pulse space-y-4">
       <div className="h-4 w-24 bg-[#f3f4f6] rounded" />
       <div className="h-6 w-2/3 bg-[#f3f4f6] rounded" />
       <div className="h-10 w-full bg-[#f3f4f6] rounded-lg" />
@@ -349,14 +349,14 @@ export default function QuizRunner({
 
   if (phase === PHASE.empty) {
     return (
-      <div className="bg-white rounded-xl p-10 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-center">
+      <div className="surface p-10 text-center">
         <h2 className="text-base font-semibold text-[#1a2e1e]">
           {mode === 'mistakes' ? 'Nothing to review' : 'Questions coming soon'}
         </h2>
         <p className="text-sm text-[#6b7280] mt-2">{emptyMessage}</p>
         <Link
           href={backHref}
-          className="inline-block mt-6 px-5 py-2 bg-[#2D6A4F] text-white rounded-lg text-sm font-medium hover:bg-[#245a42] transition-colors"
+          className="inline-block mt-6 btn btn-solid control-md"
         >
           Go back
         </Link>
@@ -369,8 +369,8 @@ export default function QuizRunner({
       ? Math.round(questions.reduce((s, q) => s + (q.time_budget_seconds || 90), 0) / 60)
       : null
     return (
-      <div className="bg-white rounded-xl p-6 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-        <p className="text-[13px] font-semibold uppercase tracking-[0.06em] text-[#9ca3af] mb-2">
+      <div className="surface p-6">
+        <p className="t-overline mb-2">
           {mode === 'mock'
             ? 'Timed Mock'
             : mode === 'mistakes'
@@ -413,7 +413,7 @@ export default function QuizRunner({
 
         <button
           onClick={startQuiz}
-          className="w-full py-2.5 bg-[#2D6A4F] text-white rounded-lg text-sm font-medium hover:bg-[#245a42] transition-colors"
+          className="w-full btn btn-solid control-md"
         >
           {timed ? 'Start timed mock' : 'Start quiz'}
         </button>
@@ -453,7 +453,7 @@ export default function QuizRunner({
     }
 
     return (
-      <div className="bg-white rounded-xl p-6 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+      <div className="surface p-6">
         {paceBlock}
 
         <div className="flex items-center justify-between mb-4">
@@ -487,7 +487,7 @@ export default function QuizRunner({
           <button
             onClick={() => goTo(currentIndex - 1)}
             disabled={currentIndex === 0}
-            className="flex-1 py-2.5 rounded-lg border border-[#e5e7eb] text-sm font-medium text-[#374151] hover:bg-[#f9fafb] transition-colors disabled:opacity-40"
+            className="flex-1 btn btn-quiet control-md disabled:opacity-40"
           >
             Back
           </button>
@@ -495,7 +495,7 @@ export default function QuizRunner({
             <button
               onClick={() => goTo(currentIndex + 1)}
               disabled={selected == null}
-              className="flex-1 py-2.5 rounded-lg bg-[#2D6A4F] text-white text-sm font-medium hover:bg-[#245a42] transition-colors disabled:opacity-40"
+              className="flex-1 btn btn-solid control-md disabled:opacity-40"
             >
               Next
             </button>
@@ -503,7 +503,7 @@ export default function QuizRunner({
             <button
               onClick={finishQuiz}
               disabled={(!timed && answeredCount < questions.length) || submitting}
-              className="flex-1 py-2.5 rounded-lg bg-[#2D6A4F] text-white text-sm font-medium hover:bg-[#245a42] transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+              className="flex-1 btn btn-solid control-md disabled:opacity-40 flex items-center justify-center gap-2"
             >
               {submitting ? <Spinner /> : null}
               {submitting ? 'Submitting' : 'Finish'}
@@ -521,8 +521,8 @@ export default function QuizRunner({
     )
 
     return (
-      <div className="bg-white rounded-xl p-6 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-        <p className="text-[13px] font-semibold uppercase tracking-[0.06em] text-[#9ca3af] mb-2">
+      <div className="surface p-6">
+        <p className="t-overline mb-2">
           Quiz Complete
         </p>
         <h1 className="text-[32px] font-bold text-[#2D6A4F] leading-tight">
@@ -570,7 +570,7 @@ export default function QuizRunner({
               >
                 <div className="flex items-start gap-2">
                   <span
-                    className={`text-xs font-bold mt-0.5 ${g.correct ? 'text-[#16a34a]' : 'text-[#dc2626]'}`}
+                    className={`text-xs font-bold mt-1 ${g.correct ? 'text-[#16a34a]' : 'text-[#dc2626]'}`}
                     aria-label={g.correct ? 'Correct' : 'Incorrect'}
                   >
                     {g.correct ? '✓' : '✗'}
@@ -593,13 +593,13 @@ export default function QuizRunner({
         <div className="mt-6 flex gap-2">
           <Link
             href={backHref}
-            className="flex-1 text-center py-2.5 rounded-lg border border-[#e5e7eb] text-sm font-medium text-[#374151] hover:bg-[#f9fafb] transition-colors"
+            className="flex-1 text-center btn btn-quiet control-md"
           >
             Done
           </Link>
           <Link
             href="/dashboard/mistakes"
-            className="flex-1 text-center py-2.5 rounded-lg bg-[#2D6A4F] text-white text-sm font-medium hover:bg-[#245a42] transition-colors"
+            className="flex-1 text-center btn btn-solid control-md"
           >
             Open Mistake Bank
           </Link>

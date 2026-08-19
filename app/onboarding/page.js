@@ -368,7 +368,7 @@ export default function Onboarding() {
             <button
               onClick={() => setStep(2)}
               disabled={!curriculum || !gradYear}
-              className="btn-primary w-full py-3.5 text-base disabled:opacity-40 disabled:cursor-not-allowed">
+              className="btn-primary w-full py-4 text-base disabled:opacity-40 disabled:cursor-not-allowed">
               Continue
             </button>
           </div>
@@ -452,7 +452,7 @@ export default function Onboarding() {
               <button
                 onClick={() => setStep(3)}
                 disabled={!subjectsValid}
-                className="btn-primary flex-1 py-3.5 text-base disabled:opacity-40 disabled:cursor-not-allowed">
+                className="btn-primary flex-1 py-4 text-base disabled:opacity-40 disabled:cursor-not-allowed">
                 Continue
               </button>
             </div>
@@ -494,7 +494,7 @@ export default function Onboarding() {
               <button
                 onClick={handleFinish}
                 disabled={loading || Object.keys(targetGrades).length !== selectedSubjects.length}
-                className="btn-primary flex-1 py-3.5 text-base disabled:opacity-40 disabled:cursor-not-allowed">
+                className="btn-primary flex-1 py-4 text-base disabled:opacity-40 disabled:cursor-not-allowed">
                 {loading ? 'Setting up…' : 'Go to my dashboard'}
               </button>
             </div>

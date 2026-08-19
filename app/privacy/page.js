@@ -15,7 +15,7 @@ export default function PrivacyPage() {
           ← Back to PSyllabus
         </Link>
 
-        <h1 className="text-[28px] font-bold text-[#1a2e1e] mt-6 mb-1">Privacy Policy</h1>
+        <h1 className="t-page-title mt-6 mb-1">Privacy Policy</h1>
         <p className="text-sm text-[#6b7280] mb-10">Last updated {LAST_UPDATED}</p>
 
         <div className="space-y-8 text-sm text-[#374151] leading-relaxed">

@@ -101,7 +101,7 @@ export default function ProgressPage() {
     <DashboardLayout profile={profile}>
       <div className="px-5 py-6 md:px-12 md:py-10 max-w-6xl mx-auto">
         <header className="mb-8">
-          <h1 className="text-[28px] font-bold text-[#1a2e1e] mb-1">Progress</h1>
+          <h1 className="t-page-title mb-1">Progress</h1>
           <p className="text-sm text-[#6b7280]">
             {overallPercent}% of all subtopics mastered across {subjects.length} subject{subjects.length !== 1 ? 's' : ''}
           </p>
@@ -111,9 +111,9 @@ export default function ProgressPage() {
           {STAT_CARDS.map((stat) => (
             <div
               key={stat.key}
-              className="bg-white rounded-xl p-5 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
+              className="surface p-5"
             >
-              <p className={`text-[32px] font-bold leading-tight ${stat.color}`}>
+              <p className={`t-stat ${stat.color}`}>
                 {summary[stat.key]}
               </p>
               <p className="text-sm text-[#6b7280] mt-1">{stat.label}</p>
@@ -123,10 +123,10 @@ export default function ProgressPage() {
 
         {bySubject.length > 0 && (
           <section className="mb-10">
-            <h2 className="text-[13px] font-semibold uppercase tracking-[0.06em] text-[#9ca3af] mb-3">
+            <h2 className="t-overline mb-3">
               By Subject
             </h2>
-            <div className="bg-white rounded-xl p-5 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] space-y-4">
+            <div className="surface p-5 space-y-4">
               {bySubject.map(({ subject, percent }) => (
                 <div key={subject} className="flex items-center gap-4">
                   <span className="w-56 shrink-0 text-sm text-[#374151] truncate">{subject}</span>

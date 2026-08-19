@@ -126,7 +126,7 @@ export default function SyllabusPage() {
             ← Back to Dashboard
           </button>
           <div className="flex items-center justify-between gap-4">
-            <h1 className="text-[28px] font-bold text-[#1a2e1e]">{subjectName}</h1>
+            <h1 className="t-page-title">{subjectName}</h1>
             <span className="shrink-0 rounded-full bg-[#f0fdf4] text-[#2D6A4F] text-sm font-semibold px-3 py-1">
               {completion}% mastered
             </span>
@@ -138,7 +138,7 @@ export default function SyllabusPage() {
             {hasQuestions && (
               <Link
                 href={`/dashboard/quiz?subject=${encodeURIComponent(subjectName)}&mode=mock&back=${encodeURIComponent(slugPath)}`}
-                className="text-sm font-medium px-4 py-1.5 rounded-lg border border-[#2D6A4F] text-[#2D6A4F] hover:bg-[#f0fdf4] transition-colors"
+                className="btn btn-outline control-sm"
               >
                 Timed mock exam
               </Link>
@@ -154,7 +154,7 @@ export default function SyllabusPage() {
         </header>
 
         {syllabusData.length === 0 ? (
-          <div className="bg-white rounded-xl p-10 border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] text-center">
+          <div className="surface p-10 text-center">
             <h2 className="text-base font-semibold text-[#1a2e1e]">Syllabus coming soon</h2>
             <p className="text-sm text-[#6b7280] mt-2">
               We are still preparing the content for this subject. Check back soon.
@@ -171,16 +171,16 @@ export default function SyllabusPage() {
               return (
                 <div
                   key={topic}
-                  className="bg-white rounded-xl border border-[#f0f0f0] shadow-[0_1px_2px_rgba(0,0,0,0.04)] overflow-hidden"
+                  className="surface overflow-hidden"
                 >
                   <button
                     onClick={() => toggleTopic(topic)}
-                    className="w-full bg-[#f9fafb] px-5 py-3.5 flex items-center justify-between hover:bg-[#f3f4f6] transition-colors"
+                    className="w-full bg-[#f9fafb] px-5 py-4 flex items-center justify-between hover:bg-[#f3f4f6] transition-colors"
                     aria-expanded={expanded}
                   >
                     <div className="text-left">
                       <h3 className="text-sm font-bold text-[#1a2e1e]">{topic}</h3>
-                      <p className="text-xs text-[#6b7280] mt-0.5">
+                      <p className="text-xs text-[#6b7280] mt-1">
                         {subtopics.length} subtopic{subtopics.length !== 1 ? 's' : ''} · {topicMastered} mastered
                       </p>
                     </div>
@@ -195,7 +195,7 @@ export default function SyllabusPage() {
                               `/dashboard/quiz?subject=${encodeURIComponent(subjectName)}&topic=${encodeURIComponent(topic)}&mode=topic&back=${encodeURIComponent(slugPath)}`
                             )
                           }}
-                          className="text-xs font-medium px-3 py-1.5 rounded-lg border border-[#2D6A4F] text-[#2D6A4F] hover:bg-[#f0fdf4] transition-colors cursor-pointer"
+                          className="btn btn-outline control-sm text-xs cursor-pointer"
                         >
                           Topic test
                         </span>
@@ -225,7 +225,7 @@ export default function SyllabusPage() {
                         return (
                           <div
                             key={item.id}
-                            className="px-5 py-3 flex flex-col sm:flex-row sm:items-center gap-2.5"
+                            className="px-5 py-3 flex flex-col sm:flex-row sm:items-center gap-3"
                           >
                             <div className="flex-1 min-w-0">
                               <button
@@ -236,14 +236,14 @@ export default function SyllabusPage() {
                                 {item.subtopic}
                               </button>
                               {item.hl_only && (
-                                <span className="inline-block mt-1 rounded-full bg-[#E8D5B0] px-2 py-0.5 text-[11px] font-medium text-[#1a2e1e]">
+                                <span className="inline-block mt-1 rounded-full bg-[#E8D5B0] px-2 py-1 text-[11px] font-medium text-[#1a2e1e]">
                                   HL only
                                 </span>
                               )}
                             </div>
                             <div className="flex items-center gap-3 shrink-0">
                               <span
-                                className={`flex items-center gap-1.5 text-xs font-medium ${STATUS_TEXT_COLORS[currentStatus]}`}
+                                className={`flex items-center gap-2 text-xs font-medium ${STATUS_TEXT_COLORS[currentStatus]}`}
                                 title={
                                   currentStatus === 'decaying'
                                     ? `Mastered ${daysSince(progressDetail[key]?.updatedAt)} days ago. Retest within the ${DECAY_DAYS}-day window to keep it green.`
@@ -255,7 +255,7 @@ export default function SyllabusPage() {
                               </span>
                               <Link
                                 href={`/dashboard/quiz?subject=${encodeURIComponent(subjectName)}&topic=${encodeURIComponent(item.topic)}&subtopic=${encodeURIComponent(item.subtopic)}&back=${encodeURIComponent(slugPath)}`}
-                                className="text-xs font-medium px-3 py-1.5 rounded-lg border border-[#2D6A4F] text-[#2D6A4F] hover:bg-[#f0fdf4] transition-colors"
+                                className="btn btn-outline control-sm text-xs"
                               >
                                 Practice quiz
                               </Link>

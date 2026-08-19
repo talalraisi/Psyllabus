@@ -133,7 +133,7 @@ export default function Signup() {
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary w-full py-3.5 mt-2 text-base"
+              className="btn-primary w-full py-4 mt-2 text-base"
             >
               {loading ? 'Creating account…' : 'Create account'}
             </button>
