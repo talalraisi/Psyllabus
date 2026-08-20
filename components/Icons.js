@@ -147,6 +147,15 @@ export function IconLogout(props) {
   )
 }
 
+export function IconSchool(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M10 2.75L18.25 7 10 11.25 1.75 7 10 2.75Z" />
+      <path d="M5.25 9v4.25c0 1.24 2.13 2.25 4.75 2.25s4.75-1.01 4.75-2.25V9" />
+    </svg>
+  )
+}
+
 export function IconClock(props) {
   return (
     <svg {...base} {...props}>

@@ -16,9 +16,49 @@ export default function Profile() {
   const [success, setSuccess] = useState('')
   const [fullName, setFullName] = useState('')
   const [avatarUrl, setAvatarUrl] = useState('')
+  const [school, setSchool] = useState(null)
+  const [joinCode, setJoinCode] = useState('')
+  const [joining, setJoining] = useState(false)
+  const [joinError, setJoinError] = useState('')
   const fileInputRef = useRef(null)
   const router = useRouter()
   const supabase = createClient()
+
+  const joinSchool = async (e) => {
+    e.preventDefault()
+    const code = joinCode.trim().toUpperCase()
+    if (!code || joining) return
+    setJoining(true)
+    setJoinError('')
+
+    const { data: match } = await supabase
+      .from('schools')
+      .select('*')
+      .eq('join_code', code)
+      .maybeSingle()
+
+    if (!match) {
+      setJoinError('That join code was not recognised. Check it with your teacher.')
+      setJoining(false)
+      return
+    }
+
+    const { error: linkError } = await supabase
+      .from('profiles')
+      .update({ school_id: match.id })
+      .eq('id', profile.id)
+
+    if (linkError) {
+      setJoinError(linkError.message)
+    } else {
+      setSchool(match)
+      setProfile((p) => ({ ...p, school_id: match.id }))
+      setJoinCode('')
+      setSuccess(`Joined ${match.name}`)
+      setTimeout(() => setSuccess(''), 4000)
+    }
+    setJoining(false)
+  }
 
   useEffect(() => {
     async function loadProfile() {
@@ -45,6 +85,16 @@ export default function Profile() {
       setProfile({ ...data, id: data.id || user.id, email: user.email })
       setFullName(data.full_name || '')
       setAvatarUrl(data.avatar_url || '')
+
+      if (data.school_id) {
+        const { data: schoolRow } = await supabase
+          .from('schools')
+          .select('*')
+          .eq('id', data.school_id)
+          .maybeSingle()
+        setSchool(schoolRow || null)
+      }
+
       setLoading(false)
     }
     loadProfile()
@@ -221,6 +271,48 @@ export default function Profile() {
             {saving ? 'Saving…' : 'Save changes'}
           </button>
         </form>
+
+        <div className="surface p-5 mt-4">
+          <h2 className="t-card-title mb-1">School</h2>
+          {school ? (
+            <>
+              <p className="t-small">
+                You are linked to <span className="font-medium text-[var(--text)]">{school.name}</span>.
+                Every subject is unlocked at no cost while your school&apos;s access is active.
+              </p>
+              <span className="mt-3 inline-block rounded-full bg-[var(--sand)] px-3 py-1 text-xs font-medium text-[var(--text)]">
+                Full access · free
+              </span>
+            </>
+          ) : (
+            <>
+              <p className="t-small mb-4">
+                Have a join code from your school? Enter it to unlock every subject for free.
+              </p>
+              <form onSubmit={joinSchool} className="flex flex-wrap gap-2">
+                <input
+                  value={joinCode}
+                  onChange={(e) => setJoinCode(e.target.value)}
+                  placeholder="e.g. ABA2026"
+                  aria-label="School join code"
+                  className="field max-w-[220px] flex-1 uppercase"
+                />
+                <button
+                  type="submit"
+                  disabled={joining || !joinCode.trim()}
+                  className="btn btn-solid control-md"
+                >
+                  {joining ? 'Joining…' : 'Join school'}
+                </button>
+              </form>
+              {joinError && (
+                <p className="mt-3 rounded-[var(--r-md)] border border-[var(--danger-border)] bg-[var(--danger-bg)] px-4 py-3 text-sm text-[var(--danger)]">
+                  {joinError}
+                </p>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </DashboardLayout>
   )

@@ -17,7 +17,9 @@ import {
   IconLogout,
   IconMenu,
   IconClose,
+  IconSchool,
 } from '@/components/Icons'
+import { isStaff } from '@/lib/access'
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', Icon: IconDashboard, match: (p) => p === '/dashboard' },
@@ -107,6 +109,19 @@ export default function DashboardLayout({ children, profile }) {
     router.push('/login')
   }
 
+  // Staff get one extra destination; students never see it.
+  const navItems = isStaff(profile)
+    ? [
+        ...NAV_ITEMS,
+        {
+          href: '/dashboard/school',
+          label: 'School',
+          Icon: IconSchool,
+          match: (p) => p === '/dashboard/school',
+        },
+      ]
+    : NAV_ITEMS
+
   const sidebar = (
     <>
       <div className="px-4 pt-5 pb-6">
@@ -120,7 +135,7 @@ export default function DashboardLayout({ children, profile }) {
       <nav className="flex-1 overflow-y-auto px-3 pt-4" aria-label="Main">
         <p className="t-overline px-3 pb-2">Menu</p>
         <ul className="flex flex-col gap-1">
-          {NAV_ITEMS.map(({ href, label, Icon, match }) => {
+          {navItems.map(({ href, label, Icon, match }) => {
             const active = match(pathname)
             return (
               <li key={href}>
