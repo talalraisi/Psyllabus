@@ -251,9 +251,18 @@ async function verifyBatch(questions) {
     )
     .join("\n\n");
 
-  const prompt = `You are the verification layer of an exam question bank. For each question below, independently solve it from scratch, then judge it.
+  const prompt = `You are the verification layer of an exam question bank. Solve each question below from scratch, then judge it.
 
-Mark sound=false if ANY of these hold: the marked answer is wrong; more than one option is correct; no option is correct; the question is ambiguous or unanswerable; the question does not fit an IB multiple-choice format.
+Set sound=true when the option marked correct is the right answer and exactly one option is right. Work the problem first, then compare your result to the marked option.
+
+Set sound=false ONLY when one of these is true:
+- your worked answer differs from the marked option
+- more than one option is correct, or none is
+- the question cannot be answered from the information given
+
+Do not set sound=false for style, wording, phrasing, or because you would have set the question differently. If your reasoning concludes the marked answer is correct, sound MUST be true.
+
+Keep each reason to one short sentence.
 
 Questions:\n\n${listing}`;
 
