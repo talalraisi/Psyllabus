@@ -41,18 +41,31 @@ export default function Home() {
     <main className="min-h-screen bg-[var(--bg)]">
       {/* Navigation with the real entry points */}
       <nav className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--surface)]">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 md:px-8">
-          <Link href="/" aria-label="PSyllabus home" className="inline-block">
-            <Image src={logoMark} alt="PSyllabus" priority style={{ height: 30, width: 'auto' }} />
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 md:px-8">
+          <Link href="/" aria-label="PSyllabus home" className="shrink-0">
+            <Image
+              src={logoMark}
+              alt="PSyllabus"
+              priority
+              className="h-6 w-auto md:h-[30px]"
+            />
           </Link>
-          <div className="flex items-center gap-2">
-            <Link href="/pricing" className="btn btn-quiet control-md hidden sm:inline-flex">
+          {/* Narrow screens drop Pricing and use compact controls so the row
+              never overflows the viewport. */}
+          <div className="flex min-w-0 items-center gap-2">
+            <Link href="/pricing" className="btn btn-quiet control-md hidden md:inline-flex">
               Pricing
             </Link>
-            <Link href="/login" className="btn btn-quiet control-md">
+            <Link
+              href="/login"
+              className="btn btn-quiet control-sm px-3 text-[13px] md:control-md md:px-4 md:text-sm"
+            >
               Log in
             </Link>
-            <Link href="/signup" className="btn btn-solid control-md">
+            <Link
+              href="/signup"
+              className="btn btn-solid control-sm px-3 text-[13px] md:control-md md:px-4 md:text-sm"
+            >
               Get started
             </Link>
           </div>

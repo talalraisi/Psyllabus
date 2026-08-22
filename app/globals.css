@@ -93,184 +93,330 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ===========================================================================
-   Type ramp
-   Every size pairs with a line height on the 4pt grid. Components use these
-   classes instead of ad-hoc font sizes.
-   =========================================================================== */
+@layer components {
+  /* ===========================================================================
+     Type ramp
+     Every size pairs with a line height on the 4pt grid. Components use these
+     classes instead of ad-hoc font sizes.
+     =========================================================================== */
 
-.t-page-title {
-  font-size: 24px;
-  line-height: 32px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: var(--text);
+  .t-page-title {
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+
+  .t-section {
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .t-card-title {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .t-body {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
+    color: var(--text-body);
+  }
+
+  .t-small {
+    font-size: 13px;
+    line-height: 20px;
+    font-weight: 400;
+    color: var(--text-muted);
+  }
+
+  .t-caption {
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 400;
+    color: var(--text-faint);
+  }
+
+  /* Group label above a section. Short by rule — never a sentence. */
+  .t-overline {
+    font-size: 11px;
+    line-height: 16px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  /* Large figures in stat cards. Tabular so columns of numbers align. */
+  .t-stat {
+    font-size: 28px;
+    line-height: 32px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+
+  /* ===========================================================================
+     Surfaces and controls
+     =========================================================================== */
+
+  .surface {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Cards that navigate somewhere lift on hover. Static cards never move. */
+  .surface-interactive {
+    transition: box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  }
+
+  .surface-interactive:hover {
+    box-shadow: var(--shadow-raised);
+    border-color: var(--border-hover);
+  }
+
+  /* Control heights are fixed rather than derived from padding, which keeps
+     every button, input, and pill on the 4pt grid regardless of its label.
+     Declared as utilities so responsive variants (md:control-md) work. */
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding-inline: 16px;
+    border-radius: var(--r-md);
+    font-size: 14px;
+    font-weight: 500;
+    transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
+      color var(--dur) var(--ease);
+    white-space: nowrap;
+  }
+
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-solid {
+    background: var(--brand);
+    color: #fff;
+  }
+
+  .btn-solid:hover:not(:disabled) {
+    background: var(--brand-hover);
+  }
+
+  .btn-outline {
+    background: var(--surface);
+    color: var(--brand);
+    border: 1px solid var(--brand);
+  }
+
+  .btn-outline:hover:not(:disabled) {
+    background: var(--brand-tint);
+  }
+
+  .btn-quiet {
+    background: var(--surface);
+    color: var(--text-body);
+    border: 1px solid var(--border-strong);
+  }
+
+  .btn-quiet:hover:not(:disabled) {
+    background: var(--surface-sunken);
+    border-color: var(--border-hover);
+  }
+
+  .field {
+    width: 100%;
+    height: 40px;
+    padding-inline: 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-md);
+    background: var(--surface);
+    color: var(--text-body);
+    font-size: 14px;
+    outline: none;
+    transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  }
+
+  .field:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px var(--brand-tint);
+  }
+
+  /* Visible focus for keyboard users on every interactive element. */
+  :where(a, button, [role='button'], input, select, textarea):focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+    border-radius: var(--r-sm);
+  }
+
+  /* ===========================================================================
+     Skeletons — every async surface uses this same pulse.
+     =========================================================================== */
+
+  .skeleton {
+    background: #f3f4f6;
+    border-radius: var(--r-md);
+    animation: skeleton-pulse 1.6s var(--ease) infinite;
+  }
+
+
+
+  /* ===========================================================================
+     Legacy classes used by the marketing, auth, and onboarding pages.
+     Retained so those routes keep rendering; values now read from the tokens.
+     =========================================================================== */
+
+  .page { min-height: 100vh; background: var(--bg); }
+
+  .page-center {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .container-narrow { width: 100%; max-width: 42rem; margin-inline: auto; }
+  .container-wide { width: 100%; max-width: 56rem; margin-inline: auto; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-card);
+  }
+
+  .card-pad { padding: 32px; }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--brand);
+    color: #fff;
+    font-weight: 600;
+    border-radius: var(--r-md);
+    transition: background var(--dur) var(--ease);
+  }
+
+  .btn-primary:hover:not(:disabled) { background: var(--brand-hover); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    color: var(--text-body);
+    font-weight: 600;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-md);
+    transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+  }
+
+  .btn-secondary:hover { background: var(--surface-sunken); border-color: var(--border-hover); }
+
+  .btn-ghost {
+    color: var(--text-muted);
+    font-size: 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-md);
+    padding: 8px 16px;
+    transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  }
+
+  .btn-ghost:hover { color: var(--text); border-color: var(--border-hover); }
+
+  .input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-md);
+    background: var(--surface);
+    color: var(--text-body);
+    font-size: 16px;
+    outline: none;
+    transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  }
+
+  .input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-tint); }
+  .input::placeholder { color: var(--text-faint); }
+
+  .label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--brand);
+    background: var(--brand-tint);
+    border-radius: 9999px;
+    padding: 4px 12px;
+  }
+
+  .chip {
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    background: var(--surface-sunken);
+    color: var(--text-muted);
+    border: 1px solid var(--border-strong);
+  }
+
+  .chip-active { background: var(--brand); color: #fff; border-color: var(--brand); }
+
+  .error-box {
+    background: var(--danger-bg);
+    border: 1px solid var(--danger-border);
+    border-radius: var(--r-md);
+    padding: 12px 16px;
+    color: var(--danger);
+    font-size: 14px;
+  }
+
+  .link { color: var(--brand); font-weight: 500; }
+  .link:hover { text-decoration: underline; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .divider { border-top: 1px solid var(--border-strong); }
+
+  .marketing-hero-grid {
+    background-image: radial-gradient(circle, var(--border-strong) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
 }
 
-.t-section {
-  font-size: 18px;
-  line-height: 24px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.t-card-title {
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.t-body {
-  font-size: 14px;
-  line-height: 20px;
-  font-weight: 400;
-  color: var(--text-body);
-}
-
-.t-small {
-  font-size: 13px;
-  line-height: 20px;
-  font-weight: 400;
-  color: var(--text-muted);
-}
-
-.t-caption {
-  font-size: 12px;
-  line-height: 16px;
-  font-weight: 400;
-  color: var(--text-faint);
-}
-
-/* Group label above a section. Short by rule — never a sentence. */
-.t-overline {
-  font-size: 11px;
-  line-height: 16px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-}
-
-/* Large figures in stat cards. Tabular so columns of numbers align. */
-.t-stat {
-  font-size: 28px;
-  line-height: 32px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-}
-
-/* ===========================================================================
-   Surfaces and controls
-   =========================================================================== */
-
-.surface {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow-card);
-}
-
-/* Cards that navigate somewhere lift on hover. Static cards never move. */
-.surface-interactive {
-  transition: box-shadow var(--dur) var(--ease), border-color var(--dur) var(--ease);
-}
-
-.surface-interactive:hover {
-  box-shadow: var(--shadow-raised);
-  border-color: var(--border-hover);
-}
-
-/* Control heights are fixed rather than derived from padding, which keeps
-   every button, input, and pill on the 4pt grid regardless of its label. */
-.control-sm { height: 32px; }
-.control-md { height: 40px; }
-.control-lg { height: 44px; }
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding-inline: 16px;
-  border-radius: var(--r-md);
-  font-size: 14px;
-  font-weight: 500;
-  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
-    color var(--dur) var(--ease);
-  white-space: nowrap;
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-solid {
-  background: var(--brand);
-  color: #fff;
-}
-
-.btn-solid:hover:not(:disabled) {
-  background: var(--brand-hover);
-}
-
-.btn-outline {
-  background: var(--surface);
-  color: var(--brand);
-  border: 1px solid var(--brand);
-}
-
-.btn-outline:hover:not(:disabled) {
-  background: var(--brand-tint);
-}
-
-.btn-quiet {
-  background: var(--surface);
-  color: var(--text-body);
-  border: 1px solid var(--border-strong);
-}
-
-.btn-quiet:hover:not(:disabled) {
-  background: var(--surface-sunken);
-  border-color: var(--border-hover);
-}
-
-.field {
-  width: 100%;
-  height: 40px;
-  padding-inline: 12px;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--r-md);
-  background: var(--surface);
-  color: var(--text-body);
-  font-size: 14px;
-  outline: none;
-  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
-}
-
-.field:focus {
-  border-color: var(--brand);
-  box-shadow: 0 0 0 3px var(--brand-tint);
-}
-
-/* Visible focus for keyboard users on every interactive element. */
-:where(a, button, [role='button'], input, select, textarea):focus-visible {
-  outline: 2px solid var(--brand);
-  outline-offset: 2px;
-  border-radius: var(--r-sm);
-}
-
-/* ===========================================================================
-   Skeletons — every async surface uses this same pulse.
-   =========================================================================== */
-
-.skeleton {
-  background: #f3f4f6;
-  border-radius: var(--r-md);
-  animation: skeleton-pulse 1.6s var(--ease) infinite;
-}
+@utility control-sm { height: 32px; }
+@utility control-md { height: 40px; }
+@utility control-lg { height: 44px; }
 
 @keyframes skeleton-pulse {
   0%, 100% { opacity: 1; }
@@ -285,143 +431,4 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-}
-
-/* ===========================================================================
-   Legacy classes used by the marketing, auth, and onboarding pages.
-   Retained so those routes keep rendering; values now read from the tokens.
-   =========================================================================== */
-
-.page { min-height: 100vh; background: var(--bg); }
-
-.page-center {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
-
-.container-narrow { width: 100%; max-width: 42rem; margin-inline: auto; }
-.container-wide { width: 100%; max-width: 56rem; margin-inline: auto; }
-
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow-card);
-}
-
-.card-pad { padding: 32px; }
-
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--brand);
-  color: #fff;
-  font-weight: 600;
-  border-radius: var(--r-md);
-  transition: background var(--dur) var(--ease);
-}
-
-.btn-primary:hover:not(:disabled) { background: var(--brand-hover); }
-.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  color: var(--text-body);
-  font-weight: 600;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--r-md);
-  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
-}
-
-.btn-secondary:hover { background: var(--surface-sunken); border-color: var(--border-hover); }
-
-.btn-ghost {
-  color: var(--text-muted);
-  font-size: 14px;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--r-md);
-  padding: 8px 16px;
-  transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
-}
-
-.btn-ghost:hover { color: var(--text); border-color: var(--border-hover); }
-
-.input {
-  width: 100%;
-  padding: 12px 16px;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--r-md);
-  background: var(--surface);
-  color: var(--text-body);
-  font-size: 16px;
-  outline: none;
-  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
-}
-
-.input:focus { border-color: var(--brand); box-shadow: 0 0 0 3px var(--brand-tint); }
-.input::placeholder { color: var(--text-faint); }
-
-.label {
-  display: block;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-muted);
-  margin-bottom: 8px;
-}
-
-.badge {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--brand);
-  background: var(--brand-tint);
-  border-radius: 9999px;
-  padding: 4px 12px;
-}
-
-.chip {
-  font-size: 12px;
-  padding: 4px 12px;
-  border-radius: 9999px;
-  background: var(--surface-sunken);
-  color: var(--text-muted);
-  border: 1px solid var(--border-strong);
-}
-
-.chip-active { background: var(--brand); color: #fff; border-color: var(--brand); }
-
-.error-box {
-  background: var(--danger-bg);
-  border: 1px solid var(--danger-border);
-  border-radius: var(--r-md);
-  padding: 12px 16px;
-  color: var(--danger);
-  font-size: 14px;
-}
-
-.link { color: var(--brand); font-weight: 500; }
-.link:hover { text-decoration: underline; }
-
-.section-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.divider { border-top: 1px solid var(--border-strong); }
-
-.marketing-hero-grid {
-  background-image: radial-gradient(circle, var(--border-strong) 1px, transparent 1px);
-  background-size: 24px 24px;
 }

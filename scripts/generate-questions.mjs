@@ -16,10 +16,9 @@
  *                       install: https://ollama.com  then: ollama pull qwen2.5:14b
  *   --provider claude   highest quality, costs API credits
  *
- * Requirements (in .env.local or the environment):
- *   NEXT_PUBLIC_SUPABASE_URL
- *   SUPABASE_SERVICE_ROLE_KEY   (Supabase dashboard -> Settings -> API; never commit it)
- *   ANTHROPIC_API_KEY           (only for --provider claude)
+ * Requirements (in .env.local):
+ *   DATABASE_URL       the same connection string npm run setup-db uses
+ *   ANTHROPIC_API_KEY  only when using --provider claude
  *
  * Usage:
  *   node scripts/generate-questions.mjs --subject "Math Analysis & Approaches HL" --per-subtopic 100
@@ -27,10 +26,8 @@
  *   node scripts/generate-questions.mjs --subject "Economics HL" --limit-subtopics 3 --per-subtopic 10
  */
 
-import fs from "node:fs";
-import path from "node:path";
 import Anthropic from "@anthropic-ai/sdk";
-import { createClient } from "@supabase/supabase-js";
+import { connect } from "./db.mjs";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -51,27 +48,9 @@ const OLLAMA_URL = arg("ollama-url", "http://localhost:11434");
 const BATCH_SIZE = PROVIDER === "ollama" ? 8 : 20; // local models do better with smaller batches
 const MODEL = "claude-opus-5";
 
-// Load .env.local without a dotenv dependency
-const envPath = path.join(process.cwd(), ".env.local");
-if (fs.existsSync(envPath)) {
-  for (const line of fs.readFileSync(envPath, "utf8").split("\n")) {
-    const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
-    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].trim();
-  }
-}
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-if (!supabaseUrl || !serviceKey) {
-  console.error(
-    "Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in .env.local"
-  );
-  process.exit(1);
-}
-
-const supabase = createClient(supabaseUrl, serviceKey);
 // Only constructed when actually using Claude, so Ollama runs need no API key.
 const anthropic = PROVIDER === "claude" ? new Anthropic() : null;
+let db;
 
 // ---------------------------------------------------------------------------
 // Schemas for structured outputs
@@ -297,12 +276,13 @@ async function main() {
   console.log(`Subject: ${SUBJECT} | target ${PER_SUBTOPIC}/subtopic | ${modelLabel}`);
   await preflight();
 
-  const { data: subtopics, error } = await supabase
-    .from("syllabus_content")
-    .select("topic, subtopic")
-    .eq("subject", SUBJECT)
-    .order("topic");
-  if (error) throw error;
+  db = await connect();
+
+  const { rows: subtopics } = await db.query(
+    `SELECT topic, subtopic FROM syllabus_content
+     WHERE subject = $1 ORDER BY topic, subtopic`,
+    [SUBJECT]
+  );
   if (!subtopics?.length) {
     console.error(`No syllabus_content rows for subject "${SUBJECT}". Seed the syllabus first.`);
     process.exit(1);
@@ -312,13 +292,12 @@ async function main() {
   let totalInserted = 0;
 
   for (const { topic, subtopic } of todo) {
-    const { data: existing } = await supabase
-      .from("questions")
-      .select("stem")
-      .eq("subject", SUBJECT)
-      .eq("subtopic", subtopic);
+    const { rows: existing } = await db.query(
+      `SELECT stem FROM questions WHERE subject = $1 AND subtopic = $2`,
+      [SUBJECT, subtopic]
+    );
 
-    const existingStems = (existing || []).map((q) => q.stem);
+    const existingStems = existing.map((q) => q.stem);
     let have = existingStems.length;
     console.log(`\n${subtopic}: ${have}/${PER_SUBTOPIC}`);
 
@@ -358,14 +337,28 @@ async function main() {
           let inserted = 0;
           let duplicates = 0;
           for (const row of rows) {
-            const { error: insertError } = await supabase.from("questions").insert(row);
-            if (!insertError) {
-              inserted++;
-              existingStems.push(row.stem);
-            } else if (insertError.code === "23505") {
-              duplicates++;
-            } else {
-              throw insertError;
+            try {
+              const res = await db.query(
+                `INSERT INTO questions
+                   (curriculum, subject, topic, subtopic, stem, options, correct_answer,
+                    explanation, marks, time_budget_seconds, difficulty, source, verified)
+                 VALUES ($1,$2,$3,$4,$5,$6::jsonb,$7,$8,$9,$10,$11,$12,$13)
+                 ON CONFLICT DO NOTHING`,
+                [
+                  row.curriculum, row.subject, row.topic, row.subtopic, row.stem,
+                  JSON.stringify(row.options), row.correct_answer, row.explanation,
+                  row.marks, row.time_budget_seconds, row.difficulty, row.source, row.verified,
+                ]
+              );
+              if (res.rowCount > 0) {
+                inserted++;
+                existingStems.push(row.stem);
+              } else {
+                duplicates++;
+              }
+            } catch (e) {
+              if (e.code === "23505") duplicates++;
+              else throw e;
             }
           }
           have += inserted;
@@ -386,9 +379,11 @@ async function main() {
   }
 
   console.log(`\nDone. Inserted ${totalInserted} new verified questions.`);
+  await db.end();
 }
 
-main().catch((err) => {
-  console.error(err);
+main().catch(async (err) => {
+  console.error(`\n${err.message}\n`);
+  await db?.end().catch(() => {});
   process.exit(1);
 });

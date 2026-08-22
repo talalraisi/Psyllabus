@@ -7,19 +7,8 @@
  * Requires DATABASE_URL in .env.local (same as setup-database.mjs).
  */
 
-import fs from 'node:fs'
-import path from 'node:path'
-import pg from 'pg'
+import { connect } from './db.mjs'
 
-const envPath = path.join(process.cwd(), '.env.local')
-if (fs.existsSync(envPath)) {
-  for (const line of fs.readFileSync(envPath, 'utf8').split('\n')) {
-    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/)
-    if (m && !process.env[m[1]]) {
-      process.env[m[1]] = m[2].trim().replace(/^["']|["']$/g, '')
-    }
-  }
-}
 
 const email = process.argv[2]
 const joinCode = process.argv[3] || 'ABA2026'
@@ -28,18 +17,11 @@ if (!email) {
   console.error('Usage: npm run make-staff -- you@example.com [JOINCODE]')
   process.exit(1)
 }
-if (!process.env.DATABASE_URL) {
-  console.error('Missing DATABASE_URL in .env.local. Run npm run setup-db first for instructions.')
-  process.exit(1)
-}
 
-const client = new pg.Client({
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
-})
+let client
 
 async function main() {
-  await client.connect()
+  client = await connect()
 
   const { rows: users } = await client.query(
     'SELECT id FROM auth.users WHERE lower(email) = lower($1)',
@@ -70,6 +52,6 @@ async function main() {
 
 main().catch(async (err) => {
   console.error(err.message)
-  await client.end().catch(() => {})
+  await client?.end().catch(() => {})
   process.exit(1)
 })
