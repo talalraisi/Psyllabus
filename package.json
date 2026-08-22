@@ -8,17 +8,25 @@
     "start": "next start",
     "lint": "eslint",
     "import-ib": "node scripts/import-ib.js \"data/PSyllabus - IB DP.csv\"",
-    "import-syllabus": "node scripts/import-syllabus-content.js \"data/PSyllabus - IB DP.csv\""
+    "import-syllabus": "node scripts/import-syllabus-content.js \"data/PSyllabus - IB DP.csv\"",
+    "setup-db": "node scripts/setup-database.mjs",
+    "make-staff": "node scripts/make-staff.mjs",
+    "generate-questions": "node scripts/generate-questions.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.117.1",
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/core": "^8.5.0",
+    "@capacitor/ios": "^8.5.0",
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.2",
     "next": "16.2.9",
+    "pg": "^8.23.0",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.0",
     "@tailwindcss/postcss": "^4",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",

@@ -1,0 +1,16 @@
+{
+  "appId": "app.psyllabus.mobile",
+  "appName": "PSyllabus",
+  "webDir": "public",
+  "server": {
+    "url": "https://www.psyllabus.app",
+    "cleartext": false
+  },
+  "ios": {
+    "contentInset": "always",
+    "backgroundColor": "#f8f6f1"
+  },
+  "android": {
+    "backgroundColor": "#f8f6f1"
+  }
+}

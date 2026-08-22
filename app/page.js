@@ -1,143 +1,209 @@
 import Link from 'next/link'
-import Logo from '@/components/Logo'
+import Image from 'next/image'
+import logoMark from '@/public/logo-mark.png'
+import { IconCheck, IconArrowRight } from '@/components/Icons'
+
+export const metadata = {
+  title: 'PSyllabus: Know exactly what to study next',
+  description:
+    'Syllabus-mapped progress tracking for IB, A-Level, and AP students. Your status is set by testing, never by self-rating.',
+}
+
+const HOW_IT_WORKS = [
+  {
+    step: '01',
+    title: 'Map your syllabus',
+    body: 'Pick your subjects and see every topic and subtopic from the official course outline, laid out on one screen.',
+  },
+  {
+    step: '02',
+    title: 'Prove what you know',
+    body: 'Take a quiz on any subtopic. Your status is set by your accuracy, not by rating your own confidence.',
+  },
+  {
+    step: '03',
+    title: 'Study what actually matters',
+    body: 'Weak and decaying subtopics rise to the top of your plan, and every wrong answer returns for review on a spaced schedule.',
+  },
+]
+
+const FEATURES = [
+  ['Quiz-verified heatmap', 'Every subtopic is graded from real test results, so nothing is marked known on a guess.'],
+  ['Skill-decay tracking', 'Master something and leave it for two weeks and it fades to amber, back into your plan.'],
+  ['Mistake bank', 'Wrong answers queue for spaced repetition, so you drill your own gaps instead of generic cards.'],
+  ['Timed mock papers', 'Build a paper from any mix of topics and run it against a live marks-per-minute pacing clock.'],
+  ['Five resources per subtopic', 'Video walkthroughs, worked examples, mark scheme breakdowns, summary sheets, and common pitfalls.'],
+  ['Cohort view for schools', 'Staff see which subtopics a year group is struggling with. Students only ever see their own data.'],
+]
 
 export default function Home() {
   return (
-    <main className="page">
-      <nav className="flex items-center justify-between px-8 py-4 border-b border-border bg-bg-elevated">
-        <Logo width={350} height={105} priority />
-        <div className="flex items-center gap-3">
-          <a
-            href="https://tally.so/r/Pd4aLx"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-primary text-sm px-5 py-2.5"
-          >
-            Join waitlist
-          </a>
+    <main className="min-h-screen bg-[var(--bg)]">
+      {/* Navigation with the real entry points */}
+      <nav className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--surface)]">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 md:px-8">
+          <Link href="/" aria-label="PSyllabus home" className="inline-block">
+            <Image src={logoMark} alt="PSyllabus" priority style={{ height: 30, width: 'auto' }} />
+          </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/pricing" className="btn btn-quiet control-md hidden sm:inline-flex">
+              Pricing
+            </Link>
+            <Link href="/login" className="btn btn-quiet control-md">
+              Log in
+            </Link>
+            <Link href="/signup" className="btn btn-solid control-md">
+              Get started
+            </Link>
+          </div>
         </div>
       </nav>
 
-      <section className="marketing-hero-grid px-6 pt-20 pb-24 text-center">
-        <div className="max-w-3xl mx-auto">
-          <span className="badge mb-8">Coming Soon · Join the Waitlist</span>
+      {/* Hero */}
+      <section className="marketing-hero-grid border-b border-[var(--border)] px-5 py-20 md:px-8 md:py-28">
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="badge mb-8 inline-block">Free for partner schools</span>
 
-          <h1 className="text-4xl sm:text-6xl font-extrabold text-text leading-[1.1] mb-6 tracking-tight">
-            Stop guessing.<br />
-            <span className="text-accent">Start progressing.</span>
+          <h1 className="mb-6 text-4xl font-bold leading-[1.1] tracking-tight text-[var(--text)] sm:text-6xl">
+            Stop guessing.
+            <br />
+            <span className="text-[var(--brand)]">Start progressing.</span>
           </h1>
 
-          <p className="text-text-muted text-lg max-w-xl mx-auto leading-relaxed mb-10">
-            PSyllabus maps your IB, A-Level, or AP syllabus topic by topic
-            and tells you exactly what to study today based on where
-            you&apos;re actually falling behind.
+          <p className="mx-auto mb-10 max-w-xl text-lg leading-relaxed text-[var(--text-muted)]">
+            PSyllabus maps your IB, A-Level, or AP syllabus topic by topic and tells you exactly
+            what to study today, based on where you are actually falling behind.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
-            <a
-              href="https://tally.so/r/Pd4aLx"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary text-base px-10 py-4"
-            >
-              Join waitlist
-            </a>
+          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link href="/signup" className="btn btn-solid control-lg w-full px-8 sm:w-auto">
+              Create a free account
+            </Link>
+            <Link href="/login" className="btn btn-quiet control-lg w-full px-8 sm:w-auto">
+              I already have an account
+            </Link>
           </div>
-          <p className="text-text-faint text-sm">Be the first to know when we launch</p>
+          <p className="mt-4 text-sm text-[var(--text-faint)]">
+            No card required. Students at partner schools get every subject free.
+          </p>
         </div>
       </section>
 
-      <div className="border-y border-border py-10 px-6 bg-bg-subtle">
-        <div className="max-w-3xl mx-auto grid grid-cols-3 gap-4 text-center">
-          <div>
-            <p className="text-text font-extrabold text-3xl mb-1">3</p>
-            <p className="text-text-muted text-sm">Curriculums covered</p>
-          </div>
-          <div>
-            <p className="text-text font-extrabold text-3xl mb-1">5,000+</p>
-            <p className="text-text-muted text-sm">Syllabus topics mapped</p>
-          </div>
-          <div>
-            <p className="text-text font-extrabold text-3xl mb-1">$0</p>
-            <p className="text-text-muted text-sm">During beta</p>
-          </div>
-        </div>
-      </div>
-
-      <section className="px-6 py-20 max-w-3xl mx-auto text-center">
-        <p className="section-label mb-4">The Problem</p>
-        <h2 className="text-text text-3xl sm:text-4xl font-bold mb-6 leading-tight">
-          You&apos;re working hard.<br />But on the wrong things.
-        </h2>
-        <p className="text-text-muted text-lg leading-relaxed">
-          Revision Village gives you questions. Save My Exams gives you notes.
-          Neither tells you whether you&apos;re actually on track for the grade you need.
-          You find out when results come back. By then it&apos;s too late.
-        </p>
-      </section>
-
-      <section className="px-6 py-10 max-w-4xl mx-auto pb-20">
-        <p className="section-label text-center mb-4">How It Works</p>
-        <h2 className="text-text text-3xl font-bold text-center mb-12">
-          Three things no other tool does together
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      {/* Proof points */}
+      <section className="border-b border-[var(--border)] bg-[var(--surface-sunken)] px-5 py-10 md:px-8">
+        <div className="mx-auto grid max-w-3xl grid-cols-3 gap-4 text-center">
           {[
-            {
-              num: '01',
-              title: 'Your syllabus. Every topic.',
-              desc: "Every topic and subtopic from your official curriculum in one place.",
-            },
-            {
-              num: '02',
-              title: 'A heatmap of your gaps.',
-              desc: "Rate each subtopic weak, review, solid, or mastered. See exactly where you're behind.",
-            },
-            {
-              num: '03',
-              title: "Today's plan. Built for you.",
-              desc: 'We surface your weakest topics so you know what to study today.',
-            },
-          ].map((item) => (
-            <div key={item.num} className="card card-pad">
-              <p className="text-accent font-bold text-sm mb-4">{item.num}</p>
-              <h3 className="text-text font-bold text-lg mb-3">{item.title}</h3>
-              <p className="text-text-muted text-sm leading-relaxed">{item.desc}</p>
+            ['3', 'Curricula supported'],
+            ['2,500+', 'Subtopics mapped'],
+            ['4', 'Status levels, all test-verified'],
+          ].map(([value, label]) => (
+            <div key={label}>
+              <p className="t-stat text-[var(--text)]">{value}</p>
+              <p className="mt-1 text-sm text-[var(--text-muted)]">{label}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="px-6 py-16 max-w-2xl mx-auto text-center border-t border-border">
-        <p className="text-text-muted text-lg leading-relaxed mb-6">
-          &ldquo;I built this because every tool I tried either gave me random questions
-          or charged me $500 for content that wasn&apos;t even on the current syllabus.
-          So I built what I actually needed.&rdquo;
-        </p>
-        <p className="text-text font-bold">Talal Al-Raisi</p>
-        <p className="text-text-muted text-sm mt-1">Founder · IB Student · Muscat, Oman</p>
+      {/* How it works */}
+      <section className="px-5 py-20 md:px-8">
+        <div className="mx-auto max-w-5xl">
+          <h2 className="t-overline mb-3">How it works</h2>
+          <p className="mb-10 max-w-2xl text-2xl font-semibold leading-snug text-[var(--text)]">
+            Confidence and competence are different things. PSyllabus only ever measures the second
+            one.
+          </p>
+
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            {HOW_IT_WORKS.map(({ step, title, body }) => (
+              <div key={step} className="surface p-6">
+                <span className="t-caption font-semibold text-[var(--brand)]">{step}</span>
+                <h3 className="t-card-title mt-3">{title}</h3>
+                <p className="t-small mt-2">{body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
-      <section className="px-6 py-20 flex flex-col items-center text-center bg-bg-subtle border-t border-border">
-        <h2 className="text-text text-3xl font-bold mb-4">
-          Be the first to know when we launch
-        </h2>
-        <p className="text-text-muted mb-8 max-w-md">
-          Join students who are done guessing what to study.
-        </p>
-        <a
-          href="https://tally.so/r/Pd4aLx"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn-primary text-lg px-12 py-4"
-        >
-          Join waitlist
-        </a>
+      {/* Features */}
+      <section className="border-t border-[var(--border)] px-5 py-20 md:px-8">
+        <div className="mx-auto max-w-5xl">
+          <h2 className="t-overline mb-3">What you get</h2>
+          <p className="mb-10 max-w-2xl text-2xl font-semibold leading-snug text-[var(--text)]">
+            Everything a serious candidate needs, in one place.
+          </p>
+
+          <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
+            {FEATURES.map(([title, body]) => (
+              <div key={title} className="flex gap-3">
+                <IconCheck width={18} height={18} className="mt-1 shrink-0 text-[var(--brand)]" />
+                <div>
+                  <h3 className="text-sm font-semibold text-[var(--text)]">{title}</h3>
+                  <p className="t-small mt-1">{body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
-      <footer className="px-8 py-8 flex items-center justify-between border-t border-border">
-        <Logo width={280} height={84} />
-        <p className="text-text-faint text-xs">© 2026 PSyllabus · Built in Muscat, Oman</p>
+      {/* Schools */}
+      <section className="border-t border-[var(--border)] bg-[var(--surface-sunken)] px-5 py-20 md:px-8">
+        <div className="mx-auto max-w-3xl text-center">
+          <h2 className="mb-4 text-2xl font-semibold text-[var(--text)]">
+            Bringing PSyllabus to your school
+          </h2>
+          <p className="mx-auto mb-8 max-w-xl text-[var(--text-body)]">
+            Schools in the pilot pay nothing. Students join with a code and unlock every subject,
+            and staff get a dashboard showing which subtopics the year group is struggling with.
+          </p>
+          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link href="/pricing" className="btn btn-solid control-md px-6">
+              See how school access works
+            </Link>
+            <a
+              href="mailto:talalraisi1@gmail.com?subject=PSyllabus%20for%20our%20school"
+              className="btn btn-quiet control-md px-6"
+            >
+              Contact us
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Final call to action */}
+      <section className="px-5 py-20 md:px-8">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="mb-4 text-2xl font-semibold text-[var(--text)]">
+            Know where you stand before the exam does.
+          </h2>
+          <Link href="/signup" className="btn btn-solid control-lg mt-2 px-8">
+            Create a free account
+            <IconArrowRight width={18} height={18} />
+          </Link>
+        </div>
+      </section>
+
+      <footer className="border-t border-[var(--border)] bg-[var(--surface)] px-5 py-10 md:px-8">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 sm:flex-row">
+          <Image src={logoMark} alt="PSyllabus" style={{ height: 24, width: 'auto' }} />
+          <nav className="flex flex-wrap items-center justify-center gap-6">
+            <Link href="/pricing" className="t-small hover:text-[var(--text)]">
+              Pricing
+            </Link>
+            <Link href="/privacy" className="t-small hover:text-[var(--text)]">
+              Privacy
+            </Link>
+            <Link href="/terms" className="t-small hover:text-[var(--text)]">
+              Terms
+            </Link>
+            <Link href="/login" className="t-small hover:text-[var(--text)]">
+              Log in
+            </Link>
+          </nav>
+          <p className="t-caption">Built in Muscat, Oman</p>
+        </div>
       </footer>
     </main>
   )
