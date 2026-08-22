@@ -1,117 +1,97 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
+import { getCurrentUser } from '@/lib/auth'
 import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
+import { Page, PageHeader, Section, PageLoading, Spinner } from '@/components/PageShell'
+import { isPremium, planLabel, FREE_SUBJECT_LIMIT } from '@/lib/access'
 
 const MAX_AVATAR_MB = 5
 
-export default function Profile() {
+export default function ProfilePage() {
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [uploading, setUploading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
+  const [loadError, setLoadError] = useState('')
+
   const [fullName, setFullName] = useState('')
   const [avatarUrl, setAvatarUrl] = useState('')
-  const [school, setSchool] = useState(null)
-  const [joinCode, setJoinCode] = useState('')
-  const [joining, setJoining] = useState(false)
-  const [joinError, setJoinError] = useState('')
-  const fileInputRef = useRef(null)
+  const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
+
+  const [code, setCode] = useState('')
+  const [redeeming, setRedeeming] = useState(false)
+  const [codeError, setCodeError] = useState('')
+
+  const fileRef = useRef(null)
   const router = useRouter()
   const supabase = createClient()
 
-  const joinSchool = async (e) => {
-    e.preventDefault()
-    const code = joinCode.trim().toUpperCase()
-    if (!code || joining) return
-    setJoining(true)
-    setJoinError('')
-
-    // Server-side function decides student vs staff from which code was used,
-    // so a role can never be self-assigned from the client.
-    const { data, error: rpcError } = await supabase.rpc('join_school_with_code', {
-      p_code: code,
-    })
-
-    if (rpcError || !data?.ok) {
-      setJoinError(rpcError?.message || data?.error || 'Could not join with that code.')
-      setJoining(false)
-      return
-    }
-
-    const { data: schoolRow } = await supabase.from('schools').select('*').maybeSingle()
-    setSchool(schoolRow || { name: data.school })
-    setProfile((p) => ({ ...p, school_id: schoolRow?.id ?? p.school_id, role: data.role }))
-    setJoinCode('')
-    setSuccess(
-      data.role === 'teacher'
-        ? `Joined ${data.school} as staff. The School dashboard is now in your sidebar.`
-        : `Joined ${data.school}. Every subject is unlocked.`
-    )
-    setTimeout(() => setSuccess(''), 5000)
-    setJoining(false)
-  }
-
   useEffect(() => {
-    async function loadProfile() {
-      // Defensive: an expired or partially-restored session can return a null
-      // data payload, which would throw on destructuring.
-      const auth = await supabase.auth.getUser().catch(() => null)
-      const user = auth?.data?.user
-      if (!user?.id) {
-        router.push('/login')
-        return
-      }
+    let cancelled = false
 
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single()
+    async function load() {
+      try {
+        const user = await getCurrentUser(supabase)
+        if (!user) {
+          router.push('/login')
+          return
+        }
 
-      if (error || !data) {
-        router.push('/onboarding')
-        return
-      }
-
-      setProfile({ ...data, id: data.id || user.id, email: user.email })
-      setFullName(data.full_name || '')
-      setAvatarUrl(data.avatar_url || '')
-
-      if (data.school_id) {
-        const { data: schoolRow } = await supabase
-          .from('schools')
+        const { data, error: profileError } = await supabase
+          .from('profiles')
           .select('*')
-          .eq('id', data.school_id)
+          .eq('id', user.id)
           .maybeSingle()
-        setSchool(schoolRow || null)
-      }
 
-      setLoading(false)
+        if (cancelled) return
+
+        if (profileError) {
+          setLoadError(profileError.message)
+          setLoading(false)
+          return
+        }
+        if (!data) {
+          router.push('/onboarding')
+          return
+        }
+
+        setProfile({ ...data, id: data.id ?? user.id, email: user.email ?? '' })
+        setFullName(data.full_name ?? '')
+        setAvatarUrl(data.avatar_url ?? '')
+        setLoading(false)
+      } catch (err) {
+        if (!cancelled) {
+          setLoadError(err?.message || 'Could not load your profile.')
+          setLoading(false)
+        }
+      }
     }
-    loadProfile()
+
+    load()
+    return () => {
+      cancelled = true
+    }
   }, [router, supabase])
 
-  const pickPhoto = () => fileInputRef.current?.click()
+  const flash = (text) => {
+    setMessage(text)
+    setTimeout(() => setMessage(''), 4000)
+  }
 
-  const handlePhotoSelected = async (e) => {
+  const onPickPhoto = async (e) => {
     const file = e.target.files?.[0]
     e.target.value = ''
-    if (!file) return
-    setError('')
+    if (!file || !profile?.id) return
 
-    if (!file.type.startsWith('image/')) {
-      setError('Please choose an image file.')
-      return
-    }
-    if (file.size > MAX_AVATAR_MB * 1024 * 1024) {
-      setError(`Image must be under ${MAX_AVATAR_MB}MB.`)
-      return
-    }
+    setError('')
+    if (!file.type.startsWith('image/')) return setError('Please choose an image file.')
+    if (file.size > MAX_AVATAR_MB * 1024 * 1024)
+      return setError(`Image must be under ${MAX_AVATAR_MB}MB.`)
 
     setUploading(true)
     const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
@@ -124,192 +104,251 @@ export default function Profile() {
     if (uploadError) {
       setError(
         uploadError.message.includes('Bucket not found')
-          ? 'Photo storage is not set up yet. Run scripts/005-avatars.sql in Supabase first.'
+          ? 'Photo storage is not set up yet. Run npm run setup-db.'
           : uploadError.message
       )
       setUploading(false)
       return
     }
 
-    const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path)
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from('avatars').getPublicUrl(path)
 
     const { error: saveError } = await supabase
       .from('profiles')
       .update({ avatar_url: publicUrl })
       .eq('id', profile.id)
 
-    if (saveError) {
-      setError(saveError.message)
-    } else {
+    if (saveError) setError(saveError.message)
+    else {
       setAvatarUrl(publicUrl)
       setProfile((p) => ({ ...p, avatar_url: publicUrl }))
-      setSuccess('Photo updated')
-      setTimeout(() => setSuccess(''), 3000)
+      flash('Photo updated')
     }
     setUploading(false)
   }
 
-  const handleSave = async (e) => {
+  const onSave = async (e) => {
     e.preventDefault()
+    if (!profile?.id) return
     setSaving(true)
     setError('')
-    setSuccess('')
 
-    const { error } = await supabase
+    const { error: saveError } = await supabase
       .from('profiles')
       .update({ full_name: fullName })
       .eq('id', profile.id)
 
-    if (error) {
-      setError(error.message)
-    } else {
+    if (saveError) setError(saveError.message)
+    else {
       setProfile((p) => ({ ...p, full_name: fullName }))
-      setSuccess('Profile updated')
-      setTimeout(() => setSuccess(''), 3000)
+      flash('Profile updated')
     }
     setSaving(false)
   }
 
-  if (loading || !profile) {
+  const onRedeem = async (e) => {
+    e.preventDefault()
+    const value = code.trim().toUpperCase()
+    if (!value || redeeming) return
+
+    setRedeeming(true)
+    setCodeError('')
+
+    const { data, error: rpcError } = await supabase.rpc('redeem_access_code', {
+      p_code: value,
+    })
+
+    if (rpcError || !data?.ok) {
+      setCodeError(rpcError?.message || data?.error || 'Could not redeem that code.')
+      setRedeeming(false)
+      return
+    }
+
+    setProfile((p) => ({
+      ...p,
+      plan: 'premium',
+      access_source: data.label,
+      is_admin: p?.is_admin || data.admin,
+    }))
+    setCode('')
+    flash(`Unlocked by ${data.label}. Every subject is now available.`)
+    setRedeeming(false)
+  }
+
+  if (loading) {
     return (
-      <div className="min-h-screen bg-[#f8f6f1] flex items-center justify-center">
-        <p className="text-sm text-[#6b7280]">Loading profile…</p>
-      </div>
+      <DashboardLayout profile={null}>
+        <PageLoading title="Profile" width="narrow" rows={3} />
+      </DashboardLayout>
     )
   }
 
-  const initial = String(profile.full_name || profile.email || 'S')
-    .charAt(0)
-    .toUpperCase()
+  if (loadError || !profile) {
+    return (
+      <DashboardLayout profile={null}>
+        <Page width="narrow">
+          <PageHeader title="Profile" />
+          <div className="surface p-6">
+            <p className="t-card-title mb-2">We could not load your profile</p>
+            <p className="t-small mb-6">{loadError || 'Please try again.'}</p>
+            <button onClick={() => location.reload()} className="btn btn-solid control-md">
+              Reload
+            </button>
+          </div>
+        </Page>
+      </DashboardLayout>
+    )
+  }
+
+  const premium = isPremium(profile)
+  const initial = String(profile.full_name || profile.email || 'S').charAt(0).toUpperCase()
 
   return (
     <DashboardLayout profile={profile}>
-      <div className="px-5 py-6 md:px-12 md:py-10 max-w-2xl mx-auto">
-        <header className="mb-8">
-          <h1 className="t-page-title mb-1">Profile</h1>
-          <p className="text-sm text-[#6b7280]">Your personal information</p>
-        </header>
+      <Page width="narrow">
+        <PageHeader title="Profile" subtitle="Your account and access" />
 
-        <div className="surface p-6 mb-4">
+        {message && (
+          <p className="mb-4 rounded-[var(--r-md)] border border-[#bbf7d0] bg-[#f0fdf4] px-4 py-3 text-sm text-[var(--success-text)]">
+            {message}
+          </p>
+        )}
+
+        {/* Photo */}
+        <div className="surface mb-3 p-5">
           <div className="flex items-center gap-5">
             {avatarUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={avatarUrl}
-                alt="Profile photo"
-                className="w-20 h-20 rounded-full object-cover border border-[#f0f0f0]"
+                alt=""
+                className="h-20 w-20 rounded-full border border-[var(--border)] object-cover"
               />
             ) : (
-              <div className="w-20 h-20 rounded-full bg-[#f0fdf4] border border-[#f0f0f0] flex items-center justify-center text-2xl font-bold text-[#2D6A4F]">
+              <div className="flex h-20 w-20 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--brand-tint)] text-2xl font-bold text-[var(--brand)]">
                 {initial}
               </div>
             )}
             <div>
               <input
-                ref={fileInputRef}
+                ref={fileRef}
                 type="file"
                 accept="image/*"
-                onChange={handlePhotoSelected}
+                onChange={onPickPhoto}
                 className="hidden"
               />
               <button
-                onClick={pickPhoto}
+                onClick={() => fileRef.current?.click()}
                 disabled={uploading}
-                className="btn btn-solid control-md disabled:opacity-50"
+                className="btn btn-solid control-md"
               >
-                {uploading ? 'Uploading…' : avatarUrl ? 'Change photo' : 'Upload photo'}
+                {uploading && <Spinner />}
+                {uploading ? 'Uploading' : avatarUrl ? 'Change photo' : 'Upload photo'}
               </button>
-              <p className="text-xs text-[#9ca3af] mt-2">JPG or PNG, up to {MAX_AVATAR_MB}MB</p>
+              <p className="t-caption mt-2">JPG or PNG, up to {MAX_AVATAR_MB}MB</p>
             </div>
           </div>
         </div>
 
-        <form
-          onSubmit={handleSave}
-          className="surface p-6 space-y-5"
-        >
+        {/* Details */}
+        <form onSubmit={onSave} className="surface mb-3 space-y-5 p-5">
           <div>
-            <label className="block text-sm font-medium text-[#1a2e1e] mb-2">Full name</label>
+            <label htmlFor="fullName" className="t-small mb-2 block font-medium text-[var(--text)]">
+              Full name
+            </label>
             <input
-              type="text"
+              id="fullName"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               required
-              className="w-full px-3 py-2 rounded-lg border border-[#e5e7eb] bg-white text-sm outline-none focus:border-[#2D6A4F]"
+              className="field"
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             {[
-              { label: 'Email', value: profile.email || '—' },
-              { label: 'Curriculum', value: profile.curriculum },
-              { label: 'Graduation', value: `Class of ${profile.grad_year}` },
-            ].map((f) => (
-              <div key={f.label} className="p-3 rounded-lg bg-[#f9fafb] border border-[#f0f0f0]">
-                <p className="text-xs text-[#9ca3af]">{f.label}</p>
-                <p className="text-sm text-[#374151] mt-1 truncate">{f.value}</p>
+              ['Email', profile.email || 'Not available'],
+              ['Curriculum', profile.curriculum || 'Not set'],
+              ['Graduation', profile.grad_year ? `Class of ${profile.grad_year}` : 'Not set'],
+            ].map(([label, value]) => (
+              <div
+                key={label}
+                className="rounded-[var(--r-md)] border border-[var(--border)] bg-[var(--surface-sunken)] p-3"
+              >
+                <p className="t-caption">{label}</p>
+                <p className="mt-1 truncate text-sm text-[var(--text-body)]">{value}</p>
               </div>
             ))}
           </div>
 
           {error && (
-            <p className="text-sm text-[#dc2626] bg-[#fef2f2] border border-[#fecaca] rounded-lg px-4 py-3">
+            <p className="rounded-[var(--r-md)] border border-[var(--danger-border)] bg-[var(--danger-bg)] px-4 py-3 text-sm text-[var(--danger)]">
               {error}
             </p>
           )}
-          {success && <p className="text-sm font-medium text-[#16a34a]">{success}</p>}
 
-          <button
-            type="submit"
-            disabled={saving}
-            className="w-full btn btn-solid control-md disabled:opacity-50"
-          >
-            {saving ? 'Saving…' : 'Save changes'}
+          <button type="submit" disabled={saving} className="btn btn-solid control-md w-full">
+            {saving && <Spinner />}
+            {saving ? 'Saving' : 'Save changes'}
           </button>
         </form>
 
-        <div className="surface p-5 mt-4">
-          <h2 className="t-card-title mb-1">School</h2>
-          {school ? (
-            <>
-              <p className="t-small">
-                You are linked to <span className="font-medium text-[var(--text)]">{school.name}</span>.
-                Every subject is unlocked at no cost while your school&apos;s access is active.
-              </p>
-              <span className="mt-3 inline-block rounded-full bg-[var(--sand)] px-3 py-1 text-xs font-medium text-[var(--text)]">
-                Full access · free
-              </span>
-            </>
-          ) : (
-            <>
-              <p className="t-small mb-4">
-                Have a join code from your school? Enter it to unlock every subject for free.
-              </p>
-              <form onSubmit={joinSchool} className="flex flex-wrap gap-2">
-                <input
-                  value={joinCode}
-                  onChange={(e) => setJoinCode(e.target.value)}
-                  placeholder="e.g. ABA2026"
-                  aria-label="School join code"
-                  className="field max-w-[220px] flex-1 uppercase"
-                />
-                <button
-                  type="submit"
-                  disabled={joining || !joinCode.trim()}
-                  className="btn btn-solid control-md"
-                >
-                  {joining ? 'Joining…' : 'Join school'}
-                </button>
-              </form>
-              {joinError && (
-                <p className="mt-3 rounded-[var(--r-md)] border border-[var(--danger-border)] bg-[var(--danger-bg)] px-4 py-3 text-sm text-[var(--danger)]">
-                  {joinError}
+        {/* Access */}
+        <Section title="Access" className="mb-0">
+          <div id="unlock" className="surface p-5">
+            <div className="mb-4 flex items-center justify-between gap-4">
+              <div>
+                <p className="t-card-title">{planLabel(profile)}</p>
+                <p className="t-small mt-1">
+                  {premium
+                    ? 'Every subject and feature is unlocked.'
+                    : `Free accounts track ${FREE_SUBJECT_LIMIT} subject.`}
                 </p>
+              </div>
+              {premium && (
+                <span className="shrink-0 rounded-full bg-[var(--sand)] px-3 py-1 text-xs font-medium text-[var(--text)]">
+                  Full access
+                </span>
               )}
-            </>
-          )}
-        </div>
-      </div>
+            </div>
+
+            {!premium && (
+              <>
+                <form onSubmit={onRedeem} className="flex flex-wrap gap-2">
+                  <input
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    placeholder="Enter your code"
+                    aria-label="Access code"
+                    className="field max-w-[240px] flex-1 uppercase"
+                  />
+                  <button
+                    type="submit"
+                    disabled={redeeming || !code.trim()}
+                    className="btn btn-solid control-md"
+                  >
+                    {redeeming && <Spinner />}
+                    {redeeming ? 'Checking' : 'Unlock'}
+                  </button>
+                </form>
+                {codeError && (
+                  <p className="mt-3 rounded-[var(--r-md)] border border-[var(--danger-border)] bg-[var(--danger-bg)] px-4 py-3 text-sm text-[var(--danger)]">
+                    {codeError}
+                  </p>
+                )}
+                <p className="t-caption mt-3">
+                  Students at partner schools have a code from their school.{' '}
+                  <Link href="/pricing" className="text-[var(--brand)] hover:underline">
+                    See plans
+                  </Link>
+                </p>
+              </>
+            )}
+          </div>
+        </Section>
+      </Page>
     </DashboardLayout>
   )
 }

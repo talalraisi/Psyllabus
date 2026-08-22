@@ -11,48 +11,57 @@ const PLANS = [
   {
     name: 'Free',
     price: 'Free',
-    cadence: 'forever',
+    cadence: 'always',
     summary: 'Track one subject end to end and see how the method works.',
     features: [
-      'Full syllabus map for one subject',
-      'Subtopic quizzes with instant marking',
-      'Quiz-verified progress heatmap',
-      'Mistake bank with spaced repetition',
+      'Syllabus tracker for 1 subject',
+      'Subtopic mini-quizzes for that subject',
+      'Accuracy-based heatmap',
+      'Basic study planner',
+      'Streak and XP tracking',
     ],
-    cta: { label: 'Create an account', href: '/signup' },
+    cta: { label: 'Create a free account', href: '/signup' },
     emphasis: false,
   },
   {
-    name: 'School',
-    price: 'Free',
-    cadence: 'for partner schools',
-    summary:
-      'Every student at a partner school gets full access, plus a cohort dashboard for staff.',
-    features: [
-      'Every subject unlocked for every student',
-      'Timed mock exams and custom multi-topic papers',
-      'Skill-decay tracking and the smart study plan',
-      'Staff dashboard: cohort weak spots and per-student progress',
-      'Students join with a school code, no card required',
-    ],
-    cta: { label: 'Talk to us about your school', href: 'mailto:talalraisi1@gmail.com?subject=PSyllabus%20for%20our%20school' },
-    emphasis: true,
-    badge: 'Current pilot',
-  },
-  {
-    name: 'Individual',
+    name: 'Premium',
     price: '$12',
-    cadence: 'per month',
-    summary: 'For students whose school has not partnered yet.',
+    cadence: 'per month, or $108 a year',
+    summary: 'Everything unlocked for serious candidates.',
     features: [
-      'Everything in the School plan, for one student',
-      'All subjects in your programme',
-      'Timed mocks, custom papers, and pacing analytics',
-      'Cancel any time',
+      'All subjects unlocked',
+      'Full-topic and full-subject quizzes with timed exam conditions',
+      'Exam readiness score, per subject and combined',
+      'Dynamic mastery decay engine',
+      'Mistake bank with spaced repetition',
+      'Confidence calibration score',
+      'Root-cause flagging and cross-subject analytics',
+      'Smart algorithmic study planner',
+      'The full resource hub for every subtopic',
+      'Weekly digest emails',
     ],
-    cta: { label: 'Join the waitlist', href: '/#waitlist' },
+    cta: { label: 'Join the waitlist', href: '/signup' },
+    emphasis: true,
+    badge: 'Most popular',
+    note: 'Payments open soon. Students at partner schools get this free today.',
+  },
+  {
+    name: 'School licence',
+    price: '$500',
+    cadence: 'to $2,000 a year',
+    summary: 'Your whole cohort on Premium, at a fraction of individual pricing.',
+    features: [
+      'Unlimited student access for the school',
+      'Every Premium feature for every student',
+      'Students unlock with a school code, no card required',
+      'Onboarding support for your department',
+    ],
+    cta: {
+      label: 'Talk to us about your school',
+      href: 'mailto:talalraisi1@gmail.com?subject=PSyllabus%20for%20our%20school',
+    },
     emphasis: false,
-    note: 'Not yet open for payment. Schools take priority during the pilot.',
+    badge: 'Pilot open',
   },
 ]
 
@@ -67,8 +76,8 @@ export default function PricingPage() {
         <header className="mt-6 mb-10 max-w-2xl">
           <h1 className="t-page-title mb-2">Pricing</h1>
           <p className="t-body">
-            PSyllabus is free for every student at a partner school. Schools pay nothing during the
-            pilot, and students never need a payment method to get started.
+            Start free with one subject. Students at partner schools unlock everything with a
+            code, at no cost to them.
           </p>
         </header>
 
@@ -136,13 +145,12 @@ export default function PricingPage() {
               immediately. No card, no trial period.
             </li>
             <li>
-              <span className="font-medium text-[var(--text)]">4.</span> Staff linked to the school
-              get a cohort dashboard showing which subtopics the year group is struggling with.
+              <span className="font-medium text-[var(--text)]">4.</span> That is the whole setup.
+              PSyllabus is a study tool for students, so there is nothing for staff to administer.
             </li>
           </ol>
           <p className="t-caption mt-4">
-            Students only ever see their own data. Staff see aggregate cohort progress for their own
-            school, enforced at the database level. See our{' '}
+            Students only ever see their own data, enforced at the database level. See our{' '}
             <Link href="/privacy" className="text-[var(--brand)] hover:underline">
               Privacy Policy
             </Link>

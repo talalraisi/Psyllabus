@@ -290,18 +290,42 @@ export default function QuizRunner({
       )
     }
 
-    if (mode === 'subtopic' && subject && subtopic) {
-      await supabase.from('progress').upsert(
-        {
+    // Update progress for every subtopic this paper touched, not just single
+    // subtopic quizzes. A topic test, mock, or custom paper covers several
+    // subtopics, and each is scored on its own questions.
+    if (mode !== 'mistakes') {
+      const bySubtopic = new Map()
+      for (const g of graded) {
+        const key = `${g.question.subject}|||${g.question.subtopic}`
+        const entry = bySubtopic.get(key) || {
+          subject: g.question.subject,
+          topic: g.question.topic,
+          subtopic: g.question.subtopic,
+          correct: 0,
+          total: 0,
+        }
+        entry.total++
+        if (g.correct) entry.correct++
+        bySubtopic.set(key, entry)
+      }
+
+      const rows = [...bySubtopic.values()]
+        // One or two questions is too thin to reclassify a subtopic.
+        .filter((e) => e.total >= 3)
+        .map((e) => ({
           user_id: userId,
-          subject,
-          topic: topic || questions[0]?.topic || '',
-          subtopic,
-          status: statusFromAccuracy(accuracy),
+          subject: e.subject,
+          topic: e.topic || '',
+          subtopic: e.subtopic,
+          status: statusFromAccuracy(e.correct / e.total),
           updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'user_id,subject,subtopic' }
-      )
+        }))
+
+      if (rows.length) {
+        await supabase.from('progress').upsert(rows, {
+          onConflict: 'user_id,subject,subtopic',
+        })
+      }
     }
 
     if (mode === 'mistakes') {

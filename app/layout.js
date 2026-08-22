@@ -13,13 +13,23 @@ export const viewport = {
 
 export const metadata = {
   title: {
-    default: 'PSyllabus',
+    // Search engines show this verbatim, so it states what the product is.
+    default: 'PSyllabus: IB, A-Level and AP syllabus tracker',
     template: '%s · PSyllabus',
   },
   manifest: '/manifest.json',
+  applicationName: 'PSyllabus',
   icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
+      { url: '/icon-512.png', type: 'image/png', sizes: '512x512' },
+    ],
+    shortcut: '/favicon.ico',
     apple: '/apple-touch-icon.png',
   },
+  alternates: { canonical: 'https://www.psyllabus.app' },
+  robots: { index: true, follow: true },
   appleWebApp: {
     capable: true,
     title: 'PSyllabus',
@@ -47,9 +57,38 @@ export const metadata = {
   },
 }
 
+// Tells Google this is one product with a logo, which is what produces a
+// branded result with the mark rather than a generic globe.
+const organisationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'PSyllabus',
+  alternateName: ['Project Syllabus', 'P Syllabus'],
+  url: 'https://www.psyllabus.app',
+  logo: 'https://www.psyllabus.app/icon-512.png',
+  description:
+    'Syllabus-mapped progress tracking for IB, A-Level, and AP students. Status is set by testing, never self-rating.',
+  foundingLocation: { '@type': 'Place', name: 'Muscat, Oman' },
+}
+
+const siteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'PSyllabus',
+  url: 'https://www.psyllabus.app',
+}
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${inter.variable} h-full`}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify([organisationSchema, siteSchema]),
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-[var(--bg,#FAFAF8)] text-[var(--text,#1C1917)] font-sans antialiased">
         {children}
       </body>

@@ -9,6 +9,7 @@ import DashboardLayout from '@/components/DashboardLayout'
 import ResourceHubDrawer from '@/components/ResourceHubDrawer'
 import { resolveOnboardingNameFromSlug } from '@/lib/subject-map'
 import { RESOURCE_COUNT } from '@/lib/resources'
+import { isSubjectLocked, isPremium } from '@/lib/access'
 import {
   STATUS_COLORS,
   STATUS_LABELS,
@@ -61,6 +62,12 @@ export default function SyllabusPage() {
 
       if (!profileData.subjects?.includes(resolved)) {
         router.push('/dashboard')
+        return
+      }
+
+      // Free accounts may open one subject; the DP core is always available.
+      if (isSubjectLocked(resolved, profileData)) {
+        router.push('/dashboard/profile#unlock')
         return
       }
 

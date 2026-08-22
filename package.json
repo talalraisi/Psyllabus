@@ -10,8 +10,8 @@
     "import-ib": "node scripts/import-ib.js \"data/PSyllabus - IB DP.csv\"",
     "import-syllabus": "node scripts/import-syllabus-content.js \"data/PSyllabus - IB DP.csv\"",
     "setup-db": "node scripts/setup-database.mjs",
-    "make-staff": "node scripts/make-staff.mjs",
-    "generate-questions": "node scripts/generate-questions.mjs"
+    "generate-questions": "node scripts/generate-questions.mjs",
+    "make-admin": "node scripts/make-admin.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.117.1",

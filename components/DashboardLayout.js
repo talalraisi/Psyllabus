@@ -17,9 +17,8 @@ import {
   IconLogout,
   IconMenu,
   IconClose,
-  IconSchool,
 } from '@/components/Icons'
-import { isStaff } from '@/lib/access'
+import { planLabel, isPremium } from '@/lib/access'
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', Icon: IconDashboard, match: (p) => p === '/dashboard' },
@@ -109,18 +108,6 @@ export default function DashboardLayout({ children, profile }) {
     router.push('/login')
   }
 
-  // Staff get one extra destination; students never see it.
-  const navItems = isStaff(profile)
-    ? [
-        ...NAV_ITEMS,
-        {
-          href: '/dashboard/school',
-          label: 'School',
-          Icon: IconSchool,
-          match: (p) => p === '/dashboard/school',
-        },
-      ]
-    : NAV_ITEMS
 
   const sidebar = (
     <>
@@ -135,7 +122,7 @@ export default function DashboardLayout({ children, profile }) {
       <nav className="flex-1 overflow-y-auto px-3 pt-4" aria-label="Main">
         <p className="t-overline px-3 pb-2">Menu</p>
         <ul className="flex flex-col gap-1">
-          {navItems.map(({ href, label, Icon, match }) => {
+          {NAV_ITEMS.map(({ href, label, Icon, match }) => {
             const active = match(pathname)
             return (
               <li key={href}>
@@ -176,6 +163,16 @@ export default function DashboardLayout({ children, profile }) {
               </p>
             </div>
           </div>
+        )}
+
+        {profile && !isPremium(profile) && (
+          <Link
+            href="/dashboard/profile#unlock"
+            className="mb-2 block rounded-[var(--r-md)] border border-[var(--sand)] bg-[var(--sand)]/30 px-3 py-2"
+          >
+            <p className="text-[13px] font-semibold text-[var(--text)]">{planLabel(profile)}</p>
+            <p className="t-caption">Have a school code? Unlock everything.</p>
+          </Link>
         )}
 
         <Link
