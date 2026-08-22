@@ -8,6 +8,7 @@ import { getCurrentUser } from '@/lib/auth'
 import DashboardLayout from '@/components/DashboardLayout'
 import ResourceHubDrawer from '@/components/ResourceHubDrawer'
 import { resolveOnboardingNameFromSlug } from '@/lib/subject-map'
+import { RESOURCE_COUNT } from '@/lib/resources'
 import {
   STATUS_COLORS,
   STATUS_LABELS,
@@ -242,6 +243,13 @@ export default function SyllabusPage() {
                               )}
                             </div>
                             <div className="flex items-center gap-3 shrink-0">
+                              <button
+                                onClick={() => setDrawerItem(item)}
+                                className="btn btn-quiet control-sm text-xs"
+                                title={`${RESOURCE_COUNT} learning resources for this subtopic`}
+                              >
+                                Resources
+                              </button>
                               <span
                                 className={`flex items-center gap-2 text-xs font-medium ${STATUS_TEXT_COLORS[currentStatus]}`}
                                 title={

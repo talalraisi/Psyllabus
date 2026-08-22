@@ -5,6 +5,13 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Logo from '@/components/Logo'
 import { isIBSelectionValid, ibSelectionHint } from '@/lib/ib-validation'
+import {
+  IB_CORE_SUBJECTS,
+  CORE_GRADES,
+  coreBonusPoints,
+  predictedTotal,
+  MAX_TOTAL_POINTS,
+} from '@/lib/ib-points'
 
 const CURRICULUMS = {
   'IB': {
@@ -81,7 +88,9 @@ const CURRICULUMS = {
       },
     ],
     grades: ['1','2','3','4','5','6','7'],
-    maxSubjects: 6
+    maxSubjects: 6,
+    // Added automatically for every IB student; never chosen from the groups.
+    core: IB_CORE_SUBJECTS,
   },
   'AP': {
     groups: [
@@ -252,6 +261,18 @@ export default function Onboarding() {
     setTargetGrades({...targetGrades, [subject]: grade})
   }
 
+  const isIB = curriculum === 'IB'
+  const coreSubjects = currentCurriculum?.core || []
+
+  // IB needs a grade for each chosen subject plus TOK and EE; other curricula
+  // only need one per chosen subject.
+  const ibTotal = predictedTotal(targetGrades, selectedSubjects)
+  const gradesComplete = isIB
+    ? selectedSubjects.every((s) => targetGrades[s]) &&
+      !!targetGrades['Theory of Knowledge'] &&
+      !!targetGrades['Extended Essay']
+    : Object.keys(targetGrades).length === selectedSubjects.length
+
   const handleFinish = async () => {
     setLoading(true)
     try {
@@ -261,12 +282,16 @@ export default function Onboarding() {
         return
       }
       
+      // The IB core is part of every Diploma, so it is appended rather than chosen.
+      const coreSubjects = currentCurriculum?.core || []
+      const allSubjects = [...selectedSubjects, ...coreSubjects]
+
       const { error } = await supabase.from('profiles').upsert({
         id: user.id,
         full_name: user.user_metadata?.full_name || user.user_metadata?.name || null,
         curriculum,
         grad_year: gradYear,
-        subjects: selectedSubjects,
+        subjects: allSubjects,
         target_grades: targetGrades,
         updated_at: new Date().toISOString()
       })
@@ -277,7 +302,18 @@ export default function Onboarding() {
         return
       }
 
-      router.push('/dashboard')
+      // Apply a school code entered at signup. The server decides whether it
+      // grants student or staff access, so roles are never self-assigned.
+      const code = user.user_metadata?.school_code
+      let joinedRole = null
+      if (code) {
+        const { data: joinResult } = await supabase.rpc('join_school_with_code', {
+          p_code: code,
+        })
+        if (joinResult?.ok) joinedRole = joinResult.role
+      }
+
+      router.push(joinedRole === 'teacher' ? '/dashboard/school' : '/dashboard')
     } catch (err) {
       console.error(err)
       setLoading(false)
@@ -445,6 +481,22 @@ export default function Onboarding() {
               </div>
             )}
 
+            {/* The DP core is compulsory, so it is shown as included rather than offered. */}
+            {isIB && coreSubjects.length > 0 && (
+              <div className="mb-6 p-4 rounded-[var(--radius-sm)] border border-border bg-bg-subtle">
+                <p className="text-text font-medium text-sm mb-1">Included automatically</p>
+                <p className="text-text-muted text-xs mb-3">
+                  Every Diploma candidate takes the core, so we add it for you. TOK and the
+                  Extended Essay are worth up to 3 bonus points.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {coreSubjects.map((s) => (
+                    <span key={s} className="chip">{s}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="flex gap-3">
               <button onClick={() => setStep(1)} className="btn-secondary px-6 py-3 text-sm">
                 Back
@@ -469,14 +521,14 @@ export default function Onboarding() {
               What are you aiming for? Be ambitious. The planner adjusts to your goals.
             </p>
 
-            <div className="space-y-4 mb-8 max-h-96 overflow-y-auto pr-1">
+            <div className="space-y-4 mb-6 max-h-80 overflow-y-auto pr-1">
               {selectedSubjects.map(subject => (
                 <div key={subject} className="p-4 rounded-[var(--radius-sm)] border border-border bg-bg-subtle">
                   <p className="text-text font-medium text-sm mb-3">{subject}</p>
                   <div className="flex gap-2 flex-wrap">
                     {currentCurriculum.grades.map(grade => (
                       <button key={grade} onClick={() => setGrade(subject, grade)}
-                      className={`w-10 h-10 rounded-[var(--radius-sm)] font-bold text-sm 
+                      className={`w-10 h-10 rounded-[var(--radius-sm)] font-bold text-sm
                       transition-all border
                       ${targetGrades[subject] === grade ? 'chip-active' : 'chip hover:border-border-strong'}`}>
                         {grade}
@@ -485,7 +537,47 @@ export default function Onboarding() {
                   </div>
                 </div>
               ))}
+
+              {/* TOK and EE are graded A-E and combine for up to 3 bonus points. */}
+              {isIB && ['Theory of Knowledge', 'Extended Essay'].map(component => (
+                <div key={component} className="p-4 rounded-[var(--radius-sm)] border border-border bg-bg-subtle">
+                  <p className="text-text font-medium text-sm mb-1">{component}</p>
+                  <p className="text-text-faint text-xs mb-3">Graded A to E</p>
+                  <div className="flex gap-2 flex-wrap">
+                    {CORE_GRADES.map(grade => (
+                      <button key={grade} onClick={() => setGrade(component, grade)}
+                      className={`w-10 h-10 rounded-[var(--radius-sm)] font-bold text-sm
+                      transition-all border
+                      ${targetGrades[component] === grade ? 'chip-active' : 'chip hover:border-border-strong'}`}>
+                        {grade}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
+
+            {/* Live Diploma total */}
+            {isIB && (
+              <div className="mb-8 p-4 rounded-[var(--radius-sm)] border border-border bg-bg-elevated">
+                <div className="flex items-baseline justify-between">
+                  <span className="text-text font-medium text-sm">Predicted Diploma total</span>
+                  <span className="text-2xl font-bold text-accent tabular-nums">
+                    {ibTotal.total}
+                    <span className="text-text-faint text-sm font-medium">/{MAX_TOTAL_POINTS}</span>
+                  </span>
+                </div>
+                <p className="text-text-muted text-xs mt-2">
+                  {ibTotal.subjectPoints} from {ibTotal.gradedCount} subject
+                  {ibTotal.gradedCount === 1 ? '' : 's'}
+                  {typeof ibTotal.bonus === 'number'
+                    ? ` plus ${ibTotal.bonus} core bonus point${ibTotal.bonus === 1 ? '' : 's'}`
+                    : ibTotal.failing
+                      ? '. A grade of E in TOK or the Extended Essay is a failing condition.'
+                      : '. Set TOK and Extended Essay grades to see your bonus points.'}
+                </p>
+              </div>
+            )}
 
             <div className="flex gap-3">
               <button onClick={() => setStep(2)} className="btn-secondary px-6 py-3 text-sm">
@@ -493,7 +585,7 @@ export default function Onboarding() {
               </button>
               <button
                 onClick={handleFinish}
-                disabled={loading || Object.keys(targetGrades).length !== selectedSubjects.length}
+                disabled={loading || !gradesComplete}
                 className="btn-primary flex-1 py-4 text-base disabled:opacity-40 disabled:cursor-not-allowed">
                 {loading ? 'Setting up…' : 'Go to my dashboard'}
               </button>

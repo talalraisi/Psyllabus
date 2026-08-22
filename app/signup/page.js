@@ -10,6 +10,7 @@ export default function Signup() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
+  const [schoolCode, setSchoolCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
@@ -23,7 +24,9 @@ export default function Signup() {
     const { data, error: authError } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: name } },
+      // The code is carried through so onboarding can link the school. The
+      // server decides whether it grants student or staff access.
+      options: { data: { full_name: name, school_code: schoolCode.trim().toUpperCase() } },
     })
 
     if (authError) {
@@ -73,7 +76,7 @@ export default function Signup() {
           <button
             onClick={handleGoogleSignup}
             disabled={loading}
-            className="btn-secondary w-full py-3 mb-4 text-base flex items-center justify-center gap-2"
+            className="btn-secondary control-lg w-full mb-4 text-base flex items-center justify-center gap-2"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -128,12 +131,30 @@ export default function Signup() {
               />
             </div>
 
+            <div>
+              <label className="label">
+                School code <span className="text-text-faint font-normal">(optional)</span>
+              </label>
+              <input
+                type="text"
+                value={schoolCode}
+                onChange={(e) => setSchoolCode(e.target.value)}
+                placeholder="e.g. ABA2026"
+                autoCapitalize="characters"
+                className="input uppercase"
+              />
+              <p className="text-text-faint text-xs mt-2">
+                Students at a partner school get every subject free. Teachers: enter your staff
+                code to get the cohort dashboard.
+              </p>
+            </div>
+
             {error && <div className="error-box">{error}</div>}
 
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary w-full py-4 mt-2 text-base"
+              className="btn-primary control-lg w-full mt-2 text-base"
             >
               {loading ? 'Creating account…' : 'Create account'}
             </button>

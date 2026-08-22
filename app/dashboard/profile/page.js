@@ -31,32 +31,28 @@ export default function Profile() {
     setJoining(true)
     setJoinError('')
 
-    const { data: match } = await supabase
-      .from('schools')
-      .select('*')
-      .eq('join_code', code)
-      .maybeSingle()
+    // Server-side function decides student vs staff from which code was used,
+    // so a role can never be self-assigned from the client.
+    const { data, error: rpcError } = await supabase.rpc('join_school_with_code', {
+      p_code: code,
+    })
 
-    if (!match) {
-      setJoinError('That join code was not recognised. Check it with your teacher.')
+    if (rpcError || !data?.ok) {
+      setJoinError(rpcError?.message || data?.error || 'Could not join with that code.')
       setJoining(false)
       return
     }
 
-    const { error: linkError } = await supabase
-      .from('profiles')
-      .update({ school_id: match.id })
-      .eq('id', profile.id)
-
-    if (linkError) {
-      setJoinError(linkError.message)
-    } else {
-      setSchool(match)
-      setProfile((p) => ({ ...p, school_id: match.id }))
-      setJoinCode('')
-      setSuccess(`Joined ${match.name}`)
-      setTimeout(() => setSuccess(''), 4000)
-    }
+    const { data: schoolRow } = await supabase.from('schools').select('*').maybeSingle()
+    setSchool(schoolRow || { name: data.school })
+    setProfile((p) => ({ ...p, school_id: schoolRow?.id ?? p.school_id, role: data.role }))
+    setJoinCode('')
+    setSuccess(
+      data.role === 'teacher'
+        ? `Joined ${data.school} as staff. The School dashboard is now in your sidebar.`
+        : `Joined ${data.school}. Every subject is unlocked.`
+    )
+    setTimeout(() => setSuccess(''), 5000)
     setJoining(false)
   }
 
