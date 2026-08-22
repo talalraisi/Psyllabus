@@ -48,14 +48,94 @@ Missing DATABASE_URL in .env.local
   process.exit(1)
 }
 
-const client = new pg.Client({
-  connectionString: url,
-  ssl: { rejectUnauthorized: false },
-})
+/**
+ * Supabase's direct host (db.<ref>.supabase.co) is IPv6-only on most projects,
+ * so it fails with ENOTFOUND on IPv4 networks. The pooler is reachable over
+ * IPv4 but lives at a region-specific hostname and uses a different username.
+ * Build the candidate pooler URLs so we can fall back automatically.
+ */
+const REGIONS = [
+  'ap-south-1', 'eu-central-1', 'ap-southeast-1', 'eu-west-1', 'eu-west-2',
+  'us-east-1', 'us-west-1', 'us-east-2', 'us-west-2', 'ap-southeast-2',
+  'ap-northeast-1', 'ap-northeast-2', 'sa-east-1', 'ca-central-1', 'eu-north-1',
+]
+
+function poolerCandidates(originalUrl) {
+  let parsed
+  try {
+    parsed = new URL(originalUrl)
+  } catch {
+    return []
+  }
+  const refMatch = parsed.hostname.match(/^db\.([a-z0-9]+)\.supabase\.co$/i)
+  if (!refMatch) return []
+
+  const ref = refMatch[1]
+  const password = decodeURIComponent(parsed.password)
+  const out = []
+  for (const prefix of ['aws-0', 'aws-1']) {
+    for (const region of REGIONS) {
+      // Session mode (5432) supports transactions and DDL, which migrations need.
+      out.push({
+        label: `${prefix}-${region}`,
+        url: `postgresql://postgres.${ref}:${encodeURIComponent(password)}@${prefix}-${region}.pooler.supabase.com:5432/postgres`,
+      })
+    }
+  }
+  return out
+}
+
+async function tryConnect(connectionString) {
+  const c = new pg.Client({ connectionString, ssl: { rejectUnauthorized: false } })
+  try {
+    await c.connect()
+    return c
+  } catch (err) {
+    await c.end().catch(() => {})
+    throw err
+  }
+}
+
+let client
+
+async function connectWithFallback() {
+  console.log('Connecting to database...')
+  try {
+    return await tryConnect(url)
+  } catch (err) {
+    const networkIssue = /ENOTFOUND|ENETUNREACH|EHOSTUNREACH|ETIMEDOUT/.test(err.message)
+    const candidates = poolerCandidates(url)
+    if (!networkIssue || candidates.length === 0) throw err
+
+    console.log(`  direct host unreachable (${err.code || 'network error'})`)
+    console.log('  this host is IPv6-only; trying the IPv4 pooler...')
+
+    for (const { label, url: candidate } of candidates) {
+      try {
+        const c = await tryConnect(candidate)
+        console.log(`  connected via ${label}\n`)
+        console.log('Update .env.local so future runs connect directly:')
+        console.log(
+          `  DATABASE_URL=postgresql://postgres.${new URL(url).hostname.split('.')[1]}:YOUR_PASSWORD@${label}.pooler.supabase.com:5432/postgres\n`
+        )
+        return c
+      } catch (e) {
+        // Wrong region resolves but refuses auth/connection; keep looking.
+        if (/password|authentication|Tenant or user not found/i.test(e.message)) continue
+        continue
+      }
+    }
+    throw new Error(
+      'Could not reach the database on any pooler region.\n' +
+        'Copy the "Session pooler" connection string from:\n' +
+        '  Supabase -> Project Settings -> Database -> Connection string -> Session pooler\n' +
+        'and put it in .env.local as DATABASE_URL.'
+    )
+  }
+}
 
 async function main() {
-  console.log('Connecting to database...')
-  await client.connect()
+  client = await connectWithFallback()
 
   await client.query(`
     CREATE TABLE IF NOT EXISTS _psyllabus_migrations (
@@ -130,7 +210,7 @@ async function main() {
 }
 
 main().catch(async (err) => {
-  console.error(err.message)
-  await client.end().catch(() => {})
+  console.error(`\n${err.message}\n`)
+  await client?.end().catch(() => {})
   process.exit(1)
 })
