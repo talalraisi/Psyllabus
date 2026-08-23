@@ -11,6 +11,7 @@ import { IconClock, IconCheck } from '@/components/Icons'
 import { sortTopics, progressKey } from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 import { accessibleSubjects, isPremium } from '@/lib/access'
+import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
 
 const LENGTHS = [10, 20, 30, 45]
 
@@ -75,7 +76,11 @@ export default function TestBuilderPage() {
         return
       }
       setProfile(profileData)
-      setSubject(accessibleSubjects(profileData)[0] || '')
+      // The core is coursework, not examinable content, so it is not testable here.
+      const testable = accessibleSubjects(profileData).filter(
+        (x) => !IB_CORE_SUBJECTS.includes(x)
+      )
+      setSubject(testable[0] || '')
       setLoading(false)
     }
     load()
@@ -156,7 +161,7 @@ export default function TestBuilderPage() {
     )
   }
 
-  const usable = accessibleSubjects(profile)
+  const usable = accessibleSubjects(profile).filter((s) => !IB_CORE_SUBJECTS.includes(s))
   const actualLength = Math.min(length, eligible.length)
   const canStart = actualLength > 0
 

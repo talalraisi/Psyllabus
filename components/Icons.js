@@ -156,6 +156,26 @@ export function IconSchool(props) {
   )
 }
 
+export function IconCalendar(props) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="2.75" y="4.25" width="14.5" height="13" rx="1.75" />
+      <path d="M2.75 8.25h14.5" />
+      <path d="M6.75 2.75v3M13.25 2.75v3" />
+    </svg>
+  )
+}
+
+export function IconTarget(props) {
+  return (
+    <svg {...base} {...props}>
+      <circle cx="10" cy="10" r="7.25" />
+      <circle cx="10" cy="10" r="3.75" />
+      <circle cx="10" cy="10" r="0.75" fill="currentColor" />
+    </svg>
+  )
+}
+
 export function IconClock(props) {
   return (
     <svg {...base} {...props}>

@@ -8,7 +8,6 @@ import { getCurrentUser } from '@/lib/auth'
 import DashboardLayout from '@/components/DashboardLayout'
 import ResourceHubDrawer from '@/components/ResourceHubDrawer'
 import { resolveOnboardingNameFromSlug } from '@/lib/subject-map'
-import { RESOURCE_COUNT } from '@/lib/resources'
 import { isSubjectLocked, isPremium } from '@/lib/access'
 import {
   STATUS_COLORS,
@@ -253,7 +252,7 @@ export default function SyllabusPage() {
                               <button
                                 onClick={() => setDrawerItem(item)}
                                 className="btn btn-quiet control-sm text-xs"
-                                title={`${RESOURCE_COUNT} learning resources for this subtopic`}
+                                title="Lessons, videos and notes for this subtopic"
                               >
                                 Resources
                               </button>

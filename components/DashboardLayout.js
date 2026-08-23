@@ -13,6 +13,8 @@ import {
   IconTest,
   IconProgress,
   IconReview,
+  IconTarget,
+  IconCalendar,
   IconUser,
   IconLogout,
   IconMenu,
@@ -39,6 +41,18 @@ const NAV_ITEMS = [
     label: 'Build a Test',
     Icon: IconTest,
     match: (p) => p === '/dashboard/test' || p.startsWith('/dashboard/quiz'),
+  },
+  {
+    href: '/dashboard/calendar',
+    label: 'Calendar',
+    Icon: IconCalendar,
+    match: (p) => p === '/dashboard/calendar',
+  },
+  {
+    href: '/dashboard/prediction',
+    label: 'Predicted Grade',
+    Icon: IconTarget,
+    match: (p) => p === '/dashboard/prediction',
   },
   {
     href: '/dashboard/progress',

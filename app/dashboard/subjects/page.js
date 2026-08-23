@@ -6,15 +6,18 @@ import { getCurrentUser } from '@/lib/auth'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
+import { Page, PageHeader, Section, PageLoading } from '@/components/PageShell'
 import ProgressRing from '@/components/ProgressRing'
 import { getSlugForSubject } from '@/lib/subject-map'
 import { computeCompletionPercent } from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
+import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
+import { isSubjectLocked, isPremium } from '@/lib/access'
 
 export default function SubjectsPage() {
   const [profile, setProfile] = useState(null)
-  const [subjectStats, setSubjectStats] = useState({})
-  const [subtopicCounts, setSubtopicCounts] = useState({})
+  const [stats, setStats] = useState({})
+  const [counts, setCounts] = useState({})
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const supabase = createClient()
@@ -31,7 +34,7 @@ export default function SubjectsPage() {
         .from('profiles')
         .select('*')
         .eq('id', user.id)
-        .single()
+        .maybeSingle()
 
       if (!profileData) {
         router.push('/onboarding')
@@ -48,19 +51,17 @@ export default function SubjectsPage() {
         supabase.from('progress').select('*').eq('user_id', user.id),
       ])
 
-      const stats = {}
-      const counts = {}
+      const effective = buildEffectiveProgressMap(progressRows)
+      const nextStats = {}
+      const nextCounts = {}
       for (const subject of subjects) {
-        const subtopics = (syllabusRows || []).filter((r) => r.subject === subject)
-        counts[subject] = subtopics.length
-        const progressMap = buildEffectiveProgressMap(
-          (progressRows || []).filter((p) => p.subject === subject)
-        )
-        stats[subject] = computeCompletionPercent(subtopics, progressMap, subject)
+        const rows = (syllabusRows || []).filter((r) => r.subject === subject)
+        nextCounts[subject] = rows.length
+        nextStats[subject] = computeCompletionPercent(rows, effective, subject)
       }
 
-      setSubjectStats(stats)
-      setSubtopicCounts(counts)
+      setStats(nextStats)
+      setCounts(nextCounts)
       setLoading(false)
     }
     loadData()
@@ -68,54 +69,92 @@ export default function SubjectsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f8f6f1] flex items-center justify-center">
-        <p className="text-[#1a2e1e]">Loading subjects…</p>
+      <DashboardLayout profile={null}>
+        <PageLoading title="My Subjects" width="wide" rows={4} />
+      </DashboardLayout>
+    )
+  }
+
+  const all = profile.subjects || []
+  const subjects = all.filter((s) => !IB_CORE_SUBJECTS.includes(s))
+  const core = all.filter((s) => IB_CORE_SUBJECTS.includes(s))
+
+  const SubjectCard = ({ subject, locked }) => {
+    const pct = stats[subject] ?? 0
+    const count = counts[subject] ?? 0
+    const target = profile.target_grades?.[subject]
+
+    return (
+      // Fixed column layout with the action pinned to the bottom, so cards line
+      // up regardless of how the subject name wraps.
+      <div className="surface surface-interactive flex flex-col p-5">
+        <div className="mb-5 flex items-start gap-4">
+          <ProgressRing progress={locked ? 0 : pct} size={64} />
+          <div className="min-w-0 flex-1">
+            <h2 className="t-card-title leading-snug">{subject}</h2>
+            <p className="t-small mt-1">
+              {count} subtopic{count === 1 ? '' : 's'}
+              {target ? ` · Target ${target}` : ''}
+            </p>
+          </div>
+        </div>
+
+        {locked ? (
+          <Link href="/dashboard/profile#unlock" className="btn btn-quiet control-md mt-auto w-full">
+            Unlock with a code
+          </Link>
+        ) : (
+          <Link
+            href={`/dashboard/syllabus/${getSlugForSubject(subject)}`}
+            className="btn btn-solid control-md mt-auto w-full"
+          >
+            Open syllabus
+          </Link>
+        )}
       </div>
     )
   }
 
-  const subjects = profile.subjects || []
-
   return (
     <DashboardLayout profile={profile}>
-      <div className="px-5 py-6 md:px-12 md:py-10 max-w-6xl mx-auto">
-        <header className="mb-8">
-          <h1 className="t-page-title mb-1">My Subjects</h1>
-          <p className="text-sm text-[#6b7280]">
-            Track every topic and subtopic across your {profile.curriculum} programme
-          </p>
-        </header>
+      <Page width="wide">
+        <PageHeader
+          title="My Subjects"
+          subtitle={`Every topic and subtopic across your ${profile.curriculum} programme`}
+        />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {subjects.map((subject) => {
-            const slug = getSlugForSubject(subject)
-            const progressPercent = subjectStats[subject] ?? 0
-            const count = subtopicCounts[subject] ?? 0
-            const targetGrade = profile.target_grades?.[subject] || '—'
-
-            return (
-              <div
+        <Section title="Subjects">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {subjects.map((subject) => (
+              <SubjectCard
                 key={subject}
-                className="surface p-5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] hover:border-[#e0e0e0] transition-all flex gap-5"
-              >
-                <ProgressRing progress={progressPercent} size={72} />
-                <div className="flex-1 min-w-0">
-                  <h2 className="text-base font-semibold text-[#1a2e1e]">{subject}</h2>
-                  <p className="text-sm text-[#6b7280] mt-1">
-                    {count} subtopic{count !== 1 ? 's' : ''} · Target grade {targetGrade}
-                  </p>
-                  <Link
-                    href={`/dashboard/syllabus/${slug}`}
-                    className="inline-block mt-4 btn btn-solid control-md"
-                  >
-                    Open syllabus
-                  </Link>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
+                subject={subject}
+                locked={isSubjectLocked(subject, profile)}
+              />
+            ))}
+          </div>
+
+          {!isPremium(profile) && subjects.length > 1 && (
+            <Link
+              href="/dashboard/profile#unlock"
+              className="mt-3 block rounded-[var(--r-md)] border border-[var(--sand)] bg-[var(--sand)]/30 px-4 py-3 text-sm text-[var(--text-body)]"
+            >
+              Free plan covers one subject. Unlock the rest with your school code.
+            </Link>
+          )}
+        </Section>
+
+        {/* The core sits apart: it is compulsory, not one of the six choices. */}
+        {core.length > 0 && (
+          <Section title="Diploma core">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {core.map((subject) => (
+                <SubjectCard key={subject} subject={subject} locked={false} />
+              ))}
+            </div>
+          </Section>
+        )}
+      </Page>
     </DashboardLayout>
   )
 }

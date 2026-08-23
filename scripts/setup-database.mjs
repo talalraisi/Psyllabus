@@ -81,7 +81,7 @@ async function main() {
   for (const [label, sql] of [
     ['syllabus subtopics', 'SELECT count(*)::int AS n FROM syllabus_content'],
     ['questions', 'SELECT count(*)::int AS n FROM questions WHERE verified'],
-    ['schools', 'SELECT count(*)::int AS n FROM schools'],
+    ['access codes', 'SELECT count(*)::int AS n FROM access_codes WHERE active'],
   ]) {
     try {
       const { rows } = await client.query(sql)
@@ -95,16 +95,16 @@ async function main() {
   console.log('\nDatabase contents:')
   for (const [k, v] of Object.entries(counts)) console.log(`  ${v}  ${k}`)
 
-  const { rows: schools } = await client
-    .query('SELECT name, join_code FROM schools ORDER BY created_at')
+  const { rows: codes } = await client
+    .query('SELECT code, label FROM access_codes WHERE active ORDER BY created_at')
     .catch(() => ({ rows: [] }))
-  if (schools.length) {
-    console.log('\nSchool join codes:')
-    for (const s of schools) console.log(`  ${s.join_code}  ${s.name}`)
+  if (codes.length) {
+    console.log('\nAccess codes students can redeem:')
+    for (const c of codes) console.log(`  ${c.code}  ${c.label}`)
   }
 
-  console.log('\nNext: make yourself staff so the School dashboard opens.')
-  console.log('  npm run make-staff -- your@email.com\n')
+  console.log('\nNext: give yourself premium so every subject opens.')
+  console.log('  npm run make-admin -- your@email.com\n')
 
   await client.end()
 }

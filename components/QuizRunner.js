@@ -469,7 +469,18 @@ export default function QuizRunner({
             min={0}
             max={questions.length}
             value={predictedScore}
-            onChange={(e) => setPredictedScore(e.target.value)}
+            onChange={(e) => {
+              // Number inputs accept 'e', '+', '-' and any magnitude, so the
+              // value is sanitised rather than trusted.
+              const digits = e.target.value.replace(/[^0-9]/g, '')
+              if (digits === '') return setPredictedScore('')
+              const clamped = Math.min(questions.length, parseInt(digits, 10))
+              setPredictedScore(String(clamped))
+            }}
+            onKeyDown={(e) => {
+              if (['e', 'E', '+', '-', '.'].includes(e.key)) e.preventDefault()
+            }}
+            inputMode="numeric" 
             placeholder={`0–${questions.length}`}
             className="w-full px-3 py-2 rounded-lg border border-[#e5e7eb] bg-white text-sm outline-none focus:border-[#2D6A4F]"
           />
