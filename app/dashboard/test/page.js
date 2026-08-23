@@ -1,24 +1,60 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
-import { sortTopics } from '@/lib/progress'
+import { Page, PageHeader, EmptyState, PageLoading, SkeletonLine } from '@/components/PageShell'
+import { IconClock, IconCheck } from '@/components/Icons'
+import { sortTopics, progressKey } from '@/lib/progress'
+import { buildEffectiveProgressMap } from '@/lib/decay'
+import { accessibleSubjects, isPremium } from '@/lib/access'
 
 const LENGTHS = [10, 20, 30, 45]
+
+const FOCUS_MODES = [
+  {
+    key: 'weak',
+    label: 'Target my weak spots',
+    hint: 'Draws from subtopics you got wrong, plus anything decaying.',
+    statuses: ['in_progress', 'confident', 'decaying'],
+  },
+  {
+    key: 'untested',
+    label: 'Cover new ground',
+    hint: 'Only subtopics you have never been tested on.',
+    statuses: ['not_started'],
+  },
+  {
+    key: 'all',
+    label: 'Everything',
+    hint: 'A full mixed paper across the topics you pick.',
+    statuses: null,
+  },
+]
+
+const DIFFICULTIES = [
+  { key: 'mixed', label: 'Mixed', range: null },
+  { key: 'easy', label: 'Easier', range: [0, 0.4] },
+  { key: 'medium', label: 'Medium', range: [0.35, 0.7] },
+  { key: 'hard', label: 'Harder', range: [0.6, 1] },
+]
 
 export default function TestBuilderPage() {
   const [profile, setProfile] = useState(null)
   const [subject, setSubject] = useState('')
   const [topics, setTopics] = useState([])
-  const [available, setAvailable] = useState({})
+  const [pool, setPool] = useState([])
+  const [statusBySubtopic, setStatusBySubtopic] = useState({})
   const [selected, setSelected] = useState([])
   const [length, setLength] = useState(20)
   const [timed, setTimed] = useState(true)
+  const [focusMode, setFocusMode] = useState('all')
+  const [difficulty, setDifficulty] = useState('mixed')
   const [loading, setLoading] = useState(true)
-  const [loadingTopics, setLoadingTopics] = useState(false)
+  const [loadingPool, setLoadingPool] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -33,64 +69,107 @@ export default function TestBuilderPage() {
         .from('profiles')
         .select('*')
         .eq('id', user.id)
-        .single()
+        .maybeSingle()
       if (!profileData) {
         router.push('/onboarding')
         return
       }
       setProfile(profileData)
-      setSubject(profileData.subjects?.[0] || '')
+      setSubject(accessibleSubjects(profileData)[0] || '')
       setLoading(false)
     }
     load()
   }, [router, supabase])
 
   useEffect(() => {
-    if (!subject) return
-    async function loadTopics() {
-      setLoadingTopics(true)
-      const [{ data: syllabus }, { data: questions }] = await Promise.all([
-        supabase.from('syllabus_content').select('topic').eq('subject', subject),
+    if (!subject || !profile) return
+    let cancelled = false
+
+    async function loadPool() {
+      setLoadingPool(true)
+      const [{ data: syllabus }, { data: questions }, { data: progressRows }] = await Promise.all([
+        supabase.from('syllabus_content').select('topic, subtopic').eq('subject', subject),
         supabase
           .from('questions')
-          .select('topic')
+          .select('id, topic, subtopic, difficulty, marks, time_budget_seconds')
           .eq('subject', subject)
           .eq('verified', true),
+        supabase.from('progress').select('*').eq('user_id', profile.id).eq('subject', subject),
       ])
+      if (cancelled) return
 
-      const counts = {}
-      for (const q of questions || []) {
-        counts[q.topic] = (counts[q.topic] || 0) + 1
+      const effective = buildEffectiveProgressMap(progressRows)
+      const statuses = {}
+      for (const row of syllabus || []) {
+        statuses[row.subtopic] = effective[progressKey(subject, row.subtopic)] || 'not_started'
       }
+
       const unique = [...new Set((syllabus || []).map((r) => r.topic))]
       const ordered = sortTopics(unique.map((t) => [t, null])).map(([t]) => t)
 
       setTopics(ordered)
-      setAvailable(counts)
-      setSelected(ordered.filter((t) => counts[t] > 0))
-      setLoadingTopics(false)
+      setPool(questions || [])
+      setStatusBySubtopic(statuses)
+      setSelected(ordered)
+      setLoadingPool(false)
     }
-    loadTopics()
-  }, [subject, supabase])
+
+    loadPool()
+    return () => {
+      cancelled = true
+    }
+  }, [subject, profile, supabase])
+
+  /** Questions matching every filter, so the count shown is always truthful. */
+  const eligible = useMemo(() => {
+    const mode = FOCUS_MODES.find((m) => m.key === focusMode)
+    const diff = DIFFICULTIES.find((d) => d.key === difficulty)
+
+    return pool.filter((q) => {
+      if (!selected.includes(q.topic)) return false
+
+      if (mode?.statuses) {
+        const status = statusBySubtopic[q.subtopic] || 'not_started'
+        if (!mode.statuses.includes(status)) return false
+      }
+
+      if (diff?.range) {
+        const d = typeof q.difficulty === 'number' ? q.difficulty : 0.5
+        if (d < diff.range[0] || d > diff.range[1]) return false
+      }
+
+      return true
+    })
+  }, [pool, selected, focusMode, difficulty, statusBySubtopic])
+
+  const perTopicCounts = useMemo(() => {
+    const counts = {}
+    for (const q of pool) counts[q.topic] = (counts[q.topic] || 0) + 1
+    return counts
+  }, [pool])
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f8f6f1] flex items-center justify-center">
-        <p className="text-sm text-[#6b7280]">Loading…</p>
-      </div>
+      <DashboardLayout profile={null}>
+        <PageLoading title="Build a Test" width="default" rows={4} />
+      </DashboardLayout>
     )
   }
 
-  const subjects = profile.subjects || []
-  const totalAvailable = selected.reduce((sum, t) => sum + (available[t] || 0), 0)
-  const canStart = selected.length > 0 && totalAvailable > 0
-  const actualLength = Math.min(length, totalAvailable)
+  const usable = accessibleSubjects(profile)
+  const actualLength = Math.min(length, eligible.length)
+  const canStart = actualLength > 0
 
-  const toggleTopic = (topic) => {
+  // Real paper metrics, taken from the questions that would actually be drawn.
+  const sample = eligible.slice(0, actualLength)
+  const totalMarks = sample.reduce((s, q) => s + (q.marks || 1), 0)
+  const totalSeconds = sample.reduce((s, q) => s + (q.time_budget_seconds || 90), 0)
+  const estMinutes = Math.max(1, Math.round(totalSeconds / 60))
+
+  const toggleTopic = (topic) =>
     setSelected((prev) =>
       prev.includes(topic) ? prev.filter((t) => t !== topic) : [...prev, topic]
     )
-  }
 
   const startTest = () => {
     const params = new URLSearchParams({
@@ -101,94 +180,129 @@ export default function TestBuilderPage() {
       back: '/dashboard/test',
     })
     if (timed) params.set('timed', '1')
+    if (focusMode !== 'all') params.set('focus', focusMode)
+    if (difficulty !== 'mixed') params.set('difficulty', difficulty)
     router.push(`/dashboard/quiz?${params.toString()}`)
   }
 
   return (
     <DashboardLayout profile={profile}>
-      <div className="px-5 py-6 md:px-12 md:py-10 max-w-3xl mx-auto">
-        <header className="mb-8">
-          <h1 className="t-page-title mb-1">Build a Test</h1>
-          <p className="text-sm text-[#6b7280]">
-            Mix any topics into an exam-style paper. Choose the length and whether to run it
-            under timed conditions.
-          </p>
-        </header>
+      <Page width="default">
+        <PageHeader
+          title="Build a Test"
+          subtitle="Compose a paper from any mix of topics, then sit it under exam conditions."
+        />
 
-        <div className="surface p-5 mb-4">
-          <label className="block text-sm font-medium text-[#1a2e1e] mb-2">Subject</label>
+        {/* Subject */}
+        <div className="surface mb-3 p-5">
+          <label htmlFor="subject" className="t-small mb-2 block font-medium text-[var(--text)]">
+            Subject
+          </label>
           <select
+            id="subject"
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
-            className="w-full px-3 py-2 rounded-lg border border-[#e5e7eb] bg-white text-sm outline-none focus:border-[#2D6A4F]"
+            className="field"
           >
-            {subjects.map((s) => (
+            {usable.map((s) => (
               <option key={s} value={s}>
                 {s}
               </option>
             ))}
           </select>
+          {!isPremium(profile) && (profile.subjects || []).length > usable.length && (
+            <p className="t-caption mt-2">
+              Free plan covers one subject.{' '}
+              <Link href="/dashboard/profile#unlock" className="text-[var(--brand)] hover:underline">
+                Unlock the rest
+              </Link>
+            </p>
+          )}
         </div>
 
-        <div className="surface p-5 mb-4">
-          <div className="flex items-center justify-between mb-3">
-            <label className="text-sm font-medium text-[#1a2e1e]">Topics</label>
+        {/* What to draw from */}
+        <div className="surface mb-3 p-5">
+          <p className="t-small mb-3 font-medium text-[var(--text)]">What should this test cover?</p>
+          <div className="flex flex-col gap-2">
+            {FOCUS_MODES.map((mode) => (
+              <button
+                key={mode.key}
+                onClick={() => setFocusMode(mode.key)}
+                aria-pressed={focusMode === mode.key}
+                className={`flex items-start gap-3 rounded-[var(--r-md)] border p-3 text-left transition-colors duration-150 ${
+                  focusMode === mode.key
+                    ? 'border-[var(--brand)] bg-[var(--brand-tint)]'
+                    : 'border-[var(--border-strong)] hover:border-[var(--border-hover)]'
+                }`}
+              >
+                <span
+                  className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
+                    focusMode === mode.key
+                      ? 'border-[var(--brand)] bg-[var(--brand)]'
+                      : 'border-[var(--border-hover)]'
+                  }`}
+                >
+                  {focusMode === mode.key && <span className="h-1.5 w-1.5 rounded-full bg-white" />}
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-sm font-medium text-[var(--text)]">{mode.label}</span>
+                  <span className="t-caption">{mode.hint}</span>
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Topics */}
+        <div className="surface mb-3 p-5">
+          <div className="mb-3 flex items-center justify-between">
+            <p className="t-small font-medium text-[var(--text)]">Topics</p>
             <button
-              onClick={() =>
-                setSelected(
-                  selected.length === topics.filter((t) => available[t] > 0).length
-                    ? []
-                    : topics.filter((t) => available[t] > 0)
-                )
-              }
-              className="text-xs font-medium text-[#2D6A4F] hover:underline"
+              onClick={() => setSelected(selected.length === topics.length ? [] : topics)}
+              className="text-xs font-medium text-[var(--brand)] hover:underline"
             >
-              {selected.length > 0 ? 'Clear all' : 'Select all'}
+              {selected.length === topics.length ? 'Clear all' : 'Select all'}
             </button>
           </div>
 
-          {loadingTopics ? (
-            <div className="space-y-2 animate-pulse">
+          {loadingPool ? (
+            <div className="flex flex-col gap-2">
               {[0, 1, 2].map((i) => (
-                <div key={i} className="h-9 bg-[#f3f4f6] rounded-lg" />
+                <SkeletonLine key={i} height={36} />
               ))}
             </div>
           ) : topics.length === 0 ? (
-            <p className="text-sm text-[#6b7280]">
-              No syllabus loaded for this subject yet.
-            </p>
+            <p className="t-small">No syllabus loaded for this subject yet.</p>
           ) : (
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               {topics.map((topic) => {
-                const n = available[topic] || 0
+                const n = perTopicCounts[topic] || 0
                 const isSelected = selected.includes(topic)
                 return (
                   <button
                     key={topic}
-                    onClick={() => n > 0 && toggleTopic(topic)}
-                    disabled={n === 0}
-                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg border text-left transition-colors ${
-                      n === 0
-                        ? 'border-[#f0f0f0] bg-[#f9fafb] cursor-not-allowed'
-                        : isSelected
-                          ? 'border-[#2D6A4F] bg-[#f0fdf4]'
-                          : 'border-[#e5e7eb] bg-white hover:border-[#d1d5db]'
+                    onClick={() => toggleTopic(topic)}
+                    aria-pressed={isSelected}
+                    className={`flex items-center gap-3 rounded-[var(--r-md)] border px-3 py-2 text-left transition-colors duration-150 ${
+                      isSelected
+                        ? 'border-[var(--brand)] bg-[var(--brand-tint)]'
+                        : 'border-[var(--border-strong)] hover:border-[var(--border-hover)]'
                     }`}
                   >
                     <span
-                      className={`w-4 h-4 rounded border shrink-0 flex items-center justify-center text-[10px] text-white ${
-                        isSelected ? 'bg-[#2D6A4F] border-[#2D6A4F]' : 'border-[#d1d5db]'
+                      className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-[var(--r-sm)] border ${
+                        isSelected
+                          ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
+                          : 'border-[var(--border-hover)]'
                       }`}
                     >
-                      {isSelected ? '✓' : ''}
+                      {isSelected && <IconCheck width={11} height={11} />}
                     </span>
-                    <span
-                      className={`flex-1 text-sm truncate ${n === 0 ? 'text-[#9ca3af]' : 'text-[#374151]'}`}
-                    >
+                    <span className="min-w-0 flex-1 truncate text-sm text-[var(--text-body)]">
                       {topic}
                     </span>
-                    <span className="text-xs text-[#9ca3af] shrink-0">
-                      {n > 0 ? `${n} questions` : 'none yet'}
+                    <span className="t-caption shrink-0">
+                      {n > 0 ? `${n} available` : 'none yet'}
                     </span>
                   </button>
                 )
@@ -197,17 +311,37 @@ export default function TestBuilderPage() {
           )}
         </div>
 
-        <div className="surface p-5 mb-4">
-          <label className="block text-sm font-medium text-[#1a2e1e] mb-3">Length</label>
-          <div className="flex flex-wrap gap-2 mb-5">
+        {/* Difficulty and length */}
+        <div className="surface mb-3 p-5">
+          <p className="t-small mb-3 font-medium text-[var(--text)]">Difficulty</p>
+          <div className="mb-6 flex flex-wrap gap-2">
+            {DIFFICULTIES.map((d) => (
+              <button
+                key={d.key}
+                onClick={() => setDifficulty(d.key)}
+                aria-pressed={difficulty === d.key}
+                className={`control-sm rounded-[var(--r-md)] border px-4 text-sm font-medium transition-colors duration-150 ${
+                  difficulty === d.key
+                    ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
+                    : 'border-[var(--border-strong)] text-[var(--text-body)] hover:bg-[var(--surface-sunken)]'
+                }`}
+              >
+                {d.label}
+              </button>
+            ))}
+          </div>
+
+          <p className="t-small mb-3 font-medium text-[var(--text)]">Length</p>
+          <div className="mb-6 flex flex-wrap gap-2">
             {LENGTHS.map((n) => (
               <button
                 key={n}
                 onClick={() => setLength(n)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
+                aria-pressed={length === n}
+                className={`control-md rounded-[var(--r-md)] border px-4 text-sm font-medium transition-colors duration-150 ${
                   length === n
-                    ? 'bg-[#2D6A4F] text-white border-[#2D6A4F]'
-                    : 'bg-white text-[#374151] border-[#e5e7eb] hover:border-[#d1d5db]'
+                    ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
+                    : 'border-[var(--border-strong)] text-[var(--text-body)] hover:bg-[var(--surface-sunken)]'
                 }`}
               >
                 {n} questions
@@ -215,54 +349,74 @@ export default function TestBuilderPage() {
             ))}
           </div>
 
-          <label className="flex items-center gap-3 cursor-pointer">
-            <button
-              onClick={() => setTimed(!timed)}
-              role="switch"
-              aria-checked={timed}
-              className={`w-10 h-6 rounded-full transition-colors relative shrink-0 ${
-                timed ? 'bg-[#2D6A4F]' : 'bg-[#e5e7eb]'
+          <button
+            onClick={() => setTimed(!timed)}
+            role="switch"
+            aria-checked={timed}
+            className="flex items-center gap-3"
+          >
+            <span
+              className={`relative h-6 w-10 shrink-0 rounded-full transition-colors duration-150 ${
+                timed ? 'bg-[var(--brand)]' : 'bg-[var(--border-strong)]'
               }`}
             >
               <span
-                className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${
+                className={`absolute top-1 h-4 w-4 rounded-full bg-white transition-all duration-150 ${
                   timed ? 'left-5' : 'left-1'
                 }`}
               />
-            </button>
-            <span className="text-sm text-[#374151]">
-              Exam conditions (timed, with live pacing clock)
             </span>
-          </label>
+            <span className="text-sm text-[var(--text-body)]">
+              Exam conditions: countdown and live marks-per-minute pacing
+            </span>
+          </button>
         </div>
 
+        {/* Summary */}
         <div className="surface p-5">
           {canStart ? (
             <>
-              <p className="text-sm text-[#6b7280] mb-4">
-                {actualLength} question{actualLength !== 1 ? 's' : ''} from {selected.length} topic
-                {selected.length !== 1 ? 's' : ''}
-                {actualLength < length
-                  ? ` (only ${totalAvailable} available so far)`
-                  : ''}
-                {timed ? ' · timed' : ' · untimed'}
-              </p>
-              <button
-                onClick={startTest}
-                className="w-full btn btn-solid control-md"
-              >
-                Start test
+              <div className="mb-4 grid grid-cols-3 gap-3">
+                {[
+                  ['Questions', actualLength],
+                  ['Marks', totalMarks],
+                  [timed ? 'Time limit' : 'Est. time', `${estMinutes}m`],
+                ].map(([label, value]) => (
+                  <div
+                    key={label}
+                    className="rounded-[var(--r-md)] border border-[var(--border)] bg-[var(--surface-sunken)] p-3"
+                  >
+                    <p className="text-lg font-bold tabular-nums text-[var(--text)]">{value}</p>
+                    <p className="t-caption">{label}</p>
+                  </div>
+                ))}
+              </div>
+
+              {actualLength < length && (
+                <p className="t-caption mb-4">
+                  Only {eligible.length} question{eligible.length === 1 ? '' : 's'} match these
+                  filters, so the paper will be {actualLength} long. Widen the topics or
+                  difficulty for more.
+                </p>
+              )}
+
+              <button onClick={startTest} className="btn btn-solid control-lg w-full">
+                {timed && <IconClock width={18} height={18} />}
+                Start {timed ? 'timed test' : 'test'}
               </button>
             </>
           ) : (
-            <p className="text-sm text-[#6b7280]">
-              {selected.length === 0
-                ? 'Select at least one topic to build a test.'
-                : 'No questions available for the selected topics yet.'}
-            </p>
+            <EmptyState
+              title="No questions match these settings"
+              description={
+                selected.length === 0
+                  ? 'Select at least one topic.'
+                  : 'Try a different focus, a wider difficulty range, or more topics.'
+              }
+            />
           )}
         </div>
-      </div>
+      </Page>
     </DashboardLayout>
   )
 }

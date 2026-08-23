@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
+import { buildEffectiveProgressMap } from '@/lib/decay'
+import { progressKey } from '@/lib/progress'
 
 const PHASE = {
   loading: 'loading',
@@ -71,6 +73,8 @@ export default function QuizRunner({
   count,
   topics,
   timed: timedProp = false,
+  focus = null,
+  difficulty = null,
   backHref = '/dashboard',
 }) {
   const [phase, setPhase] = useState(PHASE.loading)
@@ -147,6 +151,45 @@ export default function QuizRunner({
         return
       }
 
+      let candidates = questionRows
+
+      // Difficulty bands mirror the ranges offered in the test builder.
+      const BANDS = { easy: [0, 0.4], medium: [0.35, 0.7], hard: [0.6, 1] }
+      if (difficulty && BANDS[difficulty]) {
+        const [lo, hi] = BANDS[difficulty]
+        const banded = candidates.filter((q) => {
+          const d = typeof q.difficulty === 'number' ? q.difficulty : 0.5
+          return d >= lo && d <= hi
+        })
+        if (banded.length) candidates = banded
+      }
+
+      // Focus draws only from subtopics at the relevant mastery level.
+      if (focus) {
+        const { data: progressRows } = await supabase
+          .from('progress')
+          .select('subject, subtopic, status, updated_at')
+          .eq('user_id', user.id)
+        const effective = buildEffectiveProgressMap(progressRows)
+        const wanted =
+          focus === 'weak'
+            ? ['in_progress', 'confident', 'decaying']
+            : focus === 'untested'
+              ? ['not_started']
+              : null
+
+        if (wanted) {
+          const focused = candidates.filter((q) => {
+            const status = effective[progressKey(q.subject, q.subtopic)] || 'not_started'
+            return wanted.includes(status)
+          })
+          if (focused.length) candidates = focused
+        }
+      }
+
+      if (!candidates.length) candidates = questionRows
+
+      const questionRowsFiltered = candidates
       const target =
         count || (mode === 'mock' ? MOCK_COUNT : mode === 'topic' ? 15 : SUBTOPIC_COUNT)
 
@@ -157,7 +200,7 @@ export default function QuizRunner({
         .select('question_id, created_at')
         .in(
           'question_id',
-          questionRows.slice(0, 1000).map((q) => q.id)
+          questionRowsFiltered.slice(0, 1000).map((q) => q.id)
         )
         .order('created_at', { ascending: false })
 
@@ -166,8 +209,8 @@ export default function QuizRunner({
         if (!lastSeenAt.has(r.question_id)) lastSeenAt.set(r.question_id, r.created_at)
       }
 
-      const unseen = shuffle(questionRows.filter((q) => !lastSeenAt.has(q.id)))
-      const seen = questionRows
+      const unseen = shuffle(questionRowsFiltered.filter((q) => !lastSeenAt.has(q.id)))
+      const seen = questionRowsFiltered
         .filter((q) => lastSeenAt.has(q.id))
         .sort((a, b) => new Date(lastSeenAt.get(a.id)) - new Date(lastSeenAt.get(b.id)))
 
@@ -176,7 +219,7 @@ export default function QuizRunner({
     }
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subject, topic, subtopic, mode, count, topics?.join('|')])
+  }, [subject, topic, subtopic, mode, count, topics?.join('|'), focus, difficulty])
 
   const startQuiz = () => {
     questionTimesRef.current = {}

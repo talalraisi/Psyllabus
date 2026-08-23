@@ -23,6 +23,8 @@ function QuizPageInner() {
   const topicsParam = searchParams.get('topics')
   const topics = topicsParam ? topicsParam.split('~~') : undefined
   const timed = searchParams.get('timed') === '1'
+  const focus = searchParams.get('focus') || null
+  const difficulty = searchParams.get('difficulty') || null
 
   useEffect(() => {
     async function load() {
@@ -75,6 +77,8 @@ function QuizPageInner() {
           count={count}
           topics={topics}
           timed={timed}
+          focus={focus}
+          difficulty={difficulty}
           backHref={backHref}
         />
       </div>
