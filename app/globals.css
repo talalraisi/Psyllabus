@@ -143,7 +143,7 @@ body {
     color: var(--text-faint);
   }
 
-  /* Group label above a section. Short by rule — never a sentence. */
+  /* Group label above a section. Short by rule, never a sentence. */
   .t-overline {
     font-size: 11px;
     line-height: 16px;
@@ -187,6 +187,11 @@ body {
      every button, input, and pill on the 4pt grid regardless of its label.
      Declared as utilities so responsive variants (md:control-md) work. */
 
+  /* line-height: 1 matters more than it looks. At the inherited 1.5, the line
+     box is 21px tall for 14px text, and flex centres that box, not the letters.
+     The extra space sits below the baseline where no glyph reaches, so the
+     label reads as sitting low in the button. Tightening the box to the text
+     puts the letters where the eye expects them. */
   .btn {
     display: inline-flex;
     align-items: center;
@@ -196,9 +201,18 @@ body {
     border-radius: var(--r-md);
     font-size: 14px;
     font-weight: 500;
+    line-height: 1;
     transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
       color var(--dur) var(--ease);
     white-space: nowrap;
+  }
+
+  /* Doubled selector on purpose. Tailwind's text-xs/text-sm/text-base each set
+     a line-height of their own, and utilities beat this layer, so a button with
+     a size class would quietly get its 20px line box back and sit low again.
+     Two classes outrank one, which makes the rule above hold everywhere. */
+  .btn.btn {
+    line-height: 1;
   }
 
   .btn:disabled {
@@ -262,7 +276,7 @@ body {
   }
 
   /* ===========================================================================
-     Skeletons — every async surface uses this same pulse.
+     Skeletons, every async surface uses this same pulse.
      =========================================================================== */
 
   .skeleton {
@@ -300,48 +314,10 @@ body {
 
   .card-pad { padding: 32px; }
 
-  .btn-primary {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--brand);
-    color: #fff;
-    font-weight: 600;
-    border-radius: var(--r-md);
-    transition: background var(--dur) var(--ease);
-  }
-
-  .btn-primary:hover:not(:disabled) { background: var(--brand-hover); }
-  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  .btn-secondary {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    color: var(--text-body);
-    font-weight: 600;
-    border: 1px solid var(--border-strong);
-    border-radius: var(--r-md);
-    transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
-  }
-
-  .btn-secondary:hover { background: var(--surface-sunken); border-color: var(--border-hover); }
-
-  .btn-ghost {
-    color: var(--text-muted);
-    font-size: 14px;
-    border: 1px solid var(--border-strong);
-    border-radius: var(--r-md);
-    padding: 8px 16px;
-    transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
-  }
-
-  .btn-ghost:hover { color: var(--text); border-color: var(--border-hover); }
 
   /* One height for every field type. Inputs, selects and date pickers each have
      their own intrinsic sizing, so the height is fixed rather than derived from
-     padding — otherwise a select sits 2px short of the text field beside it. */
+     padding, otherwise a select sits 2px short of the text field beside it. */
   .input {
     width: 100%;
     height: 48px;

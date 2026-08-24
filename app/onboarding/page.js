@@ -357,7 +357,7 @@ export default function Onboarding() {
           ))}
         </div>
 
-        {/* Step 1 — Curriculum and year */}
+        {/* Step 1, Curriculum and year */}
         {step === 1 && (
           <div className="card card-pad">
             <h1 className="text-2xl font-bold text-text mb-2">
@@ -404,13 +404,13 @@ export default function Onboarding() {
             <button
               onClick={() => setStep(2)}
               disabled={!curriculum || !gradYear}
-              className="btn-primary w-full py-4 text-base disabled:opacity-40 disabled:cursor-not-allowed">
+              className="btn btn-solid control-lg w-full text-base">
               Continue
             </button>
           </div>
         )}
 
-        {/* Step 2 — Subject selection by group */}
+        {/* Step 2, Subject selection by group */}
         {step === 2 && currentCurriculum && (
           <div className="card card-pad">
             <h1 className="text-2xl font-bold text-text mb-2">
@@ -498,20 +498,20 @@ export default function Onboarding() {
             )}
 
             <div className="flex gap-3">
-              <button onClick={() => setStep(1)} className="btn-secondary px-6 py-3 text-sm">
+              <button onClick={() => setStep(1)} className="btn btn-quiet control-md px-6">
                 Back
               </button>
               <button
                 onClick={() => setStep(3)}
                 disabled={!subjectsValid}
-                className="btn-primary flex-1 py-4 text-base disabled:opacity-40 disabled:cursor-not-allowed">
+                className="btn btn-solid control-lg flex-1 text-base">
                 Continue
               </button>
             </div>
           </div>
         )}
 
-        {/* Step 3 — Target grades */}
+        {/* Step 3, Target grades */}
         {step === 3 && currentCurriculum && (
           <div className="card card-pad">
             <h1 className="text-2xl font-bold text-text mb-2">
@@ -580,13 +580,13 @@ export default function Onboarding() {
             )}
 
             <div className="flex gap-3">
-              <button onClick={() => setStep(2)} className="btn-secondary px-6 py-3 text-sm">
+              <button onClick={() => setStep(2)} className="btn btn-quiet control-md px-6">
                 Back
               </button>
               <button
                 onClick={handleFinish}
                 disabled={loading || !gradesComplete}
-                className="btn-primary flex-1 py-4 text-base disabled:opacity-40 disabled:cursor-not-allowed">
+                className="btn btn-solid control-lg flex-1 text-base">
                 {loading ? 'Setting up…' : 'Go to my dashboard'}
               </button>
             </div>

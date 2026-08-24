@@ -9,8 +9,8 @@ const SHOWN_KEY = 'psyllabus:reminders-shown'
 /**
  * Raises a notification for calendar events whose reminder window has opened.
  *
- * This runs client-side while PSyllabus is open — there is no push server, so
- * it cannot wake a closed browser. Ids that have already fired are kept in
+ * This runs client-side while the app is open. There is no push server, so it
+ * cannot wake a closed browser. Ids that have already fired are kept in
  * localStorage so a reload does not re-notify for the same event.
  */
 export default function ReminderWatcher({ events = [] }) {
@@ -42,7 +42,7 @@ export default function ReminderWatcher({ events = [] }) {
       try {
         localStorage.setItem(SHOWN_KEY, JSON.stringify([...shown]))
       } catch {
-        /* private mode — reminders simply repeat next session */
+        /* private mode, reminders simply repeat next session */
       }
     }
 

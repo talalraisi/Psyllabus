@@ -339,7 +339,7 @@ export default function ProfilePage() {
                   </p>
                 )}
                 <p className="t-caption mt-3">
-                  Students at partner schools have a code from their school.{' '}
+                  If your school has bought Project Syllabus, ask them for the code.{' '}
                   <Link href="/pricing" className="text-[var(--brand)] hover:underline">
                     See plans
                   </Link>

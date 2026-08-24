@@ -234,7 +234,7 @@ export default function QuizRunner({
     setPhase(PHASE.quiz)
   }
 
-  // Countdown for timed mocks — auto-submits at zero.
+  // Countdown for timed mocks, auto-submits at zero.
   useEffect(() => {
     if (phase !== PHASE.quiz || !timed) return
     const interval = setInterval(() => {

@@ -243,7 +243,7 @@ export default function StudyPlanPage() {
               <p className="text-sm font-medium text-[var(--text)]">Turn on reminders</p>
               <p className="t-caption mt-0.5">
                 Alerts before tests and deadlines, and when a study block ends. They arrive while
-                PSyllabus is open — add it to your home screen to keep it running.
+                Project Syllabus is open, so add it to your home screen to keep it running.
               </p>
             </div>
             <button onClick={enableNotifications} className="btn btn-solid control-sm shrink-0 text-xs">

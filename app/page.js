@@ -4,36 +4,36 @@ import logoMark from '@/public/logo-mark.png'
 import { IconCheck, IconArrowRight } from '@/components/Icons'
 
 export const metadata = {
-  title: 'PSyllabus: Know exactly what to study next',
+  title: 'Project Syllabus: know exactly what to study next',
   description:
-    'Syllabus-mapped progress tracking for IB, A-Level, and AP students. Your status is set by testing, never by self-rating.',
+    'Project Syllabus tracks your IB, A-Level or AP syllabus topic by topic. Where you stand is set by testing, not by how confident you feel.',
 }
 
 const HOW_IT_WORKS = [
   {
     step: '01',
     title: 'Map your syllabus',
-    body: 'Pick your subjects and see every topic and subtopic from the official course outline, laid out on one screen.',
+    body: 'Pick your subjects and see every topic and subtopic from the official course outline on one screen.',
   },
   {
     step: '02',
     title: 'Prove what you know',
-    body: 'Take a quiz on any subtopic. Your status is set by your accuracy, not by rating your own confidence.',
+    body: 'Take a quiz on any subtopic. Where you stand comes from how many you got right, not from how you felt about it.',
   },
   {
     step: '03',
     title: 'Study what actually matters',
-    body: 'Weak and decaying subtopics rise to the top of your plan, and every wrong answer returns for review on a spaced schedule.',
+    body: 'Weak and fading subtopics rise to the top of your plan, and every question you got wrong comes back for review.',
   },
 ]
 
 const FEATURES = [
-  ['Quiz-verified heatmap', 'Every subtopic is graded from real test results, so nothing is marked known on a guess.'],
-  ['Skill-decay tracking', 'Master something and leave it for two weeks and it fades to amber, back into your plan.'],
-  ['Mistake bank', 'Wrong answers queue for spaced repetition, so you drill your own gaps instead of generic cards.'],
-  ['Timed mock papers', 'Build a paper from any mix of topics and run it against a live marks-per-minute pacing clock.'],
-  ['Five resources per subtopic', 'Video walkthroughs, worked examples, mark scheme breakdowns, summary sheets, and common pitfalls.'],
-  ['Cohort view for schools', 'Staff see which subtopics a year group is struggling with. Students only ever see their own data.'],
+  ['Heatmap you cannot fake', 'Every subtopic is coloured by your real test results, so nothing shows as known on a guess.'],
+  ['Topics that fade', 'Nail something, leave it two weeks and it fades to amber and comes back into your plan.'],
+  ['Mistake bank', 'Questions you got wrong come back on a spaced schedule, so you drill your own gaps.'],
+  ['Timed papers', 'Build a paper from any mix of topics and sit it against a live marks-per-minute clock.'],
+  ['Real resources on every subtopic', 'Hand-picked lessons, videos and notes for the exact thing you got wrong, not a search box.'],
+  ['Predicted grade', 'A running prediction out of 45, built from your quiz results, next to the grades you told us you want.'],
 ]
 
 export default function Home() {
@@ -75,8 +75,6 @@ export default function Home() {
       {/* Hero */}
       <section className="marketing-hero-grid border-b border-[var(--border)] px-5 py-20 md:px-8 md:py-28">
         <div className="mx-auto max-w-3xl text-center">
-          <span className="badge mb-8 inline-block">Free for partner schools</span>
-
           <h1 className="mb-6 text-4xl font-bold leading-[1.1] tracking-tight text-[var(--text)] sm:text-6xl">
             Stop guessing.
             <br />
@@ -84,8 +82,8 @@ export default function Home() {
           </h1>
 
           <p className="mx-auto mb-10 max-w-xl text-lg leading-relaxed text-[var(--text-muted)]">
-            PSyllabus maps your IB, A-Level, or AP syllabus topic by topic and tells you exactly
-            what to study today, based on where you are actually falling behind.
+            Project Syllabus lays out your IB, A-Level or AP course topic by topic, then tells you
+            what to work on today based on where you are actually behind.
           </p>
 
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -97,7 +95,7 @@ export default function Home() {
             </Link>
           </div>
           <p className="mt-4 text-sm text-[var(--text-faint)]">
-            No card required. Students at partner schools get every subject free.
+            No card needed. One subject free, and your school code unlocks the rest.
           </p>
         </div>
       </section>
@@ -106,9 +104,9 @@ export default function Home() {
       <section className="border-b border-[var(--border)] bg-[var(--surface-sunken)] px-5 py-10 md:px-8">
         <div className="mx-auto grid max-w-3xl grid-cols-3 gap-4 text-center">
           {[
-            ['3', 'Curricula supported'],
+            ['3', 'Curricula covered'],
             ['2,500+', 'Subtopics mapped'],
-            ['4', 'Status levels, all test-verified'],
+            ['0', 'Statuses you can set by guessing'],
           ].map(([value, label]) => (
             <div key={label}>
               <p className="t-stat text-[var(--text)]">{value}</p>
@@ -123,8 +121,8 @@ export default function Home() {
         <div className="mx-auto max-w-5xl">
           <h2 className="t-overline mb-3">How it works</h2>
           <p className="mb-10 max-w-2xl text-2xl font-semibold leading-snug text-[var(--text)]">
-            Confidence and competence are different things. PSyllabus only ever measures the second
-            one.
+            Feeling ready and being ready are two different things. Project Syllabus only ever
+            measures the second one.
           </p>
 
           <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
@@ -144,7 +142,7 @@ export default function Home() {
         <div className="mx-auto max-w-5xl">
           <h2 className="t-overline mb-3">What you get</h2>
           <p className="mb-10 max-w-2xl text-2xl font-semibold leading-snug text-[var(--text)]">
-            Everything a serious candidate needs, in one place.
+            Everything you need to revise properly, in one place.
           </p>
 
           <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
@@ -165,11 +163,12 @@ export default function Home() {
       <section className="border-t border-[var(--border)] bg-[var(--surface-sunken)] px-5 py-20 md:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="mb-4 text-2xl font-semibold text-[var(--text)]">
-            Bringing PSyllabus to your school
+            Getting Project Syllabus into your school
           </h2>
           <p className="mx-auto mb-8 max-w-xl text-[var(--text-body)]">
-            Schools in the pilot pay nothing. Students join with a code and unlock every subject,
-            and staff get a dashboard showing which subtopics the year group is struggling with.
+            A school buys one code and hands it to its students. Everyone who types it in gets every
+            subject unlocked. There is nothing for teachers to set up and nothing for them to log
+            into, because your results are yours and nobody else sees them.
           </p>
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link href="/pricing" className="btn btn-solid control-md px-6">
@@ -189,7 +188,7 @@ export default function Home() {
       <section className="px-5 py-20 md:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="mb-4 text-2xl font-semibold text-[var(--text)]">
-            Know where you stand before the exam does.
+            Find out where you stand before the exam tells you.
           </h2>
           <Link href="/signup" className="btn btn-solid control-lg mt-2 px-8">
             Create a free account

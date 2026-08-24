@@ -329,7 +329,7 @@ export default function PredictionPage() {
                     Core bonus:{' '}
                     <strong className="text-[var(--text)]">
                       {bonus === 'F'
-                        ? 'Failing condition — an E in TOK or EE fails the Diploma'
+                        ? 'Failing condition. An E in TOK or EE fails the Diploma.'
                         : typeof bonus === 'number'
                           ? `${bonus} point${bonus === 1 ? '' : 's'}`
                           : 'set both TOK and EE to see this'}

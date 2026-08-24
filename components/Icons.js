@@ -1,5 +1,5 @@
 /**
- * Icon set — single visual language.
+ * Icon set, single visual language.
  *
  * Every icon: 20x20 viewBox, 1.5px stroke, round caps and joins, currentColor.
  * Drawn on the same geometric grid so weight reads identically at any size.

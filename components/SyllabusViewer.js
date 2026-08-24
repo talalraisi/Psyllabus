@@ -162,7 +162,7 @@ export default function SyllabusViewer({ subjectName, subjectSlug, syllabusYear 
                     {hasQuestions ? (
                       <Link
                         href={quizHref}
-                        className="btn-primary text-xs px-3 py-1.5 flex-shrink-0"
+                        className="btn btn-solid control-sm shrink-0 px-3 text-xs"
                       >
                         Take quiz
                       </Link>

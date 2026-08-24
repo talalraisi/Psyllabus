@@ -4,7 +4,7 @@ import { IconCheck } from '@/components/Icons'
 export const metadata = {
   title: 'Pricing',
   description:
-    'PSyllabus is free for students at partner schools. Individual and school plans explained.',
+    'What Project Syllabus costs, and how a school code unlocks everything for a whole year group.',
 }
 
 const PLANS = [
@@ -27,7 +27,7 @@ const PLANS = [
     name: 'Premium',
     price: '$12',
     cadence: 'per month, or $108 a year',
-    summary: 'Everything unlocked for serious candidates.',
+    summary: 'Everything unlocked, for the year you actually need it.',
     features: [
       'All subjects unlocked',
       'Full-topic and full-subject quizzes with timed exam conditions',
@@ -43,18 +43,18 @@ const PLANS = [
     cta: { label: 'Join the waitlist', href: '/signup' },
     emphasis: true,
     badge: 'Most popular',
-    note: 'Payments open soon. Students at partner schools get this free today.',
+    note: 'Payments are not open yet. If your school has a code, you get all of this today for nothing.',
   },
   {
     name: 'School licence',
     price: '$500',
     cadence: 'to $2,000 a year',
-    summary: 'Your whole cohort on Premium, at a fraction of individual pricing.',
+    summary: 'Your whole year group on Premium, for far less than paying one by one.',
     features: [
       'Unlimited student access for the school',
       'Every Premium feature for every student',
-      'Students unlock with a school code, no card required',
-      'Onboarding support for your department',
+      'Students unlock with the school code, no card involved',
+      'We help you get your students set up',
     ],
     cta: {
       label: 'Talk to us about your school',
@@ -70,14 +70,14 @@ export default function PricingPage() {
     <main className="min-h-screen bg-[var(--bg)]">
       <div className="mx-auto max-w-5xl px-5 py-12 md:py-16">
         <Link href="/" className="text-sm font-medium text-[var(--brand)] hover:underline">
-          Back to PSyllabus
+          Back to Project Syllabus
         </Link>
 
         <header className="mt-6 mb-10 max-w-2xl">
           <h1 className="t-page-title mb-2">Pricing</h1>
           <p className="t-body">
-            Start free with one subject. Students at partner schools unlock everything with a
-            code, at no cost to them.
+            Start free with one subject. If your school has bought a code, typing it in unlocks
+            everything and costs you nothing.
           </p>
         </header>
 

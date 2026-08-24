@@ -188,7 +188,7 @@ export default function CalendarPage() {
       <Page width="default">
         <PageHeader
           title="Calendar"
-          subtitle="Tests, mocks, IA deadlines and orals — with a reminder before each one."
+          subtitle="Tests, mocks, IA deadlines and orals, with a reminder before each one."
           action={
             <button
               onClick={() => setDraft(emptyDraft(selected))}
