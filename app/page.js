@@ -45,8 +45,9 @@ export default function Home() {
           <Link href="/" aria-label="PSyllabus home" className="shrink-0">
             <Image
               src={logoMark}
-              alt="PSyllabus"
+              alt="Project Syllabus"
               priority
+              sizes="72px"
               className="h-6 w-auto md:h-[30px]"
             />
           </Link>
@@ -199,7 +200,7 @@ export default function Home() {
 
       <footer className="border-t border-[var(--border)] bg-[var(--surface)] px-5 py-10 md:px-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 sm:flex-row">
-          <Image src={logoMark} alt="PSyllabus" style={{ height: 24, width: 'auto' }} />
+          <Image src={logoMark} alt="Project Syllabus" sizes="58px" style={{ height: 24, width: 'auto' }} />
           <nav className="flex flex-wrap items-center justify-center gap-6">
             <Link href="/pricing" className="t-small hover:text-[var(--text)]">
               Pricing

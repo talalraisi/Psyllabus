@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
+import { getProfile } from '@/lib/cache'
 import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader, Section, EmptyState, PageLoading } from '@/components/PageShell'
 import { IconCheck, IconClose } from '@/components/Icons'
@@ -78,11 +79,7 @@ export default function CalendarPage() {
         router.push('/login')
         return
       }
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .maybeSingle()
+      const profileData = await getProfile(supabase, user.id, { onFresh: setProfile })
       if (cancelled) return
       if (!profileData) {
         router.push('/onboarding')

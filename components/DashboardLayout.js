@@ -21,6 +21,7 @@ import {
   IconClose,
 } from '@/components/Icons'
 import { planLabel, isPremium } from '@/lib/access'
+import { clearCache } from '@/lib/cache'
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', Icon: IconDashboard, match: (p) => p === '/dashboard' },
@@ -118,6 +119,7 @@ export default function DashboardLayout({ children, profile }) {
   const handleLogout = async () => {
     if (signingOut) return
     setSigningOut(true)
+    clearCache()
     await supabase.auth.signOut()
     router.push('/login')
   }
@@ -127,7 +129,7 @@ export default function DashboardLayout({ children, profile }) {
     <>
       <div className="px-4 pt-5 pb-6">
         <Link href="/" className="inline-block" aria-label="PSyllabus home">
-          <Image src={logoMark} alt="PSyllabus" style={{ height: 28, width: 'auto' }} />
+          <Image src={logoMark} alt="Project Syllabus" sizes="68px" style={{ height: 28, width: 'auto' }} />
         </Link>
       </div>
 
@@ -223,7 +225,7 @@ export default function DashboardLayout({ children, profile }) {
       {/* Mobile bar */}
       <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-[var(--border)] bg-[var(--surface)] px-4 md:hidden">
         <Link href="/" className="inline-block" aria-label="PSyllabus home">
-          <Image src={logoMark} alt="PSyllabus" style={{ height: 24, width: 'auto' }} />
+          <Image src={logoMark} alt="Project Syllabus" sizes="58px" style={{ height: 24, width: 'auto' }} />
         </Link>
         <button
           onClick={() => setMobileOpen(true)}

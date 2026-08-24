@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
+import { invalidateProfile } from '@/lib/cache'
 import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader, Section, PageLoading, Spinner } from '@/components/PageShell'
@@ -122,6 +123,7 @@ export default function ProfilePage() {
 
     if (saveError) setError(saveError.message)
     else {
+      invalidateProfile(profile.id)
       setAvatarUrl(publicUrl)
       setProfile((p) => ({ ...p, avatar_url: publicUrl }))
       flash('Photo updated')
@@ -142,6 +144,7 @@ export default function ProfilePage() {
 
     if (saveError) setError(saveError.message)
     else {
+      invalidateProfile(profile.id)
       setProfile((p) => ({ ...p, full_name: fullName }))
       flash('Profile updated')
     }
@@ -166,6 +169,7 @@ export default function ProfilePage() {
       return
     }
 
+    invalidateProfile(profile.id)
     setProfile((p) => ({
       ...p,
       plan: 'premium',

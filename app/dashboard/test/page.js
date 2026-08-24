@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
+import { getSyllabus } from '@/lib/cache'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
@@ -92,8 +93,8 @@ export default function TestBuilderPage() {
 
     async function loadPool() {
       setLoadingPool(true)
-      const [{ data: syllabus }, { data: questions }, { data: progressRows }] = await Promise.all([
-        supabase.from('syllabus_content').select('topic, subtopic').eq('subject', subject),
+      const [syllabus, { data: questions }, { data: progressRows }] = await Promise.all([
+        getSyllabus(supabase, [subject]),
         supabase
           .from('questions')
           .select('id, topic, subtopic, difficulty, marks, time_budget_seconds')

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
+import { getProfile, getSyllabus, invalidateProfile } from '@/lib/cache'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
@@ -12,13 +13,14 @@ import { getSlugForSubject } from '@/lib/subject-map'
 import { computeCompletionPercent } from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
-import { isSubjectLocked, isPremium } from '@/lib/access'
+import { isSubjectLocked, isPremium, freeSubject } from '@/lib/access'
 
 export default function SubjectsPage() {
   const [profile, setProfile] = useState(null)
   const [stats, setStats] = useState({})
   const [counts, setCounts] = useState({})
   const [loading, setLoading] = useState(true)
+  const [switching, setSwitching] = useState('')
   const router = useRouter()
   const supabase = createClient()
 
@@ -30,11 +32,7 @@ export default function SubjectsPage() {
         return
       }
 
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .maybeSingle()
+      const profileData = await getProfile(supabase, user.id, { onFresh: setProfile })
 
       if (!profileData) {
         router.push('/onboarding')
@@ -44,10 +42,8 @@ export default function SubjectsPage() {
       setProfile(profileData)
       const subjects = profileData.subjects || []
 
-      const [{ data: syllabusRows }, { data: progressRows }] = await Promise.all([
-        subjects.length
-          ? supabase.from('syllabus_content').select('*').in('subject', subjects)
-          : { data: [] },
+      const [syllabusRows, { data: progressRows }] = await Promise.all([
+        getSyllabus(supabase, subjects),
         supabase.from('progress').select('*').eq('user_id', user.id),
       ])
 
@@ -66,6 +62,21 @@ export default function SubjectsPage() {
     }
     loadData()
   }, [router, supabase])
+
+  // Free accounts choose which single subject is open, and can change it.
+  const chooseFreeSubject = async (subject) => {
+    if (switching) return
+    setSwitching(subject)
+    const { error } = await supabase
+      .from('profiles')
+      .update({ free_subject: subject })
+      .eq('id', profile.id)
+    if (!error) {
+      invalidateProfile(profile.id)
+      setProfile((p) => ({ ...p, free_subject: subject }))
+    }
+    setSwitching('')
+  }
 
   if (loading) {
     return (
@@ -100,9 +111,18 @@ export default function SubjectsPage() {
         </div>
 
         {locked ? (
-          <Link href="/dashboard/profile#unlock" className="btn btn-quiet control-md mt-auto w-full">
-            Unlock with a code
-          </Link>
+          <div className="mt-auto flex flex-col gap-2">
+            <button
+              onClick={() => chooseFreeSubject(subject)}
+              disabled={!!switching}
+              className="btn btn-outline control-md w-full"
+            >
+              {switching === subject ? 'Switching' : 'Study this one instead'}
+            </button>
+            <Link href="/dashboard/profile#unlock" className="btn btn-quiet control-md w-full">
+              Unlock everything
+            </Link>
+          </div>
         ) : (
           <Link
             href={`/dashboard/syllabus/${getSlugForSubject(subject)}`}
@@ -135,12 +155,19 @@ export default function SubjectsPage() {
           </div>
 
           {!isPremium(profile) && subjects.length > 1 && (
-            <Link
-              href="/dashboard/profile#unlock"
-              className="mt-3 block rounded-[var(--r-md)] border border-[var(--sand)] bg-[var(--sand)]/30 px-4 py-3 text-sm text-[var(--text-body)]"
-            >
-              Free plan covers one subject. Unlock the rest with your school code.
-            </Link>
+            <div className="mt-3 rounded-[var(--r-md)] border border-[var(--sand)] bg-[var(--sand)]/30 px-4 py-3">
+              <p className="text-sm text-[var(--text-body)]">
+                You are on the free plan, which opens one subject at a time. Right now that is{' '}
+                <strong className="text-[var(--text)]">{freeSubject(profile)}</strong>. Switch to a
+                different one whenever you like, as often as you like.
+              </p>
+              <Link
+                href="/dashboard/profile#unlock"
+                className="mt-1 inline-block text-sm font-medium text-[var(--brand)] hover:underline"
+              >
+                Open all of them with a school code
+              </Link>
+            </div>
           )}
         </Section>
 

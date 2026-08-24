@@ -100,7 +100,7 @@ export default function Signup() {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Talal Al-Raisi"
+                placeholder="Your name"
                 required
                 className="input"
               />
@@ -139,13 +139,13 @@ export default function Signup() {
                 type="text"
                 value={schoolCode}
                 onChange={(e) => setSchoolCode(e.target.value)}
-                placeholder="e.g. ABA2026"
+                placeholder="School code"
                 autoCapitalize="characters"
                 className="input uppercase"
               />
               <p className="text-text-faint text-xs mt-2">
-                Students at a partner school get every subject free. Teachers: enter your staff
-                code to get the cohort dashboard.
+                If your school has bought Project Syllabus, put the code here and every subject
+                opens. Leave it blank to start on the free plan.
               </p>
             </div>
 

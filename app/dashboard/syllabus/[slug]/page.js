@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
+import { getSyllabus } from '@/lib/cache'
 import DashboardLayout from '@/components/DashboardLayout'
 import ResourceHubDrawer from '@/components/ResourceHubDrawer'
 import { resolveOnboardingNameFromSlug } from '@/lib/subject-map'
@@ -72,9 +73,9 @@ export default function SyllabusPage() {
 
       setSubjectName(resolved)
 
-      const [{ data: syllabus }, { data: userProgress }, { count: questionCount }] =
+      const [syllabus, { data: userProgress }, { count: questionCount }] =
         await Promise.all([
-          supabase.from('syllabus_content').select('*').eq('subject', resolved),
+          getSyllabus(supabase, [resolved]),
           supabase
             .from('progress')
             .select('*')

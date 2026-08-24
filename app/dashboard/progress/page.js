@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
+import { getProfile, getSyllabus } from '@/lib/cache'
 import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 import Heatmap from '@/components/Heatmap'
@@ -33,11 +34,7 @@ export default function ProgressPage() {
         return
       }
 
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single()
+      const profileData = await getProfile(supabase, user.id, { onFresh: setProfile })
 
       if (!profileData) {
         router.push('/onboarding')
@@ -47,10 +44,8 @@ export default function ProgressPage() {
       setProfile(profileData)
       const subjects = profileData.subjects || []
 
-      const [{ data: syllabusRows }, { data: progressRows }] = await Promise.all([
-        subjects.length
-          ? supabase.from('syllabus_content').select('*').in('subject', subjects)
-          : { data: [] },
+      const [syllabusRows, { data: progressRows }] = await Promise.all([
+        getSyllabus(supabase, subjects),
         supabase.from('progress').select('*').eq('user_id', user.id),
       ])
 

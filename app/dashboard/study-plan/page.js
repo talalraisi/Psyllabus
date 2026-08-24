@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
+import { getProfile, getSyllabus, invalidateProfile } from '@/lib/cache'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
@@ -73,11 +74,7 @@ export default function StudyPlanPage() {
         return
       }
 
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .maybeSingle()
+      const profileData = await getProfile(supabase, user.id, { onFresh: setProfile })
 
       if (!profileData) {
         router.push('/onboarding')
@@ -94,11 +91,9 @@ export default function StudyPlanPage() {
       // Free accounts plan only against the subject they can actually open.
       const usable = accessibleSubjects(profileData)
 
-      const [{ data: syllabusRows }, { data: progressRows }, { count: due }, eventsResult] =
+      const [syllabusRows, { data: progressRows }, { count: due }, eventsResult] =
         await Promise.all([
-          usable.length
-            ? supabase.from('syllabus_content').select('*').in('subject', usable)
-            : { data: [] },
+          getSyllabus(supabase, usable),
           supabase.from('progress').select('*').eq('user_id', user.id),
           supabase
             .from('mistakes')
@@ -155,7 +150,9 @@ export default function StudyPlanPage() {
       setMinutes(clamped)
       setMinutesInput(String(clamped))
       const user = await getCurrentUser(supabase)
-      if (user) await supabase.from('profiles').update({ session_minutes: clamped }).eq('id', user.id)
+      if (!user) return
+      await supabase.from('profiles').update({ session_minutes: clamped }).eq('id', user.id)
+      invalidateProfile(user.id)
     },
     [supabase]
   )

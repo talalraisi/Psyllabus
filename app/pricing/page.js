@@ -4,64 +4,59 @@ import { IconCheck } from '@/components/Icons'
 export const metadata = {
   title: 'Pricing',
   description:
-    'What Project Syllabus costs, and how a school code unlocks everything for a whole year group.',
+    'What Project Syllabus costs, and how a school code opens everything for a whole year group.',
 }
 
 const PLANS = [
   {
     name: 'Free',
     price: 'Free',
-    cadence: 'always',
-    summary: 'Track one subject end to end and see how the method works.',
+    cadence: 'no time limit',
+    summary: 'One subject, fully open. Enough to tell whether this works for you.',
     features: [
-      'Syllabus tracker for 1 subject',
-      'Subtopic mini-quizzes for that subject',
-      'Accuracy-based heatmap',
-      'Basic study planner',
-      'Streak and XP tracking',
+      'One subject, every topic and subtopic',
+      'Quizzes on any subtopic in that subject',
+      'Heatmap built from what you actually got right',
+      'Study plan for that subject',
+      'Switch which subject it is whenever you want',
     ],
     cta: { label: 'Create a free account', href: '/signup' },
     emphasis: false,
   },
   {
-    name: 'Premium',
+    name: 'Everything',
     price: '$12',
-    cadence: 'per month, or $108 a year',
-    summary: 'Everything unlocked, for the year you actually need it.',
+    cadence: 'a month, or $108 a year',
+    summary: 'All six subjects and the tools that only make sense across all of them.',
     features: [
-      'All subjects unlocked',
-      'Full-topic and full-subject quizzes with timed exam conditions',
-      'Exam readiness score, per subject and combined',
-      'Dynamic mastery decay engine',
-      'Mistake bank with spaced repetition',
-      'Confidence calibration score',
-      'Root-cause flagging and cross-subject analytics',
-      'Smart algorithmic study planner',
-      'The full resource hub for every subtopic',
-      'Weekly digest emails',
+      'Every subject you take',
+      'Whole-topic and whole-subject papers, timed',
+      'Predicted grade out of 45 against your targets',
+      'Topics fade when you leave them and come back into your plan',
+      'Mistake bank that brings wrong answers back on a schedule',
+      'Planner that ranks across every subject at once',
+      'Hand-picked resources on every subtopic',
     ],
-    cta: { label: 'Join the waitlist', href: '/signup' },
+    cta: { label: 'Create a free account first', href: '/signup' },
     emphasis: true,
-    badge: 'Most popular',
-    note: 'Payments are not open yet. If your school has a code, you get all of this today for nothing.',
+    note: 'Card payments are not open yet. If your school has a code, all of this is already yours for nothing.',
   },
   {
-    name: 'School licence',
+    name: 'Whole school',
     price: '$500',
-    cadence: 'to $2,000 a year',
-    summary: 'Your whole year group on Premium, for far less than paying one by one.',
+    cadence: 'to $2,000 a year, by size',
+    summary: 'One code for the year group. Cheaper than a handful of students paying alone.',
     features: [
-      'Unlimited student access for the school',
-      'Every Premium feature for every student',
-      'Students unlock with the school code, no card involved',
-      'We help you get your students set up',
+      'Every student at the school, no seat counting',
+      'Everything in the paid plan, for all of them',
+      'They type the code in once, no card involved',
+      'We help you get the first cohort set up',
     ],
     cta: {
-      label: 'Talk to us about your school',
-      href: 'mailto:talalraisi1@gmail.com?subject=PSyllabus%20for%20our%20school',
+      label: 'Email us about your school',
+      href: 'mailto:talalraisi1@gmail.com?subject=Project%20Syllabus%20for%20our%20school',
     },
     emphasis: false,
-    badge: 'Pilot open',
   },
 ]
 
@@ -76,8 +71,8 @@ export default function PricingPage() {
         <header className="mt-6 mb-10 max-w-2xl">
           <h1 className="t-page-title mb-2">Pricing</h1>
           <p className="t-body">
-            Start free with one subject. If your school has bought a code, typing it in unlocks
-            everything and costs you nothing.
+            Start free with one subject and keep it as long as you like. If your school has bought a
+            code, typing it in opens the rest and costs you nothing.
           </p>
         </header>
 
@@ -89,14 +84,7 @@ export default function PricingPage() {
                 plan.emphasis ? 'border-[var(--brand)]' : ''
               }`}
             >
-              <div className="mb-4 flex items-center justify-between gap-3">
-                <h2 className="t-card-title">{plan.name}</h2>
-                {plan.badge && (
-                  <span className="rounded-full bg-[var(--sand)] px-3 py-1 text-xs font-medium text-[var(--text)]">
-                    {plan.badge}
-                  </span>
-                )}
-              </div>
+              <h2 className="t-card-title mb-4">{plan.name}</h2>
 
               <p className="mb-1">
                 <span className="t-stat text-[var(--text)]">{plan.price}</span>{' '}
@@ -130,32 +118,62 @@ export default function PricingPage() {
         </div>
 
         <section className="surface mt-10 p-6">
-          <h2 className="t-card-title mb-2">How school access works</h2>
+          <h2 className="t-card-title mb-4">If your school buys a code</h2>
           <ol className="flex flex-col gap-3 text-sm text-[var(--text-body)]">
             <li>
-              <span className="font-medium text-[var(--text)]">1.</span> Your school is issued a
-              join code.
+              <span className="font-medium text-[var(--text)]">1.</span> The school gets one code.
             </li>
             <li>
-              <span className="font-medium text-[var(--text)]">2.</span> Students create a free
-              account and enter that code on their profile page.
+              <span className="font-medium text-[var(--text)]">2.</span> Students make a free
+              account and type the code into their profile page.
             </li>
             <li>
-              <span className="font-medium text-[var(--text)]">3.</span> Every subject unlocks
-              immediately. No card, no trial period.
+              <span className="font-medium text-[var(--text)]">3.</span> Every subject opens on the
+              spot. No card, no trial that quietly ends.
             </li>
             <li>
-              <span className="font-medium text-[var(--text)]">4.</span> That is the whole setup.
-              PSyllabus is a study tool for students, so there is nothing for staff to administer.
+              <span className="font-medium text-[var(--text)]">4.</span> That is all of it. There is
+              no admin panel and no teacher account, because this is a tool students use on their
+              own.
             </li>
           </ol>
           <p className="t-caption mt-4">
-            Students only ever see their own data, enforced at the database level. See our{' '}
+            Nobody at the school can see a student&rsquo;s results. That is enforced by the database
+            itself, not by a setting someone could change. Details in the{' '}
             <Link href="/privacy" className="text-[var(--brand)] hover:underline">
-              Privacy Policy
+              privacy policy
             </Link>
             .
           </p>
+        </section>
+
+        <section className="mt-10">
+          <h2 className="t-card-title mb-4">Questions people actually ask</h2>
+          <div className="flex flex-col gap-3">
+            {[
+              [
+                'Does the free plan run out?',
+                'No. It is one subject for as long as you want it, not a trial with a clock on it.',
+              ],
+              [
+                'Can I change which subject is the free one?',
+                'Yes, from the My Subjects page, as often as you like. Your results in the other subjects are kept while they are closed.',
+              ],
+              [
+                'Can I pay right now?',
+                'Not yet. Card payments are still being set up, so the only way to open everything today is a school code.',
+              ],
+              [
+                'What happens to my work if I stop paying?',
+                'Nothing is deleted. You drop back to one open subject and the rest sit there until you open them again.',
+              ],
+            ].map(([q, a]) => (
+              <div key={q} className="surface p-5">
+                <p className="text-sm font-semibold text-[var(--text)]">{q}</p>
+                <p className="t-small mt-1">{a}</p>
+              </div>
+            ))}
+          </div>
         </section>
       </div>
     </main>

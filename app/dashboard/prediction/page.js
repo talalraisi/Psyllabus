@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
+import { getProfile, getSyllabus, invalidateProfile } from '@/lib/cache'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
@@ -35,11 +36,7 @@ export default function PredictionPage() {
         return
       }
 
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .maybeSingle()
+      const profileData = await getProfile(supabase, user.id, { onFresh: setProfile })
 
       if (!profileData) {
         router.push('/onboarding')
@@ -50,10 +47,8 @@ export default function PredictionPage() {
       setTargets(profileData.target_grades || {})
 
       const subjects = profileData.subjects || []
-      const [{ data: syllabusRows }, { data: progressRows }] = await Promise.all([
-        subjects.length
-          ? supabase.from('syllabus_content').select('subject, subtopic').in('subject', subjects)
-          : { data: [] },
+      const [syllabusRows, { data: progressRows }] = await Promise.all([
+        getSyllabus(supabase, subjects),
         supabase.from('progress').select('*').eq('user_id', user.id),
       ])
 
@@ -88,6 +83,7 @@ export default function PredictionPage() {
       .update({ target_grades: targets })
       .eq('id', profile.id)
     if (!error) {
+      invalidateProfile(profile.id)
       setProfile((p) => ({ ...p, target_grades: targets }))
       setSaved(true)
       setEditing(false)
