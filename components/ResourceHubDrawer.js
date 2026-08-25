@@ -1,8 +1,10 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { getResourcesForSubtopic } from '@/lib/resources'
+import { createClient } from '@/lib/supabase'
+import { KINDS } from '@/lib/resource-catalog'
 import { IconClose } from '@/components/Icons'
 
 function ResourceLink({ r }) {
@@ -32,6 +34,41 @@ export default function ResourceHubDrawer({
   hlOnly,
   quizHref,
 }) {
+  const [picked, setPicked] = useState([])
+
+  // Resources chosen for this exact subtopic, imported from the CSV. They lead
+  // because they were picked for this one thing, not for the whole subject.
+  useEffect(() => {
+    if (!open || !subject || !subtopic) return
+    let cancelled = false
+    const supabase = createClient()
+    setPicked([])
+    supabase
+      .from('resources')
+      .select('id, kind, title, provider, url, note')
+      .eq('subject', subject)
+      .eq('subtopic', subtopic)
+      .order('sort_order')
+      .then(({ data }) => {
+        if (cancelled || !data) return
+        setPicked(
+          data.map((r) => ({
+            key: `db${r.id}`,
+            kind: r.kind,
+            kindLabel: KINDS[r.kind]?.label || 'Resource',
+            title: r.title,
+            provider: r.provider,
+            note: r.note,
+            href: r.url,
+            curated: true,
+          }))
+        )
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [open, subject, subtopic])
+
   useEffect(() => {
     if (!open) return
     const onKey = (e) => {
@@ -48,8 +85,10 @@ export default function ResourceHubDrawer({
   if (!open || !subtopic) return null
 
   const resources = getResourcesForSubtopic({ subject, subtopic, topic })
-  const picked = resources.filter((r) => r.curated)
+  const seen = new Set(picked.map((r) => r.href))
+  const generic = resources.filter((r) => r.curated && !seen.has(r.href))
   const searches = resources.filter((r) => !r.curated)
+  const recommended = [...picked, ...generic]
 
   return (
     <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="Resources">
@@ -77,10 +116,10 @@ export default function ResourceHubDrawer({
         </div>
 
         <div className="flex-1 space-y-3 overflow-y-auto p-6">
-          {picked.length > 0 && (
+          {recommended.length > 0 && (
             <>
               <p className="t-overline">Recommended</p>
-              {picked.map((r) => (
+              {recommended.map((r) => (
                 <ResourceLink key={r.key} r={r} />
               ))}
             </>

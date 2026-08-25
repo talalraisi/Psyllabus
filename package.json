@@ -11,7 +11,9 @@
     "import-syllabus": "node scripts/import-syllabus-content.js \"data/PSyllabus - IB DP.csv\"",
     "setup-db": "node scripts/setup-database.mjs",
     "generate-questions": "node scripts/generate-questions.mjs",
-    "make-admin": "node scripts/make-admin.mjs"
+    "make-admin": "node scripts/make-admin.mjs",
+    "resources:template": "node scripts/import-resources.mjs --template",
+    "resources:import": "node scripts/import-resources.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.117.1",
