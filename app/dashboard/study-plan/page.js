@@ -21,7 +21,7 @@ import {
   STATUS_TEXT_COLORS,
 } from '@/lib/progress'
 import { buildEffectiveProgressMap, buildProgressDetailMap } from '@/lib/decay'
-import { buildQueue, buildSession, groupBySubjectRanked, daysUntilExam } from '@/lib/planner'
+import { buildQueue, buildSession, groupBySubjectRanked } from '@/lib/planner'
 import { accessibleSubjects, isPremium } from '@/lib/access'
 import { upcoming, relativeDay, KIND_LABEL, KIND_DOT } from '@/lib/calendar'
 import {
@@ -31,9 +31,10 @@ import {
   notify,
 } from '@/lib/notify'
 
-const SESSION_PRESETS = [15, 25, 40, 60, 90]
 const MIN_MINUTES = 5
-const MAX_MINUTES = 240
+// Eight hours. Past that it is not a study session, it is a whole day, and the
+// queue would be padded with subtopics nobody is getting to.
+const MAX_MINUTES = 480
 
 const REASON_STYLE = {
   weak: 'text-[var(--status-weak)]',
@@ -176,7 +177,6 @@ export default function StudyPlanPage() {
     )
   }
 
-  const daysLeft = daysUntilExam(profile)
   const remaining = session.items.filter((i) => !done.has(i.id))
   const completedCount = session.items.length - remaining.length
   const sessionComplete = session.items.length > 0 && remaining.length === 0
@@ -197,11 +197,7 @@ export default function StudyPlanPage() {
       <Page width="default">
         <PageHeader
           title="Study Plan"
-          subtitle={
-            daysLeft !== null
-              ? `${daysLeft} days until your exam session · ${queue.length} subtopics still to secure`
-              : `${queue.length} subtopics still to secure`
-          }
+          subtitle={`${queue.length} subtopic${queue.length === 1 ? '' : 's'} still to secure`}
           action={
             <Link href="/dashboard/calendar" className="btn btn-outline control-md">
               Calendar
@@ -316,28 +312,15 @@ export default function StudyPlanPage() {
                             commitMinutes(Number.isNaN(parsed) ? minutes : parsed)
                           }}
                           onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
-                          className="input w-20 text-center tabular-nums"
+                          className="input w-24 text-center tabular-nums"
                         />
                         <span className="text-sm text-[var(--text-muted)]">minutes</span>
                       </div>
                     </label>
-
-                    <div className="flex flex-wrap items-center gap-2">
-                      {SESSION_PRESETS.map((m) => (
-                        <button
-                          key={m}
-                          onClick={() => commitMinutes(m)}
-                          aria-pressed={minutes === m}
-                          className={`control-sm rounded-[var(--r-sm)] border px-3 text-xs font-medium transition-colors duration-150 ${
-                            minutes === m
-                              ? 'border-[var(--brand)] bg-[var(--brand-tint)] text-[var(--brand)]'
-                              : 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text-body)] hover:bg-[var(--surface-sunken)]'
-                          }`}
-                        >
-                          {m}m
-                        </button>
-                      ))}
-                    </div>
+                    <p className="t-caption flex-1 min-w-[12rem]">
+                      Anything from {MIN_MINUTES} minutes to {MAX_MINUTES / 60} hours. The plan
+                      below is cut to fit.
+                    </p>
                   </div>
 
                   <div className="mb-4">

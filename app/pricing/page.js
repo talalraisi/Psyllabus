@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { IconCheck } from '@/components/Icons'
+import { IconCheck, IconArrowRight } from '@/components/Icons'
 
 export const metadata = {
   title: 'Pricing',
@@ -12,7 +12,7 @@ const PLANS = [
     name: 'Free',
     price: 'Free',
     cadence: 'no time limit',
-    summary: 'One subject, fully open. Enough to tell whether this works for you.',
+    summary: 'One subject, open properly, for as long as you want it.',
     features: [
       'One subject, every topic and subtopic',
       'Quizzes on any subtopic in that subject',
@@ -27,7 +27,7 @@ const PLANS = [
     name: 'Everything',
     price: '$12',
     cadence: 'a month, or $108 a year',
-    summary: 'All six subjects and the tools that only make sense across all of them.',
+    summary: 'Every subject you take, and the tools that only work across all of them.',
     features: [
       'Every subject you take',
       'Whole-topic and whole-subject papers, timed',
@@ -110,6 +110,7 @@ export default function PricingPage() {
                 className={`btn control-md w-full ${plan.emphasis ? 'btn-solid' : 'btn-quiet'}`}
               >
                 {plan.cta.label}
+                <IconArrowRight width={16} height={16} />
               </Link>
 
               {plan.note && <p className="t-caption mt-3">{plan.note}</p>}
@@ -121,7 +122,9 @@ export default function PricingPage() {
           <h2 className="t-card-title mb-4">If your school buys a code</h2>
           <ol className="flex flex-col gap-3 text-sm text-[var(--text-body)]">
             <li>
-              <span className="font-medium text-[var(--text)]">1.</span> The school gets one code.
+              <span className="font-medium text-[var(--text)]">1.</span> The school gets a code tied
+              to its own email domain, or a set of one-per-student codes if it would rather. Either
+              way a code that leaks is no use to anyone outside the school.
             </li>
             <li>
               <span className="font-medium text-[var(--text)]">2.</span> Students make a free
@@ -157,7 +160,7 @@ export default function PricingPage() {
               ],
               [
                 'Can I change which subject is the free one?',
-                'Yes, from the My Subjects page, as often as you like. Your results in the other subjects are kept while they are closed.',
+                'Yes, from the My Subjects page. There is a wait of about a month between changes, because otherwise the free plan becomes every subject one quiz at a time. Your results in the closed subjects are kept, so nothing is lost when you swap.',
               ],
               [
                 'Can I pay right now?',

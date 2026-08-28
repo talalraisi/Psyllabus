@@ -22,6 +22,7 @@ import {
 } from '@/components/Icons'
 import { planLabel, isPremium } from '@/lib/access'
 import { clearCache } from '@/lib/cache'
+import TimerPill from '@/components/TimerPill'
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', Icon: IconDashboard, match: (p) => p === '/dashboard' },
@@ -263,6 +264,9 @@ export default function DashboardLayout({ children, profile }) {
       </aside>
 
       <main className="min-w-0 flex-1">{children}</main>
+
+      {/* Follows you out of the study plan so a running session stays visible. */}
+      <TimerPill />
     </div>
   )
 }

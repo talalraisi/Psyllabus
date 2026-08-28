@@ -13,7 +13,13 @@ import { getSlugForSubject } from '@/lib/subject-map'
 import { computeCompletionPercent } from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
-import { isSubjectLocked, isPremium, freeSubject } from '@/lib/access'
+import {
+  isSubjectLocked,
+  isPremium,
+  canSwitchFreeSubject,
+  freeSubjectLockUntil,
+  FREE_SWITCH_DAYS,
+} from '@/lib/access'
 
 export default function SubjectsPage() {
   const [profile, setProfile] = useState(null)
@@ -66,14 +72,24 @@ export default function SubjectsPage() {
   // Free accounts choose which single subject is open, and can change it.
   const chooseFreeSubject = async (subject) => {
     if (switching) return
+    // Held for a period after each change, so the free plan cannot be walked
+    // through every subject one quiz at a time.
+    const { allowed } = canSwitchFreeSubject(profile)
+    if (!allowed) return
+
     setSwitching(subject)
+    const lockedUntil = freeSubjectLockUntil()
     const { error } = await supabase
       .from('profiles')
-      .update({ free_subject: subject })
+      .update({ free_subject: subject, free_subject_locked_until: lockedUntil })
       .eq('id', profile.id)
     if (!error) {
       invalidateProfile(profile.id)
-      setProfile((p) => ({ ...p, free_subject: subject }))
+      setProfile((p) => ({
+        ...p,
+        free_subject: subject,
+        free_subject_locked_until: lockedUntil,
+      }))
     }
     setSwitching('')
   }
@@ -89,6 +105,8 @@ export default function SubjectsPage() {
   const all = profile.subjects || []
   const subjects = all.filter((s) => !IB_CORE_SUBJECTS.includes(s))
   const core = all.filter((s) => IB_CORE_SUBJECTS.includes(s))
+
+  const canSwitch = canSwitchFreeSubject(profile)
 
   const SubjectCard = ({ subject, locked }) => {
     const pct = stats[subject] ?? 0
@@ -114,10 +132,19 @@ export default function SubjectsPage() {
           <div className="mt-auto flex flex-col gap-2">
             <button
               onClick={() => chooseFreeSubject(subject)}
-              disabled={!!switching}
+              disabled={!!switching || !canSwitch.allowed}
+              title={
+                canSwitch.allowed
+                  ? undefined
+                  : `You can change subject again in ${canSwitch.daysLeft} day${canSwitch.daysLeft === 1 ? '' : 's'}`
+              }
               className="btn btn-outline control-md w-full"
             >
-              {switching === subject ? 'Switching' : 'Study this one instead'}
+              {switching === subject
+                ? 'Switching'
+                : canSwitch.allowed
+                  ? 'Study this one instead'
+                  : `Locked for ${canSwitch.daysLeft}d`}
             </button>
             <Link href="/dashboard/profile#unlock" className="btn btn-quiet control-md w-full">
               Unlock everything

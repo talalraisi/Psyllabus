@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Logo from '@/components/Logo'
 import { isIBSelectionValid, ibSelectionHint } from '@/lib/ib-validation'
+import { getCurrentUser } from '@/lib/auth'
+import { freeSubjectLockUntil } from '@/lib/access'
 import {
   IB_CORE_SUBJECTS,
   CORE_GRADES,
@@ -236,6 +238,8 @@ export default function Onboarding() {
   const [targetGrades, setTargetGrades] = useState({})
   const [loading, setLoading] = useState(false)
   const [expandedGroup, setExpandedGroup] = useState(null)
+  const [freePick, setFreePick] = useState('')
+  const [savingPick, setSavingPick] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -302,22 +306,49 @@ export default function Onboarding() {
         return
       }
 
-      // Apply a school code entered at signup. The server decides whether it
-      // grants student or staff access, so roles are never self-assigned.
+      // Apply a school code entered at signup. The server decides entitlement,
+      // checks the email domain and counts the seat, so nothing is self-granted.
       const code = user.user_metadata?.school_code
-      let joinedRole = null
+      let unlocked = false
       if (code) {
-        const { data: joinResult } = await supabase.rpc('join_school_with_code', {
-          p_code: code,
-        })
-        if (joinResult?.ok) joinedRole = joinResult.role
+        const { data: result } = await supabase.rpc('redeem_access_code', { p_code: code })
+        unlocked = !!result?.ok
       }
 
-      router.push(joinedRole === 'teacher' ? '/dashboard/school' : '/dashboard')
+      // Premium accounts have every subject, so there is nothing to choose.
+      // Free accounts pick their one subject here rather than later, because
+      // picking later means picking repeatedly.
+      if (unlocked) {
+        router.push('/dashboard')
+        return
+      }
+
+      setFreePick(selectedSubjects[0] || '')
+      setLoading(false)
+      setStep(4)
     } catch (err) {
       console.error(err)
       setLoading(false)
     }
+  }
+
+  const saveFreeSubject = async () => {
+    if (savingPick || !freePick) return
+    setSavingPick(true)
+    const user = await getCurrentUser(supabase)
+    if (!user) {
+      router.push('/login')
+      return
+    }
+    // The hold is what stops the free plan being cycled through every subject.
+    await supabase
+      .from('profiles')
+      .update({
+        free_subject: freePick,
+        free_subject_locked_until: freeSubjectLockUntil(),
+      })
+      .eq('id', user.id)
+    router.push('/dashboard')
   }
 
   return (
@@ -336,7 +367,8 @@ export default function Onboarding() {
           {[
             {n: 1, label: 'Setup'},
             {n: 2, label: 'Subjects'},
-            {n: 3, label: 'Goals'}
+            {n: 3, label: 'Goals'},
+            {n: 4, label: 'Start'}
           ].map((s, i) => (
             <div key={s.n} className="flex items-center gap-2">
               <div className="flex flex-col items-center gap-1">
@@ -350,7 +382,7 @@ export default function Onboarding() {
                   {s.label}
                 </span>
               </div>
-              {i < 2 && (
+              {i < 3 && (
                 <div className={`w-16 h-px mb-4 ${step > s.n ? 'bg-accent' : 'bg-border'}`} />
               )}
             </div>
@@ -587,9 +619,64 @@ export default function Onboarding() {
                 onClick={handleFinish}
                 disabled={loading || !gradesComplete}
                 className="btn btn-solid control-lg flex-1 text-base">
-                {loading ? 'Setting up…' : 'Go to my dashboard'}
+                {loading ? 'Setting up…' : 'Continue'}
               </button>
             </div>
+          </div>
+        )}
+
+        {/* Step 4, the one subject a free account starts with */}
+        {step === 4 && (
+          <div className="surface p-6 md:p-8">
+            <h1 className="t-page-title mb-2">Which subject do you want to start with?</h1>
+            <p className="t-small mb-6">
+              The free plan opens one subject completely: every topic, every quiz, its own study
+              plan. Pick the one you most need to get on top of. You can change it later, though
+              not straight away, so choose the subject you are actually revising.
+            </p>
+
+            <div className="flex flex-col gap-2 mb-6">
+              {selectedSubjects.map((subject) => (
+                <button
+                  key={subject}
+                  onClick={() => setFreePick(subject)}
+                  aria-pressed={freePick === subject}
+                  className={`flex items-center gap-3 rounded-[var(--r-md)] border px-4 py-3 text-left transition-colors duration-150 ${
+                    freePick === subject
+                      ? 'border-[var(--brand)] bg-[var(--brand-tint)]'
+                      : 'border-[var(--border-strong)] hover:bg-[var(--surface-sunken)]'
+                  }`}
+                >
+                  <span
+                    className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 ${
+                      freePick === subject ? 'border-[var(--brand)]' : 'border-[var(--border-hover)]'
+                    }`}
+                  >
+                    {freePick === subject && (
+                      <span className="h-2 w-2 rounded-full bg-[var(--brand)]" />
+                    )}
+                  </span>
+                  <span className="text-sm font-medium text-[var(--text)]">{subject}</span>
+                </button>
+              ))}
+            </div>
+
+            <p className="t-caption mb-5">
+              Theory of Knowledge, the Extended Essay and CAS stay open whatever you pick, because
+              they are part of the Diploma rather than a subject you chose.
+            </p>
+
+            <button
+              onClick={saveFreeSubject}
+              disabled={savingPick || !freePick}
+              className="btn btn-solid control-lg w-full text-base"
+            >
+              {savingPick ? 'Setting up…' : 'Go to my dashboard'}
+            </button>
+
+            <p className="t-caption mt-4 text-center">
+              Have a school code? Add it in your profile and every subject opens.
+            </p>
           </div>
         )}
       </div>

@@ -262,8 +262,64 @@ export default function PredictionPage() {
             {!editing ? (
               <>
                 <p className="t-small mb-4">
-                  Set at signup. Change them any time and the prediction updates immediately.
+                  What you told us you are aiming for. Change them any time and the prediction
+                  updates immediately.
                 </p>
+
+                <ul className="mb-5 flex flex-col">
+                  {(profile.subjects || [])
+                    .filter((sub) => !IB_CORE_SUBJECTS.includes(sub))
+                    .map((subject, i) => (
+                      <li
+                        key={subject}
+                        className={`flex items-center justify-between gap-4 py-2.5 ${
+                          i > 0 ? 'border-t border-[var(--border)]' : ''
+                        }`}
+                      >
+                        <span className="min-w-0 truncate text-sm text-[var(--text-body)]">
+                          {subject}
+                        </span>
+                        <span className="shrink-0 text-sm font-semibold tabular-nums text-[var(--text)]">
+                          {targets[subject] || <span className="t-caption">not set</span>}
+                        </span>
+                      </li>
+                    ))}
+
+                  {['Theory of Knowledge', 'Extended Essay'].map((component) => (
+                    <li
+                      key={component}
+                      className="flex items-center justify-between gap-4 border-t border-[var(--border)] py-2.5"
+                    >
+                      <span className="min-w-0 truncate text-sm text-[var(--text-body)]">
+                        {component}
+                      </span>
+                      <span className="shrink-0 text-sm font-semibold text-[var(--text)]">
+                        {targets[component] || <span className="t-caption">not set</span>}
+                      </span>
+                    </li>
+                  ))}
+
+                  <li className="flex items-center justify-between gap-4 border-t border-[var(--border-strong)] py-3">
+                    <span className="text-sm font-medium text-[var(--text)]">
+                      Core bonus from TOK and EE
+                    </span>
+                    <span className="shrink-0 text-sm font-semibold text-[var(--text)]">
+                      {bonus === 'F'
+                        ? 'Failing condition'
+                        : typeof bonus === 'number'
+                          ? `+${bonus}`
+                          : 'not set'}
+                    </span>
+                  </li>
+
+                  <li className="flex items-center justify-between gap-4 border-t border-[var(--border-strong)] py-3">
+                    <span className="text-sm font-semibold text-[var(--text)]">Target total</span>
+                    <span className="shrink-0 text-base font-bold tabular-nums text-[var(--brand)]">
+                      {prediction.targetTotal} / {MAX_TOTAL_POINTS}
+                    </span>
+                  </li>
+                </ul>
+
                 <button onClick={() => setEditing(true)} className="btn btn-quiet control-md">
                   Edit targets
                 </button>
