@@ -143,7 +143,7 @@ export default function Dashboard() {
           subtitle={
             hasActivity
               ? `${profile.curriculum} · Class of ${profile.grad_year}`
-              : 'Welcome to PSyllabus'
+              : 'Welcome to Project Syllabus'
           }
         />
 
@@ -153,7 +153,7 @@ export default function Dashboard() {
               <h2 className="t-card-title mb-2">Start with one quiz</h2>
               <p className="t-body mb-6 max-w-xl">
                 Nothing here is filled in by guessing. Take a short quiz on any subtopic and
-                PSyllabus marks it from your answers, then works out what you should study next.
+                Project Syllabus marks it from your answers, then works out what you should study next.
               </p>
 
               <ol className="mb-6 flex flex-col gap-3">

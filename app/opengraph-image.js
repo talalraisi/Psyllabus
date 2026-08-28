@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og'
 
-export const alt = 'PSyllabus: syllabus-mapped progress tracking for IB, A-Level, and AP'
+export const alt = 'Project Syllabus: syllabus tracking for IB, A-Level and AP'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
@@ -36,7 +36,7 @@ export default function OpengraphImage() {
           >
             P
           </div>
-          <div style={{ fontSize: 28, fontWeight: 600, color: '#1a2e1e' }}>PSyllabus</div>
+          <div style={{ fontSize: 28, fontWeight: 600, color: '#1a2e1e' }}>Project Syllabus</div>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column' }}>

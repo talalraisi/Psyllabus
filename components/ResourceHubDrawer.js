@@ -131,7 +131,7 @@ export default function ResourceHubDrawer({
           ))}
 
           <p className="t-caption pt-2">
-            Links open on the publisher&rsquo;s own site. PSyllabus does not host their material.
+            Links open on the publisher&rsquo;s own site. Project Syllabus does not host their material.
           </p>
         </div>
 

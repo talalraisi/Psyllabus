@@ -5,7 +5,7 @@ import { IconCheck, IconArrowRight } from '@/components/Icons'
 import ThemeToggle from '@/components/ThemeToggle'
 
 export const metadata = {
-  title: 'Project Syllabus: know exactly what to study next',
+  title: 'Project Syllabus',
   description:
     'Project Syllabus tracks your IB, A-Level or AP syllabus topic by topic. Where you stand is set by testing, not by how confident you feel.',
 }
@@ -133,7 +133,7 @@ export default function Home() {
       {/* Navigation with the real entry points */}
       <nav className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--surface)]">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 md:px-8">
-          <Link href="/" aria-label="PSyllabus home" className="shrink-0">
+          <Link href="/" aria-label="Project Syllabus home" className="shrink-0">
             <Image
               src={logoMark}
               alt="Project Syllabus"
@@ -286,7 +286,7 @@ export default function Home() {
               See how school access works
             </Link>
             <a
-              href="mailto:talalraisi1@gmail.com?subject=PSyllabus%20for%20our%20school"
+              href="mailto:talalraisi1@gmail.com?subject=Project%20Syllabus%20for%20our%20school"
               className="btn btn-quiet control-md px-6"
             >
               Contact us

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ===========================================================================
-   PSyllabus design tokens
+   Project Syllabus design tokens
    One scale for spacing, one type ramp, one radius set, two shadows.
    Nothing outside these tokens should appear in components.
    =========================================================================== */

@@ -16,8 +16,10 @@ export const viewport = {
 
 export const metadata = {
   title: {
-    // Search engines show this verbatim, so it leads with the product name.
-    default: 'Project Syllabus: IB, A-Level and AP syllabus tracker',
+    // Both the browser tab and the blue link in search results read this
+    // verbatim, so it is the bare name. What the product does belongs in the
+    // description underneath, not bolted onto the title with a colon.
+    default: 'Project Syllabus',
     template: '%s · Project Syllabus',
   },
   manifest: '/manifest.json',
@@ -44,7 +46,7 @@ export const metadata = {
   authors: [{ name: 'Talal Al-Raisi' }],
   metadataBase: new URL('https://www.psyllabus.app'),
   openGraph: {
-    title: 'Project Syllabus: know exactly what to study next',
+    title: 'Project Syllabus',
     description:
       'Syllabus tracking for IB, A-Level and AP students. Where you stand is set by testing, not by how confident you feel.',
     siteName: 'Project Syllabus',
@@ -54,7 +56,7 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Project Syllabus: know exactly what to study next',
+    title: 'Project Syllabus',
     description:
       'Syllabus tracking for IB, A-Level and AP students.',
   },

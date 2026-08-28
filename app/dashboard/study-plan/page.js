@@ -163,7 +163,7 @@ export default function StudyPlanPage() {
     setPermission(result)
     if (result === 'granted') {
       notify('Reminders are on', {
-        body: 'PSyllabus will alert you before tests and when a study block ends.',
+        body: 'Project Syllabus will alert you before tests and when a study block ends.',
         tag: 'psyllabus-enabled',
       })
     }

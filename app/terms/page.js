@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 export const metadata = {
   title: 'Terms of Service',
-  description: 'The terms for using PSyllabus, and how our practice questions are produced.',
+  description: 'The terms for using Project Syllabus, and how our practice questions are produced.',
 }
 
 const LAST_UPDATED = '17 August 2026'
@@ -12,7 +12,7 @@ export default function TermsPage() {
     <main className="min-h-screen bg-[var(--bg)]">
       <div className="max-w-2xl mx-auto px-5 py-12 md:py-16">
         <Link href="/" className="text-sm font-medium text-[var(--brand)] hover:underline">
-          ← Back to PSyllabus
+          ← Back to Project Syllabus
         </Link>
 
         <h1 className="t-page-title mt-6 mb-1">Terms of Service</h1>
@@ -20,9 +20,9 @@ export default function TermsPage() {
 
         <div className="space-y-8 text-sm text-[var(--text-body)] leading-relaxed">
           <section>
-            <h2 className="text-base font-semibold text-[var(--text)] mb-2">Using PSyllabus</h2>
+            <h2 className="text-base font-semibold text-[var(--text)] mb-2">Using Project Syllabus</h2>
             <p>
-              PSyllabus is a study tracking and practice tool provided free of charge and as-is.
+              Project Syllabus is a study tracking and practice tool provided free of charge and as-is.
               Keep your login credentials secure, use the service for your own study, and do not
               attempt to scrape, resell, or bulk-extract the question bank.
             </p>
@@ -33,7 +33,7 @@ export default function TermsPage() {
               How our practice questions are made
             </h2>
             <p>
-              Every practice question in PSyllabus is <strong className="font-medium text-[var(--text)]">original
+              Every practice question in Project Syllabus is <strong className="font-medium text-[var(--text)]">original
               content</strong>, written to match the style, difficulty, and mark allocation of
               exam-board questions. Each question passes an automated verification step before it
               reaches you.
@@ -51,7 +51,7 @@ export default function TermsPage() {
               No affiliation or endorsement
             </h2>
             <p>
-              PSyllabus is an independent product. It is not affiliated with, authorised by,
+              Project Syllabus is an independent product. It is not affiliated with, authorised by,
               endorsed by, or in any way officially connected to the International Baccalaureate
               Organization, Cambridge Assessment, Pearson Edexcel, AQA, OCR, or the College Board.
               &ldquo;IB&rdquo;, &ldquo;International Baccalaureate&rdquo;, &ldquo;A-Level&rdquo;,

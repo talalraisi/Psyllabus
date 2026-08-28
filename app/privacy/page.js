@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 export const metadata = {
   title: 'Privacy Policy',
-  description: 'What PSyllabus collects, why, and how to delete it.',
+  description: 'What Project Syllabus collects, why, and how to delete it.',
 }
 
 const LAST_UPDATED = '17 August 2026'
@@ -12,7 +12,7 @@ export default function PrivacyPage() {
     <main className="min-h-screen bg-[var(--bg)]">
       <div className="max-w-2xl mx-auto px-5 py-12 md:py-16">
         <Link href="/" className="text-sm font-medium text-[var(--brand)] hover:underline">
-          ← Back to PSyllabus
+          ← Back to Project Syllabus
         </Link>
 
         <h1 className="t-page-title mt-6 mb-1">Privacy Policy</h1>
@@ -22,7 +22,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-base font-semibold text-[var(--text)] mb-2">The short version</h2>
             <p>
-              PSyllabus stores the minimum needed to track your syllabus progress. We do not sell
+              Project Syllabus stores the minimum needed to track your syllabus progress. We do not sell
               your data, we do not share it with advertisers, and we do not run advertising or
               analytics trackers that profile you. You can delete your account and everything in
               it at any time.
@@ -119,7 +119,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-base font-semibold text-[var(--text)] mb-2">Age</h2>
             <p>
-              PSyllabus is built for students preparing for pre-university examinations. If you are
+              Project Syllabus is built for students preparing for pre-university examinations. If you are
               under 16, please review this policy with a parent or guardian before signing up.
             </p>
           </section>

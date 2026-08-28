@@ -130,7 +130,7 @@ export default function DashboardLayout({ children, profile }) {
   const sidebar = (
     <>
       <div className="px-4 pt-5 pb-6">
-        <Link href="/" className="inline-block" aria-label="PSyllabus home">
+        <Link href="/" className="inline-block" aria-label="Project Syllabus home">
           <Image src={logoMark} alt="Project Syllabus" sizes="68px" style={{ height: 28, width: 'auto' }} />
         </Link>
       </div>
