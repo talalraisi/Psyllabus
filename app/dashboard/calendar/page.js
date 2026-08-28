@@ -197,7 +197,7 @@ export default function CalendarPage() {
         />
 
         {error && (
-          <div className="mb-6 rounded-[var(--r-md)] border border-[#fecaca] bg-[#fef2f2] px-4 py-3">
+          <div className="mb-6 rounded-[var(--r-md)] border border-[var(--danger-border)] bg-[var(--danger-bg)] px-4 py-3">
             <p className="text-sm text-[var(--status-weak)]">{error}</p>
           </div>
         )}

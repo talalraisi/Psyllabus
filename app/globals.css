@@ -38,6 +38,8 @@
   --danger-border: #fecaca;
   --warning-text: #d97706;
   --success-text: #16a34a;
+  --success-bg: #f0fdf4;
+  --success-border: #bbf7d0;
 
   /* --- Radius. Three steps, assigned by component size. -------------------- */
   --r-sm: 6px;   /* pills, checkboxes, swatches */
@@ -66,6 +68,56 @@
   --review: var(--status-decaying);
   --solid: var(--success-text);
   --mastered: var(--status-mastered);
+}
+
+/* ===========================================================================
+   Dark mode
+   Same tokens, different values, so every component follows without knowing
+   dark mode exists. Only the surfaces and text flip; the status colours keep
+   their meaning and are lifted just enough to stay legible on a dark ground.
+   The green is lightened too: #2d6a4f on near-black fails contrast, and a
+   primary button nobody can read is not a primary button.
+   =========================================================================== */
+
+[data-theme='dark'] {
+  --brand: #4c9c74;
+  --brand-hover: #5fb287;
+  --brand-tint: #16261e;
+  --sand: #c9b48d;
+
+  --bg: #0f1412;
+  --surface: #171d1a;
+  --surface-sunken: #1d2521;
+
+  --text: #e9efeb;
+  --text-body: #c2ccc6;
+  --text-muted: #98a49d;
+  --text-faint: #6f7c75;
+
+  --border: #232b27;
+  --border-strong: #2f3833;
+  --border-hover: #414d46;
+
+  --status-mastered: #4c9c74;
+  --status-decaying: #e6a33a;
+  --status-shaky: #d9b545;
+  --status-weak: #f0645f;
+  --status-untested: #2f3833;
+
+  --danger: #f0645f;
+  --danger-bg: #2a1a1a;
+  --danger-border: #4a2626;
+  --warning-text: #e0a33e;
+  --success-text: #4fb87a;
+  --success-bg: #16261e;
+  --success-border: #2a4034;
+
+  /* Shadows do almost nothing on a dark ground, so the borders carry the
+     separation instead and these stay subtle rather than muddy. */
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-raised: 0 4px 16px rgba(0, 0, 0, 0.55);
+
+  color-scheme: dark;
 }
 
 @theme inline {

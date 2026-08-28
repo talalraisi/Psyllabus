@@ -13,6 +13,9 @@ export default function Signup() {
   const [schoolCode, setSchoolCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [awaitingConfirmation, setAwaitingConfirmation] = useState(false)
+  const [resending, setResending] = useState(false)
+  const [resent, setResent] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -24,9 +27,14 @@ export default function Signup() {
     const { data, error: authError } = await supabase.auth.signUp({
       email,
       password,
-      // The code is carried through so onboarding can link the school. The
-      // server decides whether it grants student or staff access.
-      options: { data: { full_name: name, school_code: schoolCode.trim().toUpperCase() } },
+      options: {
+        // The code is carried through so onboarding can redeem it. The server
+        // checks the email domain and the seat count, so nothing is self-granted.
+        data: { full_name: name, school_code: schoolCode.trim().toUpperCase() },
+        // Where the confirmation link lands. Without this, Supabase sends
+        // people to its own domain instead of back here.
+        emailRedirectTo: getAuthCallbackUrl('/onboarding'),
+      },
     })
 
     if (authError) {
@@ -35,9 +43,32 @@ export default function Signup() {
       return
     }
 
-    if (data.user) {
+    // With email confirmation switched on, signUp returns a user but no
+    // session. Pushing to /onboarding then bounces straight back to /login,
+    // which reads as the sign-up having silently failed.
+    if (data.user && !data.session) {
+      setAwaitingConfirmation(true)
+      setLoading(false)
+      return
+    }
+
+    if (data.session) {
       router.push('/onboarding')
     }
+  }
+
+  const resendConfirmation = async () => {
+    if (resending) return
+    setResending(true)
+    setResent(false)
+    const { error: resendError } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: { emailRedirectTo: getAuthCallbackUrl('/onboarding') },
+    })
+    if (resendError) setError(resendError.message)
+    else setResent(true)
+    setResending(false)
   }
 
   const handleGoogleSignup = async () => {
@@ -55,6 +86,63 @@ export default function Signup() {
       setError(error.message)
       setLoading(false)
     }
+  }
+
+  if (awaitingConfirmation) {
+    return (
+      <main className="page px-4 py-10 md:px-6 md:py-12">
+        <div className="mx-auto max-w-md">
+          <div className="mb-8 flex justify-center">
+            <Link href="/">
+              <Logo width={180} height={54} priority className="h-auto w-[160px]" />
+            </Link>
+          </div>
+
+          <div className="card p-6 md:p-8">
+            <h1 className="t-page-title mb-2">Check your email</h1>
+            <p className="t-small mb-6">
+              We sent a confirmation link to{' '}
+              <strong className="text-[var(--text)]">{email}</strong>. Open it and you will land
+              back here to finish setting up. It can take a minute to arrive, and it is worth
+              checking your spam folder.
+            </p>
+
+            {resent && (
+              <p className="mb-4 rounded-[var(--r-md)] border border-[var(--success-border)] bg-[var(--success-bg)] px-4 py-3 text-sm text-[var(--success-text)]">
+                Sent again. If it still does not arrive, the address may have a typo in it.
+              </p>
+            )}
+            {error && <div className="error-box mb-4">{error}</div>}
+
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={resendConfirmation}
+                disabled={resending}
+                className="btn btn-quiet control-lg w-full text-base"
+              >
+                {resending ? 'Sending…' : 'Send it again'}
+              </button>
+              <button
+                onClick={() => {
+                  setAwaitingConfirmation(false)
+                  setError('')
+                }}
+                className="btn btn-quiet control-md w-full"
+              >
+                Use a different email
+              </button>
+            </div>
+          </div>
+
+          <p className="t-caption mt-6 text-center">
+            Already confirmed?{' '}
+            <Link href="/login" className="text-[var(--brand)] hover:underline">
+              Sign in
+            </Link>
+          </p>
+        </div>
+      </main>
+    )
   }
 
   return (
@@ -162,7 +250,7 @@ export default function Signup() {
         </div>
 
         <p className="text-text-faint text-xs text-center mt-6">
-          © 2026 PSyllabus · Built in Muscat, Oman
+          © 2026 Project Syllabus · Built in Muscat, Oman
         </p>
       </div>
     </main>

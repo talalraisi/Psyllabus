@@ -39,7 +39,8 @@ export async function middleware(request) {
 }
 
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
+  // Only the routes that actually need a session. This used to match every
+  // request, so opening the marketing pages cost a round trip to Supabase in
+  // Singapore before anything could render.
+  matcher: ['/dashboard/:path*', '/onboarding/:path*'],
 }

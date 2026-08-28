@@ -107,8 +107,8 @@ export default function SyllabusPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f8f6f1] flex items-center justify-center">
-        <p className="text-sm text-[#6b7280]">Loading syllabus…</p>
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
+        <p className="text-sm text-[var(--text-muted)]">Loading syllabus…</p>
       </div>
     )
   }
@@ -129,18 +129,18 @@ export default function SyllabusPage() {
         <header className="mb-8">
           <button
             onClick={() => router.push('/dashboard')}
-            className="text-sm font-medium text-[#2D6A4F] mb-4 hover:underline"
+            className="text-sm font-medium text-[var(--brand)] mb-4 hover:underline"
           >
             ← Back to Dashboard
           </button>
           <div className="flex items-center justify-between gap-4">
             <h1 className="t-page-title">{subjectName}</h1>
-            <span className="shrink-0 rounded-full bg-[#f0fdf4] text-[#2D6A4F] text-sm font-semibold px-3 py-1">
+            <span className="shrink-0 rounded-full bg-[var(--brand-tint)] text-[var(--brand)] text-sm font-semibold px-3 py-1">
               {completion}% mastered
             </span>
           </div>
           <div className="flex items-center justify-between mt-1">
-            <p className="text-sm text-[#6b7280]">
+            <p className="text-sm text-[var(--text-muted)]">
               {syllabusData.length} subtopic{syllabusData.length !== 1 ? 's' : ''}
             </p>
             {hasQuestions && (
@@ -153,9 +153,9 @@ export default function SyllabusPage() {
             )}
           </div>
 
-          <div className="mt-5 h-2 bg-[#f3f4f6] rounded-full overflow-hidden">
+          <div className="mt-5 h-2 bg-[var(--surface-sunken)] rounded-full overflow-hidden">
             <div
-              className="h-full bg-[#2D6A4F] rounded-full transition-all duration-300"
+              className="h-full bg-[var(--brand)] rounded-full transition-all duration-300"
               style={{ width: `${completion}%` }}
             />
           </div>
@@ -163,8 +163,8 @@ export default function SyllabusPage() {
 
         {syllabusData.length === 0 ? (
           <div className="surface p-10 text-center">
-            <h2 className="text-base font-semibold text-[#1a2e1e]">Syllabus coming soon</h2>
-            <p className="text-sm text-[#6b7280] mt-2">
+            <h2 className="text-base font-semibold text-[var(--text)]">Syllabus coming soon</h2>
+            <p className="text-sm text-[var(--text-muted)] mt-2">
               We are still preparing the content for this subject. Check back soon.
             </p>
           </div>
@@ -183,12 +183,12 @@ export default function SyllabusPage() {
                 >
                   <button
                     onClick={() => toggleTopic(topic)}
-                    className="w-full bg-[#f9fafb] px-5 py-4 flex items-center justify-between hover:bg-[#f3f4f6] transition-colors"
+                    className="w-full bg-[var(--surface-sunken)] px-5 py-4 flex items-center justify-between hover:bg-[var(--surface-sunken)] transition-colors"
                     aria-expanded={expanded}
                   >
                     <div className="text-left">
-                      <h3 className="text-sm font-bold text-[#1a2e1e]">{topic}</h3>
-                      <p className="text-xs text-[#6b7280] mt-1">
+                      <h3 className="text-sm font-bold text-[var(--text)]">{topic}</h3>
+                      <p className="text-xs text-[var(--text-muted)] mt-1">
                         {subtopics.length} subtopic{subtopics.length !== 1 ? 's' : ''} · {topicMastered} mastered
                       </p>
                     </div>
@@ -209,7 +209,7 @@ export default function SyllabusPage() {
                         </span>
                       )}
                       <span
-                        className={`text-[#9ca3af] text-xs transition-transform duration-150 ${
+                        className={`text-[var(--text-faint)] text-xs transition-transform duration-150 ${
                           expanded ? 'rotate-90' : ''
                         }`}
                         aria-hidden="true"
@@ -238,13 +238,13 @@ export default function SyllabusPage() {
                             <div className="flex-1 min-w-0">
                               <button
                                 onClick={() => setDrawerItem(item)}
-                                className="text-left text-sm text-[#374151] hover:text-[#2D6A4F] hover:underline underline-offset-2 transition-colors"
+                                className="text-left text-sm text-[var(--text-body)] hover:text-[var(--brand)] hover:underline underline-offset-2 transition-colors"
                                 title="Open resources and practice quiz"
                               >
                                 {item.subtopic}
                               </button>
                               {item.hl_only && (
-                                <span className="inline-block mt-1 rounded-full bg-[#E8D5B0] px-2 py-1 text-[11px] font-medium text-[#1a2e1e]">
+                                <span className="inline-block mt-1 rounded-full bg-[var(--sand)] px-2 py-1 text-[11px] font-medium text-[var(--text)]">
                                   HL only
                                 </span>
                               )}

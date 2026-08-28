@@ -47,11 +47,11 @@ function statusFromAccuracy(accuracy) {
 function Skeleton() {
   return (
     <div className="surface p-6 animate-pulse space-y-4">
-      <div className="h-4 w-24 bg-[#f3f4f6] rounded" />
-      <div className="h-6 w-2/3 bg-[#f3f4f6] rounded" />
-      <div className="h-10 w-full bg-[#f3f4f6] rounded-lg" />
-      <div className="h-10 w-full bg-[#f3f4f6] rounded-lg" />
-      <div className="h-10 w-full bg-[#f3f4f6] rounded-lg" />
+      <div className="h-4 w-24 bg-[var(--surface-sunken)] rounded" />
+      <div className="h-6 w-2/3 bg-[var(--surface-sunken)] rounded" />
+      <div className="h-10 w-full bg-[var(--surface-sunken)] rounded-lg" />
+      <div className="h-10 w-full bg-[var(--surface-sunken)] rounded-lg" />
+      <div className="h-10 w-full bg-[var(--surface-sunken)] rounded-lg" />
     </div>
   )
 }
@@ -417,10 +417,10 @@ export default function QuizRunner({
   if (phase === PHASE.empty) {
     return (
       <div className="surface p-10 text-center">
-        <h2 className="text-base font-semibold text-[#1a2e1e]">
+        <h2 className="text-base font-semibold text-[var(--text)]">
           {mode === 'mistakes' ? 'Nothing to review' : 'Questions coming soon'}
         </h2>
-        <p className="text-sm text-[#6b7280] mt-2">{emptyMessage}</p>
+        <p className="text-sm text-[var(--text-muted)] mt-2">{emptyMessage}</p>
         <Link
           href={backHref}
           className="inline-block mt-6 btn btn-solid control-md"
@@ -448,20 +448,20 @@ export default function QuizRunner({
                   ? 'Topic Test'
                   : 'Mini-Quiz'}
         </p>
-        <h1 className="text-xl font-bold text-[#1a2e1e] mb-1">
+        <h1 className="text-xl font-bold text-[var(--text)] mb-1">
           {mode === 'mistakes'
             ? 'Your past mistakes'
             : mode === 'topic'
               ? topic
               : subtopic || subject}
         </h1>
-        <p className="text-sm text-[#6b7280] mb-6">
+        <p className="text-sm text-[var(--text-muted)] mb-6">
           {questions.length} question{questions.length !== 1 ? 's' : ''} · auto-graded
           {timed ? ` · ${totalMinutes} min limit` : ''}
         </p>
 
-        <div className="mb-6 p-4 rounded-lg border border-[#f0f0f0] bg-[#f9fafb]">
-          <label className="block text-sm font-medium text-[#1a2e1e] mb-2">
+        <div className="mb-6 p-4 rounded-lg border border-[var(--border)] bg-[var(--surface-sunken)]">
+          <label className="block text-sm font-medium text-[var(--text)] mb-2">
             How many will you get right? (optional)
           </label>
           <input
@@ -482,9 +482,9 @@ export default function QuizRunner({
             }}
             inputMode="numeric" 
             placeholder={`0–${questions.length}`}
-            className="w-full px-3 py-2 rounded-lg border border-[#e5e7eb] bg-white text-sm outline-none focus:border-[#2D6A4F]"
+            className="w-full px-3 py-2 rounded-lg border border-[var(--border-strong)] bg-white text-sm outline-none focus:border-[var(--brand)]"
           />
-          <p className="text-xs text-[#9ca3af] mt-2">
+          <p className="text-xs text-[var(--text-faint)] mt-2">
             Tracks your confidence calibration over time.
           </p>
         </div>
@@ -516,11 +516,11 @@ export default function QuizRunner({
       const actualPace = elapsedSec >= 30 ? marksAnswered / (elapsedSec / 60) : null
       const behind = actualPace != null && actualPace < requiredPace
       paceBlock = (
-        <div className="flex items-center justify-between mb-4 px-4 py-2 rounded-lg bg-[#f9fafb] border border-[#f0f0f0] text-sm">
-          <span className={`font-semibold tabular-nums ${secondsLeft < 60 ? 'text-[#dc2626]' : 'text-[#1a2e1e]'}`}>
+        <div className="flex items-center justify-between mb-4 px-4 py-2 rounded-lg bg-[var(--surface-sunken)] border border-[var(--border)] text-sm">
+          <span className={`font-semibold tabular-nums ${secondsLeft < 60 ? 'text-[var(--danger)]' : 'text-[var(--text)]'}`}>
             {formatClock(secondsLeft)} left
           </span>
-          <span className={behind ? 'text-[#d97706] font-medium' : 'text-[#6b7280]'}>
+          <span className={behind ? 'text-[var(--warning-text)] font-medium' : 'text-[var(--text-muted)]'}>
             {actualPace != null
               ? `Pace ${actualPace.toFixed(1)} marks/min · target ${requiredPace.toFixed(1)}`
               : `Target pace ${requiredPace.toFixed(1)} marks/min`}
@@ -535,15 +535,15 @@ export default function QuizRunner({
         {paceBlock}
 
         <div className="flex items-center justify-between mb-4">
-          <p className="text-sm text-[#6b7280]">
+          <p className="text-sm text-[var(--text-muted)]">
             Question {currentIndex + 1} of {questions.length}
           </p>
-          <p className="text-xs text-[#9ca3af]">
+          <p className="text-xs text-[var(--text-faint)]">
             {q.marks || 1} mark{(q.marks || 1) !== 1 ? 's' : ''} · {answeredCount}/{questions.length} answered
           </p>
         </div>
 
-        <p className="text-sm text-[#1a2e1e] font-medium mb-6 leading-relaxed">{q.stem}</p>
+        <p className="text-sm text-[var(--text)] font-medium mb-6 leading-relaxed">{q.stem}</p>
 
         <div className="space-y-2 mb-6">
           {options.map((opt) => (
@@ -552,8 +552,8 @@ export default function QuizRunner({
               onClick={() => selectAnswer(q.id, opt.id)}
               className={`w-full text-left px-4 py-3 rounded-lg border text-sm transition-colors duration-150 ${
                 selected === opt.id
-                  ? 'border-[#2D6A4F] bg-[#f0fdf4] text-[#1a2e1e]'
-                  : 'border-[#e5e7eb] bg-white text-[#374151] hover:border-[#d1d5db]'
+                  ? 'border-[var(--brand)] bg-[var(--brand-tint)] text-[var(--text)]'
+                  : 'border-[var(--border-strong)] bg-white text-[var(--text-body)] hover:border-[var(--border-hover)]'
               }`}
             >
               {opt.text}
@@ -603,12 +603,12 @@ export default function QuizRunner({
         <p className="t-overline mb-2">
           Quiz Complete
         </p>
-        <h1 className="text-[32px] font-bold text-[#2D6A4F] leading-tight">
+        <h1 className="text-[32px] font-bold text-[var(--brand)] leading-tight">
           {results.score}/{results.total}
         </h1>
-        <p className="text-sm text-[#6b7280] mt-1">{pct}% accuracy</p>
+        <p className="text-sm text-[var(--text-muted)] mt-1">{pct}% accuracy</p>
         {results.prediction != null && (
-          <p className="text-xs text-[#9ca3af] mt-1">
+          <p className="text-xs text-[var(--text-faint)] mt-1">
             You predicted {results.prediction}: {results.prediction > results.score
               ? 'slightly overconfident this time'
               : results.prediction < results.score
@@ -618,19 +618,19 @@ export default function QuizRunner({
         )}
 
         {timed && (
-          <div className="mt-5 p-4 rounded-lg border border-[#f0f0f0] bg-[#f9fafb]">
-            <p className="text-sm font-semibold text-[#1a2e1e] mb-1">Pacing</p>
-            <p className="text-sm text-[#6b7280]">
+          <div className="mt-5 p-4 rounded-lg border border-[var(--border)] bg-[var(--surface-sunken)]">
+            <p className="text-sm font-semibold text-[var(--text)] mb-1">Pacing</p>
+            <p className="text-sm text-[var(--text-muted)]">
               Finished in {formatClock(results.elapsed)} of {formatClock(timeLimitRef.current)} ·{' '}
               {(results.totalMarks / (timeLimitRef.current / 60)).toFixed(1)} marks/min required
             </p>
             {overBudget.length > 0 ? (
-              <p className="text-sm text-[#d97706] mt-1">
+              <p className="text-sm text-[var(--warning-text)] mt-1">
                 Pacing penalty: {overBudget.length} question{overBudget.length !== 1 ? 's' : ''} went
                 over the exam time budget.
               </p>
             ) : (
-              <p className="text-sm text-[#16a34a] mt-1">
+              <p className="text-sm text-[var(--success-text)] mt-1">
                 All questions inside the exam time budget.
               </p>
             )}
@@ -644,21 +644,21 @@ export default function QuizRunner({
             return (
               <div
                 key={g.question.id}
-                className="p-4 rounded-lg border border-[#f0f0f0] bg-[#f9fafb]"
+                className="p-4 rounded-lg border border-[var(--border)] bg-[var(--surface-sunken)]"
               >
                 <div className="flex items-start gap-2">
                   <span
-                    className={`text-xs font-bold mt-1 ${g.correct ? 'text-[#16a34a]' : 'text-[#dc2626]'}`}
+                    className={`text-xs font-bold mt-1 ${g.correct ? 'text-[var(--success-text)]' : 'text-[var(--danger)]'}`}
                     aria-label={g.correct ? 'Correct' : 'Incorrect'}
                   >
                     {g.correct ? '✓' : '✗'}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm text-[#1a2e1e]">{g.question.stem}</p>
+                    <p className="text-sm text-[var(--text)]">{g.question.stem}</p>
                     {!g.correct && g.question.explanation && (
-                      <p className="text-xs text-[#6b7280] mt-1">{g.question.explanation}</p>
+                      <p className="text-xs text-[var(--text-muted)] mt-1">{g.question.explanation}</p>
                     )}
-                    <p className={`text-xs mt-1 ${slow && timed ? 'text-[#d97706]' : 'text-[#9ca3af]'}`}>
+                    <p className={`text-xs mt-1 ${slow && timed ? 'text-[var(--warning-text)]' : 'text-[var(--text-faint)]'}`}>
                       {g.timeSpent}s spent · {budget}s budget{slow && timed ? ' · over budget' : ''}
                     </p>
                   </div>

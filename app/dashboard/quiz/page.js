@@ -54,8 +54,8 @@ function QuizPageInner() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f8f6f1] flex items-center justify-center">
-        <p className="text-sm text-[#6b7280]">Loading quiz…</p>
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
+        <p className="text-sm text-[var(--text-muted)]">Loading quiz…</p>
       </div>
     )
   }
@@ -65,7 +65,7 @@ function QuizPageInner() {
       <div className="px-5 py-6 md:px-12 md:py-10 max-w-2xl mx-auto">
         <button
           onClick={() => router.push(backHref)}
-          className="text-sm font-medium text-[#2D6A4F] mb-6 hover:underline"
+          className="text-sm font-medium text-[var(--brand)] mb-6 hover:underline"
         >
           ← Back
         </button>

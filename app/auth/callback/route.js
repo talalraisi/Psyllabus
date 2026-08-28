@@ -30,14 +30,17 @@ export async function GET(request) {
     }
   )
 
-  const { error } = await supabase.auth.exchangeCodeForSession(code)
+  // The exchange already returns the user, so calling getUser() afterwards was
+  // a second round trip to verify a session we had just been handed. On a slow
+  // connection that was a visible pause on every Google sign-in.
+  const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
   if (error) {
     return NextResponse.redirect(new URL('/login?error=auth', requestUrl.origin))
   }
 
   let redirectPath = next
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = data?.session?.user
 
   if (user) {
     const { data: profile } = await supabase

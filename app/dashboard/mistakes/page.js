@@ -18,9 +18,9 @@ function ListSkeleton() {
   return (
     <div className="space-y-3 animate-pulse">
       {[0, 1, 2].map((i) => (
-        <div key={i} className="bg-white rounded-xl p-5 border border-[#f0f0f0] space-y-2">
-          <div className="h-4 w-1/3 bg-[#f3f4f6] rounded" />
-          <div className="h-4 w-2/3 bg-[#f3f4f6] rounded" />
+        <div key={i} className="bg-white rounded-xl p-5 border border-[var(--border)] space-y-2">
+          <div className="h-4 w-1/3 bg-[var(--surface-sunken)] rounded" />
+          <div className="h-4 w-2/3 bg-[var(--surface-sunken)] rounded" />
         </div>
       ))}
     </div>
@@ -68,7 +68,7 @@ export default function MistakeBankPage() {
 
   if (loading || !profile) {
     return (
-      <div className="min-h-screen bg-[#f8f6f1] px-12 py-10">
+      <div className="min-h-screen bg-[var(--bg)] px-12 py-10">
         <ListSkeleton />
       </div>
     )
@@ -88,7 +88,7 @@ export default function MistakeBankPage() {
       <div className="px-5 py-6 md:px-12 md:py-10 max-w-4xl mx-auto">
         <header className="mb-8">
           <h1 className="t-page-title mb-1">Mistake Bank</h1>
-          <p className="text-sm text-[#6b7280]">
+          <p className="text-sm text-[var(--text-muted)]">
             Every wrong answer becomes a spaced-repetition review, so you drill your own
             failures instead of generic flashcards
           </p>
@@ -96,12 +96,12 @@ export default function MistakeBankPage() {
 
         <div className="grid grid-cols-2 gap-3 mb-8 max-w-md">
           <div className="surface p-5">
-            <p className="t-stat text-[#d97706]">{due.length}</p>
-            <p className="text-sm text-[#6b7280] mt-1">Due for review</p>
+            <p className="t-stat text-[var(--warning-text)]">{due.length}</p>
+            <p className="text-sm text-[var(--text-muted)] mt-1">Due for review</p>
           </div>
           <div className="surface p-5">
-            <p className="t-stat text-[#1a2e1e]">{mistakes.length}</p>
-            <p className="text-sm text-[#6b7280] mt-1">Total logged</p>
+            <p className="t-stat text-[var(--text)]">{mistakes.length}</p>
+            <p className="text-sm text-[var(--text-muted)] mt-1">Total logged</p>
           </div>
         </div>
 
@@ -113,15 +113,15 @@ export default function MistakeBankPage() {
             Review {due.length} due mistake{due.length !== 1 ? 's' : ''}
           </Link>
         ) : mistakes.length > 0 ? (
-          <p className="mb-10 text-sm text-[#6b7280]">
+          <p className="mb-10 text-sm text-[var(--text-muted)]">
             Nothing due right now. Your next review unlocks automatically.
           </p>
         ) : null}
 
         {mistakes.length === 0 ? (
           <div className="surface p-10 text-center">
-            <h2 className="text-base font-semibold text-[#1a2e1e]">No mistakes logged yet</h2>
-            <p className="text-sm text-[#6b7280] mt-2">
+            <h2 className="text-base font-semibold text-[var(--text)]">No mistakes logged yet</h2>
+            <p className="text-sm text-[var(--text-muted)] mt-2">
               Take a quiz from any syllabus subtopic and wrong answers land here automatically.
             </p>
           </div>
@@ -138,10 +138,10 @@ export default function MistakeBankPage() {
                     return (
                       <div key={m.id} className="px-5 py-3 flex items-center gap-4">
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs text-[#9ca3af]">{m.questions.subtopic}</p>
-                          <p className="text-sm text-[#374151] truncate">{m.questions.stem}</p>
+                          <p className="text-xs text-[var(--text-faint)]">{m.questions.subtopic}</p>
+                          <p className="text-sm text-[var(--text-body)] truncate">{m.questions.stem}</p>
                         </div>
-                        <span className="shrink-0 text-xs text-[#9ca3af]">
+                        <span className="shrink-0 text-xs text-[var(--text-faint)]">
                           {m.review_count > 0
                             ? `${m.review_count} correct review${m.review_count !== 1 ? 's' : ''}`
                             : 'Not yet recovered'}
@@ -149,8 +149,8 @@ export default function MistakeBankPage() {
                         <span
                           className={`shrink-0 text-xs font-medium px-3 py-1 rounded-full ${
                             isDue
-                              ? 'bg-[#fef3c7] text-[#d97706]'
-                              : 'bg-[#f3f4f6] text-[#6b7280]'
+                              ? 'bg-[#fef3c7] text-[var(--warning-text)]'
+                              : 'bg-[var(--surface-sunken)] text-[var(--text-muted)]'
                           }`}
                         >
                           {relativeDue(m.next_review_at, now)}

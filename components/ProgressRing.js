@@ -31,7 +31,7 @@ export default function ProgressRing({ progress = 0, size = 64, strokeWidth = 6 
         />
       </svg>
       <span
-        className="absolute inset-0 flex items-center justify-center text-xs font-bold text-[#1a2e1e]"
+        className="absolute inset-0 flex items-center justify-center text-xs font-bold text-[var(--text)]"
         aria-label={`${clamped}% complete`}
       >
         {clamped}%

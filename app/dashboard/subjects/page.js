@@ -16,9 +16,9 @@ import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
 import {
   isSubjectLocked,
   isPremium,
+  freeSubject,
   canSwitchFreeSubject,
   freeSubjectLockUntil,
-  FREE_SWITCH_DAYS,
 } from '@/lib/access'
 
 export default function SubjectsPage() {

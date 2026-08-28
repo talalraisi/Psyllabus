@@ -23,6 +23,7 @@ import {
 import { planLabel, isPremium } from '@/lib/access'
 import { clearCache } from '@/lib/cache'
 import TimerPill from '@/components/TimerPill'
+import ThemeToggle from '@/components/ThemeToggle'
 
 const NAV_ITEMS = [
   { href: '/dashboard', label: 'Dashboard', Icon: IconDashboard, match: (p) => p === '/dashboard' },
@@ -208,6 +209,10 @@ export default function DashboardLayout({ children, profile }) {
           <IconLogout width={18} height={18} className="text-[var(--text-faint)]" />
           {signingOut ? 'Signing out…' : 'Sign out'}
         </button>
+
+        <div className="px-3 pt-3">
+          <ThemeToggle compact />
+        </div>
 
         <div className="flex gap-4 px-3 pt-3">
           <Link href="/privacy" className="t-caption hover:text-[var(--text-muted)]">

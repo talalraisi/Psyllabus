@@ -11,6 +11,9 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [needsConfirmation, setNeedsConfirmation] = useState(false)
+  const [resending, setResending] = useState(false)
+  const [resent, setResent] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -25,6 +28,9 @@ export default function Login() {
     })
 
     if (authError) {
+      // An unconfirmed address is the one sign-in failure the student can
+      // actually fix, so offer the fix rather than just the error text.
+      if (/confirm/i.test(authError.message)) setNeedsConfirmation(true)
       setError(authError.message)
       setLoading(false)
       return
@@ -37,6 +43,23 @@ export default function Login() {
       .single()
 
     router.push(profile ? '/dashboard' : '/onboarding')
+  }
+
+  const resendConfirmation = async () => {
+    if (resending || !email) return
+    setResending(true)
+    setResent(false)
+    const { error: resendError } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: { emailRedirectTo: getAuthCallbackUrl('/onboarding') },
+    })
+    if (resendError) setError(resendError.message)
+    else {
+      setResent(true)
+      setError('')
+    }
+    setResending(false)
   }
 
   const handleGoogleLogin = async () => {
@@ -119,6 +142,23 @@ export default function Login() {
 
             {error && <div className="error-box">{error}</div>}
 
+            {needsConfirmation && !resent && (
+              <button
+                type="button"
+                onClick={resendConfirmation}
+                disabled={resending}
+                className="btn btn-quiet control-md w-full"
+              >
+                {resending ? 'Sending…' : 'Resend the confirmation email'}
+              </button>
+            )}
+
+            {resent && (
+              <p className="rounded-[var(--r-md)] border border-[var(--success-border)] bg-[var(--success-bg)] px-4 py-3 text-sm text-[var(--success-text)]">
+                Sent. Open the link in your inbox, then sign in.
+              </p>
+            )}
+
             <button
               type="submit"
               disabled={loading}
@@ -130,7 +170,7 @@ export default function Login() {
         </div>
 
         <p className="text-text-faint text-xs text-center mt-6">
-          © 2026 PSyllabus · Built in Muscat, Oman
+          © 2026 Project Syllabus · Built in Muscat, Oman
         </p>
       </div>
     </main>

@@ -4,7 +4,6 @@ import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Logo from '@/components/Logo'
-import { isIBSelectionValid, ibSelectionHint } from '@/lib/ib-validation'
 import { getCurrentUser } from '@/lib/auth'
 import { freeSubjectLockUntil } from '@/lib/access'
 import {
@@ -228,7 +227,7 @@ const CURRICULUMS = {
   }
 }
 
-const GRAD_YEARS = ['2027', '2028', '2029', '2030', '2031', '2032']
+const GRAD_YEARS = ['2027', '2028', '2029', '2030']
 
 export default function Onboarding() {
   const [step, setStep] = useState(1)
@@ -245,10 +244,12 @@ export default function Onboarding() {
 
   const currentCurriculum = CURRICULUMS[curriculum]
 
-  const subjectsValid =
-    curriculum === 'IB' && currentCurriculum
-      ? isIBSelectionValid(selectedSubjects, currentCurriculum.groups)
-      : selectedSubjects.length > 0
+  // Six subjects for the Diploma, and no rules about which groups they come
+  // from. Plenty of real timetables break the standard pattern, and blocking
+  // someone at sign-up over it helps nobody.
+  const subjectsValid = curriculum === 'IB'
+    ? selectedSubjects.length === 6
+    : selectedSubjects.length > 0
 
   const toggleSubject = (subject) => {
     if (selectedSubjects.includes(subject)) {
@@ -352,18 +353,18 @@ export default function Onboarding() {
   }
 
   return (
-    <main className="page px-6 py-12">
+    <main className="page px-4 py-8 md:px-6 md:py-12">
       
       <div className="max-w-2xl mx-auto">
 
         <div className="flex justify-center mb-10">
           <Link href="/">
-            <Logo width={260} height={78} priority />
+            <Logo width={220} height={66} priority className="h-auto w-[180px] md:w-[220px]" />
           </Link>
         </div>
 
         {/* Progress steps */}
-        <div className="flex items-center gap-2 mb-10 justify-center">
+        <div className="mb-10 flex items-center justify-center gap-1 sm:gap-2">
           {[
             {n: 1, label: 'Setup'},
             {n: 2, label: 'Subjects'},
@@ -372,18 +373,18 @@ export default function Onboarding() {
           ].map((s, i) => (
             <div key={s.n} className="flex items-center gap-2">
               <div className="flex flex-col items-center gap-1">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center 
-                text-sm font-bold transition-all ${step >= s.n 
-                  ? 'bg-accent text-white' 
+                <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full
+                text-sm font-bold transition-all ${step >= s.n
+                  ? 'bg-accent text-white'
                   : 'bg-bg-subtle text-text-faint border border-border'}`}>
                   {s.n}
                 </div>
-                <span className={`text-xs ${step >= s.n ? 'text-accent font-semibold' : 'text-text-faint'}`}>
+                <span className={`text-[11px] sm:text-xs ${step >= s.n ? 'text-accent font-semibold' : 'text-text-faint'}`}>
                   {s.label}
                 </span>
               </div>
               {i < 3 && (
-                <div className={`w-16 h-px mb-4 ${step > s.n ? 'bg-accent' : 'bg-border'}`} />
+                <div className={`mb-4 h-px w-5 sm:w-12 ${step > s.n ? 'bg-accent' : 'bg-border'}`} />
               )}
             </div>
           ))}
@@ -391,7 +392,7 @@ export default function Onboarding() {
 
         {/* Step 1, Curriculum and year */}
         {step === 1 && (
-          <div className="card card-pad">
+          <div className="card p-5 md:p-8">
             <h1 className="text-2xl font-bold text-text mb-2">
               Let's set up your profile
             </h1>
@@ -422,10 +423,10 @@ export default function Onboarding() {
               <label className="label">
                 When do you graduate?
               </label>
-              <div className="grid grid-cols-6 gap-2">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {GRAD_YEARS.map(y => (
                   <button key={y} onClick={() => setGradYear(y)}
-                  className={`py-3 rounded-[var(--radius-sm)] font-bold text-xs transition-all border
+                  className={`control-lg rounded-[var(--r-md)] border text-sm font-semibold tabular-nums transition-colors duration-150
                   ${gradYear === y ? 'chip-active' : 'chip hover:border-border-strong'}`}>
                     {y}
                   </button>
@@ -444,12 +445,12 @@ export default function Onboarding() {
 
         {/* Step 2, Subject selection by group */}
         {step === 2 && currentCurriculum && (
-          <div className="card card-pad">
+          <div className="card p-5 md:p-8">
             <h1 className="text-2xl font-bold text-text mb-2">
               Select your subjects
             </h1>
             <p className="text-text-muted text-sm mb-1">
-              {curriculum === 'IB' && ibSelectionHint(selectedSubjects, currentCurriculum.groups)}
+              {curriculum === 'IB' && 'Pick the six subjects you actually take. Theory of Knowledge, the Extended Essay and CAS are added for you.'}
               {curriculum === 'AP' && 'Select the AP courses you are taking.'}
               {curriculum === 'A-Level' && 'Most students take 3-4 A-Level subjects.'}
             </p>
@@ -545,12 +546,18 @@ export default function Onboarding() {
 
         {/* Step 3, Target grades */}
         {step === 3 && currentCurriculum && (
-          <div className="card card-pad">
+          <div className="card p-5 md:p-8">
             <h1 className="text-2xl font-bold text-text mb-2">
               Set your target grades
             </h1>
-            <p className="text-text-muted text-sm mb-8">
-              What are you aiming for? Be ambitious. The planner adjusts to your goals.
+            <p className="text-text-muted text-sm mb-3">
+              What are you aiming for in each one? Everything on your dashboard is measured
+              against these, so set them where you honestly intend to land.
+            </p>
+            <p className="text-sm mb-8 rounded-[var(--r-md)] border border-[var(--sand)] bg-[var(--sand)]/25 px-4 py-3 text-[var(--text-body)]">
+              Keep it realistic. A row of 7s makes your predicted grade look permanently far off
+              and the gap stops telling you anything. Aim a grade above where you are now, not
+              five. You can raise them whenever you get there.
             </p>
 
             <div className="space-y-4 mb-6 max-h-80 overflow-y-auto pr-1">

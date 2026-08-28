@@ -171,9 +171,11 @@ export default function Dashboard() {
                 ))}
               </ol>
 
-              <Link href={startHref} className="btn btn-solid control-lg px-6">
-                {firstSubject ? `Open ${firstSubject}` : 'Choose a subject'}
-                <IconArrowRight width={18} height={18} />
+              <Link href={startHref} className="btn btn-solid control-lg max-w-full px-6">
+                <span className="min-w-0 truncate">
+                  {firstSubject ? `Open ${firstSubject}` : 'Choose a subject'}
+                </span>
+                <IconArrowRight width={18} height={18} className="shrink-0" />
               </Link>
             </div>
           </>
@@ -181,7 +183,7 @@ export default function Dashboard() {
           <>
             <div className="mb-8 flex items-center gap-4">
               <div
-                className="h-2 flex-1 overflow-hidden rounded-full bg-[#f3f4f6]"
+                className="h-2 flex-1 overflow-hidden rounded-full bg-[var(--surface-sunken)]"
                 role="progressbar"
                 aria-valuenow={overall}
                 aria-valuemin={0}
@@ -261,19 +263,20 @@ export default function Dashboard() {
                     className="flex items-center gap-4 px-5 py-4 transition-colors duration-150 hover:bg-[var(--surface-sunken)]"
                   >
                     <span
-                      className={`w-48 shrink-0 truncate text-sm font-medium ${
+                      className={`min-w-0 flex-1 truncate text-sm font-medium sm:w-48 sm:flex-none sm:shrink-0 ${
                         locked ? 'text-[var(--text-faint)]' : 'text-[var(--text)]'
                       }`}
                     >
                       {subject}
                     </span>
                     {locked ? (
-                      <span className="ml-auto rounded-full bg-[var(--sand)] px-3 py-1 text-xs font-medium text-[var(--text)]">
-                        Locked on free plan
+                      <span className="ml-auto shrink-0 rounded-full border border-[var(--border-strong)] px-2.5 py-1 text-xs font-medium text-[var(--text-muted)]">
+                        <span className="sm:hidden">Locked</span>
+                        <span className="hidden sm:inline">Locked on free plan</span>
                       </span>
                     ) : (
                       <>
-                        <span className="hidden h-2 flex-1 overflow-hidden rounded-full bg-[#f3f4f6] sm:block">
+                        <span className="hidden h-2 flex-1 overflow-hidden rounded-full bg-[var(--surface-sunken)] sm:block">
                           <span
                             className="block h-full rounded-full bg-[var(--brand)]"
                             style={{ width: `${pct}%` }}

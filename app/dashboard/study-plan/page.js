@@ -328,7 +328,7 @@ export default function StudyPlanPage() {
                   </div>
 
                   {sessionComplete ? (
-                    <div className="rounded-[var(--r-md)] border border-[#bbf7d0] bg-[#f0fdf4] px-4 py-3">
+                    <div className="rounded-[var(--r-md)] border border-[var(--success-border)] bg-[var(--success-bg)] px-4 py-3">
                       <p className="text-sm font-medium text-[var(--success-text)]">
                         You worked through everything planned for today.
                       </p>

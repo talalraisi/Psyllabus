@@ -11,11 +11,11 @@ import { mergeSyllabusWithProgress } from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 
 const STAT_CARDS = [
-  { key: 'total', label: 'Total tracked', color: 'text-[#1a2e1e]' },
-  { key: 'mastered', label: 'Mastered', color: 'text-[#2D6A4F]' },
-  { key: 'decaying', label: 'Decaying', color: 'text-[#f59e0b]' },
-  { key: 'confident', label: 'Shaky', color: 'text-[#d97706]' },
-  { key: 'inProgress', label: 'Weak', color: 'text-[#dc2626]' },
+  { key: 'total', label: 'Total tracked', color: 'text-[var(--text)]' },
+  { key: 'mastered', label: 'Mastered', color: 'text-[var(--brand)]' },
+  { key: 'decaying', label: 'Decaying', color: 'text-[var(--status-decaying)]' },
+  { key: 'confident', label: 'Shaky', color: 'text-[var(--warning-text)]' },
+  { key: 'inProgress', label: 'Weak', color: 'text-[var(--danger)]' },
 ]
 
 export default function ProgressPage() {
@@ -69,8 +69,8 @@ export default function ProgressPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f8f6f1] flex items-center justify-center">
-        <p className="text-sm text-[#6b7280]">Loading progress…</p>
+      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
+        <p className="text-sm text-[var(--text-muted)]">Loading progress…</p>
       </div>
     )
   }
@@ -97,7 +97,7 @@ export default function ProgressPage() {
       <div className="px-5 py-6 md:px-12 md:py-10 max-w-6xl mx-auto">
         <header className="mb-8">
           <h1 className="t-page-title mb-1">Progress</h1>
-          <p className="text-sm text-[#6b7280]">
+          <p className="text-sm text-[var(--text-muted)]">
             {overallPercent}% of all subtopics mastered across {subjects.length} subject{subjects.length !== 1 ? 's' : ''}
           </p>
         </header>
@@ -111,7 +111,7 @@ export default function ProgressPage() {
               <p className={`t-stat ${stat.color}`}>
                 {summary[stat.key]}
               </p>
-              <p className="text-sm text-[#6b7280] mt-1">{stat.label}</p>
+              <p className="text-sm text-[var(--text-muted)] mt-1">{stat.label}</p>
             </div>
           ))}
         </div>
@@ -124,14 +124,14 @@ export default function ProgressPage() {
             <div className="surface p-5 space-y-4">
               {bySubject.map(({ subject, percent }) => (
                 <div key={subject} className="flex items-center gap-4">
-                  <span className="w-56 shrink-0 text-sm text-[#374151] truncate">{subject}</span>
-                  <div className="flex-1 h-2 bg-[#f3f4f6] rounded-full overflow-hidden">
+                  <span className="w-56 shrink-0 text-sm text-[var(--text-body)] truncate">{subject}</span>
+                  <div className="flex-1 h-2 bg-[var(--surface-sunken)] rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-[#2D6A4F] rounded-full transition-all duration-300"
+                      className="h-full bg-[var(--brand)] rounded-full transition-all duration-300"
                       style={{ width: `${percent}%` }}
                     />
                   </div>
-                  <span className="w-10 shrink-0 text-right text-sm font-semibold text-[#2D6A4F]">
+                  <span className="w-10 shrink-0 text-right text-sm font-semibold text-[var(--brand)]">
                     {percent}%
                   </span>
                 </div>

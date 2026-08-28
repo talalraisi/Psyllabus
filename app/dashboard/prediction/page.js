@@ -158,7 +158,7 @@ export default function PredictionPage() {
                     {Math.min(100, prediction.percentToTarget)}%
                   </span>
                 </div>
-                <div className="h-2 overflow-hidden rounded-full bg-[#f3f4f6]">
+                <div className="h-2 overflow-hidden rounded-full bg-[var(--surface-sunken)]">
                   <div
                     className={`h-full rounded-full transition-[width] duration-500 ${
                       prediction.onTrack ? 'bg-[var(--success-text)]' : 'bg-[var(--brand)]'
@@ -254,7 +254,7 @@ export default function PredictionPage() {
         <Section title="Your targets">
           <div className="surface p-5">
             {saved && (
-              <p className="mb-4 rounded-[var(--r-md)] border border-[#bbf7d0] bg-[#f0fdf4] px-4 py-3 text-sm text-[var(--success-text)]">
+              <p className="mb-4 rounded-[var(--r-md)] border border-[var(--success-border)] bg-[var(--success-bg)] px-4 py-3 text-sm text-[var(--success-text)]">
                 Targets updated
               </p>
             )}

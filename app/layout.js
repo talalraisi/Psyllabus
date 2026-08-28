@@ -8,7 +8,10 @@ const inter = Inter({
 })
 
 export const viewport = {
-  themeColor: '#2D6A4F',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f8f6f1' },
+    { media: '(prefers-color-scheme: dark)', color: '#0f1412' },
+  ],
 }
 
 export const metadata = {
@@ -79,10 +82,20 @@ const siteSchema = {
   url: 'https://www.psyllabus.app',
 }
 
+// Set the theme before the browser paints. Anything later and dark-mode users
+// get a white flash on every navigation.
+const themeScript = `(function(){try{
+var t=localStorage.getItem('psyllabus:theme')||'system';
+var d=t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);
+document.documentElement.setAttribute('data-theme',d?'dark':'light');
+document.documentElement.style.colorScheme=d?'dark':'light';
+}catch(e){}})()`
+
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${inter.variable} h-full`}>
+    <html lang="en" className={`${inter.variable} h-full`} suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

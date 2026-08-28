@@ -15,8 +15,8 @@ export default function Heatmap({ items, subjects }) {
   if (!hasAny) {
     return (
       <section className="surface p-8">
-        <h2 className="text-base font-semibold text-[#1a2e1e] mb-1">Heatmap</h2>
-        <p className="text-sm text-[#6b7280]">
+        <h2 className="text-base font-semibold text-[var(--text)] mb-1">Heatmap</h2>
+        <p className="text-sm text-[var(--text-muted)]">
           Open a subject syllabus to start tracking your progress. Each square represents one subtopic.
         </p>
       </section>
@@ -29,7 +29,7 @@ export default function Heatmap({ items, subjects }) {
         <h2 className="t-overline">
           Heatmap
         </h2>
-        <div className="flex flex-wrap gap-3 text-xs text-[#6b7280]">
+        <div className="flex flex-wrap gap-3 text-xs text-[var(--text-muted)]">
           {Object.entries(STATUS_LABELS).map(([status, label]) => (
             <span key={status} className="flex items-center gap-2">
               <span className={`w-3 h-3 rounded-[3px] ${STATUS_COLORS[status]}`} />
@@ -54,14 +54,14 @@ export default function Heatmap({ items, subjects }) {
             >
               <div className="flex items-center justify-between mb-3">
                 <div>
-                  <h3 className="text-base font-semibold text-[#1a2e1e]">{subject}</h3>
-                  <p className="text-xs text-[#6b7280] mt-1">
+                  <h3 className="text-base font-semibold text-[var(--text)]">{subject}</h3>
+                  <p className="text-xs text-[var(--text-muted)] mt-1">
                     {mastered}/{subtopics.length} mastered
                   </p>
                 </div>
                 <Link
                   href={`/dashboard/syllabus/${slug}`}
-                  className="text-sm font-medium text-[#2D6A4F] hover:underline"
+                  className="text-sm font-medium text-[var(--brand)] hover:underline"
                 >
                   Open syllabus →
                 </Link>

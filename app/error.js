@@ -23,15 +23,15 @@ export default function GlobalError({ error, reset }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f6f1] flex items-center justify-center px-5">
+    <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center px-5">
       <div className="surface p-8 max-w-md w-full text-center">
-        <h1 className="text-xl font-bold text-[#1a2e1e] mb-2">Something went wrong</h1>
-        <p className="text-sm text-[#6b7280] mb-6">
+        <h1 className="text-xl font-bold text-[var(--text)] mb-2">Something went wrong</h1>
+        <p className="text-sm text-[var(--text-muted)] mb-6">
           This is usually a cached file from an older version of the app. Reloading normally
           fixes it.
         </p>
         {error?.message && (
-          <p className="text-xs text-[#9ca3af] bg-[#f9fafb] border border-[#f0f0f0] rounded-lg p-3 mb-6 text-left break-words">
+          <p className="text-xs text-[var(--text-faint)] bg-[var(--surface-sunken)] border border-[var(--border)] rounded-lg p-3 mb-6 text-left break-words">
             {error.message}
           </p>
         )}

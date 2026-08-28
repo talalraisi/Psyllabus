@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import logoMark from '@/public/logo-mark.png'
 import { IconCheck, IconArrowRight } from '@/components/Icons'
+import ThemeToggle from '@/components/ThemeToggle'
 
 export const metadata = {
   title: 'Project Syllabus: know exactly what to study next',
@@ -36,6 +37,37 @@ const FEATURES = [
   ['Predicted grade', 'A running prediction out of 45, built from your quiz results, next to the grades you told us you want.'],
 ]
 
+
+// Update after a generation run: npm run generate-questions
+// Shown on the homepage, so it needs to be a number worth showing.
+const QUESTION_COUNT = '98'
+
+const WHY = [
+  {
+    title: 'Because you cannot mark your own homework',
+    body: 'Asking students to rate their own confidence produces a map of their mood, not their knowledge. The effect is well documented: the less someone knows about a topic, the more likely they are to overrate themselves on it. Every status here comes from questions you either got right or did not, which is the one signal that cannot flatter you.',
+  },
+  {
+    title: 'Because forgetting is the default, not the exception',
+    body: 'Memory decays on a curve unless it is used, and the gap between learning something in October and being examined on it in May is where most marks quietly disappear. Rather than assume a topic stays learned, mastered subtopics fade after about two weeks untouched and return for a short retest. Spacing practice out like this is one of the most reliably supported findings in learning research.',
+  },
+  {
+    title: 'Because testing is studying, not just measuring',
+    body: 'Retrieving an answer from memory strengthens it far more than reading the same page again. Every quiz here is doing two jobs at once: telling the planner where you stand, and making the thing you just recalled harder to forget. That is why the app tests you constantly rather than saving it for a mock.',
+  },
+  {
+    title: 'Because your own mistakes are better practice than anyone else\u2019s',
+    body: 'A question you got wrong is worth more than ten you got right, and it goes straight into a bank that brings it back on a widening schedule: a day later, then three, then a week. You end up drilling your specific gaps instead of generic cards written for somebody else.',
+  },
+  {
+    title: 'Because knowing what to do is most of the battle',
+    body: 'Most students do not lack material, they lack direction, and picking a subject to revise at 8pm is a decision made on guesswork and guilt. Tell the planner how long you have and it hands you an ordered list, with a reason attached to each item so you can disagree with it.',
+  },
+  {
+    title: 'Because a number you can check beats a feeling',
+    body: 'A predicted grade out of 45 next to the one you are aiming for turns a vague worry into a gap you can close. It says how much of your syllabus it is actually based on, so a prediction from three quizzes is labelled low confidence rather than presented as a forecast.',
+  },
+]
 
 const FAQ = [
   {
@@ -107,12 +139,15 @@ export default function Home() {
               alt="Project Syllabus"
               priority
               sizes="72px"
-              className="h-9 w-auto md:h-11"
+              className="h-9 w-auto md:h-8"
             />
           </Link>
           {/* Narrow screens drop Pricing and use compact controls so the row
               never overflows the viewport. */}
           <div className="flex min-w-0 items-center gap-2">
+            <div className="hidden md:block">
+              <ThemeToggle compact />
+            </div>
             <Link href="/pricing" className="btn btn-quiet control-md hidden md:inline-flex">
               Pricing
             </Link>
@@ -165,8 +200,8 @@ export default function Home() {
         <div className="mx-auto grid max-w-3xl grid-cols-3 gap-4 text-center">
           {[
             ['2,590', 'Subtopics mapped from official course outlines'],
-            ['4', 'Status levels, every one set by a quiz'],
-            ['45', 'Points predicted, against the target you set'],
+            [QUESTION_COUNT, 'Questions written, each one independently checked'],
+            ['12', 'Features working today, not on a roadmap'],
           ].map(([value, label]) => (
             <div key={label}>
               <p className="t-stat text-[var(--text)]">{value}</p>
@@ -213,6 +248,27 @@ export default function Home() {
                   <h3 className="text-sm font-semibold text-[var(--text)]">{title}</h3>
                   <p className="t-small mt-1">{body}</p>
                 </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+
+      {/* Why it works */}
+      <section className="border-t border-[var(--border)] bg-[var(--surface-sunken)] px-5 py-20 md:px-8">
+        <div className="mx-auto max-w-5xl">
+          <h2 className="t-overline mb-3">Why it works</h2>
+          <p className="mb-10 max-w-2xl text-2xl font-semibold leading-snug text-[var(--text)]">
+            None of this is a gimmick. Each part is built on something already
+            known about how people learn and forget.
+          </p>
+
+          <div className="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-2">
+            {WHY.map(({ title, body }) => (
+              <div key={title}>
+                <h3 className="mb-2 text-base font-semibold text-[var(--text)]">{title}</h3>
+                <p className="text-sm leading-relaxed text-[var(--text-body)]">{body}</p>
               </div>
             ))}
           </div>
