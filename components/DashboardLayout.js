@@ -211,7 +211,7 @@ export default function DashboardLayout({ children, profile }) {
         </button>
 
         <div className="px-3 pt-3">
-          <ThemeToggle compact />
+          <ThemeToggle />
         </div>
 
         <div className="flex gap-4 px-3 pt-3">

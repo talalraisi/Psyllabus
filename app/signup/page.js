@@ -189,7 +189,7 @@ export default function Signup() {
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Your name"
+                placeholder="John Smith"
                 required
                 className="input"
               />
@@ -201,7 +201,7 @@ export default function Signup() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@school.com"
+                placeholder="user@example.com"
                 required
                 className="input"
               />
@@ -212,7 +212,7 @@ export default function Signup() {
               <PasswordField
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="At least 8 characters"
+                placeholder="••••••••"
                 autoComplete="new-password"
                 minLength={8}
               />
@@ -226,7 +226,7 @@ export default function Signup() {
                 type="text"
                 value={schoolCode}
                 onChange={(e) => setSchoolCode(e.target.value)}
-                placeholder="School code"
+                placeholder="ABC123"
                 autoCapitalize="characters"
                 className="input uppercase"
               />

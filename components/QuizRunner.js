@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
+import { statusFromAccuracy } from '@/lib/progress'
 import { getCurrentUser } from '@/lib/auth'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 import { progressKey } from '@/lib/progress'
@@ -38,11 +39,8 @@ function formatClock(totalSeconds) {
   return `${m}:${String(s % 60).padStart(2, '0')}`
 }
 
-function statusFromAccuracy(accuracy) {
-  if (accuracy >= 0.75) return 'mastered'
-  if (accuracy >= 0.5) return 'confident'
-  return 'in_progress'
-}
+// Bands live in lib/progress.js so the quiz, the heatmap and the legend can
+// never disagree about what a score means.
 
 function Skeleton() {
   return (
@@ -173,7 +171,7 @@ export default function QuizRunner({
         const effective = buildEffectiveProgressMap(progressRows)
         const wanted =
           focus === 'weak'
-            ? ['in_progress', 'confident', 'decaying']
+            ? ['in_progress', 'confident', 'proficient', 'decaying']
             : focus === 'untested'
               ? ['not_started']
               : null

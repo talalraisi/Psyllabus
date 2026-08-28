@@ -123,7 +123,7 @@ export default function Login() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@school.com"
+                placeholder="user@example.com"
                 required
                 className="input"
               />

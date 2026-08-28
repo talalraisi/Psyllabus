@@ -26,12 +26,21 @@
   --border-strong: #e5e7eb;  /* inputs, controls */
   --border-hover: #d1d5db;
 
-  /* --- Status. Only these four carry semantic color. ----------------------- */
-  --status-mastered: #2d6a4f;
-  --status-decaying: #f59e0b;
-  --status-shaky: #fbbf24;
-  --status-weak: #ef4444;
+  /* --- Status. Five levels of knowledge, plus untested. --------------------
+     Untested is not a level, it is the absence of one, so it stays neutral
+     grey and never competes with the colours that carry meaning. Mastered is
+     purple rather than the brand green so that "the best state" is not the
+     same colour as every button on the page. ------------------------------- */
+  --status-fading: #3b82f6;      /* was mastered, slipping */
+  --status-weak: #ef4444;        /* proven wrong */
+  --status-developing: #eab308;  /* getting there */
+  --status-proficient: #16a34a;  /* reliable */
+  --status-mastered: #7c3aed;    /* solid and recent */
   --status-untested: #e5e7eb;
+
+  /* Kept so anything still reading the old names renders. */
+  --status-decaying: var(--status-fading);
+  --status-shaky: var(--status-developing);
 
   --danger: #dc2626;
   --danger-bg: #fef2f2;
@@ -98,11 +107,15 @@
   --border-strong: #2f3833;
   --border-hover: #414d46;
 
-  --status-mastered: #4c9c74;
-  --status-decaying: #e6a33a;
-  --status-shaky: #d9b545;
+  --status-fading: #60a5fa;
   --status-weak: #f0645f;
+  --status-developing: #d9b545;
+  --status-proficient: #4fb87a;
+  --status-mastered: #a78bfa;
   --status-untested: #2f3833;
+
+  --status-decaying: var(--status-fading);
+  --status-shaky: var(--status-developing);
 
   --danger: #f0645f;
   --danger-bg: #2a1a1a;

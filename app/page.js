@@ -194,9 +194,9 @@ export default function Home() {
       <section className="border-b border-[var(--border)] bg-[var(--surface-sunken)] px-5 py-10 md:px-8">
         <div className="mx-auto grid max-w-3xl grid-cols-3 gap-4 text-center">
           {[
-            ['2,590', 'Subtopics mapped from official course outlines'],
-            [QUESTION_COUNT, 'Questions written, each one independently checked'],
-            ['12', 'Features working today, not on a roadmap'],
+            ['2,590+', 'Subtopics mapped'],
+            [QUESTION_COUNT, 'Questions in the question bank'],
+            ['12', 'Working features'],
           ].map(([value, label]) => (
             <div key={label}>
               <p className="t-stat text-[var(--text)]">{value}</p>
@@ -335,7 +335,6 @@ export default function Home() {
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 sm:flex-row">
           <Image src={logoMark} alt="Project Syllabus" sizes="96px" style={{ height: 36, width: 'auto' }} />
           <nav className="flex flex-wrap items-center justify-center gap-6">
-            <ThemeToggle compact />
             <Link href="/pricing" className="t-small hover:text-[var(--text)]">
               Pricing
             </Link>
@@ -349,7 +348,10 @@ export default function Home() {
               Log in
             </Link>
           </nav>
-          <p className="t-caption">Built in Muscat, Oman</p>
+          <div className="flex items-center gap-4">
+            <p className="t-caption">Built in Muscat, Oman</p>
+            <ThemeToggle />
+          </div>
         </div>
       </footer>
     </main>

@@ -123,7 +123,7 @@ export default function ResetPassword() {
                     id="new-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="At least 8 characters"
+                    placeholder="••••••••"
                     autoComplete="new-password"
                     minLength={8}
                   />
@@ -137,7 +137,7 @@ export default function ResetPassword() {
                     id="confirm-password"
                     value={confirm}
                     onChange={(e) => setConfirm(e.target.value)}
-                    placeholder="The same password"
+                    placeholder="••••••••"
                     autoComplete="new-password"
                     minLength={8}
                   />

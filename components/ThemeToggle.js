@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { IconSun, IconMoon } from '@/components/Icons'
 
 const KEY = 'psyllabus:theme'
 
-/** Apply a theme, or follow the operating system when set to 'system'. */
 export function applyTheme(theme) {
   const resolved =
     theme === 'system'
@@ -17,42 +17,49 @@ export function applyTheme(theme) {
 }
 
 /**
- * Light and dark, with a third setting that follows the phone or laptop.
+ * One button that flips between light and dark.
  *
- * The choice is written to localStorage and read back by an inline script in
- * the document head, before the browser paints. Without that, a dark-mode user
- * gets a white flash on every page load, which is worse than not having dark
- * mode at all.
+ * A three-way Light / Dark / Auto control was three buttons of chrome for a
+ * setting most people touch once, and it does not belong in a row of footer
+ * links. Until it is pressed the theme follows the operating system, which is
+ * the sensible default; pressing it makes the choice explicit and it sticks.
+ *
+ * The icon shows what you will get, not what you have, which is the convention
+ * people already read correctly.
  */
-export default function ThemeToggle({ compact = false }) {
-  const [theme, setTheme] = useState('system')
+export default function ThemeToggle({ className = '' }) {
+  const [isDark, setIsDark] = useState(false)
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    let stored = 'system'
-    try {
-      stored = localStorage.getItem(KEY) || 'system'
-    } catch {
-      /* private mode: fall back to following the system */
+    const read = () => {
+      const attr = document.documentElement.getAttribute('data-theme')
+      setIsDark(attr === 'dark')
     }
-    setTheme(stored)
+    read()
     setReady(true)
 
-    // Keep following the system if that is what was chosen.
+    // Keep following the system until an explicit choice is stored.
     const mq = window.matchMedia('(prefers-color-scheme: dark)')
     const onChange = () => {
+      let stored = null
       try {
-        if ((localStorage.getItem(KEY) || 'system') === 'system') applyTheme('system')
+        stored = localStorage.getItem(KEY)
       } catch {
+        /* private mode */
+      }
+      if (!stored || stored === 'system') {
         applyTheme('system')
+        read()
       }
     }
     mq.addEventListener('change', onChange)
     return () => mq.removeEventListener('change', onChange)
   }, [])
 
-  const choose = (next) => {
-    setTheme(next)
+  const toggle = () => {
+    const next = isDark ? 'light' : 'dark'
+    setIsDark(!isDark)
     try {
       localStorage.setItem(KEY, next)
     } catch {
@@ -61,40 +68,18 @@ export default function ThemeToggle({ compact = false }) {
     applyTheme(next)
   }
 
-  const OPTIONS = [
-    { key: 'light', label: 'Light' },
-    { key: 'dark', label: 'Dark' },
-    { key: 'system', label: 'Auto' },
-  ]
-
-  // Render the control only once the stored choice is known, so the highlighted
-  // option is never briefly wrong.
-  if (!ready) {
-    return <div className={compact ? 'h-8' : 'h-9'} aria-hidden="true" />
-  }
+  // Hold the space until the real theme is known, so the icon is never wrong
+  // for a frame.
+  if (!ready) return <span className={`inline-block h-9 w-9 ${className}`} aria-hidden="true" />
 
   return (
-    <div
-      className="inline-flex rounded-[var(--r-md)] border border-[var(--border-strong)] p-0.5"
-      role="group"
-      aria-label="Colour theme"
+    <button
+      onClick={toggle}
+      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      title={isDark ? 'Light mode' : 'Dark mode'}
+      className={`flex h-9 w-9 items-center justify-center rounded-[var(--r-md)] border border-[var(--border-strong)] text-[var(--text-muted)] transition-colors duration-150 hover:bg-[var(--surface-sunken)] hover:text-[var(--text)] ${className}`}
     >
-      {OPTIONS.map((o) => (
-        <button
-          key={o.key}
-          onClick={() => choose(o.key)}
-          aria-pressed={theme === o.key}
-          className={`rounded-[var(--r-sm)] px-2.5 text-xs font-medium transition-colors duration-150 ${
-            compact ? 'h-7' : 'h-8'
-          } ${
-            theme === o.key
-              ? 'bg-[var(--brand)] text-white'
-              : 'text-[var(--text-muted)] hover:bg-[var(--surface-sunken)]'
-          }`}
-        >
-          {o.label}
-        </button>
-      ))}
-    </div>
+      {isDark ? <IconSun width={17} height={17} /> : <IconMoon width={17} height={17} />}
+    </button>
   )
 }

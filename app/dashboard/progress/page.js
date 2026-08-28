@@ -12,16 +12,24 @@ import { buildEffectiveProgressMap } from '@/lib/decay'
 
 const STAT_CARDS = [
   { key: 'total', label: 'Total tracked', color: 'text-[var(--text)]' },
-  { key: 'mastered', label: 'Mastered', color: 'text-[var(--brand)]' },
-  { key: 'decaying', label: 'Decaying', color: 'text-[var(--status-decaying)]' },
-  { key: 'confident', label: 'Shaky', color: 'text-[var(--warning-text)]' },
-  { key: 'inProgress', label: 'Weak', color: 'text-[var(--danger)]' },
+  { key: 'mastered', label: 'Mastered', color: 'text-[var(--status-mastered)]' },
+  { key: 'proficient', label: 'Proficient', color: 'text-[var(--status-proficient)]' },
+  { key: 'confident', label: 'Developing', color: 'text-[var(--status-developing)]' },
+  { key: 'inProgress', label: 'Weak', color: 'text-[var(--status-weak)]' },
+  { key: 'decaying', label: 'Fading', color: 'text-[var(--status-fading)]' },
 ]
 
 export default function ProgressPage() {
   const [profile, setProfile] = useState(null)
   const [heatmapItems, setHeatmapItems] = useState([])
-  const [summary, setSummary] = useState({ total: 0, mastered: 0, inProgress: 0, confident: 0 })
+  const [summary, setSummary] = useState({
+    total: 0,
+    mastered: 0,
+    proficient: 0,
+    confident: 0,
+    inProgress: 0,
+    decaying: 0,
+  })
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const supabase = createClient()
@@ -60,6 +68,7 @@ export default function ProgressPage() {
         decaying: heatmap.filter((i) => i.status === 'decaying').length,
         inProgress: heatmap.filter((i) => i.status === 'in_progress').length,
         confident: heatmap.filter((i) => i.status === 'confident').length,
+        proficient: heatmap.filter((i) => i.status === 'proficient').length,
       })
       setHeatmapItems(heatmap)
       setLoading(false)

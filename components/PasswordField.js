@@ -17,7 +17,7 @@ import { IconEye, IconEyeOff } from '@/components/Icons'
 export default function PasswordField({
   value,
   onChange,
-  placeholder = 'Your password',
+  placeholder = '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022',
   autoComplete = 'current-password',
   minLength,
   required = true,

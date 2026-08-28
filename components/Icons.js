@@ -204,3 +204,20 @@ export function IconEyeOff(props) {
     </svg>
   )
 }
+
+export function IconSun(props) {
+  return (
+    <svg {...base} {...props}>
+      <circle cx="10" cy="10" r="3.5" />
+      <path d="M10 1.75v1.5M10 16.75v1.5M18.25 10h-1.5M3.25 10h-1.5M15.84 4.16l-1.06 1.06M5.22 14.78l-1.06 1.06M15.84 15.84l-1.06-1.06M5.22 5.22L4.16 4.16" />
+    </svg>
+  )
+}
+
+export function IconMoon(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M16.5 11.75A6.75 6.75 0 0 1 8.25 3.5a6.75 6.75 0 1 0 8.25 8.25Z" />
+    </svg>
+  )
+}
