@@ -220,7 +220,7 @@ export default function SyllabusPage() {
                   </button>
 
                   {expanded && (
-                    <div className="divide-y divide-[#f3f4f6]">
+                    <div className="divide-y divide-[var(--border)]">
                       {subtopics.map((item) => {
                         const key = progressKey(subjectName, item.subtopic)
                         const currentStatus = isDecayed(

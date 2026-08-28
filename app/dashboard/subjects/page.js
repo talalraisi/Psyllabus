@@ -97,7 +97,7 @@ export default function SubjectsPage() {
   if (loading) {
     return (
       <DashboardLayout profile={null}>
-        <PageLoading title="My Subjects" width="wide" rows={4} />
+        <PageLoading title="My Subjects" width="wide" rows={4} variant="cards" />
       </DashboardLayout>
     )
   }

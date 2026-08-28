@@ -184,3 +184,23 @@ export function IconClock(props) {
     </svg>
   )
 }
+
+export function IconEye(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M1.75 10S4.75 4.75 10 4.75 18.25 10 18.25 10 15.25 15.25 10 15.25 1.75 10 1.75 10Z" />
+      <circle cx="10" cy="10" r="2.5" />
+    </svg>
+  )
+}
+
+export function IconEyeOff(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M7.9 5.1A7.6 7.6 0 0 1 10 4.75c5.25 0 8.25 5.25 8.25 5.25a14.6 14.6 0 0 1-2.35 3.03" />
+      <path d="M12.35 12.4A2.5 2.5 0 0 1 8.2 9.6" />
+      <path d="M5.2 6.35A14.4 14.4 0 0 0 1.75 10S4.75 15.25 10 15.25c.86 0 1.66-.14 2.4-.38" />
+      <path d="M3.25 3.25l13.5 13.5" />
+    </svg>
+  )
+}

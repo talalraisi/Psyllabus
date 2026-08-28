@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Logo from '@/components/Logo'
 import { getAuthCallbackUrl } from '@/lib/auth'
+import PasswordField from '@/components/PasswordField'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -129,14 +130,19 @@ export default function Login() {
             </div>
 
             <div>
-              <label className="label">Password</label>
-              <input
-                type="password"
+              <div className="flex items-baseline justify-between gap-4">
+                <label className="label" htmlFor="password">Password</label>
+                <Link
+                  href="/forgot-password"
+                  className="mb-2 text-xs font-medium text-[var(--brand)] hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+              <PasswordField
+                id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Your password"
-                required
-                className="input"
               />
             </div>
 

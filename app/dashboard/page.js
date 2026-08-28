@@ -115,7 +115,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <DashboardLayout profile={null}>
-        <PageLoading title="Dashboard" width="wide" rows={4} />
+        <PageLoading title="Dashboard" width="wide" stats rows={4} />
       </DashboardLayout>
     )
   }

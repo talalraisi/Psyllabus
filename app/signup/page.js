@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Logo from '@/components/Logo'
 import { getAuthCallbackUrl } from '@/lib/auth'
+import PasswordField from '@/components/PasswordField'
 
 export default function Signup() {
   const [email, setEmail] = useState('')
@@ -208,14 +209,12 @@ export default function Signup() {
 
             <div>
               <label className="label">Password</label>
-              <input
-                type="password"
+              <PasswordField
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Min 8 characters"
-                required
+                placeholder="At least 8 characters"
+                autoComplete="new-password"
                 minLength={8}
-                className="input"
               />
             </div>
 

@@ -184,7 +184,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <DashboardLayout profile={null}>
-        <PageLoading title="Profile" width="narrow" rows={3} />
+        <PageLoading title="Profile" width="narrow" rows={3} variant="form" />
       </DashboardLayout>
     )
   }

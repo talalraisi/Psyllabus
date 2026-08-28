@@ -108,7 +108,7 @@ export default function MistakeBankPage() {
         {due.length > 0 ? (
           <Link
             href="/dashboard/quiz?mode=mistakes&back=/dashboard/mistakes"
-            className="inline-block mb-10 px-6 btn btn-solid control-md"
+            className="btn btn-solid control-md mb-10 px-6"
           >
             Review {due.length} due mistake{due.length !== 1 ? 's' : ''}
           </Link>
@@ -132,7 +132,7 @@ export default function MistakeBankPage() {
                 <h2 className="t-overline mb-3">
                   {subject}
                 </h2>
-                <div className="surface divide-y divide-[#f3f4f6]">
+                <div className="surface divide-y divide-[var(--border)]">
                   {items.map((m) => {
                     const isDue = new Date(m.next_review_at).getTime() <= now
                     return (

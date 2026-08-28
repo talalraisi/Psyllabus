@@ -170,7 +170,7 @@ export default function CalendarPage() {
   if (loading) {
     return (
       <DashboardLayout profile={null}>
-        <PageLoading title="Calendar" width="default" rows={5} />
+        <PageLoading title="Calendar" width="default" variant="calendar" />
       </DashboardLayout>
     )
   }

@@ -172,7 +172,7 @@ export default function StudyPlanPage() {
   if (loading) {
     return (
       <DashboardLayout profile={null}>
-        <PageLoading title="Study Plan" width="default" rows={5} />
+        <PageLoading title="Study Plan" width="default" rows={5} variant="plan" />
       </DashboardLayout>
     )
   }

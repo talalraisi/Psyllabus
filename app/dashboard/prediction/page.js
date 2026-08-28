@@ -71,7 +71,7 @@ export default function PredictionPage() {
   if (loading || !prediction) {
     return (
       <DashboardLayout profile={null}>
-        <PageLoading title="Predicted Grade" width="default" stats rows={4} />
+        <PageLoading title="Predicted Grade" width="default" variant="prediction" />
       </DashboardLayout>
     )
   }

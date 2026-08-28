@@ -423,7 +423,7 @@ export default function QuizRunner({
         <p className="text-sm text-[var(--text-muted)] mt-2">{emptyMessage}</p>
         <Link
           href={backHref}
-          className="inline-block mt-6 btn btn-solid control-md"
+          className="btn btn-solid control-md mt-6"
         >
           Go back
         </Link>

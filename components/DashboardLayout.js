@@ -229,18 +229,21 @@ export default function DashboardLayout({ children, profile }) {
   return (
     <div className="flex min-h-screen flex-col bg-[var(--bg)] md:flex-row">
       {/* Mobile bar */}
-      <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-[var(--border)] bg-[var(--surface)] px-4 md:hidden">
-        <Link href="/" className="inline-block" aria-label="PSyllabus home">
-          <Image src={logoMark} alt="Project Syllabus" sizes="58px" style={{ height: 24, width: 'auto' }} />
-        </Link>
+      <header className="sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-[var(--border)] bg-[var(--surface)] px-4 md:hidden">
+        {/* The drawer slides in from the left, so the button that opens it
+            belongs on the left. It sat on the right, which meant reaching
+            across the screen to open a panel that appeared under your thumb. */}
         <button
           onClick={() => setMobileOpen(true)}
           aria-label="Open menu"
           aria-expanded={mobileOpen}
-          className="control-md -mr-2 flex w-10 items-center justify-center rounded-[var(--r-md)] text-[var(--text)] transition-colors duration-150 hover:bg-[var(--surface-sunken)]"
+          className="control-md -ml-2 flex w-10 shrink-0 items-center justify-center rounded-[var(--r-md)] text-[var(--text)] transition-colors duration-150 hover:bg-[var(--surface-sunken)]"
         >
           <IconMenu />
         </button>
+        <Link href="/" className="inline-block" aria-label="Project Syllabus home">
+          <Image src={logoMark} alt="Project Syllabus" sizes="70px" style={{ height: 28, width: 'auto' }} />
+        </Link>
       </header>
 
       {/* Mobile drawer */}

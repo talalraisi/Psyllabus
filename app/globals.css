@@ -332,9 +332,27 @@ body {
      =========================================================================== */
 
   .skeleton {
-    background: #f3f4f6;
+    position: relative;
+    overflow: hidden;
+    background: var(--surface-sunken);
     border-radius: var(--r-md);
-    animation: skeleton-pulse 1.6s var(--ease) infinite;
+  }
+
+  /* A highlight sweeping left to right reads as work in progress. The old
+     opacity pulse just looked like the page was flickering, and its grey was
+     hardcoded, so in dark mode the skeletons were invisible. */
+  .skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in srgb, var(--text-faint) 18%, transparent),
+      transparent
+    );
+    animation: skeleton-sweep 1.4s ease-in-out infinite;
   }
 
 
@@ -452,9 +470,8 @@ body {
 @utility control-md { height: 40px; }
 @utility control-lg { height: 44px; }
 
-@keyframes skeleton-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.55; }
+@keyframes skeleton-sweep {
+  100% { transform: translateX(100%); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -466,3 +483,13 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   .btn sets display:inline-flex to centre its label. A layout utility such as
+   inline-block or block silently overrides that and the text drops low in the
+   button, which is how the Open syllabus and Review buttons ended up looking
+   broken. Winning here means the combination is merely redundant, never wrong.
+   --------------------------------------------------------------------------- */
+.btn.btn { display: inline-flex; }
+.btn.btn.w-full,
+.btn.btn.flex-1 { display: flex; }

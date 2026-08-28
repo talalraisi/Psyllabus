@@ -142,24 +142,19 @@ export default function Home() {
               className="h-9 w-auto md:h-8"
             />
           </Link>
-          {/* Narrow screens drop Pricing and use compact controls so the row
-              never overflows the viewport. */}
+          {/* Two ways in and nothing else. Pricing lives in the footer, and the
+              theme control sits there too so it is reachable on a phone, where
+              a third and fourth nav button would not fit anyway. */}
           <div className="flex min-w-0 items-center gap-2">
-            <div className="hidden md:block">
-              <ThemeToggle compact />
-            </div>
-            <Link href="/pricing" className="btn btn-quiet control-md hidden md:inline-flex">
-              Pricing
-            </Link>
             <Link
               href="/login"
-              className="btn btn-quiet control-sm px-3 text-[13px] md:control-md md:px-4 md:text-sm"
+              className="btn btn-quiet control-md px-4 text-sm"
             >
               Log in
             </Link>
             <Link
               href="/signup"
-              className="btn btn-solid control-sm px-3 text-[13px] md:control-md md:px-4 md:text-sm"
+              className="btn btn-solid control-md px-4 text-sm"
             >
               Get started
             </Link>
@@ -340,6 +335,7 @@ export default function Home() {
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 sm:flex-row">
           <Image src={logoMark} alt="Project Syllabus" sizes="96px" style={{ height: 36, width: 'auto' }} />
           <nav className="flex flex-wrap items-center justify-center gap-6">
+            <ThemeToggle compact />
             <Link href="/pricing" className="t-small hover:text-[var(--text)]">
               Pricing
             </Link>
