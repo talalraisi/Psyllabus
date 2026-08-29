@@ -14,7 +14,8 @@
     "make-admin": "node scripts/make-admin.mjs",
     "resources:template": "node scripts/import-resources.mjs --template",
     "resources:import": "node scripts/import-resources.mjs",
-    "codes": "node scripts/make-codes.mjs"
+    "codes": "node scripts/make-codes.mjs",
+    "audit": "node scripts/audit-questions.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.117.1",

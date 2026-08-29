@@ -46,6 +46,20 @@ const PROVIDER = arg("provider", "ollama"); // ollama (free) | claude
 const OLLAMA_MODEL = arg("ollama-model", "qwen2.5:14b");
 const OLLAMA_URL = arg("ollama-url", "http://localhost:11434");
 const BATCH_SIZE = PROVIDER === "ollama" ? 8 : 20; // local models do better with smaller batches
+
+/**
+ * How many subtopics to work on at once.
+ *
+ * Default 1, because on a laptop the model is bound by memory bandwidth and
+ * running four at once mostly makes each of them four times slower. On a rented
+ * GPU behind vLLM the opposite is true: one request at a time leaves the card
+ * about 95% idle, and this is the single number that decides whether renting
+ * one was worth it. Start at 16 there and watch tokens/sec.
+ */
+const CONCURRENCY = Math.max(1, parseInt(arg("concurrency", "1"), 10));
+
+// Stop after this many, for pilots. 0 = no limit.
+const MAX_QUESTIONS = parseInt(arg("max-questions", "0"), 10);
 const MODEL = "claude-opus-5";
 
 // Only constructed when actually using Claude, so Ollama runs need no API key.
@@ -299,8 +313,10 @@ async function main() {
 
   const todo = LIMIT_SUBTOPICS > 0 ? subtopics.slice(0, LIMIT_SUBTOPICS) : subtopics;
   let totalInserted = 0;
+  const startedAt = Date.now();
 
-  for (const { topic, subtopic } of todo) {
+  /** One subtopic, worked until it hits the target or stops making progress. */
+  async function fillSubtopic({ topic, subtopic }) {
     const { rows: existing } = await db.query(
       `SELECT stem FROM questions WHERE subject = $1 AND subtopic = $2`,
       [SUBJECT, subtopic]
@@ -387,7 +403,45 @@ async function main() {
     }
   }
 
-  console.log(`\nDone. Inserted ${totalInserted} new verified questions.`);
+  // A pool rather than Promise.all over everything: 2,590 subtopics started at
+  // once would open 2,590 model requests and fall over. Workers pull the next
+  // subtopic as they finish, so exactly CONCURRENCY are ever in flight.
+  const queue = [...todo];
+  let stopped = false;
+
+  async function worker(id) {
+    while (!stopped) {
+      const next = queue.shift();
+      if (!next) return;
+      if (MAX_QUESTIONS > 0 && totalInserted >= MAX_QUESTIONS) {
+        stopped = true;
+        return;
+      }
+      try {
+        await fillSubtopic(next);
+      } catch (err) {
+        // One bad subtopic must not take the whole run down. It stays
+        // unfinished and the next run picks it up, because progress is counted
+        // from what is already in the database rather than from memory.
+        console.error(`  [w${id}] ${next.subtopic} failed: ${err.message}`);
+      }
+    }
+  }
+
+  console.log(
+    `${todo.length} subtopics, ${CONCURRENCY} at a time` +
+      (MAX_QUESTIONS > 0 ? `, stopping after ${MAX_QUESTIONS} questions` : "")
+  );
+
+  await Promise.all(
+    Array.from({ length: Math.min(CONCURRENCY, todo.length) }, (_, i) => worker(i + 1))
+  );
+
+  const mins = (Date.now() - startedAt) / 60000;
+  console.log(`\nDone. Inserted ${totalInserted} new verified questions in ${mins.toFixed(1)} min.`);
+  if (totalInserted > 0) {
+    console.log(`Rate: ${(totalInserted / mins).toFixed(1)} questions/min at concurrency ${CONCURRENCY}.`);
+  }
   await db.end();
 }
 
