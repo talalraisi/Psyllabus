@@ -210,17 +210,14 @@ export default function DashboardLayout({ children, profile }) {
           {signingOut ? 'Signing out…' : 'Sign out'}
         </button>
 
-        <div className="px-3 pt-3">
-          <ThemeToggle />
-        </div>
-
-        <div className="flex gap-4 px-3 pt-3">
-          <Link href="/privacy" className="t-caption hover:text-[var(--text-muted)]">
+        <div className="flex items-center gap-4 px-3 pt-3">
+          <Link href="/privacy?from=dashboard" className="t-caption hover:text-[var(--text-muted)]">
             Privacy
           </Link>
-          <Link href="/terms" className="t-caption hover:text-[var(--text-muted)]">
+          <Link href="/terms?from=dashboard" className="t-caption hover:text-[var(--text-muted)]">
             Terms
           </Link>
+          <ThemeToggle className="ml-auto" />
         </div>
       </div>
     </>

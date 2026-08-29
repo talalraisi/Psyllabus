@@ -64,7 +64,11 @@ export default function PricingPage() {
   return (
     <main className="min-h-screen bg-[var(--bg)]">
       <div className="mx-auto max-w-5xl px-5 py-12 md:py-16">
-        <Link href="/" className="text-sm font-medium text-[var(--brand)] hover:underline">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--brand)] hover:underline"
+        >
+          <span aria-hidden="true">&larr;</span>
           Back to Project Syllabus
         </Link>
 

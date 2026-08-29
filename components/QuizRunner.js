@@ -4,7 +4,16 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
-import { statusFromAccuracy } from '@/lib/progress'
+import {
+  statusFromPoints,
+  pointsForQuestion,
+  pointsToNextLevel,
+  masteryFraction,
+  MASTERY_TARGET,
+  STATUS_LABELS,
+  STATUS_COLORS,
+  STATUS_TEXT_COLORS,
+} from '@/lib/progress'
 import { getCurrentUser } from '@/lib/auth'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 import { progressKey } from '@/lib/progress'
@@ -331,42 +340,83 @@ export default function QuizRunner({
       )
     }
 
-    // Update progress for every subtopic this paper touched, not just single
-    // subtopic quizzes. A topic test, mock, or custom paper covers several
-    // subtopics, and each is scored on its own questions.
+    let earnedSummary = []
+
+    // Award mastery points, then restate each touched subtopic from its running
+    // total. Every subtopic this paper covered is scored on its own questions,
+    // so a topic test or a mock updates each one separately.
     if (mode !== 'mistakes') {
-      const bySubtopic = new Map()
-      for (const g of graded) {
-        const key = `${g.question.subject}|||${g.question.subtopic}`
-        const entry = bySubtopic.get(key) || {
+      // Only correct answers pay, and the unique index on (user_id,
+      // question_id) means each question pays exactly once however many times
+      // it comes back. Ignoring the conflict is the whole anti-farming rule.
+      const credits = graded
+        .filter((g) => g.correct)
+        .map((g) => ({
+          user_id: userId,
+          question_id: g.question.id,
           subject: g.question.subject,
-          topic: g.question.topic,
           subtopic: g.question.subtopic,
-          correct: 0,
-          total: 0,
-        }
-        entry.total++
-        if (g.correct) entry.correct++
-        bySubtopic.set(key, entry)
+          points: pointsForQuestion(g.question.difficulty),
+        }))
+
+      if (credits.length) {
+        await supabase.from('mastery_credits').upsert(credits, {
+          onConflict: 'user_id,question_id',
+          ignoreDuplicates: true,
+        })
       }
 
-      const rows = [...bySubtopic.values()]
-        // One or two questions is too thin to reclassify a subtopic.
-        .filter((e) => e.total >= 3)
-        .map((e) => ({
+      // Re-read the totals rather than adding up locally: the insert above
+      // silently drops questions already credited, so the database is the only
+      // thing that knows what this attempt actually earned.
+      const touched = [...new Set(graded.map((g) => `${g.question.subject}|||${g.question.subtopic}`))]
+      const meta = new Map(
+        graded.map((g) => [
+          `${g.question.subject}|||${g.question.subtopic}`,
+          { subject: g.question.subject, topic: g.question.topic, subtopic: g.question.subtopic },
+        ])
+      )
+
+      const { data: creditRows } = await supabase
+        .from('mastery_credits')
+        .select('subject, subtopic, points')
+        .eq('user_id', userId)
+        .in(
+          'subtopic',
+          touched.map((k) => k.split('|||')[1])
+        )
+
+      const totals = new Map()
+      for (const row of creditRows || []) {
+        const key = `${row.subject}|||${row.subtopic}`
+        totals.set(key, (totals.get(key) || 0) + Number(row.points))
+      }
+
+      const rows = touched.map((key) => {
+        const m = meta.get(key)
+        const points = +(totals.get(key) || 0).toFixed(2)
+        return {
           user_id: userId,
-          subject: e.subject,
-          topic: e.topic || '',
-          subtopic: e.subtopic,
-          status: statusFromAccuracy(e.correct / e.total),
+          subject: m.subject,
+          topic: m.topic || '',
+          subtopic: m.subtopic,
+          mastery_points: points,
+          status: statusFromPoints(points),
           updated_at: new Date().toISOString(),
-        }))
+        }
+      })
 
       if (rows.length) {
         await supabase.from('progress').upsert(rows, {
           onConflict: 'user_id,subject,subtopic',
         })
       }
+
+      earnedSummary = rows.map((r) => ({
+        subtopic: r.subtopic,
+        points: r.mastery_points,
+        status: r.status,
+      }))
     }
 
     if (mode === 'mistakes') {
@@ -403,7 +453,7 @@ export default function QuizRunner({
       }
     }
 
-    setResults({ score, total, accuracy, prediction, graded, totalMarks, elapsed })
+    setResults({ score, total, accuracy, prediction, graded, totalMarks, elapsed, earned: earnedSummary })
     setPhase(PHASE.results)
     setSubmitting(false)
   }, [userId, submitting, questions, currentIndex, secondsLeft, predictedScore, mode, subject, topic, subtopic, timed, mistakeRowsById, commitTime, supabase])
@@ -480,7 +530,7 @@ export default function QuizRunner({
             }}
             inputMode="numeric" 
             placeholder={`0–${questions.length}`}
-            className="w-full px-3 py-2 rounded-lg border border-[var(--border-strong)] bg-white text-sm outline-none focus:border-[var(--brand)]"
+            className="w-full rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--text)] outline-none focus:border-[var(--brand)]"
           />
           <p className="text-xs text-[var(--text-faint)] mt-2">
             Tracks your confidence calibration over time.
@@ -551,7 +601,7 @@ export default function QuizRunner({
               className={`w-full text-left px-4 py-3 rounded-lg border text-sm transition-colors duration-150 ${
                 selected === opt.id
                   ? 'border-[var(--brand)] bg-[var(--brand-tint)] text-[var(--text)]'
-                  : 'border-[var(--border-strong)] bg-white text-[var(--text-body)] hover:border-[var(--border-hover)]'
+                  : 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
               }`}
             >
               {opt.text}
@@ -613,6 +663,47 @@ export default function QuizRunner({
                 ? 'you underestimated yourself'
                 : 'perfectly calibrated'}
           </p>
+        )}
+
+        {/* Where each subtopic now stands, and how much further it has to go.
+            Without this the level looks arbitrary: a perfect score that leaves
+            you on Weak needs explaining, and the explanation is the point. */}
+        {results.earned?.length > 0 && (
+          <div className="mt-5 rounded-[var(--r-md)] border border-[var(--border-strong)] p-4">
+            <p className="t-overline mb-3">Mastery</p>
+            <ul className="flex flex-col gap-3">
+              {results.earned.map((e) => {
+                const next = pointsToNextLevel(e.points)
+                return (
+                  <li key={e.subtopic}>
+                    <div className="flex items-baseline justify-between gap-3">
+                      <span className="min-w-0 truncate text-sm text-[var(--text-body)]">
+                        {e.subtopic}
+                      </span>
+                      <span
+                        className={`shrink-0 text-xs font-semibold ${STATUS_TEXT_COLORS[e.status]}`}
+                      >
+                        {STATUS_LABELS[e.status]}
+                      </span>
+                    </div>
+                    <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-sunken)]">
+                      <div
+                        className={`h-full rounded-full ${STATUS_COLORS[e.status]}`}
+                        style={{ width: `${masteryFraction(e.points) * 100}%` }}
+                      />
+                    </div>
+                    <p className="t-caption mt-1">
+                      {e.points} of {MASTERY_TARGET} points
+                      {next ? ` · ${next.points} more for ${STATUS_LABELS[next.status]}` : ''}
+                    </p>
+                  </li>
+                )
+              })}
+            </ul>
+            <p className="t-caption mt-3">
+              Hard questions are worth 1 point, medium 0.5, easy 0.25. Each question pays once.
+            </p>
+          </div>
         )}
 
         {timed && (

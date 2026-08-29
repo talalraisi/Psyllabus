@@ -38,8 +38,9 @@ const MAX_MINUTES = 480
 
 const REASON_STYLE = {
   weak: 'text-[var(--status-weak)]',
-  decaying: 'text-[var(--status-decaying)]',
-  shaky: 'text-[var(--warning-text)]',
+  decaying: 'text-[var(--status-fading)]',
+  shaky: 'text-[var(--status-developing)]',
+  proficient: 'text-[var(--status-proficient)]',
   untested: 'text-[var(--text-faint)]',
   foundation: 'text-[var(--brand)]',
   exam: 'text-[var(--status-weak)]',

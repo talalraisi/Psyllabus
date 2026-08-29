@@ -29,10 +29,12 @@ const HOW_IT_WORKS = [
 ]
 
 const FEATURES = [
-  ['Heatmap you cannot fake', 'Every subtopic is coloured by your real test results, so nothing shows as known on a guess.'],
-  ['Topics that fade', 'Nail something, leave it two weeks and it fades to amber and comes back into your plan.'],
+  ['Heatmap you cannot fake', 'Five levels, from Weak to Mastered, every one set by a quiz rather than by how you feel.'],
+  ['Topics that fade', 'Nail something, leave it two weeks untouched and it fades back into your plan for a retest.'],
   ['Mistake bank', 'Questions you got wrong come back on a spaced schedule, so you drill your own gaps.'],
   ['Timed papers', 'Build a paper from any mix of topics and sit it against a live marks-per-minute clock.'],
+  ['Calendar and reminders', 'Put your tests and IA deadlines in, and the planner moves that subject up as they get close.'],
+  ['A session timer that follows you', 'Start a study block and it keeps running while you work through quizzes.'],
   ['Real resources on every subtopic', 'Hand-picked lessons, videos and notes for the exact thing you got wrong, not a search box.'],
   ['Predicted grade', 'A running prediction out of 45, built from your quiz results, next to the grades you told us you want.'],
 ]
@@ -49,7 +51,7 @@ const WHY = [
   },
   {
     title: 'Because forgetting is the default, not the exception',
-    body: 'Memory decays on a curve unless it is used, and the gap between learning something in October and being examined on it in May is where most marks quietly disappear. Rather than assume a topic stays learned, mastered subtopics fade after about two weeks untouched and return for a short retest. Spacing practice out like this is one of the most reliably supported findings in learning research.',
+    body: 'Memory decays on a curve unless it is used, and the gap between learning something in October and being examined on it in May is where most marks quietly disappear. Rather than assume a topic stays learned, anything you had proved starts Fading after about two weeks untouched and returns for a short retest. Spacing practice out like this is one of the most reliably supported findings in learning research.',
   },
   {
     title: 'Because testing is studying, not just measuring',
@@ -80,7 +82,7 @@ const FAQ = [
   },
   {
     q: 'How does the syllabus tracking work?',
-    a: 'Pick your subjects and you get the full course broken into topics and subtopics, taken from the official course outlines. Each subtopic carries one of four statuses: untested, weak, shaky, or mastered. Every status comes from a quiz, and nothing is marked known until you have proved it.',
+    a: 'Pick your subjects and you get the full course broken into topics and subtopics, taken from the official course outlines. Each subtopic then sits at one of five levels: Weak, Developing, Proficient, Mastered, or Fading once something you had proved starts slipping. Anything you have not been tested on stays grey, because untested is not a level, it is the absence of one.',
   },
   {
     q: 'What does the study plan actually do?',
@@ -88,7 +90,7 @@ const FAQ = [
   },
   {
     q: 'What is skill decay?',
-    a: 'Knowledge fades when you leave it alone. Master a subtopic and stop practising it, and after about two weeks Project Syllabus fades it from green to amber and puts it back into your plan for a short retest. This keeps what you learned in October from quietly disappearing before May.',
+    a: 'Knowledge fades when you leave it alone. Reach Proficient or Mastered on a subtopic and stop practising it, and after about two weeks Project Syllabus marks it Fading and puts it back into your plan for a short retest. This keeps what you learned in October from quietly disappearing before May.',
   },
   {
     q: 'How is my predicted grade calculated?',
@@ -96,7 +98,15 @@ const FAQ = [
   },
   {
     q: 'Is it free?',
-    a: 'One subject is free with no time limit and no card: every topic, every quiz, its own study plan and heatmap. Unlocking all your subjects is $12 a month or $108 a year. Schools can buy a licence from $500 to $2,000 a year that covers their students.',
+    a: 'One subject is free with no time limit and no card: every topic, every quiz, its own study plan and heatmap. You choose which subject when you sign up, and you can change it later, though not every day. Unlocking all your subjects is $12 a month or $108 a year, and schools can buy a licence from $500 to $2,000 a year that covers their students.',
+  },
+  {
+    q: 'How do school codes work, and what stops one leaking?',
+    a: 'A school gets a code tied to its own email domain, so it only works for someone signing up with a school address and is useless to anyone outside. Schools whose students use personal email get a set of one-per-student codes instead, each of which stops working after one account. Either way a code can be switched off, and every account it let in goes back to the free plan.',
+  },
+  {
+    q: 'Does it work on a phone?',
+    a: 'Yes. It is a web app, so there is nothing to install, and adding it to your home screen makes it open like an app. There is a dark mode, and reminders for tests and study blocks work while it is open in a tab.',
   },
   {
     q: 'Do teachers see my results?',
@@ -298,18 +308,15 @@ export default function Home() {
 
       {/* Detail. Written to be read by a person and quoted by a search engine. */}
       <section className="border-t border-[var(--border)] px-5 py-20 md:px-8">
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-5xl">
           <h2 className="t-overline mb-3">Questions people ask</h2>
           <p className="mb-10 max-w-2xl text-2xl font-semibold leading-snug text-[var(--text)]">
             What Project Syllabus is, and how it works.
           </p>
 
-          <div className="flex flex-col">
-            {FAQ.map(({ q, a }, i) => (
-              <div
-                key={q}
-                className={`py-6 ${i > 0 ? 'border-t border-[var(--border)]' : 'pt-0'}`}
-              >
+          <div className="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-2">
+            {FAQ.map(({ q, a }) => (
+              <div key={q}>
                 <h3 className="mb-2 text-base font-semibold text-[var(--text)]">{q}</h3>
                 <p className="text-sm leading-relaxed text-[var(--text-body)]">{a}</p>
               </div>
@@ -335,6 +342,9 @@ export default function Home() {
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 sm:flex-row">
           <Image src={logoMark} alt="Project Syllabus" sizes="96px" style={{ height: 36, width: 'auto' }} />
           <nav className="flex flex-wrap items-center justify-center gap-6">
+            <Link href="/about" className="t-small hover:text-[var(--text)]">
+              About
+            </Link>
             <Link href="/pricing" className="t-small hover:text-[var(--text)]">
               Pricing
             </Link>

@@ -6,25 +6,13 @@ import { getCurrentUser } from '@/lib/auth'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
+import { PageLoading } from '@/components/PageShell'
 
 function relativeDue(nextReviewAt, now = Date.now()) {
   const diff = new Date(nextReviewAt).getTime() - now
   if (diff <= 0) return 'Due now'
   const days = Math.ceil(diff / (24 * 60 * 60 * 1000))
   return days === 1 ? 'Due tomorrow' : `Due in ${days} days`
-}
-
-function ListSkeleton() {
-  return (
-    <div className="space-y-3 animate-pulse">
-      {[0, 1, 2].map((i) => (
-        <div key={i} className="bg-white rounded-xl p-5 border border-[var(--border)] space-y-2">
-          <div className="h-4 w-1/3 bg-[var(--surface-sunken)] rounded" />
-          <div className="h-4 w-2/3 bg-[var(--surface-sunken)] rounded" />
-        </div>
-      ))}
-    </div>
-  )
 }
 
 export default function MistakeBankPage() {
@@ -68,9 +56,9 @@ export default function MistakeBankPage() {
 
   if (loading || !profile) {
     return (
-      <div className="min-h-screen bg-[var(--bg)] px-12 py-10">
-        <ListSkeleton />
-      </div>
+      <DashboardLayout profile={null}>
+        <PageLoading title="Mistake Bank" width="default" rows={4} variant="mistakes" />
+      </DashboardLayout>
     )
   }
 
@@ -149,7 +137,7 @@ export default function MistakeBankPage() {
                         <span
                           className={`shrink-0 text-xs font-medium px-3 py-1 rounded-full ${
                             isDue
-                              ? 'bg-[#fef3c7] text-[var(--warning-text)]'
+                              ? 'bg-[var(--sand)]/30 text-[var(--warning-text)]'
                               : 'bg-[var(--surface-sunken)] text-[var(--text-muted)]'
                           }`}
                         >

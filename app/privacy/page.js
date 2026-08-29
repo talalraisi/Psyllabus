@@ -1,4 +1,6 @@
+import { Suspense } from 'react'
 import Link from 'next/link'
+import BackLink from '@/components/BackLink'
 
 export const metadata = {
   title: 'Privacy Policy',
@@ -11,9 +13,9 @@ export default function PrivacyPage() {
   return (
     <main className="min-h-screen bg-[var(--bg)]">
       <div className="max-w-2xl mx-auto px-5 py-12 md:py-16">
-        <Link href="/" className="text-sm font-medium text-[var(--brand)] hover:underline">
-          ← Back to Project Syllabus
-        </Link>
+        <Suspense fallback={<span className="text-sm text-[var(--brand)]">&larr; Back</span>}>
+          <BackLink />
+        </Suspense>
 
         <h1 className="t-page-title mt-6 mb-1">Privacy Policy</h1>
         <p className="text-sm text-[var(--text-muted)] mb-10">Last updated {LAST_UPDATED}</p>

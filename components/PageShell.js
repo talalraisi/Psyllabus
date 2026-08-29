@@ -228,6 +228,40 @@ export function SkeletonForm({ rows = 3 }) {
   )
 }
 
+/** Two stat cards, the review button, then the grouped list. */
+export function SkeletonMistakes({ rows = 4 }) {
+  return (
+    <div aria-hidden="true">
+      <div className="mb-8 grid max-w-md grid-cols-2 gap-3">
+        {[0, 1].map((i) => (
+          <div key={i} className="surface p-5">
+            <SkeletonLine width={44} height={28} />
+            <SkeletonLine width={90} height={13} className="mt-2" />
+          </div>
+        ))}
+      </div>
+
+      <SkeletonLine width={200} height={40} className="mb-10" />
+
+      <SkeletonLine width={140} height={11} className="mb-3" />
+      <div className="surface">
+        {Array.from({ length: rows }).map((_, i) => (
+          <div
+            key={i}
+            className={`flex items-center gap-4 px-5 py-4 ${i > 0 ? 'border-t border-[var(--border)]' : ''}`}
+          >
+            <div className="min-w-0 flex-1">
+              <SkeletonLine width="30%" height={10} />
+              <SkeletonLine width="60%" height={13} className="mt-2" />
+            </div>
+            <SkeletonLine width={64} height={12} />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 const LOADING_VARIANTS = {
   list: ({ rows }) => <SkeletonRows rows={rows} />,
   cards: ({ rows }) => <SkeletonCards count={rows} />,
@@ -235,6 +269,7 @@ const LOADING_VARIANTS = {
   calendar: () => <SkeletonCalendar />,
   prediction: () => <SkeletonPrediction />,
   form: ({ rows }) => <SkeletonForm rows={rows} />,
+  mistakes: ({ rows }) => <SkeletonMistakes rows={rows} />,
 }
 
 /**
