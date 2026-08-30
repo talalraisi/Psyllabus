@@ -5,16 +5,23 @@
  *   npm run audit -- --subject "Physics SL" --subtopic "Forces and dynamics"
  *   npm run audit -- --subject "Physics SL" --recheck 40
  *
- * A row count is not depth. A model asked for 300 questions on a narrow
- * subtopic will write perhaps sixty genuinely different ones and then start
- * reskinning them with new numbers. The unique index on stem_fingerprint only
- * catches identical text, so those all insert happily and the bank looks three
- * hundred deep while a student sees the same question over and over.
+ * A row count is not depth, but nor is every repeat a problem. Twenty
+ * differentiation questions with different functions is how procedural fluency
+ * is built; a student who has done one product rule question has not learned
+ * the product rule. So this counts two different things and only complains
+ * about one of them:
  *
- * This reports what is really there:
+ *   types      distinct question shapes, once the numbers are stripped out.
+ *              This is the real measure of coverage.
+ *   variants   the same shape with different values. Good practice in maths,
+ *              physics, chemistry and economics. Padding in history or TOK,
+ *              where there are no numbers to vary and a variant is just the
+ *              same question asked twice.
+ *   twins      same shape AND same numbers, so genuinely the same question
+ *              reworded. Wasted rows in every subject.
  *
- *   shape collisions   same sentence, different numbers
- *   near duplicates    high word overlap, so barely reworded
+ * It also reports:
+ *
  *   answer skew        if the right option is nearly always (b), the bank is
  *                      guessable without knowing any of the content
  *   difficulty spread  a bank of easy questions cannot reach mastery, since
@@ -68,6 +75,18 @@ function words(stem) {
       .filter((w) => w && w !== '#' && !STOP.has(w))
   )
 }
+
+/** The numbers in a question, in order, so two variants can be told apart. */
+function numbersIn(stem) {
+  return (String(stem).match(/\d+(\.\d+)?/g) || []).join(',')
+}
+
+/**
+ * Subjects where varying the numbers produces genuinely new practice. In
+ * everything else a repeated shape is just the same question again, because
+ * there is nothing to vary.
+ */
+const PROCEDURAL = /math|physics|chemistry|economics|computer science|business|sports/i
 
 function jaccard(a, b) {
   if (!a.size || !b.size) return 0
@@ -180,49 +199,83 @@ try {
   let totalDistinct = 0
   const worst = []
 
-  for (const [key, qs] of bySubtopic) {
-    const subtopic = key.split('|||')[1]
+  let totalTwins = 0
 
-    // Same sentence with the numbers swapped.
-    const shapes = new Map()
+  for (const [key, qs] of bySubtopic) {
+    const [subject, subtopic] = key.split('|||')
+    const procedural = PROCEDURAL.test(subject)
+
+    // Group by shape. Each group is one question type; its members are
+    // variants of it.
+    const types = new Map()
     for (const q of qs) {
       const s = shape(q.stem)
-      shapes.set(s, (shapes.get(s) || 0) + 1)
+      if (!types.has(s)) types.set(s, [])
+      types.get(s).push(q)
     }
-    const shapeCollisions = qs.length - shapes.size
 
-    // Barely reworded: high word overlap with something already counted.
+    // Within a type, identical numbers means it is not a variant at all.
+    let twins = 0
+    for (const group of types.values()) {
+      const seen = new Set()
+      for (const q of group) {
+        const n = numbersIn(q.stem)
+        if (seen.has(n)) twins++
+        else seen.add(n)
+      }
+    }
+
+    // Different words entirely, so a genuinely separate type even if the shape
+    // hash did not catch it.
     const kept = []
-    let nearDupes = 0
-    for (const q of qs) {
-      const w = words(q.stem)
-      if (kept.some((k) => jaccard(w, k) >= 0.75)) nearDupes++
-      else kept.push(w)
+    for (const [s, group] of types) {
+      const w = words(group[0].stem)
+      if (!kept.some((k) => jaccard(w, k) >= 0.85)) kept.push(w)
     }
 
-    const distinct = kept.length
-    totalDistinct += distinct
-    const realDepth = Math.round((distinct / qs.length) * 100)
+    const typeCount = kept.length
+    const perType = (qs.length / Math.max(1, typeCount)).toFixed(1)
+    totalDistinct += typeCount
+    totalTwins += twins
 
-    worst.push({ subtopic, total: qs.length, distinct, realDepth, shapeCollisions, nearDupes })
+    worst.push({ subtopic, procedural, total: qs.length, types: typeCount, perType, twins })
   }
 
-  worst.sort((a, b) => a.realDepth - b.realDepth)
+  // Sort by the thing that actually matters: how few question types there are.
+  worst.sort((a, b) => a.types - b.types)
 
-  console.log('Least varied subtopics:')
-  console.log('  distinct/total   shape collisions   near dupes   subtopic')
+  console.log('Thinnest coverage (fewest distinct question types):')
+  console.log('  types  variants each  same-question twins  subtopic')
   for (const w of worst.slice(0, 12)) {
     console.log(
-      `  ${String(w.distinct).padStart(4)}/${String(w.total).padEnd(5)} ${String(w.realDepth + '%').padStart(5)}` +
-        `   ${String(w.shapeCollisions).padStart(6)}            ${String(w.nearDupes).padStart(5)}       ${w.subtopic}`
+      `  ${String(w.types).padStart(5)}  ${String(w.perType).padStart(13)}  ${String(w.twins).padStart(19)}  ` +
+        `${w.subtopic}${w.procedural ? '' : '  (variants do not help here)'}`
     )
   }
 
-  const pct = Math.round((totalDistinct / rows.length) * 100)
-  console.log(`\nGenuinely distinct: ${totalDistinct} of ${rows.length} (${pct}%)`)
-  if (pct < 70) {
-    console.log('A large share of this bank is the same question reworded. Generating more of')
-    console.log('the same will not add depth; the prompt needs to change first.')
+  console.log(`\n${totalDistinct} distinct question types across ${rows.length} questions`)
+  console.log(
+    `${(rows.length / Math.max(1, totalDistinct)).toFixed(1)} variants per type on average`
+  )
+  if (totalTwins > 0) {
+    console.log(
+      `${totalTwins} are the same question with the same numbers, which is padding in any subject.`
+    )
+  }
+
+  const thin = worst.filter((w) => w.types < 8)
+  if (thin.length) {
+    console.log(
+      `\n${thin.length} subtopic${thin.length === 1 ? ' has' : 's have'} fewer than 8 question types.` +
+        ' More questions there will mostly be more of the same few.'
+    )
+  }
+  const nonProceduralPadding = worst.filter((w) => !w.procedural && w.total / Math.max(1, w.types) > 2)
+  if (nonProceduralPadding.length) {
+    console.log(
+      `${nonProceduralPadding.length} non-numerical subtopic${nonProceduralPadding.length === 1 ? '' : 's'}` +
+        ' repeat a shape, where there are no numbers to vary and a repeat is just a repeat.'
+    )
   }
 
   // Answer skew: a bank where the answer is usually (b) is guessable.

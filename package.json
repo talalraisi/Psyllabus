@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "import-ib": "node scripts/import-ib.js \"data/PSyllabus - IB DP.csv\"",
-    "import-syllabus": "node scripts/import-syllabus-content.js \"data/PSyllabus - IB DP.csv\"",
+    "import-syllabus": "node scripts/import-syllabus.mjs",
     "setup-db": "node scripts/setup-database.mjs",
     "generate-questions": "node scripts/generate-questions.mjs",
     "make-admin": "node scripts/make-admin.mjs",

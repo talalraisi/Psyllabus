@@ -392,18 +392,28 @@ export default function QuizRunner({
         totals.set(key, (totals.get(key) || 0) + Number(row.points))
       }
 
+      // Which subtopics had at least one right answer. Fading clears only for
+      // these: revisiting a subtopic and getting everything wrong is not
+      // evidence that you still know it.
+      const gotSomethingRight = new Set(
+        graded.filter((g) => g.correct).map((g) => `${g.question.subject}|||${g.question.subtopic}`)
+      )
+
+      const now = new Date().toISOString()
       const rows = touched.map((key) => {
         const m = meta.get(key)
         const points = +(totals.get(key) || 0).toFixed(2)
-        return {
+        const row = {
           user_id: userId,
           subject: m.subject,
           topic: m.topic || '',
           subtopic: m.subtopic,
           mastery_points: points,
           status: statusFromPoints(points),
-          updated_at: new Date().toISOString(),
+          updated_at: now,
         }
+        if (gotSomethingRight.has(key)) row.last_correct_at = now
+        return row
       })
 
       if (rows.length) {
