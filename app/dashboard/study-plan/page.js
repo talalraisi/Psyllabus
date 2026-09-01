@@ -18,6 +18,7 @@ import {
   computeCompletionPercent,
   STATUS_COLORS,
   STATUS_LABELS,
+  displaySubtopic,
   STATUS_TEXT_COLORS,
 } from '@/lib/progress'
 import { buildEffectiveProgressMap, buildProgressDetailMap } from '@/lib/decay'
@@ -371,7 +372,7 @@ export default function StudyPlanPage() {
                               <p
                                 className={`truncate text-sm ${isDone ? 'text-[var(--text-faint)] line-through' : 'text-[var(--text-body)]'}`}
                               >
-                                {item.subtopic}
+                                {displaySubtopic(item.subtopic)}
                               </p>
                               {item.reasons.length > 0 && !isDone && (
                                 <p className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
@@ -471,7 +472,7 @@ export default function StudyPlanPage() {
                             <div className="min-w-[10rem] flex-1">
                               <p className="t-caption truncate">{item.topic}</p>
                               <p className="truncate text-sm text-[var(--text-body)]">
-                                {item.subtopic}
+                                {displaySubtopic(item.subtopic)}
                               </p>
                             </div>
                             <span

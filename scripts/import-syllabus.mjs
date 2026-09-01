@@ -106,9 +106,20 @@ const header = rows[2] || []
 const collected = []
 const perSubject = {}
 
+/**
+ * Courses the sheet summarises rather than lists, because their real syllabus
+ * is shared and seeded separately. Reading the summary rows would put a second,
+ * shorter set of topics alongside the real ones.
+ */
+const SEEDED_ELSEWHERE = [/^AP .+ Language and Culture$/]
+
 for (let col = 0; col < header.length; col++) {
   const subject = (header[col] || '').trim()
   if (!subject) continue
+  if (SEEDED_ELSEWHERE.some((re) => re.test(subject))) {
+    console.log(`  skipping ${subject} (seeded from its shared framework)`)
+    continue
+  }
 
   let currentTopic = null
   const items = []

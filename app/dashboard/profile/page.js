@@ -5,12 +5,15 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
 import { invalidateProfile } from '@/lib/cache'
+import AvatarCropper from '@/components/AvatarCropper'
 import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader, Section, PageLoading, Spinner } from '@/components/PageShell'
 import { isPremium, planLabel, FREE_SUBJECT_LIMIT } from '@/lib/access'
 
-const MAX_AVATAR_MB = 5
+// Only a guard against someone picking a RAW file; the cropper re-encodes
+// everything to a small square before it is uploaded.
+const MAX_AVATAR_MB = 25
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState(null)
@@ -21,6 +24,7 @@ export default function ProfilePage() {
   const [avatarUrl, setAvatarUrl] = useState('')
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [pendingPhoto, setPendingPhoto] = useState(null)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
 
@@ -84,7 +88,8 @@ export default function ProfilePage() {
     setTimeout(() => setMessage(''), 4000)
   }
 
-  const onPickPhoto = async (e) => {
+  // Choosing a file opens the cropper. Nothing is uploaded until Save.
+  const onPickPhoto = (e) => {
     const file = e.target.files?.[0]
     e.target.value = ''
     if (!file || !profile?.id) return
@@ -92,15 +97,25 @@ export default function ProfilePage() {
     setError('')
     if (!file.type.startsWith('image/')) return setError('Please choose an image file.')
     if (file.size > MAX_AVATAR_MB * 1024 * 1024)
-      return setError(`Image must be under ${MAX_AVATAR_MB}MB.`)
+      return setError(`That image is over ${MAX_AVATAR_MB}MB. Most photos are well under.`)
 
+    setPendingPhoto(file)
+  }
+
+  /**
+   * Upload the cropped square.
+   *
+   * The cropper hands back a 512px JPEG whatever went in, so a 12MB phone photo
+   * arrives here at roughly 60KB and the size limit is close to irrelevant.
+   */
+  const onCropped = async (blob) => {
+    if (!profile?.id) return
     setUploading(true)
-    const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
-    const path = `${profile.id}/avatar-${Date.now()}.${ext}`
+    const path = `${profile.id}/avatar-${Date.now()}.jpg`
 
     const { error: uploadError } = await supabase.storage
       .from('avatars')
-      .upload(path, file, { upsert: true })
+      .upload(path, blob, { upsert: true, contentType: 'image/jpeg' })
 
     if (uploadError) {
       setError(
@@ -129,6 +144,7 @@ export default function ProfilePage() {
       flash('Photo updated')
     }
     setUploading(false)
+    setPendingPhoto(null)
   }
 
   const onSave = async (e) => {
@@ -184,6 +200,14 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <DashboardLayout profile={null}>
+      {pendingPhoto && (
+        <AvatarCropper
+          file={pendingPhoto}
+          saving={uploading}
+          onCancel={() => setPendingPhoto(null)}
+          onCropped={onCropped}
+        />
+      )}
         <PageLoading title="Profile" width="narrow" rows={3} variant="form" />
       </DashboardLayout>
     )
@@ -251,7 +275,9 @@ export default function ProfilePage() {
                 {uploading && <Spinner />}
                 {uploading ? 'Uploading' : avatarUrl ? 'Change photo' : 'Upload photo'}
               </button>
-              <p className="t-caption mt-2">JPG or PNG, up to {MAX_AVATAR_MB}MB</p>
+              <p className="t-caption mt-2">
+                JPG, PNG or HEIC. You can zoom and drag to frame it before it saves.
+              </p>
             </div>
           </div>
         </div>

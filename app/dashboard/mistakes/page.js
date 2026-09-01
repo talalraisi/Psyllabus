@@ -6,6 +6,7 @@ import { getCurrentUser } from '@/lib/auth'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
+import { displaySubtopic } from '@/lib/progress'
 import { PageLoading } from '@/components/PageShell'
 
 function relativeDue(nextReviewAt, now = Date.now()) {
@@ -126,7 +127,7 @@ export default function MistakeBankPage() {
                     return (
                       <div key={m.id} className="px-5 py-3 flex items-center gap-4">
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs text-[var(--text-faint)]">{m.questions.subtopic}</p>
+                          <p className="text-xs text-[var(--text-faint)]">{displaySubtopic(m.questions.subtopic)}</p>
                           <p className="text-sm text-[var(--text-body)] truncate">{m.questions.stem}</p>
                         </div>
                         <span className="shrink-0 text-xs text-[var(--text-faint)]">

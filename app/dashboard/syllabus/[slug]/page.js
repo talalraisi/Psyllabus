@@ -13,6 +13,7 @@ import { isSubjectLocked, isPremium } from '@/lib/access'
 import {
   STATUS_COLORS,
   STATUS_LABELS,
+  displaySubtopic,
   STATUS_TEXT_COLORS,
   buildProgressMap,
   computeCompletionPercent,
@@ -241,7 +242,7 @@ export default function SyllabusPage() {
                                 className="text-left text-sm text-[var(--text-body)] hover:text-[var(--brand)] hover:underline underline-offset-2 transition-colors"
                                 title="Open resources and practice quiz"
                               >
-                                {item.subtopic}
+                                {displaySubtopic(item.subtopic)}
                               </button>
                               {item.hl_only && (
                                 <span className="inline-block mt-1 rounded-full bg-[var(--sand)] px-2 py-1 text-[11px] font-medium text-[var(--text)]">

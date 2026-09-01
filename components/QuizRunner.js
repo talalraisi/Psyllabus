@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import CopyButton from '@/components/CopyButton'
 import { createClient } from '@/lib/supabase'
 import {
   statusFromPoints,
@@ -30,7 +31,35 @@ const SUBTOPIC_COUNT = 10
 const MOCK_COUNT = 15
 const MISTAKES_COUNT = 15
 // Spaced-repetition intervals in days, indexed by consecutive correct reviews
-const REVIEW_INTERVALS = [1, 3, 7, 14, 30, 60]
+/**
+ * Spacing between reviews of a question you got wrong: tomorrow, then three
+ * days, then five. Get it right three times running and it leaves the bank.
+ *
+ * A mistake bank that only grows is a list nobody opens. Three correct recalls
+ * spread over nine days is decent evidence the gap has closed, and anything
+ * still shaky comes straight back the next time the question is drawn in a
+ * normal quiz.
+ */
+/** One question as plain text: stem, options, and the answer if it is known. */
+function questionAsText(question, { includeAnswer = false } = {}) {
+  const opts = (question.options || []).map((o) => `${o.id}) ${o.text}`).join('\n')
+  const parts = [question.stem, opts]
+  if (includeAnswer) {
+    parts.push(`Answer: ${question.correct_answer}`)
+    if (question.explanation) parts.push(question.explanation)
+  }
+  return parts.filter(Boolean).join('\n')
+}
+
+/** The whole paper, for pasting into notes or a revision doc. */
+function paperAsText(graded) {
+  return graded
+    .map((g, i) => `${i + 1}. ${questionAsText(g.question, { includeAnswer: true })}`)
+    .join('\n\n')
+}
+
+const REVIEW_INTERVALS = [1, 3, 5]
+const REVIEWS_TO_CLEAR = 3
 const DAY_MS = 24 * 60 * 60 * 1000
 
 function shuffle(list) {
@@ -341,6 +370,7 @@ export default function QuizRunner({
     }
 
     let earnedSummary = []
+    let clearedFromBank = 0
 
     // Award mastery points, then restate each touched subtopic from its running
     // total. Every subtopic this paper covered is scored on its own questions,
@@ -434,9 +464,15 @@ export default function QuizRunner({
         graded.map((g) => {
           const row = mistakeRowsById[g.question.id]
           if (!row) return null
+
+          // Wrong again puts it back to the start of the schedule.
           const reviewCount = g.correct ? (row.review_count || 0) + 1 : 0
-          const intervalDays =
-            REVIEW_INTERVALS[Math.min(reviewCount, REVIEW_INTERVALS.length - 1)]
+
+          if (reviewCount >= REVIEWS_TO_CLEAR) {
+            return supabase.from('mistakes').delete().eq('id', row.id)
+          }
+
+          const intervalDays = REVIEW_INTERVALS[Math.min(reviewCount, REVIEW_INTERVALS.length - 1)]
           return supabase
             .from('mistakes')
             .update({
@@ -446,6 +482,12 @@ export default function QuizRunner({
             .eq('id', row.id)
         })
       )
+
+      const cleared = graded.filter((g) => {
+        const row = mistakeRowsById[g.question.id]
+        return row && g.correct && (row.review_count || 0) + 1 >= REVIEWS_TO_CLEAR
+      }).length
+      if (cleared > 0) clearedFromBank = cleared
     } else {
       const wrong = graded.filter((g) => !g.correct)
       if (wrong.length) {
@@ -463,7 +505,17 @@ export default function QuizRunner({
       }
     }
 
-    setResults({ score, total, accuracy, prediction, graded, totalMarks, elapsed, earned: earnedSummary })
+    setResults({
+      score,
+      total,
+      accuracy,
+      prediction,
+      graded,
+      totalMarks,
+      elapsed,
+      earned: earnedSummary,
+      clearedFromBank,
+    })
     setPhase(PHASE.results)
     setSubmitting(false)
   }, [userId, submitting, questions, currentIndex, secondsLeft, predictedScore, mode, subject, topic, subtopic, timed, mistakeRowsById, commitTime, supabase])
@@ -601,7 +653,10 @@ export default function QuizRunner({
           </p>
         </div>
 
-        <p className="text-sm text-[var(--text)] font-medium mb-6 leading-relaxed">{q.stem}</p>
+        <div className="mb-6 flex items-start justify-between gap-3">
+          <p className="text-sm font-medium leading-relaxed text-[var(--text)]">{q.stem}</p>
+          <CopyButton text={questionAsText(q)} label="Copy" />
+        </div>
 
         <div className="space-y-2 mb-6">
           {options.map((opt) => (
@@ -672,6 +727,13 @@ export default function QuizRunner({
               : results.prediction < results.score
                 ? 'you underestimated yourself'
                 : 'perfectly calibrated'}
+          </p>
+        )}
+
+        {results.clearedFromBank > 0 && (
+          <p className="mt-4 rounded-[var(--r-md)] border border-[var(--success-border)] bg-[var(--success-bg)] px-4 py-3 text-sm text-[var(--success-text)]">
+            {results.clearedFromBank} question{results.clearedFromBank === 1 ? '' : 's'} left your
+            mistake bank. Three correct reviews and it is considered fixed.
           </p>
         )}
 
@@ -753,7 +815,13 @@ export default function QuizRunner({
                     {g.correct ? '✓' : '✗'}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm text-[var(--text)]">{g.question.stem}</p>
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="text-sm text-[var(--text)]">{g.question.stem}</p>
+                      <CopyButton
+                        text={questionAsText(g.question, { includeAnswer: true })}
+                        label=""
+                      />
+                    </div>
                     {!g.correct && g.question.explanation && (
                       <p className="text-xs text-[var(--text-muted)] mt-1">{g.question.explanation}</p>
                     )}
@@ -765,6 +833,10 @@ export default function QuizRunner({
               </div>
             )
           })}
+        </div>
+
+        <div className="mt-4 flex justify-end">
+          <CopyButton text={paperAsText(results.graded)} label="Copy all questions and answers" />
         </div>
 
         <div className="mt-6 flex gap-2">

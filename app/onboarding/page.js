@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Logo from '@/components/Logo'
 import { getCurrentUser } from '@/lib/auth'
 import { freeSubjectLockUntil } from '@/lib/access'
+import { realismNote, curriculumOf } from '@/lib/curriculum'
 import {
   IB_CORE_SUBJECTS,
   CORE_GRADES,
@@ -555,9 +556,7 @@ export default function Onboarding() {
               against these, so set them where you honestly intend to land.
             </p>
             <p className="text-sm mb-8 rounded-[var(--r-md)] border border-[var(--sand)] bg-[var(--sand)]/25 px-4 py-3 text-[var(--text-body)]">
-              Keep it realistic. A row of 7s makes your predicted grade look permanently far off
-              and the gap stops telling you anything. Aim a grade above where you are now, not
-              five. You can raise them whenever you get there.
+              {realismNote({ curriculum })} You can raise them whenever you get there.
             </p>
 
             <div className="space-y-4 mb-6 max-h-80 overflow-y-auto pr-1">

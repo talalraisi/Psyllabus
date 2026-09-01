@@ -16,6 +16,7 @@ import {
   topicSortKey,
   STATUS_COLORS,
   STATUS_LABELS,
+  displaySubtopic,
   STATUS_TEXT_COLORS,
 } from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
@@ -360,7 +361,7 @@ export default function Dashboard() {
                       <p className="t-caption truncate">
                         {item.subject} · {item.topic}
                       </p>
-                      <p className="truncate text-sm text-[var(--text-body)]">{item.subtopic}</p>
+                      <p className="truncate text-sm text-[var(--text-body)]">{displaySubtopic(item.subtopic)}</p>
                     </div>
                     <span
                       className={`hidden shrink-0 text-xs font-medium sm:block ${STATUS_TEXT_COLORS[item.status]}`}

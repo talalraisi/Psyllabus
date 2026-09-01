@@ -11,10 +11,11 @@ import { Page, PageHeader, Section, EmptyState, PageLoading, Spinner } from '@/c
 import { getSlugForSubject } from '@/lib/subject-map'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 import { predictDiploma, CONFIDENCE_COPY } from '@/lib/prediction'
-import { CORE_GRADES, coreBonusPoints, MAX_TOTAL_POINTS, IB_CORE_SUBJECTS } from '@/lib/ib-points'
+import { CORE_GRADES, coreBonusPoints, IB_CORE_SUBJECTS } from '@/lib/ib-points'
+import { curriculumOf } from '@/lib/curriculum'
 import { daysUntilExam } from '@/lib/planner'
 
-const SUBJECT_GRADES = [1, 2, 3, 4, 5, 6, 7]
+
 
 export default function PredictionPage() {
   const [profile, setProfile] = useState(null)
@@ -95,7 +96,12 @@ export default function PredictionPage() {
   const setTarget = (key, value) => setTargets((t) => ({ ...t, [key]: value }))
 
   const daysLeft = daysUntilExam(profile)
-  const bonus = coreBonusPoints(targets['Theory of Knowledge'], targets['Extended Essay'])
+  const rules = curriculumOf(profile)
+  const gradeScale = rules.grades
+  // Only meaningful for the IB, and even there it is shown rather than counted.
+  const bonus = rules.hasCore
+    ? coreBonusPoints(targets['Theory of Knowledge'], targets['Extended Essay'])
+    : null
   const hasData = prediction.testedSubjects > 0
 
   return (
@@ -126,12 +132,14 @@ export default function PredictionPage() {
             <div className="surface mb-3 p-6">
               <div className="flex flex-wrap items-end justify-between gap-6">
                 <div>
-                  <p className="t-overline mb-2">Predicted total</p>
+                  <p className="t-overline mb-2">
+                    {rules.hasCore ? 'Predicted subject points' : 'Predicted total'}
+                  </p>
                   <p className="flex items-baseline gap-2">
                     <span className="text-[44px] font-bold leading-none tabular-nums text-[var(--brand)]">
                       {prediction.predictedTotal}
                     </span>
-                    <span className="t-small">/ {MAX_TOTAL_POINTS}</span>
+                    <span className="t-small">/ {rules.maxSubjectPoints}</span>
                   </p>
                 </div>
 
@@ -141,7 +149,7 @@ export default function PredictionPage() {
                     <span className="text-[28px] font-bold leading-none tabular-nums text-[var(--text)]">
                       {prediction.targetTotal}
                     </span>
-                    <span className="t-small">/ {MAX_TOTAL_POINTS}</span>
+                    <span className="t-small">/ {rules.maxSubjectPoints}</span>
                   </p>
                 </div>
               </div>
@@ -268,7 +276,7 @@ export default function PredictionPage() {
 
                 <ul className="mb-5 flex flex-col">
                   {(profile.subjects || [])
-                    .filter((sub) => !IB_CORE_SUBJECTS.includes(sub))
+                    .filter((sub) => !rules.hasCore || !IB_CORE_SUBJECTS.includes(sub))
                     .map((subject, i) => (
                       <li
                         key={subject}
@@ -285,7 +293,8 @@ export default function PredictionPage() {
                       </li>
                     ))}
 
-                  {['Theory of Knowledge', 'Extended Essay'].map((component) => (
+                  {rules.hasCore &&
+                    ['Theory of Knowledge', 'Extended Essay'].map((component) => (
                     <li
                       key={component}
                       className="flex items-center justify-between gap-4 border-t border-[var(--border)] py-2.5"
@@ -297,8 +306,9 @@ export default function PredictionPage() {
                         {targets[component] || <span className="t-caption">not set</span>}
                       </span>
                     </li>
-                  ))}
+                    ))}
 
+                  {rules.hasCore && (
                   <li className="flex items-center justify-between gap-4 border-t border-[var(--border-strong)] py-3">
                     <span className="text-sm font-medium text-[var(--text)]">
                       Core bonus from TOK and EE
@@ -311,13 +321,16 @@ export default function PredictionPage() {
                           : 'not set'}
                     </span>
                   </li>
+                  )}
 
-                  <li className="flex items-center justify-between gap-4 border-t border-[var(--border-strong)] py-3">
-                    <span className="text-sm font-semibold text-[var(--text)]">Target total</span>
-                    <span className="shrink-0 text-base font-bold tabular-nums text-[var(--brand)]">
-                      {prediction.targetTotal} / {MAX_TOTAL_POINTS}
-                    </span>
-                  </li>
+                  {rules.hasTotal && (
+                    <li className="flex items-center justify-between gap-4 border-t border-[var(--border-strong)] py-3">
+                      <span className="text-sm font-semibold text-[var(--text)]">Target total</span>
+                      <span className="shrink-0 text-base font-bold tabular-nums text-[var(--brand)]">
+                        {prediction.targetTotal} / {rules.maxSubjectPoints}
+                      </span>
+                    </li>
+                  )}
                 </ul>
 
                 <button onClick={() => setEditing(true)} className="btn btn-quiet control-md">
@@ -328,12 +341,12 @@ export default function PredictionPage() {
               <>
                 <div className="mb-5 flex flex-col gap-4">
                   {(profile.subjects || [])
-                    .filter((s) => !IB_CORE_SUBJECTS.includes(s))
+                    .filter((s) => !rules.hasCore || !IB_CORE_SUBJECTS.includes(s))
                     .map((subject) => (
                       <div key={subject}>
                         <p className="t-small mb-2 font-medium text-[var(--text)]">{subject}</p>
                         <div className="flex flex-wrap gap-2">
-                          {SUBJECT_GRADES.map((g) => (
+                          {gradeScale.map((g) => (
                             <button
                               key={g}
                               onClick={() => setTarget(subject, String(g))}
@@ -351,7 +364,8 @@ export default function PredictionPage() {
                       </div>
                     ))}
 
-                  {['Theory of Knowledge', 'Extended Essay'].map((component) => (
+                  {rules.hasCore &&
+                    ['Theory of Knowledge', 'Extended Essay'].map((component) => (
                     <div key={component}>
                       <p className="t-small mb-2 font-medium text-[var(--text)]">
                         {component} <span className="t-caption">(A to E)</span>
@@ -376,6 +390,7 @@ export default function PredictionPage() {
                   ))}
                 </div>
 
+                {rules.hasCore && (
                 <div className="mb-5 rounded-[var(--r-md)] border border-[var(--border)] bg-[var(--surface-sunken)] p-4">
                   <p className="t-small">
                     Core bonus:{' '}
@@ -387,7 +402,12 @@ export default function PredictionPage() {
                           : 'set both TOK and EE to see this'}
                     </strong>
                   </p>
+                  <p className="t-caption mt-2">
+                    Shown for reference. It is not added to your predicted total, because nothing
+                    here has assessed your TOK or EE work.
+                  </p>
                 </div>
+                )}
 
                 <div className="flex gap-2">
                   <button

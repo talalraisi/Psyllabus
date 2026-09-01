@@ -221,3 +221,12 @@ export function IconMoon(props) {
     </svg>
   )
 }
+
+export function IconCopy(props) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="7.25" y="7.25" width="9" height="9" rx="1.75" />
+      <path d="M12.75 7.25v-1.5a1.75 1.75 0 0 0-1.75-1.75h-5.25A1.75 1.75 0 0 0 4 5.75V11a1.75 1.75 0 0 0 1.75 1.75h1.5" />
+    </svg>
+  )
+}

@@ -1,13 +1,13 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { createClient } from '@/lib/supabase'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Logo from '@/components/Logo'
 import { getAuthCallbackUrl } from '@/lib/auth'
 import PasswordField from '@/components/PasswordField'
 
-export default function Login() {
+function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -16,7 +16,15 @@ export default function Login() {
   const [resending, setResending] = useState(false)
   const [resent, setResent] = useState(false)
   const router = useRouter()
+  const params = useSearchParams()
   const supabase = createClient()
+
+  // The OAuth callback redirects here with a reason when sign-in fails.
+  // Without this it looked like nothing happened at all.
+  useEffect(() => {
+    const reason = params.get('error')
+    if (reason) setError(reason === 'auth' ? 'Sign-in did not complete. Try again.' : reason)
+  }, [params])
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -180,5 +188,17 @@ export default function Login() {
         </p>
       </div>
     </main>
+  )
+}
+
+/**
+ * useSearchParams needs a boundary, otherwise the whole page opts out of static
+ * rendering and Next fails the build.
+ */
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <Login />
+    </Suspense>
   )
 }
