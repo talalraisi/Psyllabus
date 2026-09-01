@@ -8,7 +8,7 @@ import { getCurrentUser } from '@/lib/auth'
 import { getSyllabus } from '@/lib/cache'
 import DashboardLayout from '@/components/DashboardLayout'
 import ResourceHubDrawer from '@/components/ResourceHubDrawer'
-import { resolveOnboardingNameFromSlug } from '@/lib/subject-map'
+import { resolveSubjectFromSlug } from '@/lib/subject-map'
 import { isSubjectLocked, isPremium } from '@/lib/access'
 import {
   STATUS_COLORS,
@@ -58,10 +58,11 @@ export default function SyllabusPage() {
 
       setProfile(profileData)
 
-      const resolved =
-        resolveOnboardingNameFromSlug(slug) || decodeURIComponent(slug)
+      // Resolved against this student's own subjects, so it works for every
+      // curriculum rather than only the ones in the IB map.
+      const resolved = resolveSubjectFromSlug(slug, profileData.subjects || [])
 
-      if (!profileData.subjects?.includes(resolved)) {
+      if (!resolved) {
         router.push('/dashboard')
         return
       }

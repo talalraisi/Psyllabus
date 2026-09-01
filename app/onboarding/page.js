@@ -108,17 +108,17 @@ const CURRICULUMS = {
         name: 'Sciences',
         required: 0,
         subjects: [
-          'AP Biology', 'AP Chemistry', 'AP Physics 1',
-          'AP Physics 2', 'AP Physics C: Mechanics',
-          'AP Physics C: Electricity & Magnetism', 'AP Environmental Science',
+          'AP Biology', 'AP Chemistry', 'AP Physics 1: Algebra-Based',
+          'AP Physics 2: Algebra-Based', 'AP Physics C: Mechanics',
+          'AP Physics C: Electricity and Magnetism', 'AP Environmental Science',
         ]
       },
       {
         name: 'History & Social Sciences',
         required: 0,
         subjects: [
-          'AP World History: Modern', 'AP US History', 'AP European History',
-          'AP US Government & Politics', 'AP Comparative Government & Politics',
+          'AP World History: Modern', 'AP United States History', 'AP European History',
+          'AP United States Government and Politics', 'AP Comparative Government and Politics',
           'AP Macroeconomics', 'AP Microeconomics',
           'AP Psychology', 'AP Human Geography', 'AP African American Studies',
         ]
@@ -127,20 +127,19 @@ const CURRICULUMS = {
         name: 'English',
         required: 0,
         subjects: [
-          'AP English Language & Composition',
-          'AP English Literature & Composition',
+          'AP English Language and Composition',
+          'AP English Literature and Composition',
         ]
       },
       {
         name: 'World Languages',
         required: 0,
         subjects: [
-          'AP Spanish Language & Culture',
-          'AP French Language & Culture',
-          'AP Chinese Language & Culture',
-          'AP German Language & Culture',
-          'AP Japanese Language & Culture',
-          'AP Latin',
+          'AP Spanish Language and Culture',
+          'AP French Language and Culture',
+          'AP Chinese Language and Culture',
+          'AP German Language and Culture', 'AP Italian Language and Culture',
+          'AP Japanese Language and Culture',
         ]
       },
       {
@@ -148,7 +147,7 @@ const CURRICULUMS = {
         required: 0,
         subjects: [
           'AP Art History', 'AP Music Theory',
-          'AP 2-D Art & Design', 'AP 3-D Art & Design', 'AP Drawing',
+          'AP 2-D Art and Design', 'AP 3-D Art and Design', 'AP Drawing',
         ]
       },
       {
@@ -167,7 +166,7 @@ const CURRICULUMS = {
         required: 0,
         subjects: [
           'Mathematics', 'Further Mathematics', 'Statistics',
-          'Computer Science', 'Information Technology',
+          'Computer Science', 'Information Technology (IT) / Applied ICT',
         ]
       },
       {
@@ -175,7 +174,7 @@ const CURRICULUMS = {
         required: 0,
         subjects: [
           'Biology', 'Chemistry', 'Physics', 'Psychology',
-          'Environmental Science', 'Geology', 'Marine Science',
+          'Environmental Science / Environmental Management', 'Geology', 'Marine Science',
         ]
       },
       {
@@ -183,9 +182,9 @@ const CURRICULUMS = {
         required: 0,
         subjects: [
           'History', 'Geography', 'Economics',
-          'Politics & Government', 'Sociology', 'Philosophy',
-          'Law', 'Ancient History', 'Classical Civilisation',
-          'Religious Studies',
+          'Politics / Government and Politics', 'Sociology', 'Philosophy',
+          'Law', 'Ancient History', 'Classical Civilisation / Classical Studies',
+          'Religious Studies / Divinity',
         ]
       },
       {
@@ -193,7 +192,7 @@ const CURRICULUMS = {
         required: 0,
         subjects: [
           'English Language', 'English Literature',
-          'English Language & Literature',
+          'English Language and Literature',
         ]
       },
       {
@@ -201,17 +200,17 @@ const CURRICULUMS = {
         required: 0,
         subjects: [
           'Business Studies', 'Accounting',
-          'Design & Technology', 'Electronics',
-          'Food Science & Nutrition', 'Travel & Tourism',
+          'Design and Technology (D&T)', 'Electronics',
+          'Food Science and Nutrition', 'Travel and Tourism',
         ]
       },
       {
         name: 'Creative & Performing Arts',
         required: 0,
         subjects: [
-          'Art & Design', 'Drama & Theatre Studies',
+          'Art and Design (Fine Art, Graphics, Photography, Textiles, 3D Design)', 'Drama and Theatre Studies',
           'Music', 'Music Technology', 'Film Studies',
-          'Media Studies', 'Dance', 'Physical Education',
+          'Media Studies', 'Dance', 'Physical Education (PE) / Sports Science',
         ]
       },
       {
