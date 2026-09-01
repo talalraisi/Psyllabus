@@ -27,6 +27,16 @@ const CURRICULUMS = {
           'Arabic A: Literature HL', 'Arabic A: Literature SL',
           'French A: Literature HL', 'French A: Literature SL',
           'Spanish A: Literature HL', 'Spanish A: Literature SL',
+        
+          'Arabic A: Language & Literature HL',
+          'Arabic A: Language & Literature SL',
+          'French A: Language & Literature HL',
+          'French A: Language & Literature SL',
+          'Mandarin A: Language & Literature HL',
+          'Mandarin A: Language & Literature SL',
+          'Spanish A: Language & Literature HL',
+          'Spanish A: Language & Literature SL',
+          'Literature and Performance SL',
         ]
       },
       {
@@ -38,6 +48,15 @@ const CURRICULUMS = {
           'French B HL', 'French B SL',
           'Spanish B HL', 'Spanish B SL',
           'English ab initio SL', 'French ab initio SL', 'Spanish ab initio SL',
+        
+          'Mandarin B HL',
+          'Mandarin B SL',
+          'Arabic ab initio SL',
+          'Mandarin ab initio SL',
+          'Classical Languages: Latin HL',
+          'Classical Languages: Latin SL',
+          'Classical Languages: Classical Greek HL',
+          'Classical Languages: Classical Greek SL',
         ]
       },
       {
@@ -52,6 +71,10 @@ const CURRICULUMS = {
           'Global Politics HL', 'Global Politics SL',
           'Philosophy HL', 'Philosophy SL',
           'Digital Society HL', 'Digital Society SL',
+        
+          'Social and Cultural Anthropology HL',
+          'Social and Cultural Anthropology SL',
+          'World Religions SL',
         ]
       },
       {
@@ -65,6 +88,11 @@ const CURRICULUMS = {
           'Environmental Systems & Societies SL',
           'Sports Exercise & Health Science HL', 'Sports Exercise & Health Science SL',
           'Design Technology HL', 'Design Technology SL',
+        
+          'Environmental Systems and Societies HL',
+          'Environmental Systems and Societies SL',
+          'Sports, Exercise, and Health Science HL',
+          'Sports, Exercise, and Health Science SL',
         ]
       },
       {

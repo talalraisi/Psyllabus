@@ -56,8 +56,16 @@ try {
     // Compared directly for every curriculum. SUBJECT_MAP looks like it should
     // be involved, but syllabus_content actually stores the onboarding names,
     // so the map points at names that are not in the table.
+    // The DP core is appended to every IB profile rather than chosen, so it is
+    // expected to be in the syllabus without appearing in the pick list.
+    const AUTO_ADDED = new Set([
+      'Theory of Knowledge',
+      'Extended Essay',
+      'Creativity Activity Service',
+    ])
+
     const missing = list.filter((s) => !have.has(s))
-    const unused = [...have].filter((s) => !list.includes(s))
+    const unused = [...have].filter((s) => !list.includes(s) && !AUTO_ADDED.has(s))
 
     console.log(`${cur}: ${list.length} offered, ${have.size} in the syllabus`)
     if (missing.length) {
