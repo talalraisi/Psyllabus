@@ -506,3 +506,48 @@ body {
 .btn.btn { display: inline-flex; }
 .btn.btn.w-full,
 .btn.btn.flex-1 { display: flex; }
+
+/* ---------------------------------------------------------------------------
+   Legal documents
+   Privacy and terms are read by people looking for a clause to quote, not
+   browsed. One column, numbered clauses, no panels. Logical properties
+   throughout so the Arabic version needs nothing but dir="rtl".
+   --------------------------------------------------------------------------- */
+
+.legal-body {
+  font-size: 0.94rem;
+  line-height: 1.75;
+  color: var(--text-body);
+}
+
+.legal-body section { margin-top: 34px; }
+
+.legal-body h2 {
+  display: flex;
+  gap: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 10px;
+}
+
+.legal-body p { margin: 0 0 12px; }
+.legal-body p:last-child { margin-bottom: 0; }
+
+.legal-body ul {
+  margin: 0 0 12px;
+  padding-inline-start: 22px;
+}
+
+.legal-body li { margin-bottom: 7px; }
+.legal-body strong { color: var(--text); font-weight: 600; }
+.legal-body a { color: var(--brand); }
+
+/* The number is how somebody refers to a paragraph, so it stays out of the
+   text flow rather than running into the heading. */
+.legal-body .clause {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-faint);
+  font-weight: 500;
+}
