@@ -11,7 +11,7 @@ import { Page, PageHeader, Section, EmptyState, PageLoading, Spinner } from '@/c
 import { getSlugForSubject } from '@/lib/subject-map'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 import { predictDiploma, CONFIDENCE_COPY } from '@/lib/prediction'
-import { CORE_GRADES, coreBonusPoints, IB_CORE_SUBJECTS } from '@/lib/ib-points'
+import { CORE_GRADES, coreBonusPoints, IB_CORE_SUBJECTS, MAX_TOTAL_POINTS } from '@/lib/ib-points'
 import { curriculumOf } from '@/lib/curriculum'
 import { daysUntilExam } from '@/lib/planner'
 

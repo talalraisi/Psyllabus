@@ -13,6 +13,7 @@ import {
   coreBonusPoints,
   predictedTotal,
   MAX_TOTAL_POINTS,
+  MAX_SUBJECT_POINTS,
 } from '@/lib/ib-points'
 
 const CURRICULUMS = {
@@ -626,7 +627,7 @@ export default function Onboarding() {
             {isIB && (
               <div className="mb-8 p-4 rounded-[var(--radius-sm)] border border-border bg-bg-elevated">
                 <div className="flex items-baseline justify-between">
-                  <span className="text-text font-medium text-sm">Predicted Diploma total</span>
+                  <span className="text-text font-medium text-sm">Target Diploma total</span>
                   <span className="text-2xl font-bold text-accent tabular-nums">
                     {ibTotal.total}
                     <span className="text-text-faint text-sm font-medium">/{MAX_TOTAL_POINTS}</span>
@@ -640,6 +641,12 @@ export default function Onboarding() {
                     : ibTotal.failing
                       ? '. A grade of E in TOK or the Extended Essay is a failing condition.'
                       : '. Set TOK and Extended Essay grades to see your bonus points.'}
+                </p>
+                <p className="text-text-faint text-xs mt-2">
+                  This is what you are aiming for, not a prediction. Your dashboard predicts the{' '}
+                  {MAX_SUBJECT_POINTS} points from your six subjects, because those are the ones it
+                  can measure. The TOK and Extended Essay points arrive when that coursework is
+                  marked.
                 </p>
               </div>
             )}
