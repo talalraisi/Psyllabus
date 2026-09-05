@@ -4,7 +4,8 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
-import { invalidateProfile } from '@/lib/cache'
+import { invalidateProfile, clearCache } from '@/lib/cache'
+import { OPERATOR } from '@/lib/legal'
 import AvatarCropper from '@/components/AvatarCropper'
 import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
@@ -25,6 +26,9 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [pendingPhoto, setPendingPhoto] = useState(null)
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const [deleteConfirm, setDeleteConfirm] = useState('')
+  const [deleting, setDeleting] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
 
@@ -145,6 +149,29 @@ export default function ProfilePage() {
     }
     setUploading(false)
     setPendingPhoto(null)
+  }
+
+  /**
+   * Erasure. The RPC runs as definer because a client cannot delete its own
+   * auth.users row, and removing only the profile would leave an account that
+   * can still sign in to nothing.
+   */
+  const deleteAccount = async () => {
+    if (deleting) return
+    setDeleting(true)
+    setError('')
+
+    const { data, error: rpcError } = await supabase.rpc('delete_my_account')
+
+    if (rpcError || !data?.ok) {
+      setError(rpcError?.message || data?.error || 'Could not delete the account. Please email us.')
+      setDeleting(false)
+      return
+    }
+
+    clearCache()
+    await supabase.auth.signOut()
+    router.push('/?deleted=1')
   }
 
   const onSave = async (e) => {
@@ -376,6 +403,79 @@ export default function ProfilePage() {
                 </p>
               </>
             )}
+          </div>
+        </Section>
+
+        {/* Right to erasure. Oman's PDPL makes this absolute, and a school's IT
+            department will ask for it before anything else. It has to actually
+            delete, not flag as inactive. */}
+        <Section title="Your data">
+          <div className="surface p-5">
+            <p className="t-small">
+              Everything Project Syllabus holds about you is yours: your name, your email, your
+              subjects and every answer you have given. You can take all of it away at any time,
+              and it is removed rather than hidden.
+            </p>
+
+            {!confirmingDelete ? (
+              <button
+                onClick={() => setConfirmingDelete(true)}
+                className="btn btn-quiet control-md mt-4 border-[var(--danger-border)] text-[var(--danger)]"
+              >
+                Delete my account and data
+              </button>
+            ) : (
+              <div className="mt-4 rounded-[var(--r-md)] border border-[var(--danger-border)] bg-[var(--danger-bg)] p-4">
+                <p className="text-sm font-semibold text-[var(--danger)]">
+                  This cannot be undone.
+                </p>
+                <p className="t-small mt-2">
+                  Your account, your progress, your mastery points, your mistake bank, your calendar
+                  and every quiz you have taken will be permanently deleted. There is no backup and
+                  no recovery.
+                </p>
+                <p className="t-small mt-2">
+                  Type <strong className="text-[var(--text)]">DELETE</strong> to confirm.
+                </p>
+                <input
+                  value={deleteConfirm}
+                  onChange={(e) => setDeleteConfirm(e.target.value)}
+                  placeholder="DELETE"
+                  autoComplete="off"
+                  className="input mt-3"
+                />
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    onClick={() => {
+                      setConfirmingDelete(false)
+                      setDeleteConfirm('')
+                    }}
+                    className="btn btn-quiet control-md"
+                  >
+                    Keep my account
+                  </button>
+                  <button
+                    onClick={deleteAccount}
+                    disabled={deleting || deleteConfirm.trim().toUpperCase() !== 'DELETE'}
+                    className="btn control-md bg-[var(--danger)] text-white disabled:opacity-40"
+                  >
+                    {deleting ? 'Deleting…' : 'Delete everything'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <p className="t-caption mt-4">
+              You can also ask us to show you or correct what we hold, by writing to{' '}
+              <a href={`mailto:${OPERATOR.dpoEmail}`} className="text-[var(--brand)] hover:underline">
+                {OPERATOR.dpoEmail}
+              </a>
+              . See the{' '}
+              <Link href="/privacy?from=dashboard" className="text-[var(--brand)] hover:underline">
+                privacy policy
+              </Link>{' '}
+              for what is held and why.
+            </p>
           </div>
         </Section>
       </Page>

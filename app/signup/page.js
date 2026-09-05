@@ -7,6 +7,17 @@ import Logo from '@/components/Logo'
 import { getAuthCallbackUrl } from '@/lib/auth'
 import PasswordField from '@/components/PasswordField'
 
+/**
+ * The exact wording a student agrees to.
+ *
+ * Stored alongside the timestamp rather than just a boolean, so changing this
+ * form later cannot retroactively change what somebody actually consented to.
+ */
+export const CONSENT_TEXT = {
+  en: 'I confirm that I am a student and have obtained permission from my parent or guardian to use this platform, in line with the Oman Personal Data Protection Law. I agree to the Privacy Policy.',
+  ar: 'أقر بأنني طالب وقد حصلت على موافقة صريحة من ولي أمري لاستخدام هذه المنصة وفقاً لقانون حماية البيانات الشخصية العماني. أوافق على سياسة الخصوصية.',
+}
+
 export default function Signup() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -14,6 +25,7 @@ export default function Signup() {
   const [schoolCode, setSchoolCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [consented, setConsented] = useState(false)
   const [awaitingConfirmation, setAwaitingConfirmation] = useState(false)
   const [resending, setResending] = useState(false)
   const [resent, setResent] = useState(false)
@@ -31,7 +43,12 @@ export default function Signup() {
       options: {
         // The code is carried through so onboarding can redeem it. The server
         // checks the email domain and the seat count, so nothing is self-granted.
-        data: { full_name: name, school_code: schoolCode.trim().toUpperCase() },
+        data: {
+          full_name: name,
+          school_code: schoolCode.trim().toUpperCase(),
+          guardian_consent_text: CONSENT_TEXT.en,
+          guardian_consent_at: new Date().toISOString(),
+        },
         // Where the confirmation link lands. Without this, Supabase sends
         // people to its own domain instead of back here.
         emailRedirectTo: getAuthCallbackUrl('/onboarding'),
@@ -73,6 +90,12 @@ export default function Signup() {
   }
 
   const handleGoogleSignup = async () => {
+    // The form's required attribute does nothing for a button outside it, so
+    // the same consent has to be enforced here or Google becomes a way round it.
+    if (!consented) {
+      setError('Please confirm you have your parent or guardian\u2019s permission first.')
+      return
+    }
     setLoading(true)
     setError('')
     
@@ -236,11 +259,35 @@ export default function Signup() {
               </p>
             </div>
 
+            {/* Unticked by default and required. Pre-ticked consent is not
+                consent, and Oman's PDPL wants it explicit for a minor. */}
+            <label className="flex cursor-pointer items-start gap-3 rounded-[var(--r-md)] border border-[var(--border-strong)] p-4">
+              <input
+                type="checkbox"
+                checked={consented}
+                onChange={(e) => setConsented(e.target.checked)}
+                required
+                className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--brand)]"
+              />
+              <span className="text-[13px] leading-relaxed text-[var(--text-body)]">
+                I confirm that I am a student and have permission from my parent or guardian to use
+                Project Syllabus, in line with the{' '}
+                <Link href="/privacy" className="text-[var(--brand)] underline">
+                  Oman Personal Data Protection Law
+                </Link>
+                . I agree to the{' '}
+                <Link href="/privacy" className="text-[var(--brand)] underline">
+                  Privacy Policy
+                </Link>
+                .
+              </span>
+            </label>
+
             {error && <div className="error-box">{error}</div>}
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !consented}
               className="btn btn-solid control-lg mt-2 w-full text-base"
             >
               {loading ? 'Creating account…' : 'Create account'}

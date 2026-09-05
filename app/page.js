@@ -3,6 +3,7 @@ import Image from 'next/image'
 import logoMark from '@/public/logo-mark.png'
 import { IconCheck, IconArrowRight } from '@/components/Icons'
 import ThemeToggle from '@/components/ThemeToggle'
+import { operatorLine, OPERATOR } from '@/lib/legal'
 
 export const metadata = {
   title: 'Project Syllabus',
@@ -359,9 +360,18 @@ export default function Home() {
             </Link>
           </nav>
           <div className="flex items-center gap-4">
-            <p className="t-caption">Built in Muscat, Oman</p>
             <ThemeToggle />
           </div>
+        </div>
+
+        <div className="mx-auto mt-8 max-w-6xl border-t border-[var(--border)] pt-6 text-center">
+          <p className="t-caption">{operatorLine()}</p>
+          <p className="t-caption mt-1">
+            Student data handled under the {OPERATOR.law.en}.{' '}
+            <Link href="/privacy" className="text-[var(--brand)] hover:underline">
+              Privacy policy
+            </Link>
+          </p>
         </div>
       </footer>
     </main>

@@ -323,6 +323,10 @@ export default function Onboarding() {
       const { error } = await supabase.from('profiles').upsert({
         id: user.id,
         full_name: user.user_metadata?.full_name || user.user_metadata?.name || null,
+        // Carried from the sign-up form so the record sits on the profile, with
+        // the wording that was actually agreed to rather than a bare boolean.
+        guardian_consent_at: user.user_metadata?.guardian_consent_at || new Date().toISOString(),
+        guardian_consent_text: user.user_metadata?.guardian_consent_text || null,
         curriculum,
         grad_year: gradYear,
         subjects: allSubjects,
