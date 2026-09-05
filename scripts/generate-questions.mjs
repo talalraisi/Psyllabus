@@ -62,6 +62,14 @@ const CONCURRENCY = Math.max(1, parseInt(arg("concurrency", "1"), 10));
 const MAX_QUESTIONS = parseInt(arg("max-questions", "0"), 10);
 const MODEL = "claude-opus-5";
 
+// mcq | short_answer | mixed. Mixed alternates, so a subtopic ends up with both
+// rather than one type followed by the other.
+const TYPE = arg("type", "mixed");
+
+// Looked up from the syllabus rather than assumed, now that AP and A-Level are
+// in the same table. Subject names do not collide across curricula.
+let CURRICULUM = "IB";
+
 // Only constructed when actually using Claude, so Ollama runs need no API key.
 const anthropic = PROVIDER === "claude" ? new Anthropic() : null;
 let db;
@@ -69,6 +77,57 @@ let db;
 // ---------------------------------------------------------------------------
 // Schemas for structured outputs
 // ---------------------------------------------------------------------------
+
+const SHORT_ANSWER_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  required: ["questions"],
+  properties: {
+    questions: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: [
+          "stem",
+          "accepted_answers",
+          "answer_kind",
+          "explanation",
+          "marks",
+          "time_budget_seconds",
+          "difficulty",
+        ],
+        properties: {
+          stem: {
+            type: "string",
+            description:
+              "The question. It must have exactly one correct answer that is a number or a single short term. Plain text, ^ for powers, / for division.",
+          },
+          accepted_answers: {
+            type: "array",
+            description:
+              "Every form of the answer that should be marked correct: 0.5 and 1/2, or mitochondrion and mitochondria. First one is the canonical form.",
+            items: { type: "string" },
+            minItems: 1,
+          },
+          answer_kind: {
+            type: "string",
+            enum: ["numeric", "text"],
+            description: "numeric when the answer is a number, text when it is a term or short phrase.",
+          },
+          answer_hint: {
+            type: "string",
+            description: "What form the answer should take, e.g. 'to 3 significant figures' or 'in m/s'. Optional.",
+          },
+          explanation: { type: "string", description: "One or two sentences of working." },
+          marks: { type: "integer", enum: [1, 2, 3] },
+          time_budget_seconds: { type: "integer", enum: [30, 45, 60, 75, 90, 120, 150, 180] },
+          difficulty: { type: "number", description: "0.1 easy to 0.9 hard." },
+        },
+      },
+    },
+  },
+};
 
 const QUESTIONS_SCHEMA = {
   type: "object",
@@ -228,40 +287,118 @@ async function preflight() {
   }
 }
 
-async function generateBatch(subtopic, topic, count, existingStems) {
+/**
+ * The angles a question can come at a subtopic from.
+ *
+ * Asking for "20 more questions" produced twenty versions of the same one: the
+ * bank came out at 86 distinct shapes across 98 questions. Naming the angle
+ * forces a different question rather than the same question with new numbers,
+ * which is what actually adds coverage.
+ */
+const ANGLES = [
+  "state or define the key idea precisely",
+  "apply it to a routine case with given values",
+  "work backwards from a result to a missing input",
+  "combine it with something from an earlier topic",
+  "interpret a described graph, diagram or data set",
+  "spot and correct a common student error in a worked attempt",
+  "decide which method or formula applies and why",
+  "apply it to an unfamiliar real-world context",
+  "compare two cases and explain the difference",
+  "handle an edge case, limit or special value",
+];
+
+function anglesFor(round, count) {
+  // Rotate so a long run works through every angle rather than the first few.
+  const start = (round * count) % ANGLES.length;
+  return Array.from({ length: Math.min(count, ANGLES.length) }, (_, i) => ANGLES[(start + i) % ANGLES.length]);
+}
+
+async function generateBatch(subtopic, topic, count, existingStems, { round = 0, type = "mcq" } = {}) {
   const avoid =
     existingStems.length > 0
-      ? `\n\nDo NOT duplicate or closely paraphrase any of these existing questions:\n${existingStems
+      ? `\n\nAlready written, so do not repeat these or reword them:\n${existingStems
           .slice(-40)
           .map((s) => `- ${s}`)
           .join("\n")}`
       : "";
 
-  const prompt = `You are writing exam questions for the IB Diploma Programme subject "${SUBJECT}", ${topic}, subtopic "${subtopic}".
+  const angles = anglesFor(round, count)
+    .map((a, i) => `${i + 1}. ${a}`)
+    .join("\n");
 
-Write ${count} multiple-choice questions testing this exact subtopic at IB exam standard. Requirements:
-- Mix of difficulties: about 30% easy (recall/one-step), 45% medium (two-step application), 25% hard (multi-step, exam-style).
-- Each question has exactly 4 options (ids a-d) with plausible distractors based on common student errors.
-- Exactly one option is correct. Verify each answer by working the problem before writing the options.
-- marks: 1 for one-step, 2 for two-step, 3 for multi-step. time_budget_seconds: roughly 45s per mark, matching real IB pacing.
-- Plain text math only (x^2, 3/4, sqrt(x)); no LaTeX.
-- Explanations show the key working in one or two sentences.${avoid}`;
+  const shared = `You are writing exam questions for the ${CURRICULUM} subject "${SUBJECT}", ${topic}, subtopic "${subtopic}".
+
+Each question must come at the subtopic from a DIFFERENT angle. Use these, in order:
+${angles}
+
+Requirements:
+- Mix of difficulties: about 30% easy (recall or one step), 45% medium (two steps), 25% hard (multi-step, exam standard).
+- marks: 1 for one step, 2 for two steps, 3 for multi-step. time_budget_seconds: roughly 45s per mark.
+- Plain text maths only (x^2, 3/4, sqrt(x)); never LaTeX.
+- Work the problem out before writing the answer, and make the explanation show the key step.
+- Vary the surface: different quantities, contexts and phrasings, not the same sentence with new numbers.${avoid}`;
+
+  if (type === "short_answer") {
+    const prompt = `${shared}
+
+Write ${count} SHORT ANSWER questions. The student types their answer into a box and
+a computer marks it by comparing what they typed, so the answer has to be something
+a person would write identically every time.
+
+HARD RULES. A question breaking any of these is useless and must not be written:
+- NEVER ask "why", "explain", "describe", "compare", "discuss", or "which formula
+  would you use". Those need a sentence, and a sentence cannot be marked here.
+- NEVER expect an algebraic expression as the answer. "sqrt(rg)" and "(v^2)/r" are
+  not things a student would type character for character.
+- If the question gives numbers, the answer MUST be the worked-out number. Do the
+  arithmetic yourself and put the result in accepted_answers.
+- ONE value or ONE term. Not two things, and never a value plus a reason.
+
+For every question:
+- answer_kind is "numeric" when the answer is a number, even with a unit attached.
+  "85 min" is numeric, not text. Use "text" only for a named thing: a term, a law,
+  a scientist, an organelle.
+- For numeric, put the bare number FIRST in accepted_answers, then other forms worth
+  taking: ["84.8", "85", "84.8 min"]. Units are stripped before comparison, so the
+  plain number must be in there.
+- Put any required rounding or unit in answer_hint, e.g. "to 3 significant figures".
+- For text, list the spellings that should pass: ["mitochondrion", "mitochondria"].
+
+Good: "A car travels at 20 m/s around a track of radius 50 m. Calculate its
+centripetal acceleration." -> accepted_answers ["8", "8.0"], numeric, hint "in m/s^2".
+
+Bad: "Which formula would you use and why?" -> needs a sentence.
+Bad: "What is the minimum speed?" answered "sqrt(rg)" -> the numbers were given, so
+the answer is a number.`;
+
+    const data = await callModel(prompt, SHORT_ANSWER_SCHEMA);
+    return (data.questions || [])
+      .filter((q) => q.stem && q.accepted_answers?.length)
+      .map((q) => ({ ...q, question_type: "short_answer" }));
+  }
+
+  const prompt = `${shared}
+
+Write ${count} multiple-choice questions.
+- Exactly 4 options (ids a-d), with distractors that are the answers a student would reach by making a specific, common mistake.
+- Exactly one option is correct.
+- Spread the correct option across a, b, c and d roughly evenly. Do not favour any letter.`;
 
   const data = await callModel(prompt, QUESTIONS_SCHEMA);
-  return (data.questions || []).filter(
-    (q) =>
-      q.options?.length === 4 &&
-      q.options.some((o) => o.id === q.correct_answer)
-  );
+  return (data.questions || [])
+    .filter((q) => q.options?.length === 4 && q.options.some((o) => o.id === q.correct_answer))
+    .map((q) => ({ ...q, question_type: "mcq" }));
 }
 
 async function verifyBatch(questions) {
   const listing = questions
-    .map(
-      (q, i) =>
-        `${i}. ${q.stem}\n   Options: ${q.options
-          .map((o) => `(${o.id}) ${o.text}`)
-          .join("  ")}\n   Marked correct: (${q.correct_answer})`
+    .map((q, i) =>
+      q.question_type === "short_answer"
+        ? `${i}. ${q.stem}\n   Accepted answers: ${(q.accepted_answers || []).join(" | ")}`
+        : `${i}. ${q.stem}\n   Options: ${q.options
+            .map((o) => `(${o.id}) ${o.text}`)
+            .join("  ")}\n   Marked correct: (${q.correct_answer})`
     )
     .join("\n\n");
 
@@ -270,8 +407,10 @@ async function verifyBatch(questions) {
 Set sound=true when the option marked correct is the right answer and exactly one option is right. Work the problem first, then compare your result to the marked option.
 
 Set sound=false ONLY when one of these is true:
-- your worked answer differs from the marked option
+- your worked answer differs from the marked option, or from every accepted answer
 - more than one option is correct, or none is
+- a short answer question does not have exactly one right answer, or its answer
+  is a sentence rather than a number or a single term
 - the question cannot be answered from the information given
 
 Do not set sound=false for style, wording, phrasing, or because you would have set the question differently. If your reasoning concludes the marked answer is correct, sound MUST be true.
@@ -302,10 +441,11 @@ async function main() {
   db = await connect();
 
   const { rows: subtopics } = await db.query(
-    `SELECT topic, subtopic FROM syllabus_content
+    `SELECT topic, subtopic, curriculum FROM syllabus_content
      WHERE subject = $1 ORDER BY topic, subtopic`,
     [SUBJECT]
   );
+  if (subtopics[0]?.curriculum) CURRICULUM = subtopics[0].curriculum;
   if (!subtopics?.length) {
     console.error(`No syllabus_content rows for subject "${SUBJECT}". Seed the syllabus first.`);
     process.exit(1);
@@ -327,7 +467,9 @@ async function main() {
     console.log(`\n${subtopic}: ${have}/${PER_SUBTOPIC}`);
 
     let consecutiveNoProgress = 0;
+    let round = 0;
     while (have < PER_SUBTOPIC) {
+      round++;
       if (consecutiveNoProgress >= 3) {
         console.log(
           `  no new unique questions after 3 attempts; moving on at ${have}/${PER_SUBTOPIC}`
@@ -335,21 +477,33 @@ async function main() {
         break;
       }
       const want = Math.min(BATCH_SIZE, PER_SUBTOPIC - have);
+      const batchType =
+        TYPE === "mixed" ? (round % 2 === 0 ? "mcq" : "short_answer") : TYPE;
       try {
-        const generated = await generateBatch(subtopic, topic, want, existingStems);
+        const generated = await generateBatch(subtopic, topic, want, existingStems, {
+          round,
+          type: batchType,
+        });
         console.log(`  generated ${generated.length}, verifying...`);
         const verified = await verifyBatch(generated);
         console.log(`  ${verified.length}/${generated.length} passed verification`);
 
         if (verified.length > 0) {
           const rows = verified.map((q) => ({
-            curriculum: "IB",
+            curriculum: CURRICULUM,
             subject: SUBJECT,
             topic,
             subtopic,
+            question_type: q.question_type || "mcq",
             stem: q.stem,
-            options: q.options,
-            correct_answer: q.correct_answer,
+            // A short answer has no options, and its answer lives in
+            // accepted_answers; correct_answer keeps the canonical form so
+            // anything reading only that column still shows something sensible.
+            options: q.options || null,
+            correct_answer: q.correct_answer ?? q.accepted_answers?.[0] ?? null,
+            accepted_answers: q.accepted_answers || null,
+            answer_kind: q.answer_kind || null,
+            answer_hint: q.answer_hint || null,
             explanation: q.explanation,
             marks: q.marks,
             time_budget_seconds: q.time_budget_seconds,
@@ -365,13 +519,18 @@ async function main() {
             try {
               const res = await db.query(
                 `INSERT INTO questions
-                   (curriculum, subject, topic, subtopic, stem, options, correct_answer,
+                   (curriculum, subject, topic, subtopic, question_type, stem, options,
+                    correct_answer, accepted_answers, answer_kind, answer_hint,
                     explanation, marks, time_budget_seconds, difficulty, source, verified)
-                 VALUES ($1,$2,$3,$4,$5,$6::jsonb,$7,$8,$9,$10,$11,$12,$13)
+                 VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,$9::jsonb,$10,$11,$12,$13,$14,$15,$16,$17)
                  ON CONFLICT DO NOTHING`,
                 [
-                  row.curriculum, row.subject, row.topic, row.subtopic, row.stem,
-                  JSON.stringify(row.options), row.correct_answer, row.explanation,
+                  row.curriculum, row.subject, row.topic, row.subtopic, row.question_type,
+                  row.stem,
+                  row.options ? JSON.stringify(row.options) : null,
+                  row.correct_answer,
+                  row.accepted_answers ? JSON.stringify(row.accepted_answers) : null,
+                  row.answer_kind, row.answer_hint, row.explanation,
                   row.marks, row.time_budget_seconds, row.difficulty, row.source, row.verified,
                 ]
               );

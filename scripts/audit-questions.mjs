@@ -122,9 +122,11 @@ async function judge(batch) {
   const listing = batch
     .map(
       (q, i) =>
-        `${i}. ${q.stem}\n   Options: ${(q.options || [])
-          .map((o) => `(${o.id}) ${o.text}`)
-          .join('  ')}\n   Marked correct: (${q.correct_answer})`
+        q.question_type === 'short_answer'
+          ? `${i}. ${q.stem}\n   Accepted: ${(q.accepted_answers || []).join(' | ')}`
+          : `${i}. ${q.stem}\n   Options: ${(q.options || [])
+              .map((o) => `(${o.id}) ${o.text}`)
+              .join('  ')}\n   Marked correct: (${q.correct_answer})`
     )
     .join('\n\n')
 
@@ -177,7 +179,8 @@ try {
   const clause = where.length ? `WHERE ${where.join(' AND ')}` : ''
 
   const { rows } = await db.query(
-    `SELECT id, subject, subtopic, stem, options, correct_answer, difficulty
+    `SELECT id, subject, subtopic, stem, options, correct_answer, difficulty,
+            question_type, accepted_answers
      FROM questions ${clause} ORDER BY subject, subtopic, created_at`,
     params
   )
@@ -279,14 +282,21 @@ try {
   }
 
   // Answer skew: a bank where the answer is usually (b) is guessable.
+  const mcq = rows.filter((q) => q.question_type !== 'short_answer')
+  const short = rows.length - mcq.length
+  if (short > 0) {
+    console.log(`\nTypes: ${mcq.length} multiple choice, ${short} short answer`)
+  }
+
+  // Letter skew is meaningless for a typed answer, so only the MCQs count.
   const letters = {}
-  for (const q of rows) letters[q.correct_answer] = (letters[q.correct_answer] || 0) + 1
+  for (const q of mcq) letters[q.correct_answer] = (letters[q.correct_answer] || 0) + 1
   const skew = Object.entries(letters).sort((a, b) => b[1] - a[1])
   console.log(
     '\nCorrect answer spread: ' +
-      skew.map(([l, n]) => `${l} ${Math.round((n / rows.length) * 100)}%`).join('  ')
+      skew.map(([l, n]) => `${l} ${Math.round((n / Math.max(1, mcq.length)) * 100)}%`).join('  ')
   )
-  if (skew[0] && skew[0][1] / rows.length > 0.4) {
+  if (mcq.length && skew[0] && skew[0][1] / mcq.length > 0.4) {
     console.log(`  Skewed towards (${skew[0][0]}). A student could beat this bank by always picking it.`)
   }
 

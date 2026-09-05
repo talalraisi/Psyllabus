@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import CopyButton from '@/components/CopyButton'
+import { gradeAnswer } from '@/lib/grading'
 import { createClient } from '@/lib/supabase'
 import {
   statusFromPoints,
@@ -317,7 +318,7 @@ export default function QuizRunner({
     const currentAnswers = answersRef.current
     const graded = questions.map((q) => {
       const selected = currentAnswers[q.id] ?? null
-      const correct = selected != null && String(selected) === String(q.correct_answer)
+      const { correct } = gradeAnswer(q, selected)
       return {
         question: q,
         selected,
@@ -613,7 +614,11 @@ export default function QuizRunner({
     const q = questions[currentIndex]
     const options = q.options || []
     const selected = answers[q.id]
-    const answeredCount = questions.filter((question) => answers[question.id] != null).length
+    // An empty box is not an answer. != null alone was true for '', so a
+    // short-answer paper counted itself finished before anything was typed.
+    const answeredCount = questions.filter(
+      (question) => answers[question.id] != null && String(answers[question.id]).trim() !== ''
+    ).length
 
     let paceBlock = null
     if (timed && secondsLeft != null) {
@@ -658,21 +663,46 @@ export default function QuizRunner({
           <CopyButton text={questionAsText(q)} label="Copy" />
         </div>
 
-        <div className="space-y-2 mb-6">
-          {options.map((opt) => (
-            <button
-              key={opt.id}
-              onClick={() => selectAnswer(q.id, opt.id)}
-              className={`w-full text-left px-4 py-3 rounded-lg border text-sm transition-colors duration-150 ${
-                selected === opt.id
-                  ? 'border-[var(--brand)] bg-[var(--brand-tint)] text-[var(--text)]'
-                  : 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
-              }`}
-            >
-              {opt.text}
-            </button>
-          ))}
-        </div>
+        {q.question_type === 'short_answer' ? (
+          <div className="mb-6">
+            <label className="t-overline" htmlFor="short-answer">
+              Your answer
+            </label>
+            <input
+              id="short-answer"
+              key={q.id}
+              type="text"
+              inputMode={q.answer_kind === 'numeric' ? 'decimal' : 'text'}
+              autoComplete="off"
+              value={selected ?? ''}
+              onChange={(e) => selectAnswer(q.id, e.target.value)}
+              placeholder={q.answer_kind === 'numeric' ? 'e.g. 9.81' : 'Type your answer'}
+              className="input mt-1"
+            />
+            <p className="t-caption mt-2">
+              {q.answer_hint ||
+                (q.answer_kind === 'numeric'
+                  ? 'Units are optional, and close counts. Write the number.'
+                  : 'Spelling is forgiving, but say the right thing.')}
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-2 mb-6">
+            {options.map((opt) => (
+              <button
+                key={opt.id}
+                onClick={() => selectAnswer(q.id, opt.id)}
+                className={`w-full text-left px-4 py-3 rounded-lg border text-sm transition-colors duration-150 ${
+                  selected === opt.id
+                    ? 'border-[var(--brand)] bg-[var(--brand-tint)] text-[var(--text)]'
+                    : 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
+                }`}
+              >
+                {opt.text}
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="flex gap-2">
           <button
@@ -685,7 +715,7 @@ export default function QuizRunner({
           {currentIndex < questions.length - 1 ? (
             <button
               onClick={() => goTo(currentIndex + 1)}
-              disabled={selected == null}
+              disabled={selected == null || String(selected).trim() === ''}
               className="flex-1 btn btn-solid control-md disabled:opacity-40"
             >
               Next
