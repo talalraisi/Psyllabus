@@ -28,6 +28,7 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { connect } from "./db.mjs";
+import { normaliseText, parseNumber, numbersMatch } from "../lib/grading.js";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -66,12 +67,35 @@ const MODEL = "claude-opus-5";
 // rather than one type followed by the other.
 const TYPE = arg("type", "mixed");
 
+/**
+ * How many times each question is independently solved during verification.
+ * Two is the useful minimum: one solve can only be compared to the answer the
+ * generator wrote, and a model that got it wrong once will often get it wrong
+ * the same way twice in a row when it is anchored. Three is stricter and
+ * roughly half again as slow.
+ */
+const VERIFY_PASSES = Math.max(1, parseInt(arg("verify-passes", "2"), 10));
+
+/**
+ * Verification can use a different model from generation, and usually should.
+ *
+ * Writing a plausible exam question is easy; getting the arithmetic right is
+ * not, and a local 14B model fails physics questions it can happily write. But
+ * generation is the expensive half in tokens and the cheap half in
+ * consequences: a badly written question gets thrown away, while a badly
+ * verified one gets taught to a student. So generate free and locally, verify
+ * with something that can actually do the work.
+ *
+ *   --provider ollama --verify-provider claude
+ */
+const VERIFY_PROVIDER = arg("verify-provider", PROVIDER);
+
 // Looked up from the syllabus rather than assumed, now that AP and A-Level are
 // in the same table. Subject names do not collide across curricula.
 let CURRICULUM = "IB";
 
 // Only constructed when actually using Claude, so Ollama runs need no API key.
-const anthropic = PROVIDER === "claude" ? new Anthropic() : null;
+const anthropic = PROVIDER === "claude" || VERIFY_PROVIDER === "claude" ? new Anthropic() : null;
 let db;
 
 // ---------------------------------------------------------------------------
@@ -174,25 +198,29 @@ const QUESTIONS_SCHEMA = {
   },
 };
 
-const VERDICTS_SCHEMA = {
+const SOLUTIONS_SCHEMA = {
   type: "object",
   additionalProperties: false,
-  required: ["verdicts"],
+  required: ["solutions"],
   properties: {
-    verdicts: {
+    solutions: {
       type: "array",
       items: {
         type: "object",
         additionalProperties: false,
-        required: ["index", "sound", "reason"],
+        required: ["index", "answer", "confident"],
         properties: {
           index: { type: "integer" },
-          sound: {
+          answer: {
+            type: "string",
+            description:
+              "For multiple choice, the single letter a, b, c or d. For short answer, the value alone: a number with its unit, or a single term. No working, no sentence.",
+          },
+          confident: {
             type: "boolean",
             description:
-              "true only if the marked answer is mathematically/factually correct, exactly one option is correct, and the question is unambiguous",
+              "false if the question is ambiguous, unanswerable, or has more than one defensible answer",
           },
-          reason: { type: "string" },
         },
       },
     },
@@ -203,10 +231,11 @@ const VERDICTS_SCHEMA = {
 // Claude calls
 // ---------------------------------------------------------------------------
 
-async function callClaude(prompt, schema, maxTokens = 16000) {
+async function callClaude(prompt, schema, maxTokens = 16000, temperature) {
   const response = await anthropic.beta.messages.create({
     model: MODEL,
     max_tokens: maxTokens,
+    ...(temperature != null ? { temperature } : {}),
     betas: ["server-side-fallback-2026-07-01"],
     fallbacks: "default",
     output_config: { format: { type: "json_schema", schema } },
@@ -221,7 +250,7 @@ async function callClaude(prompt, schema, maxTokens = 16000) {
 }
 
 /** Free local generation via Ollama's JSON-schema-constrained output. */
-async function callOllama(prompt, schema) {
+async function callOllama(prompt, schema, temperature) {
   const res = await fetch(`${OLLAMA_URL}/api/chat`, {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -229,7 +258,9 @@ async function callOllama(prompt, schema) {
       model: OLLAMA_MODEL,
       stream: false,
       format: schema, // Ollama constrains output to this JSON schema
-      options: { temperature: 0.8 }, // variety across batches
+      // High for generation so batches differ; 0 for verification, where
+      // the same question must produce the same answer every time.
+      options: { temperature: temperature ?? 0.8 },
       messages: [{ role: "user", content: prompt }],
     }),
   });
@@ -250,18 +281,18 @@ async function callOllama(prompt, schema) {
   return JSON.parse(content);
 }
 
-async function callModel(prompt, schema, maxTokens) {
-  return PROVIDER === "claude"
-    ? callClaude(prompt, schema, maxTokens)
-    : callOllama(prompt, schema);
+async function callModel(prompt, schema, maxTokens, temperature, provider = PROVIDER) {
+  return provider === "claude"
+    ? callClaude(prompt, schema, maxTokens, temperature)
+    : callOllama(prompt, schema, temperature);
 }
 
 async function preflight() {
-  if (PROVIDER === "claude") {
+  if (PROVIDER === "claude" || VERIFY_PROVIDER === "claude") {
     if (!process.env.ANTHROPIC_API_KEY) {
       console.log("No ANTHROPIC_API_KEY set; relying on an `ant auth login` profile.");
     }
-    return;
+    if (PROVIDER === "claude") return;
   }
   try {
     const res = await fetch(`${OLLAMA_URL}/api/tags`);
@@ -391,42 +422,120 @@ Write ${count} multiple-choice questions.
     .map((q) => ({ ...q, question_type: "mcq" }));
 }
 
-async function verifyBatch(questions) {
+/**
+ * Verification by independent solving.
+ *
+ * The old version showed the model the answer it had just written and asked
+ * whether it was sound. That is not a check, it is a request for agreement,
+ * and it passed two physics questions whose answers were out by a factor of
+ * four. Being told the answer anchors the next token as surely for a model as
+ * it does for a person marking their own homework.
+ *
+ * So the answer is not shown. Each question is solved from scratch, twice, at
+ * a temperature low enough to be near deterministic, and the two solutions are
+ * compared to each other and to the marked answer in code rather than by the
+ * model. A question survives only when three independent things agree.
+ *
+ * This rejects more than it used to, including some questions that were fine.
+ * That is the intended trade. A bank of 40 questions a student can trust beats
+ * a bank of 100 where one in twenty quietly teaches them the wrong physics,
+ * because the second kind costs them marks in a real exam and they will never
+ * know why.
+ */
+function askForAnswers(questions) {
   const listing = questions
     .map((q, i) =>
       q.question_type === "short_answer"
-        ? `${i}. ${q.stem}\n   Accepted answers: ${(q.accepted_answers || []).join(" | ")}`
-        : `${i}. ${q.stem}\n   Options: ${q.options
-            .map((o) => `(${o.id}) ${o.text}`)
-            .join("  ")}\n   Marked correct: (${q.correct_answer})`
+        ? `${i}. ${q.stem}`
+        : `${i}. ${q.stem}\n   ${q.options.map((o) => `(${o.id}) ${o.text}`).join("  ")}`
     )
     .join("\n\n");
 
-  const prompt = `You are the verification layer of an exam question bank. Solve each question below from scratch, then judge it.
+  return `Answer each question below. Work each one out fully before answering.
 
-Set sound=true when the option marked correct is the right answer and exactly one option is right. Work the problem first, then compare your result to the marked option.
-
-Set sound=false ONLY when one of these is true:
-- your worked answer differs from the marked option, or from every accepted answer
-- more than one option is correct, or none is
-- a short answer question does not have exactly one right answer, or its answer
-  is a sentence rather than a number or a single term
-- the question cannot be answered from the information given
-
-Do not set sound=false for style, wording, phrasing, or because you would have set the question differently. If your reasoning concludes the marked answer is correct, sound MUST be true.
-
-Keep each reason to one short sentence.
+Give the answer only: a single letter for multiple choice, or the value alone for the rest. Include the unit where there is one. If a question cannot be answered from what it gives you, or has more than one defensible answer, set confident to false.
 
 Questions:\n\n${listing}`;
+}
 
-  const data = await callModel(prompt, VERDICTS_SCHEMA);
-  const badIndices = new Set(
-    (data.verdicts || []).filter((v) => !v.sound).map((v) => v.index)
-  );
-  for (const v of data.verdicts || []) {
-    if (!v.sound) console.log(`    rejected #${v.index}: ${v.reason}`);
+/** Compare two answers the way a marker would, not the way a string does. */
+function sameAnswer(a, b, kind) {
+  if (a == null || b == null) return false;
+  const left = normaliseText(String(a));
+  const right = normaliseText(String(b));
+  if (!left || !right) return false;
+  if (left === right) return true;
+
+  // Numbers compare by value, so 1.2e4, 12000 and "12000 m/s" all agree.
+  const ln = parseNumber(left);
+  const rn = parseNumber(right);
+  if (ln != null && rn != null) return numbersMatch(ln, rn, 0.02);
+
+  // Text answers: one being contained in the other covers "the mitochondria"
+  // against "mitochondria" without accepting anything looser.
+  if (kind === "text") return left.includes(right) || right.includes(left);
+  return false;
+}
+
+/** What the question itself claims the answer is. */
+function markedAnswer(q) {
+  if (q.question_type === "short_answer") return q.accepted_answers || [];
+  return [q.correct_answer];
+}
+
+function agreesWithMarked(q, given) {
+  const kind = q.question_type === "short_answer" ? q.answer_kind || "number" : "letter";
+  return markedAnswer(q).some((expected) => sameAnswer(given, expected, kind));
+}
+
+async function verifyBatch(questions) {
+  if (!questions.length) return [];
+
+  const prompt = askForAnswers(questions);
+  const passes = [];
+  for (let i = 0; i < VERIFY_PASSES; i++) {
+    const data = await callModel(prompt, SOLUTIONS_SCHEMA, undefined, 0, VERIFY_PROVIDER);
+    const byIndex = new Map();
+    for (const s of data.solutions || []) byIndex.set(s.index, s);
+    passes.push(byIndex);
   }
-  return questions.filter((_, i) => !badIndices.has(i));
+
+  const kept = [];
+  for (let i = 0; i < questions.length; i++) {
+    const q = questions[i];
+    const solutions = passes.map((p) => p.get(i)).filter(Boolean);
+
+    if (solutions.length < passes.length) {
+      console.log(`    rejected #${i}: verifier did not answer it`);
+      continue;
+    }
+    if (solutions.some((s) => !s.confident)) {
+      console.log(`    rejected #${i}: verifier called it ambiguous`);
+      continue;
+    }
+
+    // The independent solves must agree with each other first. Two different
+    // answers means the question is hard to pin down even when it is fair, and
+    // a question nobody can answer the same way twice does not belong here.
+    const kind = q.question_type === "short_answer" ? q.answer_kind || "number" : "letter";
+    const [first, ...rest] = solutions;
+    if (!rest.every((s) => sameAnswer(s.answer, first.answer, kind))) {
+      console.log(
+        `    rejected #${i}: solves disagreed (${solutions.map((s) => s.answer).join(" vs ")})`
+      );
+      continue;
+    }
+
+    if (!agreesWithMarked(q, first.answer)) {
+      console.log(
+        `    rejected #${i}: worked answer ${first.answer}, marked ${markedAnswer(q).join("/")}`
+      );
+      continue;
+    }
+
+    kept.push(q);
+  }
+  return kept;
 }
 
 // ---------------------------------------------------------------------------

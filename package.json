@@ -16,7 +16,9 @@
     "resources:import": "node scripts/import-resources.mjs",
     "codes": "node scripts/make-codes.mjs",
     "audit": "node scripts/audit-questions.mjs",
-    "check-subjects": "node scripts/check-subjects.mjs"
+    "check-subjects": "node scripts/check-subjects.mjs",
+    "build-bank": "node scripts/build-bank.mjs",
+    "verify-selftest": "node scripts/verify-selftest.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.117.1",
