@@ -95,6 +95,18 @@ const BATCH_SIZE = parseInt(arg("batch-size", PROVIDER === "ollama" ? "8" : "20"
 const NUM_CTX = parseInt(arg("num-ctx", "16384"), 10);
 
 /**
+ * How many already-written stems to show the model so it does not repeat them.
+ *
+ * This is the largest part of the prompt and the first thing to cut when the
+ * context is tight: forty stems is roughly 1,600 tokens, which on a machine
+ * that can only spare a 4k context is most of the budget. Fewer means slightly
+ * more repetition, and the unique stem fingerprint rejects the exact repeats
+ * anyway, so the cost is small and the alternative is truncating the
+ * instructions.
+ */
+const AVOID_STEMS = parseInt(arg("avoid-stems", NUM_CTX <= 4096 ? "12" : "40"), 10);
+
+/**
  * How many subtopics to work on at once.
  *
  * Default 1, because on a laptop the model is bound by memory bandwidth and
@@ -674,7 +686,7 @@ async function generateBatch(subtopic, topic, count, existingStems, { round = 0,
   const avoid =
     existingStems.length > 0
       ? `\n\nAlready written, so do not repeat these or reword them:\n${existingStems
-          .slice(-40)
+          .slice(-AVOID_STEMS)
           .map((s) => `- ${s}`)
           .join("\n")}`
       : "";
