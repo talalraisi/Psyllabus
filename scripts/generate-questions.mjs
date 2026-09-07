@@ -61,7 +61,13 @@ const CONCURRENCY = Math.max(1, parseInt(arg("concurrency", "1"), 10));
 
 // Stop after this many, for pilots. 0 = no limit.
 const MAX_QUESTIONS = parseInt(arg("max-questions", "0"), 10);
-const MODEL = "claude-opus-5";
+/**
+ * Which Claude model, when using one. Verification is short work: it reads a
+ * batch and returns one answer each, so a cheaper model is a real saving over
+ * thousands of batches without giving up much of the arithmetic that matters.
+ * Generation is where the quality shows.
+ */
+const MODEL = arg("claude-model", "claude-opus-5");
 
 // mcq | short_answer | mixed. Mixed alternates, so a subtopic ends up with both
 // rather than one type followed by the other.
