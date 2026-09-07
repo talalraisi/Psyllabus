@@ -230,3 +230,21 @@ export function IconCopy(props) {
     </svg>
   )
 }
+
+export function IconSearch(props) {
+  return (
+    <svg {...base} {...props}>
+      <circle cx="8.75" cy="8.75" r="5.25" />
+      <path d="M12.75 12.75l4 4" />
+    </svg>
+  )
+}
+
+export function IconCards(props) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="2.75" y="5.75" width="10.5" height="11.5" rx="1.75" />
+      <path d="M6.5 3.25h8.25a2 2 0 0 1 2 2v8" />
+    </svg>
+  )
+}

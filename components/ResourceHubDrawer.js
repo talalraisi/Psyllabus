@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { getResourcesForSubtopic } from '@/lib/resources'
 import { createClient } from '@/lib/supabase'
+import { getCurrentUser } from '@/lib/auth'
 import { KINDS } from '@/lib/resource-catalog'
 import { IconClose } from '@/components/Icons'
 
@@ -35,6 +36,66 @@ export default function ResourceHubDrawer({
   quizHref,
 }) {
   const [picked, setPicked] = useState([])
+  const [note, setNote] = useState('')
+  const [noteState, setNoteState] = useState('idle') // idle | saving | saved
+  const saveTimer = useRef(null)
+
+  // Load whatever the student already wrote about this subtopic.
+  useEffect(() => {
+    if (!open || !subject || !subtopic) return
+    let cancelled = false
+    const supabase = createClient()
+    setNote('')
+    setNoteState('idle')
+
+    getCurrentUser(supabase).then((user) => {
+      if (!user) return
+      supabase
+        .from('notes')
+        .select('body')
+        .eq('user_id', user.id)
+        .eq('subject', subject)
+        .eq('subtopic', subtopic)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (!cancelled && data?.body) setNote(data.body)
+        })
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [open, subject, subtopic])
+
+  /**
+   * Autosave, debounced. Nobody presses save on a note, and losing a paragraph
+   * because the drawer was closed is the fastest way to stop someone using it.
+   */
+  const saveNote = useCallback(
+    (body) => {
+      clearTimeout(saveTimer.current)
+      setNoteState('saving')
+      saveTimer.current = setTimeout(async () => {
+        const supabase = createClient()
+        const user = await getCurrentUser(supabase)
+        if (!user) return
+        await supabase.from('notes').upsert(
+          {
+            user_id: user.id,
+            subject,
+            topic: topic || null,
+            subtopic,
+            body,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'user_id,subject,subtopic' }
+        )
+        setNoteState('saved')
+        setTimeout(() => setNoteState('idle'), 1500)
+      }, 700)
+    },
+    [subject, topic, subtopic]
+  )
 
   // Resources chosen for this exact subtopic, imported from the CSV. They lead
   // because they were picked for this one thing, not for the whole subject.
@@ -116,6 +177,28 @@ export default function ResourceHubDrawer({
         </div>
 
         <div className="flex-1 space-y-3 overflow-y-auto p-6">
+          {/* Notes first. What a student wrote about this subtopic is worth
+              more to them than anything we can link to. */}
+          <div className="mb-5">
+            <div className="mb-2 flex items-baseline justify-between">
+              <p className="t-overline">Your notes</p>
+              <span className="t-caption">
+                {noteState === 'saving' ? 'Saving\u2026' : noteState === 'saved' ? 'Saved' : ''}
+              </span>
+            </div>
+            <textarea
+              rows={6}
+              value={note}
+              onChange={(e) => {
+                setNote(e.target.value)
+                saveNote(e.target.value)
+              }}
+              placeholder={'Anything you want to keep about this subtopic.\n\nLines written as "term: definition" can become flashcards later.'}
+              className="input w-full resize-y"
+              style={{ height: 'auto', padding: '12px 16px', lineHeight: 1.6 }}
+            />
+          </div>
+
           {recommended.length > 0 && (
             <>
               <p className="t-overline">Recommended</p>
