@@ -12,6 +12,8 @@ import { IconCheck, IconClose, IconArrowRight } from '@/components/Icons'
 import { displaySubtopic } from '@/lib/progress'
 import { accessibleSubjects } from '@/lib/access'
 import { scheduleAfter, isDue, dueLabel, cardsFromNote } from '@/lib/flashcards'
+import FlashcardReview from '@/components/FlashcardReview'
+import NoteImport from '@/components/NoteImport'
 
 /**
  * Flashcards.
@@ -182,89 +184,23 @@ export default function FlashcardsPage() {
 
   /* ---------------------------------------------------------------- review */
 
-  if (mode === 'review' && queue[index]) {
-    const card = queue[index]
+  if (mode === 'review' && queue.length) {
     return (
       <DashboardLayout profile={profile}>
-        <Page width="narrow">
-          <div className="mb-6 flex items-center justify-between">
-            <p className="t-small">
-              {index + 1} of {queue.length}
-            </p>
-            <button onClick={() => setMode('overview')} className="btn btn-quiet control-sm text-xs">
-              End session
-            </button>
-          </div>
-
-          <div className="surface p-6">
-            <p className="t-caption mb-3">
-              {card.subject}
-              {card.subtopic ? ` · ${displaySubtopic(card.subtopic)}` : ''}
-            </p>
-
-            <p className="whitespace-pre-wrap text-lg leading-relaxed text-[var(--text)]">
-              {card.front}
-            </p>
-
-            {revealed ? (
-              <>
-                <div className="mt-6 border-t border-[var(--border)] pt-5">
-                  <p className="t-overline mb-2">Answer</p>
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--text-body)]">
-                    {card.back}
-                  </p>
-                </div>
-
-                <p className="t-caption mt-6">Did you get it?</p>
-                <div className="mt-2 flex gap-2">
-                  <button
-                    onClick={() => mark(false)}
-                    className="btn btn-quiet control-lg flex-1 border-[var(--danger-border)] text-[var(--danger)]"
-                  >
-                    <IconClose width={16} height={16} />
-                    No
-                  </button>
-                  <button onClick={() => mark(true)} className="btn btn-solid control-lg flex-1">
-                    <IconCheck width={16} height={16} />
-                    Yes
-                  </button>
-                </div>
-              </>
-            ) : (
-              <button
-                onClick={() => setRevealed(true)}
-                className="btn btn-solid control-lg mt-6 w-full"
-              >
-                Show answer
-              </button>
-            )}
-          </div>
-
-          <p className="t-caption mt-4">
-            Marking these yourself does not change your level. Only quizzes do that.
-          </p>
-        </Page>
-      </DashboardLayout>
-    )
-  }
-
-  if (mode === 'done') {
-    return (
-      <DashboardLayout profile={profile}>
-        <Page width="narrow">
-          <div className="surface p-6 text-center">
-            <p className="t-overline mb-2">Session complete</p>
-            <p className="t-stat text-[var(--brand)]">
-              {sessionStats.right}/{sessionStats.right + sessionStats.wrong}
-            </p>
-            <p className="t-small mt-2">
-              The ones you missed come back tomorrow. The rest move further out.
-            </p>
-            <button onClick={() => { setMode('overview'); load() }} className="btn btn-solid control-md mt-6">
-              Back to cards
-            </button>
-          </div>
-        </Page>
+        <FlashcardReview
+          cards={queue}
+          stats={sessionStats}
+          onMark={async (card, correct) => {
+            const patch = scheduleAfter(card, correct)
+            setCards((prev) => prev.map((c) => (c.id === card.id ? { ...c, ...patch } : c)))
+            setSessionStats((st) => ({
+              ...st,
+              [correct ? 'right' : 'wrong']: st[correct ? 'right' : 'wrong'] + 1,
+            }))
+            await supabase.from('flashcards').update(patch).eq('id', card.id)
+          }}
+          onExit={({ finished }) => setMode(finished ? 'done' : 'overview')}
+        />
       </DashboardLayout>
     )
   }
@@ -355,8 +291,17 @@ export default function FlashcardsPage() {
           </form>
         </Section>
 
+        {/* Import */}
+        <Section title="Turn notes into cards">
+          <NoteImport
+            subject={draft.subject}
+            subjects={subjects}
+            onCards={(cards) => setGenerated(cards)}
+          />
+        </Section>
+
         {/* Generate */}
-        <Section title="Build from your notes">
+        <Section title="Build from notes already in the app">
           <div className="surface p-5">
             <p className="t-small">
               Turns headings, and lines written as <strong className="text-[var(--text)]">term: definition</strong>{' '}

@@ -551,3 +551,59 @@ body {
   color: var(--text-faint);
   font-weight: 500;
 }
+
+/* ---------------------------------------------------------------------------
+   Flashcard review
+   A card that turns over, rather than one panel swapped for another. The
+   rotation is what makes it read as the same object showing its other side,
+   which is the whole point of a flashcard.
+   --------------------------------------------------------------------------- */
+
+.card-stage {
+  perspective: 1600px;
+}
+
+.card-flip {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 520ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.card-flip.is-flipped {
+  transform: rotateY(180deg);
+}
+
+.card-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.card-face-back {
+  transform: rotateY(180deg);
+}
+
+/* Advancing to the next card should not look like the same card turning back,
+   so it slides rather than rotates. */
+@keyframes card-advance {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes card-retreat {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.card-enter-next { animation: card-advance 260ms cubic-bezier(0.2, 0.7, 0.2, 1); }
+.card-enter-prev { animation: card-retreat 260ms cubic-bezier(0.2, 0.7, 0.2, 1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .card-flip { transition: none; }
+  .card-enter-next,
+  .card-enter-prev { animation: none; }
+}
