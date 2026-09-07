@@ -273,7 +273,11 @@ function Table({ figure }) {
 const KINDS = { plot: Plot, scatter: Scatter, bar: Bars, table: Table }
 
 export default function QuestionFigure({ figure }) {
-  if (!figure?.kind) return null
+  // The same guard the generator uses, so a figure that would render as an
+  // empty box or a single lonely bar renders as nothing instead. The generator
+  // already drops these, but rows written before it did, or by hand, reach
+  // here too, and the student is the one who sees the difference.
+  if (!figureIsUsable(figure)) return null
   const Render = KINDS[figure.kind]
   if (!Render) return null
 
