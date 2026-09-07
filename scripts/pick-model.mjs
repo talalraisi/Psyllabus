@@ -85,20 +85,38 @@ function sameAnswer(a, b, kind) {
   return false;
 }
 
-async function callOllama(model, prompt) {
-  const res = await fetch(`${OLLAMA_URL}/api/chat`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({
-      model,
-      stream: false,
-      format: SOLUTIONS_SCHEMA,
-      options: { temperature: 0 },
-      messages: [{ role: "user", content: prompt }],
-    }),
-  });
-  if (!res.ok) throw new Error(`${res.status}`);
-  return JSON.parse((await res.json()).message.content);
+/**
+ * The first call to a model it has not loaded yet pays for reading twenty
+ * gigabytes off disk, which on a laptop can take longer than fetch is willing
+ * to wait. Node gives up after five minutes with a bare "fetch failed", which
+ * reads as "this model is broken" when it means "this model is still loading".
+ * So: a long explicit timeout, and one silent retry now that it is warm.
+ */
+async function callOllama(model, prompt, attempt = 0) {
+  try {
+    const res = await fetch(`${OLLAMA_URL}/api/chat`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      signal: AbortSignal.timeout(20 * 60 * 1000),
+      body: JSON.stringify({
+        model,
+        stream: false,
+        format: SOLUTIONS_SCHEMA,
+        // Hold it in memory between the two passes rather than unloading and
+        // paying the load cost again.
+        keep_alive: "20m",
+        options: { temperature: 0 },
+        messages: [{ role: "user", content: prompt }],
+      }),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return JSON.parse((await res.json()).message.content);
+  } catch (e) {
+    if (attempt === 0) return callOllama(model, prompt, 1);
+    throw new Error(
+      e.name === "TimeoutError" ? "timed out, likely too large for this machine" : e.message
+    );
+  }
 }
 
 const PROMPT = (() => {
