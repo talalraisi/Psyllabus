@@ -92,6 +92,7 @@ const VLLM_KEY = process.env.VLLM_API_KEY || "EMPTY";
 // Local models do better with smaller batches; a served model has no such
 // problem and larger batches amortise the prompt across more questions.
 const BATCH_SIZE = parseInt(arg("batch-size", PROVIDER === "ollama" ? "8" : "20"), 10);
+const NUM_CTX = parseInt(arg("num-ctx", "16384"), 10);
 
 /**
  * How many subtopics to work on at once.
@@ -516,9 +517,16 @@ async function callOllama(prompt, schema, temperature) {
       model: OLLAMA_MODEL,
       stream: false,
       format: schema, // Ollama constrains output to this JSON schema
-      // High for generation so batches differ; 0 for verification, where
-      // the same question must produce the same answer every time.
-      options: { temperature: temperature ?? 0.8 },
+      // Ollama defaults num_ctx to 4096. A generation prompt is ~3.6k tokens
+      // and the reply is another ~6.6k, so the default silently truncates the
+      // oldest part of the context: the instructions. That does not error, it
+      // just quietly produces worse questions, which is the worst way for a
+      // setting to be wrong.
+      options: { temperature: temperature ?? 0.8, num_ctx: NUM_CTX },
+      // Thinking models spend the whole budget reasoning before they emit any
+      // JSON, and with schema-constrained output that reads as a hang. The
+      // verification here does its own double-solve, so the trace buys nothing.
+      think: false,
       messages: [{ role: "user", content: prompt }],
     }),
   });

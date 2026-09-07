@@ -76,7 +76,8 @@ async function callOllama(prompt, schema, temperature) {
       model: OLLAMA_MODEL,
       stream: false,
       format: schema,
-      options: { temperature: temperature ?? 0 },
+      options: { temperature: temperature ?? 0, num_ctx: 16384 },
+      think: false,
       messages: [{ role: "user", content: prompt }],
     }),
   });

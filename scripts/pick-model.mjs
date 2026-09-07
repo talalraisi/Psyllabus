@@ -105,7 +105,8 @@ async function callOllama(model, prompt, attempt = 0) {
         // Hold it in memory between the two passes rather than unloading and
         // paying the load cost again.
         keep_alive: "20m",
-        options: { temperature: 0 },
+        options: { temperature: 0, num_ctx: 16384 },
+      think: false,
         messages: [{ role: "user", content: prompt }],
       }),
     });
