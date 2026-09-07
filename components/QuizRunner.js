@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import CopyButton from '@/components/CopyButton'
 import HeatBadge from '@/components/HeatBadge'
+import QuestionFigure from '@/components/QuestionFigure'
 import { gradeAnswer } from '@/lib/grading'
 import { createClient } from '@/lib/supabase'
 import {
@@ -130,6 +131,7 @@ export default function QuizRunner({
   const [submitting, setSubmitting] = useState(false)
   const [userId, setUserId] = useState(null)
   const [secondsLeft, setSecondsLeft] = useState(null)
+  const [hintsShown, setHintsShown] = useState({})
   const router = useRouter()
   const supabase = createClient()
 
@@ -724,10 +726,33 @@ export default function QuizRunner({
           </div>
         </div>
 
-        <div className="mb-6 flex items-start justify-between gap-3">
+        <div className="mb-4 flex items-start justify-between gap-3">
           <p className="text-sm font-medium leading-relaxed text-[var(--text)]">{q.stem}</p>
           <CopyButton text={questionAsText(q)} label="Copy" />
         </div>
+
+        <QuestionFigure figure={q.figure} />
+
+        {/* A hint is offered rather than shown. Reading it before trying is the
+            fastest way to feel like you understood something you could not
+            have done, so it costs a click and says so on the results. */}
+        {q.hint && (
+          <div className="mb-5">
+            {hintsShown[q.id] ? (
+              <div className="rounded-[var(--r-md)] border border-[var(--border)] bg-[var(--surface-sunken)] px-4 py-3">
+                <p className="t-overline mb-1">Hint</p>
+                <p className="text-sm text-[var(--text-body)]">{q.hint}</p>
+              </div>
+            ) : (
+              <button
+                onClick={() => setHintsShown((h) => ({ ...h, [q.id]: true }))}
+                className="btn btn-quiet control-sm text-xs"
+              >
+                Show a hint
+              </button>
+            )}
+          </div>
+        )}
 
         {q.question_type === 'short_answer' ? (
           <div className="mb-6">
@@ -920,6 +945,16 @@ export default function QuizRunner({
                         label=""
                       />
                     </div>
+                    {/* Why the option you chose is wrong beats why the right
+                        one is right: the second closes the loop, the first
+                        names the mistake you actually made. Both are shown,
+                        the specific one first. */}
+                    {!g.correct && g.question.option_feedback?.[g.selected] && (
+                      <p className="mt-1.5 text-xs text-[var(--danger)]">
+                        You picked {String(g.selected).toUpperCase()}:{' '}
+                        {g.question.option_feedback[g.selected]}
+                      </p>
+                    )}
                     {!g.correct && g.question.explanation && (
                       <p className="text-xs text-[var(--text-muted)] mt-1">{g.question.explanation}</p>
                     )}

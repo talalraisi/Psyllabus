@@ -12,6 +12,11 @@
  *   node scripts/build-bank.mjs --mine --per-subtopic 20 --concurrency 4
  *   node scripts/build-bank.mjs --mine --verify-provider claude
  *
+ * Two machines at once: give each one a shard and they split every subject
+ * between them instead of racing through the same list.
+ *   Mac: node scripts/build-bank.mjs --all --shard 1/2
+ *   PC:  node scripts/build-bank.mjs --all --shard 2/2
+ *
  * Anything it does not recognise is passed straight through to the generator,
  * so --provider, --ollama-model, --verify-passes and the rest work here too.
  */
@@ -30,12 +35,12 @@ const PER_SUBTOPIC = arg("per-subtopic", "20");
 const EMAIL = arg("email", null);
 
 /** Flags that belong to this script and must not be forwarded. */
-const OWN = new Set(["--subjects", "--per-subtopic", "--mine", "--email"]);
+const OWN = new Set(["--subjects", "--per-subtopic", "--mine", "--all", "--email"]);
 function passthrough() {
   const out = [];
   for (let i = 0; i < args.length; i++) {
     if (OWN.has(args[i])) {
-      if (args[i] !== "--mine") i++; // skip its value too
+      if (args[i] !== "--mine" && args[i] !== "--all") i++; // skip its value too
       continue;
     }
     out.push(args[i]);
@@ -74,7 +79,16 @@ async function subjectList(db) {
     );
   }
 
-  console.error("Nothing to build. Pass --mine or --subjects \"Physics SL,Economics HL\".");
+  if (flag("all")) {
+    const { rows } = await db.query(
+      `SELECT DISTINCT subject FROM syllabus_content ORDER BY subject`
+    );
+    return rows.map((r) => r.subject);
+  }
+
+  console.error(
+    "Nothing to build. Pass --mine, --all, or --subjects \"Physics SL,Economics HL\"."
+  );
   process.exit(1);
 }
 

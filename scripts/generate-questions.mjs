@@ -29,6 +29,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { connect } from "./db.mjs";
 import { normaliseText, parseNumber, numbersMatch } from "../lib/grading.js";
+import { figureIsUsable } from "../lib/figures.js";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -69,6 +70,50 @@ const MAX_QUESTIONS = parseInt(arg("max-questions", "0"), 10);
  */
 const MODEL = arg("claude-model", "claude-opus-5");
 
+/**
+ * Spend, watched rather than discovered.
+ *
+ * A generation run is thousands of calls made while nobody is looking, which
+ * is exactly the shape of job that produces a bill you did not expect. So the
+ * tokens are counted as they go, converted at the rate for the model in use,
+ * printed with every subtopic, and --budget stops the run dead when it reaches
+ * a number you set. Stopping early costs a night. Not stopping costs money you
+ * did not agree to spend.
+ *
+ * Prices are dollars per million tokens and are checked at
+ * https://claude.com/pricing — they change, and a number hardcoded here is a
+ * number that will eventually be wrong. Everything printed is an estimate; the
+ * console is the authority.
+ */
+const PRICES = {
+  "claude-opus-5": { input: 15, output: 75 },
+  "claude-sonnet-5": { input: 3, output: 15 },
+  "claude-haiku-4-5-20251001": { input: 1, output: 5 },
+};
+
+const BUDGET = parseFloat(arg("budget", "0")); // dollars, 0 = no limit
+const spend = { input: 0, output: 0, calls: 0 };
+
+function priceOf(model) {
+  return PRICES[model] || PRICES["claude-sonnet-5"];
+}
+
+function dollars() {
+  const p = priceOf(MODEL);
+  return (spend.input / 1e6) * p.input + (spend.output / 1e6) * p.output;
+}
+
+function budgetCheck() {
+  if (BUDGET > 0 && dollars() >= BUDGET) {
+    console.log(
+      `\nBudget of $${BUDGET.toFixed(2)} reached after ${spend.calls} calls. Stopping.\n` +
+        `Re-run the same command to carry on from here: nothing is lost.`
+    );
+    return true;
+  }
+  return false;
+}
+
 // mcq | short_answer | mixed. Mixed alternates, so a subtopic ends up with both
 // rather than one type followed by the other.
 const TYPE = arg("type", "mixed");
@@ -96,6 +141,29 @@ const VERIFY_PASSES = Math.max(1, parseInt(arg("verify-passes", "2"), 10));
  */
 const VERIFY_PROVIDER = arg("verify-provider", PROVIDER);
 
+/**
+ * Split the subtopics between machines: --shard 1/2 on one, --shard 2/2 on the
+ * other. Without this, two machines pointed at the same subject both start at
+ * subtopic one and race each other through the identical list. Nothing breaks,
+ * because the unique stem fingerprint throws the duplicates away, but the
+ * second machine spends the night generating questions the first one already
+ * has, which is the same as not having a second machine.
+ *
+ * The split is by position in the ordered subtopic list rather than by subject,
+ * so both machines finish at roughly the same time even when one subject has
+ * four times the subtopics of another.
+ */
+const SHARD = (() => {
+  const raw = arg("shard", null);
+  if (!raw) return null;
+  const [index, total] = raw.split("/").map((n) => parseInt(n, 10));
+  if (!index || !total || index < 1 || index > total) {
+    console.error(`--shard must look like 1/2 or 2/3. Got "${raw}".`);
+    process.exit(1);
+  }
+  return { index, total };
+})();
+
 // Looked up from the syllabus rather than assumed, now that AP and A-Level are
 // in the same table. Subject names do not collide across curricula.
 let CURRICULUM = "IB";
@@ -107,6 +175,54 @@ let db;
 // ---------------------------------------------------------------------------
 // Schemas for structured outputs
 // ---------------------------------------------------------------------------
+
+/**
+ * A figure, described as data rather than drawn. The app renders these, so the
+ * model never writes SVG: an SVG it produces looks fine in the response and
+ * renders as a tangle, and nobody finds out until a student is looking at it.
+ * Four kinds, which between them cover most of what an exam actually shows.
+ */
+const FIGURE_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  required: ["kind", "alt"],
+  properties: {
+    kind: { type: "string", enum: ["none", "plot", "scatter", "bar", "table"] },
+    alt: { type: "string", description: "What the figure shows, for a screen reader." },
+    caption: { type: "string" },
+    x_label: { type: "string" },
+    y_label: { type: "string" },
+    points: {
+      type: "array",
+      description: "For plot and scatter. At least 2 points, in x order.",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["x", "y"],
+        properties: { x: { type: "number" }, y: { type: "number" } },
+      },
+    },
+    bars: {
+      type: "array",
+      description: "For bar. At least 2.",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["label", "value"],
+        properties: { label: { type: "string" }, value: { type: "number" } },
+      },
+    },
+    columns: { type: "array", items: { type: "string" }, description: "For table." },
+    rows: {
+      type: "array",
+      description: "For table. Each row has one cell per column.",
+      items: { type: "array", items: { type: "string" } },
+    },
+  },
+};
+
+const HINT_DESCRIPTION =
+  "One sentence pointing at the method or the first step. It must not contain the answer, or a number that gives it away.";
 
 const SHORT_ANSWER_SCHEMA = {
   type: "object",
@@ -126,6 +242,7 @@ const SHORT_ANSWER_SCHEMA = {
           "marks",
           "time_budget_seconds",
           "difficulty",
+          "hint",
         ],
         properties: {
           stem: {
@@ -150,6 +267,8 @@ const SHORT_ANSWER_SCHEMA = {
             description: "What form the answer should take, e.g. 'to 3 significant figures' or 'in m/s'. Optional.",
           },
           explanation: { type: "string", description: "One or two sentences of working." },
+          hint: { type: "string", description: HINT_DESCRIPTION },
+          figure: FIGURE_SCHEMA,
           marks: { type: "integer", enum: [1, 2, 3] },
           time_budget_seconds: { type: "integer", enum: [30, 45, 60, 75, 90, 120, 150, 180] },
           difficulty: { type: "number", description: "0.1 easy to 0.9 hard." },
@@ -174,6 +293,7 @@ const QUESTIONS_SCHEMA = {
           "options",
           "correct_answer",
           "explanation",
+          "hint",
           "marks",
           "time_budget_seconds",
           "difficulty",
@@ -186,15 +306,22 @@ const QUESTIONS_SCHEMA = {
             items: {
               type: "object",
               additionalProperties: false,
-              required: ["id", "text"],
+              required: ["id", "text", "why_wrong"],
               properties: {
                 id: { type: "string", enum: ["a", "b", "c", "d"] },
                 text: { type: "string" },
+                why_wrong: {
+                  type: "string",
+                  description:
+                    "For a wrong option: the specific mistake that leads a student here, in one sentence, e.g. 'forgot to convert grams to kilograms'. For the correct option: an empty string.",
+                },
               },
             },
           },
           correct_answer: { type: "string", enum: ["a", "b", "c", "d"] },
           explanation: { type: "string", description: "One or two sentences showing why the correct answer is right." },
+          hint: { type: "string", description: HINT_DESCRIPTION },
+          figure: FIGURE_SCHEMA,
           marks: { type: "integer", enum: [1, 2, 3] },
           time_budget_seconds: { type: "integer", enum: [30, 45, 60, 75, 90, 120, 150, 180] },
           difficulty: { type: "number", description: "0.1 (easy) to 0.9 (hard)" },
@@ -247,6 +374,11 @@ async function callClaude(prompt, schema, maxTokens = 16000, temperature) {
     output_config: { format: { type: "json_schema", schema } },
     messages: [{ role: "user", content: prompt }],
   });
+  if (response.usage) {
+    spend.input += response.usage.input_tokens || 0;
+    spend.output += response.usage.output_tokens || 0;
+    spend.calls++;
+  }
   if (response.stop_reason === "refusal") {
     throw new Error("Request was declined by safety classifiers");
   }
@@ -351,6 +483,16 @@ function anglesFor(round, count) {
   return Array.from({ length: Math.min(count, ANGLES.length) }, (_, i) => ANGLES[(start + i) % ANGLES.length]);
 }
 
+/**
+ * A figure the app cannot draw is worse than no figure: it renders as an empty
+ * box under a stem that refers to it. So it is checked here, with the same
+ * function the renderer uses, and dropped when it does not hold up.
+ */
+function cleanFigure(figure) {
+  if (!figure || figure.kind === "none") return null;
+  return figureIsUsable(figure) ? figure : null;
+}
+
 async function generateBatch(subtopic, topic, count, existingStems, { round = 0, type = "mcq" } = {}) {
   const avoid =
     existingStems.length > 0
@@ -374,7 +516,23 @@ Requirements:
 - marks: 1 for one step, 2 for two steps, 3 for multi-step. time_budget_seconds: roughly 45s per mark.
 - Plain text maths only (x^2, 3/4, sqrt(x)); never LaTeX.
 - Work the problem out before writing the answer, and make the explanation show the key step.
-- Vary the surface: different quantities, contexts and phrasings, not the same sentence with new numbers.${avoid}`;
+- Vary the surface: different quantities, contexts and phrasings, not the same sentence with new numbers.
+
+Every question also carries a hint: one sentence pointing at the method or the
+first step, never containing the answer or a number that gives it away. "Start
+from F = ma" is a hint. "Divide 40 by 8" is the answer.
+
+FIGURES. Most questions need none: set kind to "none" and move on. Add one only
+when the question genuinely cannot be asked without it, and only as data, never
+as a description of a picture:
+- "plot" for a relationship or function, as points in x order
+- "scatter" for measured data, with fit_line only if the question is about it
+- "bar" for categories against values
+- "table" for a data-based question where the numbers are the point
+The stem must then refer to it ("the graph shows...", "using the table..."), and
+alt must say what it shows for a student using a screen reader. A figure that
+merely decorates a question is worse than none, because it implies something is
+there to read.${avoid}`;
 
   if (type === "short_answer") {
     const prompt = `${shared}
@@ -412,7 +570,7 @@ the answer is a number.`;
     const data = await callModel(prompt, SHORT_ANSWER_SCHEMA);
     return (data.questions || [])
       .filter((q) => q.stem && q.accepted_answers?.length)
-      .map((q) => ({ ...q, question_type: "short_answer" }));
+      .map((q) => ({ ...q, question_type: "short_answer", figure: cleanFigure(q.figure) }));
   }
 
   const prompt = `${shared}
@@ -420,12 +578,19 @@ the answer is a number.`;
 Write ${count} multiple-choice questions.
 - Exactly 4 options (ids a-d), with distractors that are the answers a student would reach by making a specific, common mistake.
 - Exactly one option is correct.
-- Spread the correct option across a, b, c and d roughly evenly. Do not favour any letter.`;
+- Spread the correct option across a, b, c and d roughly evenly. Do not favour any letter.
+
+Every wrong option carries why_wrong: the specific mistake that lands a student
+there, in one sentence. "Forgot to convert grams to kilograms" or "used the
+diameter instead of the radius". This is what the student sees when they pick it,
+so it has to name the error rather than restate the right answer. If you cannot
+name the mistake behind an option, that option is a filler and the question needs
+a better distractor. The correct option has why_wrong as an empty string.`;
 
   const data = await callModel(prompt, QUESTIONS_SCHEMA);
   return (data.questions || [])
     .filter((q) => q.options?.length === 4 && q.options.some((o) => o.id === q.correct_answer))
-    .map((q) => ({ ...q, question_type: "mcq" }));
+    .map((q) => ({ ...q, question_type: "mcq", figure: cleanFigure(q.figure) }));
 }
 
 /**
@@ -566,7 +731,16 @@ async function main() {
     process.exit(1);
   }
 
-  const todo = LIMIT_SUBTOPICS > 0 ? subtopics.slice(0, LIMIT_SUBTOPICS) : subtopics;
+  const mine = SHARD
+    ? subtopics.filter((_, i) => i % SHARD.total === SHARD.index - 1)
+    : subtopics;
+  if (SHARD) {
+    console.log(
+      `Shard ${SHARD.index}/${SHARD.total}: ${mine.length} of ${subtopics.length} subtopics.`
+    );
+  }
+
+  const todo = LIMIT_SUBTOPICS > 0 ? mine.slice(0, LIMIT_SUBTOPICS) : mine;
   let totalInserted = 0;
   const startedAt = Date.now();
 
@@ -579,11 +753,16 @@ async function main() {
 
     const existingStems = existing.map((q) => q.stem);
     let have = existingStems.length;
-    console.log(`\n${subtopic}: ${have}/${PER_SUBTOPIC}`);
+    const meter =
+      PROVIDER === "claude" || VERIFY_PROVIDER === "claude"
+        ? ` · $${dollars().toFixed(2)} spent`
+        : "";
+    console.log(`\n${subtopic}: ${have}/${PER_SUBTOPIC}${meter}`);
 
     let consecutiveNoProgress = 0;
     let round = 0;
     while (have < PER_SUBTOPIC) {
+      if (budgetCheck()) return;
       round++;
       if (consecutiveNoProgress >= 3) {
         console.log(
@@ -620,6 +799,18 @@ async function main() {
             answer_kind: q.answer_kind || null,
             answer_hint: q.answer_hint || null,
             explanation: q.explanation,
+            hint: q.hint || null,
+            // Only the wrong options carry feedback. Storing an empty string
+            // for the correct one would make the UI think there is something
+            // to say about picking the right answer.
+            option_feedback: q.options
+              ? Object.fromEntries(
+                  q.options
+                    .filter((o) => o.id !== q.correct_answer && o.why_wrong?.trim())
+                    .map((o) => [o.id, o.why_wrong.trim()])
+                )
+              : null,
+            figure: q.figure || null,
             marks: q.marks,
             time_budget_seconds: q.time_budget_seconds,
             difficulty: Math.min(0.9, Math.max(0.1, q.difficulty)),
@@ -636,8 +827,10 @@ async function main() {
                 `INSERT INTO questions
                    (curriculum, subject, topic, subtopic, question_type, stem, options,
                     correct_answer, accepted_answers, answer_kind, answer_hint,
-                    explanation, marks, time_budget_seconds, difficulty, source, verified)
-                 VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,$9::jsonb,$10,$11,$12,$13,$14,$15,$16,$17)
+                    explanation, hint, option_feedback, figure,
+                    marks, time_budget_seconds, difficulty, source, verified)
+                 VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,$9::jsonb,$10,$11,$12,$13,
+                         $14::jsonb,$15::jsonb,$16,$17,$18,$19,$20)
                  ON CONFLICT DO NOTHING`,
                 [
                   row.curriculum, row.subject, row.topic, row.subtopic, row.question_type,
@@ -646,6 +839,11 @@ async function main() {
                   row.correct_answer,
                   row.accepted_answers ? JSON.stringify(row.accepted_answers) : null,
                   row.answer_kind, row.answer_hint, row.explanation,
+                  row.hint,
+                  row.option_feedback && Object.keys(row.option_feedback).length
+                    ? JSON.stringify(row.option_feedback)
+                    : null,
+                  row.figure ? JSON.stringify(row.figure) : null,
                   row.marks, row.time_budget_seconds, row.difficulty, row.source, row.verified,
                 ]
               );
@@ -713,6 +911,15 @@ async function main() {
 
   const mins = (Date.now() - startedAt) / 60000;
   console.log(`\nDone. Inserted ${totalInserted} new verified questions in ${mins.toFixed(1)} min.`);
+  if (spend.calls > 0) {
+    const perQuestion = totalInserted > 0 ? dollars() / totalInserted : 0;
+    console.log(
+      `Spend: $${dollars().toFixed(2)} over ${spend.calls} calls ` +
+        `(${(spend.input / 1000).toFixed(0)}k in, ${(spend.output / 1000).toFixed(0)}k out) ` +
+        `= $${perQuestion.toFixed(4)} per question kept.`
+    );
+    console.log(`At that rate, 10,000 questions would cost about $${(perQuestion * 10000).toFixed(0)}.`);
+  }
   if (totalInserted > 0) {
     console.log(`Rate: ${(totalInserted / mins).toFixed(1)} questions/min at concurrency ${CONCURRENCY}.`);
   }
