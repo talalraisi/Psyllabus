@@ -257,6 +257,16 @@ async function checkerIsTrustworthy() {
 /* --------------------------------------------------------------------- main */
 
 async function main() {
+  if (PROVIDER === "claude" && !process.env.ANTHROPIC_API_KEY) {
+    console.error(
+      `No ANTHROPIC_API_KEY found. Add credits at console.anthropic.com, create a\n` +
+        `key, and put it in .env.local. API credits are separate from a Claude.ai\n` +
+        `subscription. Or check locally with --provider ollama, which can report\n` +
+        `but will not be allowed to unpublish.`
+    );
+    process.exit(1);
+  }
+
   const db = await connect();
   await db.query(fs.readFileSync(new URL("./034-recheck.sql", import.meta.url), "utf8"));
 

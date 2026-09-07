@@ -520,8 +520,18 @@ async function callModel(prompt, schema, maxTokens, temperature, provider = PROV
 
 async function preflight() {
   if (PROVIDER === "claude" || VERIFY_PROVIDER === "claude") {
+    // Failing here, before anything is generated, beats failing on the first
+    // call at 2am with a stack trace and a night already lost.
     if (!process.env.ANTHROPIC_API_KEY) {
-      console.log("No ANTHROPIC_API_KEY set; relying on an `ant auth login` profile.");
+      console.error(
+        `No ANTHROPIC_API_KEY found.\n\n` +
+          `  1. console.anthropic.com -> Billing -> add credits (API credits are\n` +
+          `     separate from a Claude.ai subscription; a Pro plan does not include them)\n` +
+          `  2. API keys -> Create key\n` +
+          `  3. Put it in .env.local as ANTHROPIC_API_KEY=sk-ant-...\n\n` +
+          `Or generate without paying: --provider ollama`
+      );
+      process.exit(1);
     }
     if (PROVIDER === "claude") return;
   }
