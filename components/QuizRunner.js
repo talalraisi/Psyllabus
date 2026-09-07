@@ -6,6 +6,7 @@ import Link from 'next/link'
 import CopyButton from '@/components/CopyButton'
 import HeatBadge from '@/components/HeatBadge'
 import QuestionFigure from '@/components/QuestionFigure'
+import ReportQuestion from '@/components/ReportQuestion'
 import { gradeAnswer } from '@/lib/grading'
 import { createClient } from '@/lib/supabase'
 import {
@@ -958,6 +959,7 @@ export default function QuizRunner({
                     {!g.correct && g.question.explanation && (
                       <p className="text-xs text-[var(--text-muted)] mt-1">{g.question.explanation}</p>
                     )}
+                    <ReportQuestion questionId={g.question.id} />
                     <div className="mt-1.5 flex flex-wrap items-center gap-3">
                       <HeatBadge difficulty={g.question.difficulty} showPoints />
                       <p className={`text-xs ${slow && timed ? 'text-[var(--warning-text)]' : 'text-[var(--text-faint)]'}`}>
