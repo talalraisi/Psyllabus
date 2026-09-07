@@ -21,7 +21,8 @@
     "verify-selftest": "node scripts/verify-selftest.mjs",
     "spot-check": "node scripts/spot-check.mjs",
     "reports": "node scripts/reports.mjs",
-    "recheck": "node scripts/recheck.mjs"
+    "recheck": "node scripts/recheck.mjs",
+    "pick-model": "node scripts/pick-model.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.117.1",
