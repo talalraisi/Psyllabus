@@ -9,7 +9,7 @@ import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader, EmptyState, PageLoading, SkeletonLine } from '@/components/PageShell'
 import { IconClock, IconCheck } from '@/components/Icons'
-import { sortTopics, progressKey } from '@/lib/progress'
+import { sortTopics, progressKey, HEAT_LEVELS, HEAT_RANGES } from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 import { accessibleSubjects, isPremium } from '@/lib/access'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
@@ -49,11 +49,14 @@ const LEVELS = [
   { key: 'hl', label: 'HL extension only', hint: 'Only the additional higher level content' },
 ]
 
+/**
+ * Heat, as something to filter by. The ranges are the same cut points the
+ * badge uses, so "Burning" on this screen and "Burning" on a question are the
+ * same set of questions rather than two different opinions.
+ */
 const DIFFICULTIES = [
-  { key: 'mixed', label: 'Mixed', range: null },
-  { key: 'easy', label: 'Easier', range: [0, 0.4] },
-  { key: 'medium', label: 'Medium', range: [0.35, 0.7] },
-  { key: 'hard', label: 'Harder', range: [0.6, 1] },
+  { key: 'mixed', label: 'Any heat', range: null },
+  ...HEAT_LEVELS.map((h) => ({ key: h.key, label: h.label, range: HEAT_RANGES[h.key] })),
 ]
 
 export default function TestBuilderPage() {
@@ -370,22 +373,35 @@ export default function TestBuilderPage() {
 
         {/* Difficulty and length */}
         <div className="surface mb-3 p-5">
-          <p className="t-small mb-3 font-medium text-[var(--text)]">Difficulty</p>
+          <p className="t-small mb-1 font-medium text-[var(--text)]">Heat</p>
+          <p className="t-caption mb-3">
+            How hard the questions are. Burning is the hardest end of the paper.
+          </p>
           <div className="mb-6 flex flex-wrap gap-2">
-            {DIFFICULTIES.map((d) => (
-              <button
-                key={d.key}
-                onClick={() => setDifficulty(d.key)}
-                aria-pressed={difficulty === d.key}
-                className={`control-sm rounded-[var(--r-md)] border px-4 text-sm font-medium transition-colors duration-150 ${
-                  difficulty === d.key
-                    ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
-                    : 'border-[var(--border-strong)] text-[var(--text-body)] hover:bg-[var(--surface-sunken)]'
-                }`}
-              >
-                {d.label}
-              </button>
-            ))}
+            {DIFFICULTIES.map((d) => {
+              const n = d.range
+                ? pool.filter((q) => {
+                    const v = typeof q.difficulty === 'number' ? q.difficulty : 0.5
+                    return v > d.range[0] && v <= d.range[1]
+                  }).length
+                : pool.length
+              return (
+                <button
+                  key={d.key}
+                  onClick={() => setDifficulty(d.key)}
+                  aria-pressed={difficulty === d.key}
+                  disabled={n === 0}
+                  className={`control-sm rounded-[var(--r-md)] border px-4 text-sm font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40 ${
+                    difficulty === d.key
+                      ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
+                      : 'border-[var(--border-strong)] text-[var(--text-body)] hover:bg-[var(--surface-sunken)]'
+                  }`}
+                >
+                  {d.label}
+                  <span className="ml-2 opacity-60">{n}</span>
+                </button>
+              )
+            })}
           </div>
 
           <p className="t-small mb-3 font-medium text-[var(--text)]">Length</p>

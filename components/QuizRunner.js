@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import CopyButton from '@/components/CopyButton'
+import HeatBadge from '@/components/HeatBadge'
 import { gradeAnswer } from '@/lib/grading'
 import { createClient } from '@/lib/supabase'
 import {
@@ -20,7 +21,7 @@ import { getCurrentUser } from '@/lib/auth'
 import { getSyllabus, getProfile } from '@/lib/cache'
 import { paperById, typesForStyle } from '@/lib/papers'
 import { buildEffectiveProgressMap } from '@/lib/decay'
-import { progressKey } from '@/lib/progress'
+import { progressKey, HEAT_RANGES } from '@/lib/progress'
 
 const PHASE = {
   loading: 'loading',
@@ -201,13 +202,13 @@ export default function QuizRunner({
 
       let candidates = questionRows
 
-      // Difficulty bands mirror the ranges offered in the test builder.
-      const BANDS = { easy: [0, 0.4], medium: [0.35, 0.7], hard: [0.6, 1] }
-      if (difficulty && BANDS[difficulty]) {
-        const [lo, hi] = BANDS[difficulty]
+      // Heat bands come from one definition shared with the test builder, so
+      // picking "Burning" there cannot quietly select something else here.
+      if (difficulty && HEAT_RANGES[difficulty]) {
+        const [lo, hi] = HEAT_RANGES[difficulty]
         const banded = candidates.filter((q) => {
           const d = typeof q.difficulty === 'number' ? q.difficulty : 0.5
-          return d >= lo && d <= hi
+          return d > lo && d <= hi
         })
         if (banded.length) candidates = banded
       }
@@ -715,9 +716,12 @@ export default function QuizRunner({
           <p className="text-sm text-[var(--text-muted)]">
             Question {currentIndex + 1} of {questions.length}
           </p>
-          <p className="text-xs text-[var(--text-faint)]">
-            {q.marks || 1} mark{(q.marks || 1) !== 1 ? 's' : ''} · {answeredCount}/{questions.length} answered
-          </p>
+          <div className="flex items-center gap-3">
+            <HeatBadge difficulty={q.difficulty} />
+            <p className="text-xs text-[var(--text-faint)]">
+              {q.marks || 1} mark{(q.marks || 1) !== 1 ? 's' : ''} · {answeredCount}/{questions.length} answered
+            </p>
+          </div>
         </div>
 
         <div className="mb-6 flex items-start justify-between gap-3">
@@ -865,7 +869,9 @@ export default function QuizRunner({
               })}
             </ul>
             <p className="t-caption mt-3">
-              Hard questions are worth 1 point, medium 0.5, easy 0.25. Each question pays once.
+              A question is worth points by heat: Low 0.5, Medium 0.75, Hot 1, Extremely hot 1.25,
+              Burning 1.5. Only correct answers pay, and each question pays once, so the same easy
+              question cannot be farmed.
             </p>
           </div>
         )}
@@ -917,9 +923,12 @@ export default function QuizRunner({
                     {!g.correct && g.question.explanation && (
                       <p className="text-xs text-[var(--text-muted)] mt-1">{g.question.explanation}</p>
                     )}
-                    <p className={`text-xs mt-1 ${slow && timed ? 'text-[var(--warning-text)]' : 'text-[var(--text-faint)]'}`}>
-                      {g.timeSpent}s spent · {budget}s budget{slow && timed ? ' · over budget' : ''}
-                    </p>
+                    <div className="mt-1.5 flex flex-wrap items-center gap-3">
+                      <HeatBadge difficulty={g.question.difficulty} showPoints />
+                      <p className={`text-xs ${slow && timed ? 'text-[var(--warning-text)]' : 'text-[var(--text-faint)]'}`}>
+                        {g.timeSpent}s spent · {budget}s budget{slow && timed ? ' · over budget' : ''}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -38,6 +38,17 @@
   --status-mastered: #7c3aed;    /* solid and recent */
   --status-untested: #e5e7eb;
 
+  /* --- Heat. How hard a question is, on a scale a student can read. --------
+     Deliberately a different family from the status colours: status is about
+     you, heat is about the question, and if the two shared a palette a red
+     question would read as a bad result. This one runs cool to hot, which is
+     what the words already say. ------------------------------------------- */
+  --heat-low: #64748b;       /* cool grey-blue */
+  --heat-medium: #0891b2;    /* teal */
+  --heat-hot: #d97706;       /* amber */
+  --heat-extreme: #ea580c;   /* orange */
+  --heat-burning: #dc2626;   /* red */
+
   /* Kept so anything still reading the old names renders. */
   --status-decaying: var(--status-fading);
   --status-shaky: var(--status-developing);
@@ -113,6 +124,12 @@
   --status-proficient: #4fb87a;
   --status-mastered: #a78bfa;
   --status-untested: #2f3833;
+
+  --heat-low: #94a3b8;
+  --heat-medium: #22b8cf;
+  --heat-hot: #eab308;
+  --heat-extreme: #fb923c;
+  --heat-burning: #f0645f;
 
   --status-decaying: var(--status-fading);
   --status-shaky: var(--status-developing);
