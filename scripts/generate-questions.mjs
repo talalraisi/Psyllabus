@@ -28,7 +28,7 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { connect } from "./db.mjs";
-import { normaliseText, parseNumber, numbersMatch } from "../lib/grading.js";
+import { normaliseText, parseNumber, numbersMatch, looseNumericMatch } from "../lib/grading.js";
 import { figureIsUsable } from "../lib/figures.js";
 
 // ---------------------------------------------------------------------------
@@ -760,13 +760,15 @@ function sameAnswer(a, b, kind) {
   if (!left || !right) return false;
   if (left === right) return true;
 
-  // Numbers compare by value, so 1.2e4, 12000 and "12000 m/s" all agree.
   const ln = parseNumber(left);
   const rn = parseNumber(right);
   if (ln != null && rn != null) return numbersMatch(ln, rn, 0.02);
 
-  // Text answers: one being contained in the other covers "the mitochondria"
-  // against "mitochondria" without accepting anything looser.
+  // A checker told to answer "40" sometimes answers "a shortage of 40 million
+  // bushels". That is obedience failing, not a wrong answer, and treating it
+  // as a disagreement unpublishes a good question.
+  if (kind !== "letter" && looseNumericMatch(a, b)) return true;
+
   if (kind === "text") return left.includes(right) || right.includes(left);
   return false;
 }

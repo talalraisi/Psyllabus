@@ -21,8 +21,9 @@
  *     --vllm-url http://1.2.3.4:8000/v1 --vllm-model Qwen/Qwen2.5-72B-Instruct
  */
 
+import { CASES } from "./checker-cases.mjs";
 import Anthropic from "@anthropic-ai/sdk";
-import { normaliseText, parseNumber, numbersMatch } from "../lib/grading.js";
+import { normaliseText, parseNumber, numbersMatch, looseNumericMatch } from "../lib/grading.js";
 
 const args = process.argv.slice(2);
 const arg = (name, fallback) => {
@@ -65,78 +66,7 @@ const SOLUTIONS_SCHEMA = {
  * stored. The rest are correct, and exist so a verifier that simply rejects
  * everything cannot pass this test.
  */
-const CASES = [
-  {
-    name: "geostationary speed (was wrong in the bank)",
-    shouldPass: false,
-    question: {
-      question_type: "short_answer",
-      answer_kind: "number",
-      stem: "A satellite orbits Earth in a geostationary orbit of radius 4.22 x 10^7 m. Calculate its orbital speed in km/h.",
-      accepted_answers: ["3071"],
-    },
-  },
-  {
-    name: "centripetal force (was wrong in the bank)",
-    shouldPass: false,
-    question: {
-      question_type: "short_answer",
-      answer_kind: "number",
-      stem: "A 2.0 kg mass moves in a circle of radius 0.50 m at a constant speed of 3.0 m/s. Calculate the centripetal force in N.",
-      accepted_answers: ["900"],
-    },
-  },
-  {
-    name: "centripetal force, correct answer",
-    shouldPass: true,
-    question: {
-      question_type: "short_answer",
-      answer_kind: "number",
-      stem: "A 2.0 kg mass moves in a circle of radius 0.50 m at a constant speed of 3.0 m/s. Calculate the centripetal force in N.",
-      accepted_answers: ["36"],
-    },
-  },
-  {
-    name: "kinetic energy, correct answer",
-    shouldPass: true,
-    question: {
-      question_type: "short_answer",
-      answer_kind: "number",
-      stem: "A 4.0 kg object moves at 5.0 m/s. Calculate its kinetic energy in J.",
-      accepted_answers: ["50"],
-    },
-  },
-  {
-    name: "MCQ derivative, correct answer",
-    shouldPass: true,
-    question: {
-      question_type: "mcq",
-      stem: "What is the derivative of f(x) = 3x^2 + 2x with respect to x?",
-      options: [
-        { id: "a", text: "6x + 2" },
-        { id: "b", text: "3x + 2" },
-        { id: "c", text: "6x" },
-        { id: "d", text: "x^3 + x^2" },
-      ],
-      correct_answer: "a",
-    },
-  },
-  {
-    name: "MCQ derivative, wrong option marked",
-    shouldPass: false,
-    question: {
-      question_type: "mcq",
-      stem: "What is the derivative of f(x) = 3x^2 + 2x with respect to x?",
-      options: [
-        { id: "a", text: "6x + 2" },
-        { id: "b", text: "3x + 2" },
-        { id: "c", text: "6x" },
-        { id: "d", text: "x^3 + x^2" },
-      ],
-      correct_answer: "c",
-    },
-  },
-];
+
 
 async function callOllama(prompt, schema, temperature) {
   const res = await fetch(`${OLLAMA_URL}/api/chat`, {
@@ -200,9 +130,16 @@ function sameAnswer(a, b, kind) {
   const right = normaliseText(String(b));
   if (!left || !right) return false;
   if (left === right) return true;
+
   const ln = parseNumber(left);
   const rn = parseNumber(right);
   if (ln != null && rn != null) return numbersMatch(ln, rn, 0.02);
+
+  // A checker told to answer "40" sometimes answers "a shortage of 40 million
+  // bushels". That is obedience failing, not a wrong answer, and treating it
+  // as a disagreement unpublishes a good question.
+  if (kind !== "letter" && looseNumericMatch(a, b)) return true;
+
   if (kind === "text") return left.includes(right) || right.includes(left);
   return false;
 }

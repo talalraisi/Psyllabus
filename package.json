@@ -20,7 +20,8 @@
     "build-bank": "node scripts/build-bank.mjs",
     "verify-selftest": "node scripts/verify-selftest.mjs",
     "spot-check": "node scripts/spot-check.mjs",
-    "reports": "node scripts/reports.mjs"
+    "reports": "node scripts/reports.mjs",
+    "recheck": "node scripts/recheck.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.117.1",
