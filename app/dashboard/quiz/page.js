@@ -4,6 +4,7 @@ import { Suspense, useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
+import { getProfile } from '@/lib/cache'
 import DashboardLayout from '@/components/DashboardLayout'
 import QuizRunner from '@/components/QuizRunner'
 
@@ -26,6 +27,7 @@ function QuizPageInner() {
   const focus = searchParams.get('focus') || null
   const difficulty = searchParams.get('difficulty') || null
   const level = searchParams.get('level') || null
+  const paper = searchParams.get('paper') || null
 
   useEffect(() => {
     async function load() {
@@ -34,11 +36,7 @@ function QuizPageInner() {
         router.push('/login')
         return
       }
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single()
+      const profileData = await getProfile(supabase, user.id, { onFresh: setProfile })
       if (!profileData) {
         router.push('/onboarding')
         return
@@ -81,6 +79,7 @@ function QuizPageInner() {
           focus={focus}
           difficulty={difficulty}
           level={level}
+          paper={paper}
           backHref={backHref}
         />
       </div>

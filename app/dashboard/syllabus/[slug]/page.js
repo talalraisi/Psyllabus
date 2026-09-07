@@ -5,9 +5,10 @@ import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
-import { getSyllabus } from '@/lib/cache'
+import { getSyllabus, getProfile } from '@/lib/cache'
 import DashboardLayout from '@/components/DashboardLayout'
 import ResourceHubDrawer from '@/components/ResourceHubDrawer'
+import PaperPicker from '@/components/PaperPicker'
 import { resolveSubjectFromSlug } from '@/lib/subject-map'
 import { isSubjectLocked, isPremium } from '@/lib/access'
 import {
@@ -36,6 +37,7 @@ export default function SyllabusPage() {
   const [progressDetail, setProgressDetail] = useState({})
   const [hasQuestions, setHasQuestions] = useState(false)
   const [drawerItem, setDrawerItem] = useState(null)
+  const [papersOpen, setPapersOpen] = useState(false)
 
   useEffect(() => {
     async function loadData() {
@@ -45,11 +47,7 @@ export default function SyllabusPage() {
         return
       }
 
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single()
+      const profileData = await getProfile(supabase, user.id, { onFresh: setProfile })
 
       if (!profileData) {
         router.push('/onboarding')
@@ -139,10 +137,10 @@ export default function SyllabusPage() {
       <div className="px-5 py-6 md:px-12 md:py-10 max-w-4xl mx-auto">
         <header className="mb-8">
           <button
-            onClick={() => router.push('/dashboard')}
+            onClick={() => router.push('/dashboard/subjects')}
             className="text-sm font-medium text-[var(--brand)] mb-4 hover:underline"
           >
-            ← Back to Dashboard
+            ← Back to My Subjects
           </button>
           <div className="flex items-center justify-between gap-4">
             <h1 className="t-page-title">{subjectName}</h1>
@@ -165,12 +163,9 @@ export default function SyllabusPage() {
                 </button>
               )}
               {hasQuestions && (
-                <Link
-                  href={`/dashboard/quiz?subject=${encodeURIComponent(subjectName)}&mode=mock&back=${encodeURIComponent(slugPath)}`}
-                  className="btn btn-outline control-sm"
-                >
-                  Timed mock exam
-                </Link>
+                <button onClick={() => setPapersOpen(true)} className="btn btn-outline control-sm">
+                  Test
+                </button>
               )}
             </div>
           </div>
@@ -311,6 +306,14 @@ export default function SyllabusPage() {
           </div>
         )}
       </div>
+
+      <PaperPicker
+        open={papersOpen}
+        onClose={() => setPapersOpen(false)}
+        subject={subjectName}
+        curriculum={profile?.curriculum}
+        backHref={slugPath}
+      />
 
       <ResourceHubDrawer
         open={!!drawerItem}

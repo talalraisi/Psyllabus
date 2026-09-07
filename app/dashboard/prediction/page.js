@@ -323,11 +323,21 @@ export default function PredictionPage() {
                   </li>
                   )}
 
+                  {rules.hasTotal && rules.hasCore && (
+                    <li className="flex items-center justify-between gap-4 border-t border-[var(--border)] py-2.5">
+                      <span className="text-sm text-[var(--text-body)]">Subject points</span>
+                      <span className="shrink-0 text-sm font-semibold tabular-nums text-[var(--text)]">
+                        {prediction.targetTotal} / {rules.maxSubjectPoints}
+                      </span>
+                    </li>
+                  )}
+
                   {rules.hasTotal && (
                     <li className="flex items-center justify-between gap-4 border-t border-[var(--border-strong)] py-3">
                       <span className="text-sm font-semibold text-[var(--text)]">Target total</span>
                       <span className="shrink-0 text-base font-bold tabular-nums text-[var(--brand)]">
-                        {prediction.targetTotal} / {rules.maxSubjectPoints}
+                        {rules.hasCore ? prediction.targetDiplomaTotal : prediction.targetTotal} /{' '}
+                        {rules.hasCore ? rules.maxTotal : rules.maxSubjectPoints}
                       </span>
                     </li>
                   )}

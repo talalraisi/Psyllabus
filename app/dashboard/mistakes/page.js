@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
+import { getProfile } from '@/lib/cache'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
@@ -18,6 +19,7 @@ function relativeDue(nextReviewAt, now = Date.now()) {
 
 export default function MistakeBankPage() {
   const [profile, setProfile] = useState(null)
+  const [expanded, setExpanded] = useState({})
   const [mistakes, setMistakes] = useState([])
   const [loading, setLoading] = useState(true)
   const router = useRouter()
@@ -31,11 +33,7 @@ export default function MistakeBankPage() {
         return
       }
 
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single()
+      const profileData = await getProfile(supabase, user.id, { onFresh: setProfile })
 
       if (!profileData) {
         router.push('/onboarding')
@@ -115,13 +113,43 @@ export default function MistakeBankPage() {
             </p>
           </div>
         ) : (
-          <div className="space-y-8">
-            {Object.entries(bySubject).map(([subject, items]) => (
-              <section key={subject}>
-                <h2 className="t-overline mb-3">
-                  {subject}
-                </h2>
-                <div className="surface divide-y divide-[var(--border)]">
+          <div className="space-y-3">
+            {Object.entries(bySubject).map(([subject, items]) => {
+              const dueHere = items.filter(
+                (m) => new Date(m.next_review_at).getTime() <= now
+              ).length
+              const open = !!expanded[subject]
+
+              return (
+              <section key={subject} className="surface overflow-hidden">
+                <button
+                  onClick={() =>
+                    setExpanded((prev) => ({ ...prev, [subject]: !prev[subject] }))
+                  }
+                  aria-expanded={open}
+                  className="flex w-full items-center justify-between gap-4 bg-[var(--surface-sunken)] px-5 py-4 text-left"
+                >
+                  <div className="min-w-0">
+                    <h2 className="text-sm font-bold text-[var(--text)]">{subject}</h2>
+                    <p className="text-xs text-[var(--text-muted)] mt-1">
+                      {items.length} logged
+                      {dueHere > 0 && (
+                        <span className="text-[var(--warning-text)]"> · {dueHere} due</span>
+                      )}
+                    </p>
+                  </div>
+                  <span
+                    className={`shrink-0 text-xs text-[var(--text-faint)] transition-transform duration-150 ${
+                      open ? 'rotate-90' : ''
+                    }`}
+                    aria-hidden="true"
+                  >
+                    &#9654;
+                  </span>
+                </button>
+
+                {open && (
+                <div className="divide-y divide-[var(--border)]">
                   {items.map((m) => {
                     const isDue = new Date(m.next_review_at).getTime() <= now
                     return (
@@ -148,8 +176,10 @@ export default function MistakeBankPage() {
                     )
                   })}
                 </div>
+                )}
               </section>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>

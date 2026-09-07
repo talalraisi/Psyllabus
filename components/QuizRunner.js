@@ -17,7 +17,8 @@ import {
   STATUS_TEXT_COLORS,
 } from '@/lib/progress'
 import { getCurrentUser } from '@/lib/auth'
-import { getSyllabus } from '@/lib/cache'
+import { getSyllabus, getProfile } from '@/lib/cache'
+import { paperById, typesForStyle } from '@/lib/papers'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 import { progressKey } from '@/lib/progress'
 
@@ -114,6 +115,7 @@ export default function QuizRunner({
   focus = null,
   difficulty = null,
   level = null,
+  paper = null,
   backHref = '/dashboard',
 }) {
   const [phase, setPhase] = useState(PHASE.loading)
@@ -130,7 +132,10 @@ export default function QuizRunner({
   const router = useRouter()
   const supabase = createClient()
 
-  const timed = mode === 'mock' || timedProp
+  // A paper is sat under exam conditions by definition.
+  const timed = mode === 'mock' || mode === 'paper' || timedProp
+  const [curriculumId, setCurriculumId] = useState('IB')
+  const paperDefinition = mode === 'paper' && paper ? paperById(subject, curriculumId, paper) : null
   const timeLimitRef = useRef(null)
   const questionTimesRef = useRef({})
   const lastSwitchRef = useRef(null)
@@ -172,6 +177,10 @@ export default function QuizRunner({
         return
       }
 
+      const profileRow = await getProfile(supabase, user.id)
+      const curriculum = profileRow?.curriculum || 'IB'
+      setCurriculumId(curriculum)
+
       let query = supabase
         .from('questions')
         .select('*')
@@ -201,6 +210,28 @@ export default function QuizRunner({
           return d >= lo && d <= hi
         })
         if (banded.length) candidates = banded
+      }
+
+      // A paper has a shape of its own: which question types it holds, which
+      // half of the course it draws from, and how long it runs. It is applied
+      // before anything else, because it is the whole point of sitting one.
+      let paperDef = null
+      if (mode === 'paper' && paper) {
+        paperDef = paperById(subject, curriculum, paper)
+        if (paperDef) {
+          const types = typesForStyle(paperDef.style)
+          if (types) {
+            const typed = candidates.filter((q) => types.includes(q.question_type || 'mcq'))
+            if (typed.length) candidates = typed
+          }
+          if (paperDef.scope === 'hl') {
+            const syllabus = await getSyllabus(supabase, [subject])
+            const hlBySubtopic = {}
+            for (const row of syllabus || []) hlBySubtopic[row.subtopic] = !!row.hl_only
+            const hlOnly = candidates.filter((q) => hlBySubtopic[q.subtopic])
+            if (hlOnly.length) candidates = hlOnly
+          }
+        }
       }
 
       // Level splits an IB HL course into the half SL students also sit and
@@ -243,7 +274,9 @@ export default function QuizRunner({
 
       const questionRowsFiltered = candidates
       const target =
-        count || (mode === 'mock' ? MOCK_COUNT : mode === 'topic' ? 15 : SUBTOPIC_COUNT)
+        paperDef?.target ||
+        count ||
+        (mode === 'mock' ? MOCK_COUNT : mode === 'topic' ? 15 : SUBTOPIC_COUNT)
 
       // Serve unseen questions first so repeats only happen once this pool is
       // exhausted. Falls back to seen ones (oldest-seen first) to fill the paper.
@@ -271,7 +304,7 @@ export default function QuizRunner({
     }
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subject, topic, subtopic, mode, count, topics?.join('|'), focus, difficulty, level])
+  }, [subject, topic, subtopic, mode, count, topics?.join('|'), focus, difficulty, level, paper])
 
   const startQuiz = () => {
     questionTimesRef.current = {}
@@ -359,7 +392,11 @@ export default function QuizRunner({
         topic: topic || questions[0]?.topic || null,
         subtopic: mode === 'subtopic' ? subtopic : null,
         // DB constraint allows subtopic|topic|mock|mistakes
-        quiz_type: mode === 'custom' ? (timed ? 'mock' : 'topic') : mode,
+        // quiz_attempts.quiz_type is constrained to four values. A paper is a
+        // timed mock as far as that column is concerned, so it is stored as one
+        // rather than failing the insert at the moment the student finishes.
+        quiz_type:
+          mode === 'paper' ? 'mock' : mode === 'custom' ? (timed ? 'mock' : 'topic') : mode,
         predicted_score: prediction,
         score,
         total_questions: total,
@@ -564,7 +601,9 @@ export default function QuizRunner({
     return (
       <div className="surface p-6">
         <p className="t-overline mb-2">
-          {mode === 'mock'
+          {paperDefinition
+            ? `${paperDefinition.name} · ${subject}`
+            : mode === 'mock'
             ? 'Timed Mock'
             : mode === 'mistakes'
               ? 'Mistake Review'
@@ -575,7 +614,9 @@ export default function QuizRunner({
                   : 'Mini-Quiz'}
         </p>
         <h1 className="text-xl font-bold text-[var(--text)] mb-1">
-          {mode === 'mistakes'
+          {paperDefinition
+            ? paperDefinition.blurb
+            : mode === 'mistakes'
             ? 'Your past mistakes'
             : mode === 'topic'
               ? topic
@@ -585,6 +626,12 @@ export default function QuizRunner({
           {questions.length} question{questions.length !== 1 ? 's' : ''} · auto-graded
           {timed ? ` · ${totalMinutes} min limit` : ''}
         </p>
+        {paperDefinition && paperDefinition.minutes && (
+          <p className="t-caption -mt-4 mb-6">
+            The real {paperDefinition.name} runs {paperDefinition.minutes} minutes. This one is
+            timed from the questions it actually contains.
+          </p>
+        )}
 
         <div className="mb-6 p-4 rounded-lg border border-[var(--border)] bg-[var(--surface-sunken)]">
           <label className="block text-sm font-medium text-[var(--text)] mb-2">
