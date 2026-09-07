@@ -59,7 +59,33 @@ const LIMIT_SUBTOPICS = parseInt(arg("limit-subtopics", "0"), 10); // 0 = all
  */
 const PROVIDER = arg("provider", "ollama"); // ollama | vllm | claude
 const OLLAMA_MODEL = arg("ollama-model", "qwen2.5:14b");
-const OLLAMA_URL = arg("ollama-url", "http://localhost:11434");
+/**
+ * One or more Ollama endpoints, comma separated.
+ *
+ * A second machine does not need this repo, the database password, or Node.
+ * It needs Ollama and the model. Point at both and the work is shared between
+ * them, with everything that touches the database staying on one machine.
+ *
+ *   --ollama-url "http://localhost:11434,http://192.168.1.42:11434"
+ *
+ * That is a better arrangement than running the whole pipeline twice: there is
+ * one set of credentials, one progress count, and no way for the two halves to
+ * disagree about what has already been generated.
+ */
+const OLLAMA_URLS = arg("ollama-url", "http://localhost:11434")
+  .split(",")
+  .map((u) => u.trim().replace(/\/$/, ""))
+  .filter(Boolean);
+const OLLAMA_URL = OLLAMA_URLS[0];
+
+// Round robin. Requests are long and similar in cost, so taking the next
+// endpoint each time keeps both machines busy without needing to measure them.
+let endpointCursor = 0;
+function nextEndpoint() {
+  const url = OLLAMA_URLS[endpointCursor % OLLAMA_URLS.length];
+  endpointCursor++;
+  return url;
+}
 const VLLM_URL = arg("vllm-url", process.env.VLLM_URL || "http://localhost:8000/v1");
 const VLLM_MODEL = arg("vllm-model", process.env.VLLM_MODEL || "");
 const VLLM_KEY = process.env.VLLM_API_KEY || "EMPTY";
@@ -482,7 +508,8 @@ async function callOpenAICompatible(prompt, schema, temperature) {
 
 /** Free local generation via Ollama's JSON-schema-constrained output. */
 async function callOllama(prompt, schema, temperature) {
-  const res = await fetch(`${OLLAMA_URL}/api/chat`, {
+  const endpoint = nextEndpoint();
+  const res = await fetch(`${endpoint}/api/chat`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
@@ -503,7 +530,7 @@ async function callOllama(prompt, schema, temperature) {
         `Model "${OLLAMA_MODEL}" not found. Run: ollama pull ${OLLAMA_MODEL}`
       );
     }
-    throw new Error(`Ollama ${res.status}: ${body.slice(0, 200)}`);
+    throw new Error(`Ollama ${res.status} at ${endpoint}: ${body.slice(0, 200)}`);
   }
 
   const data = await res.json();
@@ -565,27 +592,36 @@ async function preflight() {
     if (PROVIDER === "vllm") return;
   }
 
-  try {
-    const res = await fetch(`${OLLAMA_URL}/api/tags`);
-    const { models } = await res.json();
-    const names = (models || []).map((m) => m.name);
-    if (!names.some((n) => n === OLLAMA_MODEL || n.startsWith(`${OLLAMA_MODEL}:`))) {
+  // Every endpoint is checked, because one machine quietly missing the model
+  // means half the night's requests fail and the other half carry the load.
+  for (const url of OLLAMA_URLS) {
+    try {
+      const res = await fetch(`${url}/api/tags`);
+      const { models } = await res.json();
+      const names = (models || []).map((m) => m.name);
+      if (!names.some((n) => n === OLLAMA_MODEL || n.startsWith(`${OLLAMA_MODEL}:`))) {
+        console.error(
+          `${url} is running but "${OLLAMA_MODEL}" is not installed there.\n` +
+            `Installed: ${names.join(", ") || "(none)"}\n` +
+            `Fix, on that machine: ollama pull ${OLLAMA_MODEL}`
+        );
+        process.exit(1);
+      }
+    } catch {
       console.error(
-        `Ollama is running but "${OLLAMA_MODEL}" is not installed.\n` +
-          `Installed: ${names.join(", ") || "(none)"}\n` +
-          `Fix: ollama pull ${OLLAMA_MODEL}`
+        `Cannot reach Ollama at ${url}.\n` +
+          (url.includes("localhost")
+            ? `1. Install it from https://ollama.com\n` +
+              `2. ollama pull ${OLLAMA_MODEL}\n` +
+              `3. Re-run (Ollama serves automatically once installed).`
+            : `On that machine: set OLLAMA_HOST=0.0.0.0 so it listens on the network,\n` +
+              `restart Ollama, and check the firewall allows port 11434.`)
       );
       process.exit(1);
     }
-  } catch {
-    console.error(
-      `Cannot reach Ollama at ${OLLAMA_URL}.\n` +
-        `1. Install it from https://ollama.com\n` +
-        `2. ollama pull ${OLLAMA_MODEL}\n` +
-        `3. Re-run this script (Ollama serves automatically once installed).\n` +
-        `Or use paid generation instead: --provider claude`
-    );
-    process.exit(1);
+  }
+  if (OLLAMA_URLS.length > 1) {
+    console.log(`Sharing work across ${OLLAMA_URLS.length} machines.`);
   }
 }
 

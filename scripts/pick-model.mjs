@@ -14,6 +14,10 @@
  *   node scripts/pick-model.mjs
  *   node scripts/pick-model.mjs --models "qwen2.5:14b,qwen2.5:32b,gemma3:27b"
  *   node scripts/pick-model.mjs --pull        download the suggested candidates first
+ *   node scripts/pick-model.mjs --ollama-url http://192.168.1.42:11434
+ *
+ * The last form tests a second machine over the network, so a PC that does not
+ * have this repo on it can still be measured from the one that does.
  */
 
 import { execSync } from "node:child_process";
