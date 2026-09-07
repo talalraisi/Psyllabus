@@ -44,10 +44,28 @@ function arg(name, fallback) {
 const SUBJECT = arg("subject", "Math Analysis & Approaches HL");
 const PER_SUBTOPIC = parseInt(arg("per-subtopic", "100"), 10);
 const LIMIT_SUBTOPICS = parseInt(arg("limit-subtopics", "0"), 10); // 0 = all
-const PROVIDER = arg("provider", "ollama"); // ollama (free) | claude
+/**
+ * ollama  free, local, one request at a time in practice
+ * vllm    an OpenAI-compatible server you rent by the hour, the fast option
+ * claude  the accurate option, paid per token
+ *
+ * vllm exists because Ollama on a laptop is the wrong tool for 300,000
+ * questions: it holds one model on one machine and serves roughly one request
+ * at a time, so the card sits idle between calls. vLLM on a rented GPU batches
+ * dozens of requests into the same forward pass, which is the difference
+ * between a question a minute and a few questions a second. It speaks the
+ * OpenAI API, so this is the same code path any hosted open-weights provider
+ * would use too.
+ */
+const PROVIDER = arg("provider", "ollama"); // ollama | vllm | claude
 const OLLAMA_MODEL = arg("ollama-model", "qwen2.5:14b");
 const OLLAMA_URL = arg("ollama-url", "http://localhost:11434");
-const BATCH_SIZE = PROVIDER === "ollama" ? 8 : 20; // local models do better with smaller batches
+const VLLM_URL = arg("vllm-url", process.env.VLLM_URL || "http://localhost:8000/v1");
+const VLLM_MODEL = arg("vllm-model", process.env.VLLM_MODEL || "");
+const VLLM_KEY = process.env.VLLM_API_KEY || "EMPTY";
+// Local models do better with smaller batches; a served model has no such
+// problem and larger batches amortise the prompt across more questions.
+const BATCH_SIZE = parseInt(arg("batch-size", PROVIDER === "ollama" ? "8" : "20"), 10);
 
 /**
  * How many subtopics to work on at once.
@@ -58,7 +76,10 @@ const BATCH_SIZE = PROVIDER === "ollama" ? 8 : 20; // local models do better wit
  * about 95% idle, and this is the single number that decides whether renting
  * one was worth it. Start at 16 there and watch tokens/sec.
  */
-const CONCURRENCY = Math.max(1, parseInt(arg("concurrency", "1"), 10));
+const CONCURRENCY = Math.max(
+  1,
+  parseInt(arg("concurrency", PROVIDER === "ollama" ? "1" : "16"), 10)
+);
 
 // Stop after this many, for pilots. 0 = no limit.
 const MAX_QUESTIONS = parseInt(arg("max-questions", "0"), 10);
@@ -92,15 +113,39 @@ const PRICES = {
 };
 
 const BUDGET = parseFloat(arg("budget", "0")); // dollars, 0 = no limit
+
+/**
+ * A rented GPU is billed by the hour, not by the token, so the meter is a
+ * clock. Pass what you are paying and the run prices itself the same way a
+ * paid API run does, which is the only way to compare the two honestly.
+ */
+const GPU_COST_PER_HOUR = parseFloat(arg("gpu-cost", "0"));
+const RUN_STARTED = Date.now();
 const spend = { input: 0, output: 0, calls: 0 };
 
 function priceOf(model) {
   return PRICES[model] || PRICES["claude-sonnet-5"];
 }
 
+function elapsedHours() {
+  return (Date.now() - RUN_STARTED) / 3600000;
+}
+
 function dollars() {
+  if (GPU_COST_PER_HOUR > 0) return elapsedHours() * GPU_COST_PER_HOUR;
+  if (PROVIDER !== "claude" && VERIFY_PROVIDER !== "claude") return 0;
   const p = priceOf(MODEL);
   return (spend.input / 1e6) * p.input + (spend.output / 1e6) * p.output;
+}
+
+/**
+ * Output tokens per second across every concurrent request. This is the single
+ * number that says whether a rented card is being used or idling: raise
+ * --concurrency until it stops climbing, and that is the setting.
+ */
+function tokensPerSecond() {
+  const seconds = (Date.now() - RUN_STARTED) / 1000;
+  return seconds > 0 ? spend.output / seconds : 0;
 }
 
 function budgetCheck() {
@@ -387,6 +432,54 @@ async function callClaude(prompt, schema, maxTokens = 16000, temperature) {
   return JSON.parse(text);
 }
 
+/**
+ * An OpenAI-compatible server: vLLM, SGLang, or a hosted open-weights provider.
+ *
+ * Schema-constrained decoding is requested through response_format, which vLLM
+ * implements with guided decoding, so the output is valid against the schema
+ * by construction rather than by asking nicely and hoping. Without it a 70B
+ * model returns prose around the JSON often enough to matter across thousands
+ * of calls.
+ */
+async function callOpenAICompatible(prompt, schema, temperature) {
+  const res = await fetch(`${VLLM_URL}/chat/completions`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      authorization: `Bearer ${VLLM_KEY}`,
+    },
+    body: JSON.stringify({
+      model: VLLM_MODEL,
+      temperature: temperature ?? 0.8,
+      max_tokens: 8000,
+      messages: [{ role: "user", content: prompt }],
+      response_format: {
+        type: "json_schema",
+        json_schema: { name: "output", schema, strict: true },
+      },
+    }),
+  });
+
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`vLLM ${res.status}: ${body.slice(0, 300)}`);
+  }
+
+  const data = await res.json();
+  const content = data?.choices?.[0]?.message?.content;
+  if (!content) throw new Error("Empty response from the server");
+
+  // Track tokens here too: a rented box is billed by the hour rather than by
+  // the token, but tokens per second is the number that tells you whether you
+  // are getting your money's worth out of it.
+  if (data.usage) {
+    spend.input += data.usage.prompt_tokens || 0;
+    spend.output += data.usage.completion_tokens || 0;
+    spend.calls++;
+  }
+  return JSON.parse(content);
+}
+
 /** Free local generation via Ollama's JSON-schema-constrained output. */
 async function callOllama(prompt, schema, temperature) {
   const res = await fetch(`${OLLAMA_URL}/api/chat`, {
@@ -420,9 +513,9 @@ async function callOllama(prompt, schema, temperature) {
 }
 
 async function callModel(prompt, schema, maxTokens, temperature, provider = PROVIDER) {
-  return provider === "claude"
-    ? callClaude(prompt, schema, maxTokens, temperature)
-    : callOllama(prompt, schema, temperature);
+  if (provider === "claude") return callClaude(prompt, schema, maxTokens, temperature);
+  if (provider === "vllm") return callOpenAICompatible(prompt, schema, temperature);
+  return callOllama(prompt, schema, temperature);
 }
 
 async function preflight() {
@@ -432,6 +525,36 @@ async function preflight() {
     }
     if (PROVIDER === "claude") return;
   }
+
+  if (PROVIDER === "vllm" || VERIFY_PROVIDER === "vllm") {
+    if (!VLLM_MODEL) {
+      console.error("--vllm-model is required, e.g. --vllm-model Qwen/Qwen2.5-72B-Instruct");
+      process.exit(1);
+    }
+    try {
+      const res = await fetch(`${VLLM_URL}/models`, {
+        headers: { authorization: `Bearer ${VLLM_KEY}` },
+      });
+      const { data } = await res.json();
+      const served = (data || []).map((m) => m.id);
+      if (served.length && !served.includes(VLLM_MODEL)) {
+        console.error(
+          `The server at ${VLLM_URL} is serving ${served.join(", ")}, not "${VLLM_MODEL}".`
+        );
+        process.exit(1);
+      }
+      console.log(`Server: ${VLLM_MODEL} at ${VLLM_URL}`);
+    } catch {
+      console.error(
+        `Cannot reach an OpenAI-compatible server at ${VLLM_URL}.\n` +
+          `Start one on the rented box, then tunnel or expose it:\n` +
+          `  vllm serve ${VLLM_MODEL} --port 8000 --max-model-len 8192`
+      );
+      process.exit(1);
+    }
+    if (PROVIDER === "vllm") return;
+  }
+
   try {
     const res = await fetch(`${OLLAMA_URL}/api/tags`);
     const { models } = await res.json();
@@ -714,7 +837,12 @@ async function verifyBatch(questions) {
 // ---------------------------------------------------------------------------
 
 async function main() {
-  const modelLabel = PROVIDER === "claude" ? MODEL : `${OLLAMA_MODEL} (local, free)`;
+  const modelLabel =
+    PROVIDER === "claude"
+      ? MODEL
+      : PROVIDER === "vllm"
+        ? `${VLLM_MODEL} (served)`
+        : `${OLLAMA_MODEL} (local, free)`;
   console.log(`Subject: ${SUBJECT} | target ${PER_SUBTOPIC}/subtopic | ${modelLabel}`);
   await preflight();
 
@@ -753,9 +881,10 @@ async function main() {
 
     const existingStems = existing.map((q) => q.stem);
     let have = existingStems.length;
+    const cost = dollars();
     const meter =
-      PROVIDER === "claude" || VERIFY_PROVIDER === "claude"
-        ? ` · $${dollars().toFixed(2)} spent`
+      spend.calls > 0
+        ? ` · ${tokensPerSecond().toFixed(0)} tok/s` + (cost > 0 ? ` · $${cost.toFixed(2)}` : "")
         : "";
     console.log(`\n${subtopic}: ${have}/${PER_SUBTOPIC}${meter}`);
 
@@ -912,13 +1041,27 @@ async function main() {
   const mins = (Date.now() - startedAt) / 60000;
   console.log(`\nDone. Inserted ${totalInserted} new verified questions in ${mins.toFixed(1)} min.`);
   if (spend.calls > 0) {
-    const perQuestion = totalInserted > 0 ? dollars() / totalInserted : 0;
     console.log(
-      `Spend: $${dollars().toFixed(2)} over ${spend.calls} calls ` +
+      `Throughput: ${tokensPerSecond().toFixed(0)} output tok/s over ${spend.calls} calls ` +
         `(${(spend.input / 1000).toFixed(0)}k in, ${(spend.output / 1000).toFixed(0)}k out) ` +
-        `= $${perQuestion.toFixed(4)} per question kept.`
+        `at concurrency ${CONCURRENCY}.`
     );
-    console.log(`At that rate, 10,000 questions would cost about $${(perQuestion * 10000).toFixed(0)}.`);
+    const cost = dollars();
+    if (cost > 0 && totalInserted > 0) {
+      const perQuestion = cost / totalInserted;
+      console.log(
+        `Cost: $${cost.toFixed(2)} = $${perQuestion.toFixed(4)} per question kept. ` +
+          `10,000 would be about $${(perQuestion * 10000).toFixed(0)}, ` +
+          `all 295,700 about $${Math.round((perQuestion * 295700) / 10) * 10}.`
+      );
+    }
+    const rate = totalInserted / Math.max(mins, 0.01);
+    if (rate > 0) {
+      console.log(
+        `At ${rate.toFixed(1)} questions/min, 295,700 would take ` +
+          `${(295700 / rate / 60).toFixed(0)} hours.`
+      );
+    }
   }
   if (totalInserted > 0) {
     console.log(`Rate: ${(totalInserted / mins).toFixed(1)} questions/min at concurrency ${CONCURRENCY}.`);

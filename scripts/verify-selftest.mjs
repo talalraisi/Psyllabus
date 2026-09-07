@@ -8,10 +8,17 @@
  * must survive. If the good ones are also rejected the model is too weak for
  * the subject, which is worth knowing before spending a night generating.
  *
+ * This is also how you choose a model for a rented server. Start the box, serve
+ * a candidate, point this at it, and you know in five minutes and a few cents
+ * whether it can do the arithmetic, instead of finding out from a bank of
+ * questions you already paid for a night to generate.
+ *
  * Usage:
  *   node scripts/verify-selftest.mjs
  *   node scripts/verify-selftest.mjs --provider claude
  *   node scripts/verify-selftest.mjs --ollama-model qwen2.5:14b --verify-passes 3
+ *   node scripts/verify-selftest.mjs --provider vllm \
+ *     --vllm-url http://1.2.3.4:8000/v1 --vllm-model Qwen/Qwen2.5-72B-Instruct
  */
 
 import Anthropic from "@anthropic-ai/sdk";
@@ -27,6 +34,9 @@ const PROVIDER = arg("provider", "ollama");
 const OLLAMA_MODEL = arg("ollama-model", "qwen2.5:14b");
 const OLLAMA_URL = arg("ollama-url", "http://localhost:11434");
 const VERIFY_PASSES = Math.max(1, parseInt(arg("verify-passes", "2"), 10));
+const VLLM_URL = arg("vllm-url", process.env.VLLM_URL || "http://localhost:8000/v1");
+const VLLM_MODEL = arg("vllm-model", process.env.VLLM_MODEL || "");
+const VLLM_KEY = process.env.VLLM_API_KEY || "EMPTY";
 const anthropic = PROVIDER === "claude" ? new Anthropic() : null;
 
 const SOLUTIONS_SCHEMA = {
@@ -158,8 +168,31 @@ async function callClaude(prompt, schema) {
   return JSON.parse(response.content.find((b) => b.type === "text").text);
 }
 
-const callModel = (prompt, schema, temperature) =>
-  PROVIDER === "claude" ? callClaude(prompt, schema) : callOllama(prompt, schema, temperature);
+async function callVllm(prompt, schema, temperature) {
+  const res = await fetch(`${VLLM_URL}/chat/completions`, {
+    method: "POST",
+    headers: { "content-type": "application/json", authorization: `Bearer ${VLLM_KEY}` },
+    body: JSON.stringify({
+      model: VLLM_MODEL,
+      temperature: temperature ?? 0,
+      max_tokens: 8000,
+      messages: [{ role: "user", content: prompt }],
+      response_format: {
+        type: "json_schema",
+        json_schema: { name: "output", schema, strict: true },
+      },
+    }),
+  });
+  if (!res.ok) throw new Error(`vLLM ${res.status}: ${(await res.text()).slice(0, 300)}`);
+  const data = await res.json();
+  return JSON.parse(data.choices[0].message.content);
+}
+
+const callModel = (prompt, schema, temperature) => {
+  if (PROVIDER === "claude") return callClaude(prompt, schema);
+  if (PROVIDER === "vllm") return callVllm(prompt, schema, temperature);
+  return callOllama(prompt, schema, temperature);
+};
 
 function sameAnswer(a, b, kind) {
   if (a == null || b == null) return false;
@@ -190,9 +223,9 @@ Give the answer only: a single letter for multiple choice, or the value alone fo
 
 Questions:\n\n${listing}`;
 
-  console.log(
-    `Verifier self-test · ${PROVIDER === "claude" ? "claude-opus-5" : OLLAMA_MODEL} · ${VERIFY_PASSES} passes\n`
-  );
+  const label =
+    PROVIDER === "claude" ? "claude-opus-5" : PROVIDER === "vllm" ? VLLM_MODEL : OLLAMA_MODEL;
+  console.log(`Verifier self-test · ${label} · ${VERIFY_PASSES} passes\n`);
 
   const passes = [];
   for (let i = 0; i < VERIFY_PASSES; i++) {
