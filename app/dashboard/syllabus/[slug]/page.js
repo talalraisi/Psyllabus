@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
 import { getSyllabus } from '@/lib/cache'
-import { summarise } from '@/lib/coverage'
 import DashboardLayout from '@/components/DashboardLayout'
 import ResourceHubDrawer from '@/components/ResourceHubDrawer'
 import { resolveSubjectFromSlug } from '@/lib/subject-map'
@@ -37,64 +36,6 @@ export default function SyllabusPage() {
   const [progressDetail, setProgressDetail] = useState({})
   const [hasQuestions, setHasQuestions] = useState(false)
   const [drawerItem, setDrawerItem] = useState(null)
-  const [logging, setLogging] = useState('')
-
-  /**
-   * Write one field on a progress row, creating it if this subtopic has never
-   * been touched. Coverage and review both need to work before any quiz exists,
-   * which is the whole point of them.
-   */
-  const upsertProgress = async (item, patch) => {
-    const user = await getCurrentUser(supabase)
-    if (!user) return
-    const key = progressKey(subjectName, item.subtopic)
-
-    setProgressDetail((prev) => ({ ...prev, [key]: { ...prev[key], ...patch.local } }))
-
-    await supabase.from('progress').upsert(
-      {
-        user_id: user.id,
-        subject: subjectName,
-        topic: item.topic || '',
-        subtopic: item.subtopic,
-        ...patch.row,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'user_id,subject,subtopic' }
-    )
-  }
-
-  const setCovered = (item, covered) =>
-    upsertProgress(item, {
-      row: { covered, covered_at: covered ? new Date().toISOString() : null },
-      local: { covered },
-    })
-
-  /**
-   * Logging review deliberately does not touch status or mastery_points. It
-   * says "I studied this", which is not the same claim as "I know this", and
-   * only the second one is allowed to colour the heatmap.
-   */
-  const logReview = async (item) => {
-    if (logging) return
-    setLogging(item.id)
-    const now = new Date().toISOString()
-    await upsertProgress(item, {
-      row: { reviewed_at: now },
-      local: { reviewedAt: now },
-    })
-    setTimeout(() => setLogging(''), 900)
-  }
-
-  /** "Reviewed today" reads better than a date nobody wanted. */
-  const reviewedLabel = (reviewedAt) => {
-    if (!reviewedAt) return null
-    const days = Math.floor((Date.now() - new Date(reviewedAt).getTime()) / 86400000)
-    if (days <= 0) return 'Reviewed today'
-    if (days === 1) return 'Reviewed yesterday'
-    if (days < 30) return `Reviewed ${days}d ago`
-    return 'Mark reviewed'
-  }
 
   useEffect(() => {
     async function loadData() {
@@ -155,8 +96,10 @@ export default function SyllabusPage() {
       setProgressDetail(buildProgressDetailMap(userProgress))
       setHasQuestions((questionCount || 0) > 0)
 
-      const topics = [...new Set((syllabus || []).map((item) => item.topic))]
-      setExpandedTopics(topics.reduce((acc, topic) => ({ ...acc, [topic]: true }), {}))
+      // Everything starts closed. A syllabus is 40 to 300 subtopics, and
+      // dropping all of them on the page at once means scrolling past nine
+      // topics to reach the one you actually came for.
+      setExpandedTopics({})
       setLoading(false)
     }
     loadData()
@@ -164,6 +107,11 @@ export default function SyllabusPage() {
 
   const toggleTopic = (topic) => {
     setExpandedTopics((prev) => ({ ...prev, [topic]: !prev[topic] }))
+  }
+
+  const setAllTopics = (open) => {
+    const topics = [...new Set(syllabusData.map((item) => item.topic))]
+    setExpandedTopics(open ? Object.fromEntries(topics.map((t) => [t, true])) : {})
   }
 
   if (loading) {
@@ -181,8 +129,9 @@ export default function SyllabusPage() {
       effectiveStatus(d.status, d.updatedAt),
     ])
   )
-  const cover = summarise(syllabusData, progressDetail, subjectName)
   const completion = computeCompletionPercent(syllabusData, effectiveMap, subjectName)
+  const topicCount = new Set(syllabusData.map((i) => i.topic)).size
+  const anyOpen = Object.values(expandedTopics).some(Boolean)
   const slugPath = `/dashboard/syllabus/${slug}`
 
   return (
@@ -201,45 +150,29 @@ export default function SyllabusPage() {
               {completion}% mastered
             </span>
           </div>
-          {/* Two different numbers. What the class has been through, and what
-              this student has actually shown. The gap between them is the
-              backlog, and it is readable before a single quiz. */}
-          <div className="surface mt-4 flex flex-wrap items-center gap-x-8 gap-y-3 p-4">
-            <div>
-              <p className="t-overline">Covered in class</p>
-              <p className="t-stat mt-0.5 text-[var(--text)]">{cover.coveredPercent}%</p>
-            </div>
-            <div>
-              <p className="t-overline">Proved by testing</p>
-              <p className="t-stat mt-0.5 text-[var(--brand)]">{cover.provenPercent}%</p>
-            </div>
-            {cover.gap > 0 && (
-              <p className="t-small min-w-[14rem] flex-1">
-                <strong className="text-[var(--text)]">{cover.gap}</strong> subtopic
-                {cover.gap === 1 ? ' has' : 's have'} been covered in class but not tested.
-                That is your backlog, and it is what the planner works through first.
-              </p>
-            )}
-            {cover.gap === 0 && cover.coveredPercent === 0 && (
-              <p className="t-small min-w-[14rem] flex-1">
-                Tick a subtopic as your class covers it. Nothing here needs a quiz, and the
-                planner starts working as soon as it knows what you have been taught.
-              </p>
-            )}
-          </div>
-
-          <div className="flex items-center justify-between mt-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 mt-4">
             <p className="text-sm text-[var(--text-muted)]">
-              {syllabusData.length} subtopic{syllabusData.length !== 1 ? 's' : ''}
+              {topicCount} topic{topicCount !== 1 ? 's' : ''} · {syllabusData.length} subtopic
+              {syllabusData.length !== 1 ? 's' : ''}
             </p>
-            {hasQuestions && (
-              <Link
-                href={`/dashboard/quiz?subject=${encodeURIComponent(subjectName)}&mode=mock&back=${encodeURIComponent(slugPath)}`}
-                className="btn btn-outline control-sm"
-              >
-                Timed mock exam
-              </Link>
-            )}
+            <div className="flex items-center gap-3">
+              {syllabusData.length > 0 && (
+                <button
+                  onClick={() => setAllTopics(!anyOpen)}
+                  className="btn btn-quiet control-sm text-xs"
+                >
+                  {anyOpen ? 'Collapse all' : 'Expand all'}
+                </button>
+              )}
+              {hasQuestions && (
+                <Link
+                  href={`/dashboard/quiz?subject=${encodeURIComponent(subjectName)}&mode=mock&back=${encodeURIComponent(slugPath)}`}
+                  className="btn btn-outline control-sm"
+                >
+                  Timed mock exam
+                </Link>
+              )}
+            </div>
           </div>
 
           <div className="mt-5 h-2 bg-[var(--surface-sunken)] rounded-full overflow-hidden">
@@ -324,19 +257,6 @@ export default function SyllabusPage() {
                             key={item.id}
                             className="px-5 py-3 flex flex-col sm:flex-row sm:items-center gap-3"
                           >
-                            <label
-                              className="flex shrink-0 cursor-pointer items-center gap-2 self-start pt-0.5 sm:self-center"
-                              title="Has your class covered this? This is about the course, not about you, so it never changes your level."
-                            >
-                              <input
-                                type="checkbox"
-                                checked={!!progressDetail[key]?.covered}
-                                onChange={(e) => setCovered(item, e.target.checked)}
-                                className="h-4 w-4 shrink-0 accent-[var(--brand)]"
-                              />
-                              <span className="t-caption sm:hidden">Covered in class</span>
-                            </label>
-
                             <div className="flex-1 min-w-0">
                               <button
                                 onClick={() => setDrawerItem(item)}
@@ -346,22 +266,15 @@ export default function SyllabusPage() {
                                 {displaySubtopic(item.subtopic)}
                               </button>
                               {item.hl_only && (
-                                <span className="inline-block mt-1 rounded-full bg-[var(--sand)] px-2 py-1 text-[11px] font-medium text-[var(--text)]">
-                                  HL only
+                                <span
+                                  title="Higher level only"
+                                  className="ml-2 align-middle text-[10px] font-semibold uppercase tracking-wide text-[var(--text-faint)]"
+                                >
+                                  HL
                                 </span>
                               )}
                             </div>
                             <div className="flex items-center gap-3 shrink-0">
-                              <button
-                                onClick={() => logReview(item)}
-                                disabled={logging === item.id}
-                                className="btn btn-quiet control-sm text-xs"
-                                title="Log that you studied this without taking a quiz. It moves the subtopic down your plan for a few days, but it does not change your level: only a quiz can do that."
-                              >
-                                {logging === item.id
-                                  ? 'Logged'
-                                  : reviewedLabel(progressDetail[key]?.reviewedAt) || 'Mark reviewed'}
-                              </button>
                               <button
                                 onClick={() => setDrawerItem(item)}
                                 className="btn btn-quiet control-sm text-xs"

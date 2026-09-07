@@ -25,6 +25,7 @@ function QuizPageInner() {
   const timed = searchParams.get('timed') === '1'
   const focus = searchParams.get('focus') || null
   const difficulty = searchParams.get('difficulty') || null
+  const level = searchParams.get('level') || null
 
   useEffect(() => {
     async function load() {
@@ -79,6 +80,7 @@ function QuizPageInner() {
           timed={timed}
           focus={focus}
           difficulty={difficulty}
+          level={level}
           backHref={backHref}
         />
       </div>

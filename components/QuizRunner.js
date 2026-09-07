@@ -17,6 +17,7 @@ import {
   STATUS_TEXT_COLORS,
 } from '@/lib/progress'
 import { getCurrentUser } from '@/lib/auth'
+import { getSyllabus } from '@/lib/cache'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 import { progressKey } from '@/lib/progress'
 
@@ -112,6 +113,7 @@ export default function QuizRunner({
   timed: timedProp = false,
   focus = null,
   difficulty = null,
+  level = null,
   backHref = '/dashboard',
 }) {
   const [phase, setPhase] = useState(PHASE.loading)
@@ -201,6 +203,19 @@ export default function QuizRunner({
         if (banded.length) candidates = banded
       }
 
+      // Level splits an IB HL course into the half SL students also sit and
+      // the extension on top of it. Which subtopics are which lives in the
+      // syllabus, not on the question, so it is looked up here.
+      if (level === 'core' || level === 'hl') {
+        const syllabus = await getSyllabus(supabase, [subject])
+        const hlBySubtopic = {}
+        for (const row of syllabus || []) hlBySubtopic[row.subtopic] = !!row.hl_only
+        const levelled = candidates.filter((q) =>
+          level === 'hl' ? hlBySubtopic[q.subtopic] : !hlBySubtopic[q.subtopic]
+        )
+        if (levelled.length) candidates = levelled
+      }
+
       // Focus draws only from subtopics at the relevant mastery level.
       if (focus) {
         const { data: progressRows } = await supabase
@@ -256,7 +271,7 @@ export default function QuizRunner({
     }
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subject, topic, subtopic, mode, count, topics?.join('|'), focus, difficulty])
+  }, [subject, topic, subtopic, mode, count, topics?.join('|'), focus, difficulty, level])
 
   const startQuiz = () => {
     questionTimesRef.current = {}

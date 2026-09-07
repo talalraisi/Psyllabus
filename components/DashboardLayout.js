@@ -15,7 +15,6 @@ import {
   IconReview,
   IconTarget,
   IconCalendar,
-  IconSearch,
   IconCards,
   IconUser,
   IconLogout,
@@ -34,12 +33,6 @@ const NAV_ITEMS = [
     label: 'My Subjects',
     Icon: IconSubjects,
     match: (p) => p.startsWith('/dashboard/syllabus') || p === '/dashboard/subjects',
-  },
-  {
-    href: '/dashboard/search',
-    label: 'Search',
-    Icon: IconSearch,
-    match: (p) => p === '/dashboard/search',
   },
   {
     href: '/dashboard/flashcards',

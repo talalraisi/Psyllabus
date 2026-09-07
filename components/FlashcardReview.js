@@ -121,23 +121,23 @@ export default function FlashcardReview({ cards, onMark, onExit, stats }) {
 
       {/* The card */}
       <div className="flex flex-1 items-center justify-center overflow-hidden p-5">
-        <div className="card-stage w-full max-w-2xl">
+        <div className="card-stage w-full max-w-4xl">
           <div
             key={card.id}
             onClick={() => setFlipped((f) => !f)}
             className={`card-flip ${flipped ? 'is-flipped' : ''} ${
               direction === 'next' ? 'card-enter-next' : 'card-enter-prev'
             } cursor-pointer`}
-            style={{ height: 'min(60vh, 420px)' }}
+            style={{ height: 'min(72vh, 640px)' }}
           >
             {/* Front */}
-            <div className="card-face surface p-7 md:p-10">
+            <div className="card-face surface p-7 md:p-12">
               <p className="t-caption mb-4">
                 {card.subject}
                 {card.subtopic ? ` · ${displaySubtopic(card.subtopic)}` : ''}
               </p>
               <div className="flex flex-1 items-center">
-                <p className="whitespace-pre-wrap text-xl leading-relaxed text-[var(--text)] md:text-2xl">
+                <p className="whitespace-pre-wrap text-2xl leading-relaxed text-[var(--text)] md:text-3xl">
                   {card.front}
                 </p>
               </div>
@@ -145,10 +145,10 @@ export default function FlashcardReview({ cards, onMark, onExit, stats }) {
             </div>
 
             {/* Back */}
-            <div className="card-face card-face-back surface p-7 md:p-10">
+            <div className="card-face card-face-back surface p-7 md:p-12">
               <p className="t-overline mb-4">Answer</p>
               <div className="flex flex-1 items-center">
-                <p className="whitespace-pre-wrap text-lg leading-relaxed text-[var(--text-body)]">
+                <p className="whitespace-pre-wrap text-xl leading-relaxed text-[var(--text-body)] md:text-2xl">
                   {card.back}
                 </p>
               </div>
@@ -159,7 +159,7 @@ export default function FlashcardReview({ cards, onMark, onExit, stats }) {
 
       {/* Controls */}
       <div className="shrink-0 border-t border-[var(--border)] bg-[var(--surface)] p-4">
-        <div className="mx-auto flex max-w-2xl items-center gap-2">
+        <div className="mx-auto flex max-w-4xl items-center gap-2">
           <button
             onClick={() => go(-1)}
             disabled={atStart}

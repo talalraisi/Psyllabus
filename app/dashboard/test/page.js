@@ -37,6 +37,18 @@ const FOCUS_MODES = [
   },
 ]
 
+/**
+ * IB HL courses are the SL course plus additional higher level content. An HL
+ * student can usefully sit either half on its own: the core when they are
+ * behind, the extension when they are revising for the paper that only tests
+ * it. SL students never see this, because there is no second half to choose.
+ */
+const LEVELS = [
+  { key: 'all', label: 'Everything', hint: 'Core and HL extension together' },
+  { key: 'core', label: 'Core only', hint: 'The content SL students also sit' },
+  { key: 'hl', label: 'HL extension only', hint: 'Only the additional higher level content' },
+]
+
 const DIFFICULTIES = [
   { key: 'mixed', label: 'Mixed', range: null },
   { key: 'easy', label: 'Easier', range: [0, 0.4] },
@@ -55,6 +67,8 @@ export default function TestBuilderPage() {
   const [timed, setTimed] = useState(true)
   const [focusMode, setFocusMode] = useState('all')
   const [difficulty, setDifficulty] = useState('mixed')
+  const [level, setLevel] = useState('all')
+  const [hlBySubtopic, setHlBySubtopic] = useState({})
   const [loading, setLoading] = useState(true)
   const [loadingPool, setLoadingPool] = useState(false)
   const router = useRouter()
@@ -110,10 +124,15 @@ export default function TestBuilderPage() {
         statuses[row.subtopic] = effective[progressKey(subject, row.subtopic)] || 'not_started'
       }
 
+      // Which subtopics are the HL extension, so a paper can be split by level.
+      const hlMap = {}
+      for (const row of syllabus || []) hlMap[row.subtopic] = !!row.hl_only
+
       const unique = [...new Set((syllabus || []).map((r) => r.topic))]
       const ordered = sortTopics(unique.map((t) => [t, null])).map(([t]) => t)
 
       setTopics(ordered)
+      setHlBySubtopic(hlMap)
       setPool(questions || [])
       setStatusBySubtopic(statuses)
       setSelected(ordered)
@@ -139,6 +158,12 @@ export default function TestBuilderPage() {
         if (!mode.statuses.includes(status)) return false
       }
 
+      if (level !== 'all') {
+        const isHL = !!hlBySubtopic[q.subtopic]
+        if (level === 'hl' && !isHL) return false
+        if (level === 'core' && isHL) return false
+      }
+
       if (diff?.range) {
         const d = typeof q.difficulty === 'number' ? q.difficulty : 0.5
         if (d < diff.range[0] || d > diff.range[1]) return false
@@ -146,7 +171,7 @@ export default function TestBuilderPage() {
 
       return true
     })
-  }, [pool, selected, focusMode, difficulty, statusBySubtopic])
+  }, [pool, selected, focusMode, difficulty, statusBySubtopic, level, hlBySubtopic])
 
   const perTopicCounts = useMemo(() => {
     const counts = {}
@@ -163,6 +188,8 @@ export default function TestBuilderPage() {
   }
 
   const usable = accessibleSubjects(profile).filter((s) => !IB_CORE_SUBJECTS.includes(s))
+  const isHLSubject = profile?.curriculum === 'IB' && / HL$/.test(subject)
+  const hlCount = Object.values(hlBySubtopic).filter(Boolean).length
   const actualLength = Math.min(length, eligible.length)
   const canStart = actualLength > 0
 
@@ -188,6 +215,7 @@ export default function TestBuilderPage() {
     if (timed) params.set('timed', '1')
     if (focusMode !== 'all') params.set('focus', focusMode)
     if (difficulty !== 'mixed') params.set('difficulty', difficulty)
+    if (level !== 'all') params.set('level', level)
     router.push(`/dashboard/quiz?${params.toString()}`)
   }
 
@@ -225,6 +253,33 @@ export default function TestBuilderPage() {
             </p>
           )}
         </div>
+
+        {/* Level. Only an IB HL subject has two halves to choose between. */}
+        {isHLSubject && hlCount > 0 && (
+          <div className="surface mb-3 p-5">
+            <p className="t-small mb-1 font-medium text-[var(--text)]">Level</p>
+            <p className="t-caption mb-3">
+              {hlCount} of your subtopics in this subject are HL extension.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {LEVELS.map((l) => (
+                <button
+                  key={l.key}
+                  onClick={() => setLevel(l.key)}
+                  aria-pressed={level === l.key}
+                  title={l.hint}
+                  className={`control-sm rounded-[var(--r-md)] border px-4 text-sm font-medium transition-colors duration-150 ${
+                    level === l.key
+                      ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
+                      : 'border-[var(--border-strong)] text-[var(--text-body)] hover:bg-[var(--surface-sunken)]'
+                  }`}
+                >
+                  {l.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* What to draw from */}
         <div className="surface mb-3 p-5">
