@@ -434,12 +434,12 @@ export default function Onboarding() {
             </p>
 
             <div className="mb-6">
-              <label className="label">
+              <p className="label" id="curriculum-label">
                 Which curriculum are you studying?
-              </label>
-              <div className="grid grid-cols-3 gap-3">
+              </p>
+              <div className="grid grid-cols-3 gap-3" role="group" aria-labelledby="curriculum-label">
                 {['IB', 'AP', 'A-Level'].map(c => (
-                  <button key={c} onClick={() => {
+                  <button key={c} aria-pressed={curriculum === c} onClick={() => {
                     setCurriculum(c)
                     setSelectedSubjects([])
                     setTargetGrades({})
@@ -453,12 +453,12 @@ export default function Onboarding() {
             </div>
 
             <div className="mb-8">
-              <label className="label">
+              <p className="label" id="gradyear-label">
                 When do you graduate?
-              </label>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              </p>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4" role="group" aria-labelledby="gradyear-label">
                 {GRAD_YEARS.map(y => (
-                  <button key={y} onClick={() => setGradYear(y)}
+                  <button key={y} aria-pressed={gradYear === y} onClick={() => setGradYear(y)}
                   className={`control-lg rounded-[var(--r-md)] border text-sm font-semibold tabular-nums transition-colors duration-150
                   ${gradYear === y ? 'chip-active' : 'chip hover:border-border-strong'}`}>
                     {y}

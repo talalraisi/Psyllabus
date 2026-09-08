@@ -126,8 +126,10 @@ function Login() {
 
           <form onSubmit={handleLogin} className="flex flex-col gap-4">
             <div>
-              <label className="label">Email address</label>
+              <label className="label" htmlFor="login-email">Email address</label>
               <input
+                id="login-email"
+                autoComplete="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

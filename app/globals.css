@@ -19,8 +19,8 @@
 
   --text: #1a2e1e;           /* headings */
   --text-body: #374151;      /* body copy */
-  --text-muted: #6b7280;     /* supporting copy */
-  --text-faint: #9ca3af;     /* labels, metadata */
+  --text-muted: #656b78; /* 5.1:1 on white, 4.9:1 on the tinted sections; #6b7280 sat at 4.48 */     /* supporting copy */
+  --text-faint: #656a72; /* 5.2:1 on white and 4.8:1 on the tinted sections; #9ca3af was 2.54 */     /* labels, metadata */
 
   --border: #f0f0f0;         /* card edges */
   --border-strong: #e5e7eb;  /* inputs, controls */
@@ -37,6 +37,12 @@
   --status-proficient: #16a34a;  /* reliable */
   --status-mastered: #7c3aed;    /* solid and recent */
   --status-untested: #e5e7eb;
+
+  /* A solid button's background is a different job from a link's colour, and
+     they need different greens to stay readable. Kept apart so darkening the
+     button for contrast does not drag every link down with it. Light mode's
+     brand already clears 4.5:1 against white text, so this matches it. */
+  --brand-solid: #2d6a4f;
 
   /* --- Heat. How hard a question is, on a scale a student can read. --------
      Deliberately a different family from the status colours: status is about
@@ -112,7 +118,7 @@
   --text: #e9efeb;
   --text-body: #c2ccc6;
   --text-muted: #98a49d;
-  --text-faint: #6f7c75;
+  --text-faint: #85958c; /* 5.44:1 on the dark surface; #6f7c75 was 3.92 */
 
   --border: #232b27;
   --border-strong: #2f3833;
@@ -124,6 +130,11 @@
   --status-proficient: #4fb87a;
   --status-mastered: #a78bfa;
   --status-untested: #2f3833;
+
+  /* White text on #4c9c74 is 3.33:1, so the primary call to action failed on
+     every dark-mode screen. This green carries white at 4.9:1 while --brand
+     stays light enough for links to read against the page. */
+  --brand-solid: #3d7d5d;
 
   --heat-low: #94a3b8;
   --heat-medium: #22b8cf;
@@ -303,7 +314,7 @@ body {
   }
 
   .btn-solid {
-    background: var(--brand);
+    background: var(--brand-solid);
     color: #fff;
   }
 

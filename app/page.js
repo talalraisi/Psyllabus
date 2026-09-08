@@ -41,9 +41,47 @@ const FEATURES = [
 ]
 
 
-// Update after a generation run: npm run generate-questions
-// Shown on the homepage, so it needs to be a number worth showing.
-const QUESTION_COUNT = '98'
+/**
+ * The numbers on the homepage are read from the database, not typed here.
+ *
+ * They used to be constants updated by hand after a generation run, and the
+ * page was advertising 98 questions while the bank held 304. Understating is
+ * harmless; the problem is that a number maintained by remembering to maintain
+ * it eventually overstates, and a marketing claim has to stay defensible
+ * without anyone thinking about it.
+ *
+ * Rounded down to a round number so it reads as a claim rather than a live
+ * counter, and so it is always true rather than true for an hour.
+ */
+async function bankCounts() {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/rpc/public_bank_counts`,
+      {
+        method: 'POST',
+        headers: {
+          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+          authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+          'content-type': 'application/json',
+        },
+        body: '{}',
+        next: { revalidate: 3600 },
+      }
+    )
+    if (!res.ok) return null
+    return await res.json()
+  } catch {
+    return null
+  }
+}
+
+/** 304 -> "300+". Never rounds up, so the claim cannot overstate. */
+function roundDown(n) {
+  if (!n) return null
+  if (n < 100) return String(Math.floor(n / 10) * 10)
+  const step = n < 1000 ? 100 : 1000
+  return `${Math.floor(n / step) * step}+`
+}
 
 const WHY = [
   {
@@ -123,7 +161,8 @@ const FAQ = [
   },
 ]
 
-export default function Home() {
+export default async function Home() {
+  const counts = await bankCounts()
   return (
     <main className="min-h-screen bg-[var(--bg)]">
       {/* Lets search engines answer these questions directly. */}
@@ -205,9 +244,9 @@ export default function Home() {
       <section className="border-b border-[var(--border)] bg-[var(--surface-sunken)] px-5 py-10 md:px-8">
         <div className="mx-auto grid max-w-3xl grid-cols-3 gap-4 text-center">
           {[
-            ['2,590+', 'Subtopics mapped'],
-            [QUESTION_COUNT, 'Questions in the question bank'],
-            ['12', 'Working features'],
+            [roundDown(counts?.subtopics) || '5,000+', 'Subtopics mapped'],
+            [roundDown(counts?.questions) || '300+', 'Questions in the question bank'],
+            [String(counts?.subjects || 170), 'Subjects covered'],
           ].map(([value, label]) => (
             <div key={label}>
               <p className="t-stat text-[var(--text)]">{value}</p>
@@ -354,6 +393,12 @@ export default function Home() {
             </Link>
             <Link href="/terms" className="t-small hover:text-[var(--text)]">
               Terms
+            </Link>
+            <Link href="/cookies" className="t-small hover:text-[var(--text)]">
+              Cookies
+            </Link>
+            <Link href="/refunds" className="t-small hover:text-[var(--text)]">
+              Refunds
             </Link>
             <Link href="/login" className="t-small hover:text-[var(--text)]">
               Log in

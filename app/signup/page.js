@@ -207,8 +207,10 @@ export default function Signup() {
 
           <form onSubmit={handleSignup} className="flex flex-col gap-4">
             <div>
-              <label className="label">Full name</label>
+              <label className="label" htmlFor="signup-name">Full name</label>
               <input
+                id="signup-name"
+                autoComplete="name"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -219,8 +221,10 @@ export default function Signup() {
             </div>
 
             <div>
-              <label className="label">Email address</label>
+              <label className="label" htmlFor="signup-email">Email address</label>
               <input
+                id="signup-email"
+                autoComplete="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -231,8 +235,9 @@ export default function Signup() {
             </div>
 
             <div>
-              <label className="label">Password</label>
+              <label className="label" htmlFor="signup-password">Password</label>
               <PasswordField
+                id="signup-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
@@ -242,10 +247,11 @@ export default function Signup() {
             </div>
 
             <div>
-              <label className="label">
+              <label className="label" htmlFor="signup-code">
                 School code <span className="text-text-faint font-normal">(optional)</span>
               </label>
               <input
+                id="signup-code"
                 type="text"
                 value={schoolCode}
                 onChange={(e) => setSchoolCode(e.target.value)}
@@ -276,10 +282,18 @@ export default function Signup() {
                   Oman Personal Data Protection Law
                 </Link>
                 . I agree to the{' '}
+                <Link href="/terms" className="text-[var(--brand)] underline">
+                  Terms
+                </Link>
+                ,{' '}
                 <Link href="/privacy" className="text-[var(--brand)] underline">
                   Privacy Policy
+                </Link>{' '}
+                and{' '}
+                <Link href="/cookies" className="text-[var(--brand)] underline">
+                  Cookie Policy
                 </Link>
-                .
+                , and I understand I can delete my account and all of my data at any time.
               </span>
             </label>
 
