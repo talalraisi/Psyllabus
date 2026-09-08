@@ -904,6 +904,15 @@ async function verifyBatch(questions) {
 // Main
 // ---------------------------------------------------------------------------
 
+/**
+ * A background run must not die on one stray rejection. Anything unhandled is
+ * logged and the loop carries on: the alternative is what happened overnight,
+ * where a dropped socket ended the whole thing and the log was a stack trace.
+ */
+process.on("unhandledRejection", (err) => {
+  console.error(`  unhandled: ${err?.message || err}`);
+});
+
 async function main() {
   const modelLabel =
     PROVIDER === "claude"

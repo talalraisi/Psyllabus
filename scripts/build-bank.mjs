@@ -31,11 +31,28 @@ const arg = (name, fallback) => {
 };
 const flag = (name) => args.includes(`--${name}`);
 
+/**
+ * Depth or breadth.
+ *
+ * The generator fills one subtopic to its target before moving to the next, so
+ * a night that does not finish leaves a few subtopics complete and the rest
+ * empty. Overnight that is the wrong shape: waking up to 34 questions in one
+ * English subtopic and nothing in the other fourteen is a bank you cannot test
+ * the app with.
+ *
+ * --ladder runs several passes at rising targets, so every subtopic gets five
+ * before any gets ten. Stopping halfway then leaves thin but complete coverage,
+ * which is the useful kind of unfinished.
+ */
+const LADDER = arg("ladder", null);
 const PER_SUBTOPIC = arg("per-subtopic", "20");
+const LEVELS = LADDER
+  ? LADDER.split(",").map((n) => n.trim()).filter(Boolean)
+  : [PER_SUBTOPIC];
 const EMAIL = arg("email", null);
 
 /** Flags that belong to this script and must not be forwarded. */
-const OWN = new Set(["--subjects", "--per-subtopic", "--mine", "--all", "--email"]);
+const OWN = new Set(["--subjects", "--per-subtopic", "--mine", "--all", "--email", "--ladder"]);
 function passthrough() {
   const out = [];
   for (let i = 0; i < args.length; i++) {
@@ -92,7 +109,7 @@ async function subjectList(db) {
   process.exit(1);
 }
 
-function run(subject) {
+function run(subject, level) {
   return new Promise((resolve) => {
     const child = spawn(
       process.execPath,
@@ -101,7 +118,7 @@ function run(subject) {
         "--subject",
         subject,
         "--per-subtopic",
-        PER_SUBTOPIC,
+        level,
         ...passthrough(),
       ],
       { stdio: "inherit" }
@@ -129,25 +146,37 @@ async function main() {
   const subjects = await subjectList(db);
 
   const before = await progress(db, subjects);
-  const target = before.reduce((sum, r) => sum + Number(r.subtopics) * Number(PER_SUBTOPIC), 0);
+  const finalLevel = LEVELS[LEVELS.length - 1];
+  const target = before.reduce((sum, r) => sum + Number(r.subtopics) * Number(finalLevel), 0);
   const have = before.reduce((sum, r) => sum + Number(r.questions), 0);
 
-  console.log(`Building ${subjects.length} subjects at ${PER_SUBTOPIC} questions per subtopic.`);
+  console.log(
+    LEVELS.length > 1
+      ? `Building ${subjects.length} subjects in passes: ${LEVELS.join(" then ")} per subtopic.`
+      : `Building ${subjects.length} subjects at ${PER_SUBTOPIC} questions per subtopic.`
+  );
   console.table(
     before.map((r) => ({
       subject: r.subject,
       subtopics: Number(r.subtopics),
       have: Number(r.questions),
-      want: Number(r.subtopics) * Number(PER_SUBTOPIC),
+      want: Number(r.subtopics) * Number(finalLevel),
     }))
   );
   console.log(`${have} of ${target} done. ${target - have} to go.\n`);
 
   const startedAt = Date.now();
-  for (const [i, subject] of subjects.entries()) {
-    console.log(`\n${"=".repeat(70)}\n[${i + 1}/${subjects.length}] ${subject}\n${"=".repeat(70)}`);
-    const code = await run(subject);
-    if (code !== 0) console.log(`  (${subject} exited with code ${code}, carrying on)`);
+  for (const level of LEVELS) {
+    if (LEVELS.length > 1) {
+      console.log(`\n${"#".repeat(70)}\n# Pass: every subtopic up to ${level} questions\n${"#".repeat(70)}`);
+    }
+    for (const [i, subject] of subjects.entries()) {
+      console.log(
+        `\n${"=".repeat(70)}\n[${i + 1}/${subjects.length}] ${subject} → ${level}\n${"=".repeat(70)}`
+      );
+      const code = await run(subject, level);
+      if (code !== 0) console.log(`  (${subject} exited with code ${code}, carrying on)`);
+    }
   }
 
   const after = await progress(db, subjects);
@@ -159,7 +188,7 @@ async function main() {
     after.map((r) => ({
       subject: r.subject,
       questions: Number(r.questions),
-      want: Number(r.subtopics) * Number(PER_SUBTOPIC),
+      want: Number(r.subtopics) * Number(finalLevel),
     }))
   );
   console.log(
