@@ -433,6 +433,12 @@ const SOLUTIONS_SCHEMA = {
             description:
               "For multiple choice, the single letter a, b, c or d. For short answer, the value alone: a number with its unit, or a single term. No working, no sentence.",
           },
+          all_true_options: {
+            type: "array",
+            description:
+              "Multiple choice only: EVERY option that is a true statement or a correct answer, not just the best one. Usually one letter. More than one means the question has no single answer.",
+            items: { type: "string" },
+          },
           confident: {
             type: "boolean",
             description:
@@ -677,6 +683,48 @@ function anglesFor(round, count) {
  * box under a stem that refers to it. So it is checked here, with the same
  * function the renderer uses, and dropped when it does not hold up.
  */
+/**
+ * The spread of difficulties a batch must contain.
+ *
+ * Models do not self-assess difficulty. Asked for "a mix", qwen returned 0.90
+ * for every question in Economics, Physics and Computer Science, and 43 of 51
+ * in English: a bank where everything is Burning, which is the same as a bank
+ * with no difficulty information at all. So the difficulty is decided here and
+ * the model is told which one to write, one question at a time.
+ *
+ * The model's own number is still read, but only as a nudge within the band it
+ * was asked for. It can say a question came out slightly harder than requested;
+ * it cannot say everything is the hardest thing in the syllabus.
+ */
+const DIFFICULTY_PLAN = [0.2, 0.3, 0.45, 0.55, 0.7, 0.85];
+
+function plannedDifficulties(count, round) {
+  const out = [];
+  for (let i = 0; i < count; i++) {
+    out.push(DIFFICULTY_PLAN[(i + round) % DIFFICULTY_PLAN.length]);
+  }
+  return out;
+}
+
+/** Keep the model's opinion, but inside the band it was asked to write. */
+function settleDifficulty(requested, reported) {
+  const r = typeof reported === "number" ? reported : requested;
+  return Math.min(0.9, Math.max(0.1, Math.min(requested + 0.1, Math.max(requested - 0.1, r))));
+}
+
+/**
+ * A stem that refers to a figure, with no figure, is unanswerable. It happens
+ * because an unusable figure is dropped after the stem has already been written
+ * around it, and the student is then asked to read a chart that was never
+ * there. Cheaper to throw the question away than to explain it.
+ */
+const MENTIONS_FIGURE =
+  /\b(bar chart|pie chart|line graph|scatter|the graph|the chart|the table|the diagram|the figure|shown below|following (?:graph|chart|table|diagram|figure)|attached)\b/i;
+
+function referencesMissingFigure(q) {
+  return !q.figure && MENTIONS_FIGURE.test(q.stem || "");
+}
+
 function cleanFigure(figure) {
   if (!figure || figure.kind === "none") return null;
   return figureIsUsable(figure) ? figure : null;
@@ -695,7 +743,28 @@ async function generateBatch(subtopic, topic, count, existingStems, { round = 0,
     .map((a, i) => `${i + 1}. ${a}`)
     .join("\n");
 
+  const plan = plannedDifficulties(count, round);
+  const planned = plan
+    .map((d, i) => `${i + 1}. ${d <= 0.3 ? "easy, one step" : d <= 0.55 ? "medium, two steps" : d <= 0.7 ? "hard, multi-step" : "very hard, exam-standard and combining ideas"} (difficulty ${d})`)
+    .join("\n");
+
+  // A literature or language paper has no arithmetic in it. Asking for the
+  // percentage of a page taken by a paragraph is not a hard English question,
+  // it is a maths question wearing a costume, and it was being generated.
+  const isTextSubject =
+    /Literature|Language|Philosophy|History|Theatre|Film|Visual Arts|Music|Religions|Anthropology/i.test(
+      SUBJECT
+    );
+  const numericRule = isTextSubject
+    ? `\n\nThis is not a numerate subject. Do NOT write questions that require arithmetic, percentages, counting, or any calculation. Ask about technique, effect, structure, context, interpretation and argument. A question asking what percentage of a page a passage occupies is a maths question in disguise and is worthless here.`
+    : "";
+
   const shared = `You are writing exam questions for the ${CURRICULUM} subject "${SUBJECT}", ${topic}, subtopic "${subtopic}".
+
+Write them at these difficulties, in this order:
+${planned}
+
+Use the difficulty you were given for each question. Do not mark everything hard.${numericRule}
 
 Each question must come at the subtopic from a DIFFERENT angle. Use these, in order:
 ${angles}
@@ -706,6 +775,23 @@ Requirements:
 - Plain text maths only (x^2, 3/4, sqrt(x)); never LaTeX.
 - Work the problem out before writing the answer, and make the explanation show the key step.
 - Vary the surface: different quantities, contexts and phrasings, not the same sentence with new numbers.
+
+GIVE EXACTLY THE DATA NEEDED AND NO MORE. This is the rule that breaks most
+often and it ruins the question every time. If orbital radius and g are enough,
+do not also state the mass of the Earth: three quantities where two suffice will
+not agree with each other, and then two students using two correct methods get
+two different answers and both are right. Before writing the numbers, check that
+every quantity you state is either needed or consistent with the others.
+
+THE ANSWER IS WHAT YOUR NUMBERS PRODUCE, not what the textbook says. If the
+figures you invented give Earth a mass of 5.82 x 10^24 kg, the answer is
+5.82 x 10^24, not 5.97 x 10^24. Never state a remembered constant as the answer
+to a question whose own data implies something else. If the two differ, the
+question is wrong: change the given numbers until they agree.
+
+DO NOT ASK ABOUT A MISTAKE THAT IS NOT THERE. "What is wrong with this
+expression" is only a question when the expression is actually wrong. v =
+sqrt(GM/r) is correct, and asking what it is missing has no answer.
 
 Every question also carries a hint: one sentence pointing at the method or the
 first step, never containing the answer or a number that gives it away. "Start
@@ -759,7 +845,13 @@ the answer is a number.`;
     const data = await callModel(prompt, SHORT_ANSWER_SCHEMA);
     return (data.questions || [])
       .filter((q) => q.stem && q.accepted_answers?.length)
-      .map((q) => ({ ...q, question_type: "short_answer", figure: cleanFigure(q.figure) }));
+      .map((q, i) => ({
+        ...q,
+        question_type: "short_answer",
+        figure: cleanFigure(q.figure),
+        difficulty: settleDifficulty(plan[i] ?? 0.5, q.difficulty),
+      }))
+      .filter((q) => !referencesMissingFigure(q));
   }
 
   const prompt = `${shared}
@@ -768,6 +860,12 @@ Write ${count} multiple-choice questions.
 - Exactly 4 options (ids a-d), with distractors that are the answers a student would reach by making a specific, common mistake.
 - Exactly one option is correct.
 - Spread the correct option across a, b, c and d roughly evenly. Do not favour any letter.
+
+EXACTLY ONE OPTION MAY BE TRUE. Not "one is best" — the other three must be
+statements that are actually false. This fails most often on questions that list
+formulas: if the options are g = GM/r^2, v = sqrt(gr), v = 2*pi*r/T and g = v^2/r,
+every one of them is true for an orbit, and the question has no answer. When
+options are formulas, three of them must be formulas that do not hold.
 
 Every wrong option carries why_wrong: the specific mistake that lands a student
 there, in one sentence. "Forgot to convert grams to kilograms" or "used the
@@ -779,7 +877,13 @@ a better distractor. The correct option has why_wrong as an empty string.`;
   const data = await callModel(prompt, QUESTIONS_SCHEMA);
   return (data.questions || [])
     .filter((q) => q.options?.length === 4 && q.options.some((o) => o.id === q.correct_answer))
-    .map((q) => ({ ...q, question_type: "mcq", figure: cleanFigure(q.figure) }));
+    .map((q, i) => ({
+      ...q,
+      question_type: "mcq",
+      figure: cleanFigure(q.figure),
+      difficulty: settleDifficulty(plan[i] ?? 0.5, q.difficulty),
+    }))
+    .filter((q) => !referencesMissingFigure(q));
 }
 
 /**
@@ -802,7 +906,7 @@ a better distractor. The correct option has why_wrong as an empty string.`;
  * because the second kind costs them marks in a real exam and they will never
  * know why.
  */
-function askForAnswers(questions) {
+function askForAnswers(questions, { alternativeRoute = false } = {}) {
   const listing = questions
     .map((q, i) =>
       q.question_type === "short_answer"
@@ -811,9 +915,15 @@ function askForAnswers(questions) {
     )
     .join("\n\n");
 
-  return `Answer each question below. Work each one out fully before answering.
+  const route = alternativeRoute
+    ? `\n\nWhere a question can be worked more than one way, deliberately take a DIFFERENT route from the most obvious one: use a different given quantity, or a different relationship, to reach the answer. If two valid routes give two different answers, the question's data contradicts itself. Set confident to false when that happens.`
+    : "";
+
+  return `Answer each question below. Work each one out fully before answering, using ONLY the numbers the question gives you. Never substitute a remembered constant for what the question's own data implies.
 
 Give the answer only: a single letter for multiple choice, or the value alone for the rest. Include the unit where there is one. If a question cannot be answered from what it gives you, or has more than one defensible answer, set confident to false.
+
+For multiple choice, also list in all_true_options EVERY option that is a true statement or a correct answer, not only the one you chose. Most questions will have exactly one. Listing two is how a question with no single answer gets caught.${route}
 
 Questions:\n\n${listing}`;
 }
@@ -853,10 +963,16 @@ function agreesWithMarked(q, given) {
 async function verifyBatch(questions) {
   if (!questions.length) return [];
 
-  const prompt = askForAnswers(questions);
+  // The passes are deliberately NOT identical. Two solves at temperature zero
+  // take the same route and agree with each other even when the question's own
+  // numbers contradict themselves, which is how three over-specified satellite
+  // questions got through: state the radius, g and the Earth's mass, and two
+  // correct methods give two different answers. Asking the second pass to reach
+  // the answer another way is what surfaces that.
   const passes = [];
   for (let i = 0; i < VERIFY_PASSES; i++) {
-    const data = await callModel(prompt, SOLUTIONS_SCHEMA, undefined, 0, VERIFY_PROVIDER);
+    const prompt = askForAnswers(questions, { alternativeRoute: i > 0 });
+    const data = await callModel(prompt, SOLUTIONS_SCHEMA, undefined, i > 0 ? 0.3 : 0, VERIFY_PROVIDER);
     const byIndex = new Map();
     for (const s of data.solutions || []) byIndex.set(s.index, s);
     passes.push(byIndex);
@@ -885,6 +1001,16 @@ async function verifyBatch(questions) {
       console.log(
         `    rejected #${i}: solves disagreed (${solutions.map((s) => s.answer).join(" vs ")})`
       );
+      continue;
+    }
+
+    // More than one true option means there is no single answer, however
+    // confidently the solver picked one of them.
+    const trueOptions = new Set(
+      solutions.flatMap((s) => (s.all_true_options || []).map((o) => String(o).toLowerCase().trim()))
+    );
+    if (q.question_type !== "short_answer" && trueOptions.size > 1) {
+      console.log(`    rejected #${i}: more than one option is true (${[...trueOptions].join(", ")})`);
       continue;
     }
 
@@ -1019,7 +1145,7 @@ async function main() {
             figure: q.figure || null,
             marks: q.marks,
             time_budget_seconds: q.time_budget_seconds,
-            difficulty: Math.min(0.9, Math.max(0.1, q.difficulty)),
+            difficulty: q.difficulty,
             source: "ai-generated",
             verified: true,
           }));
