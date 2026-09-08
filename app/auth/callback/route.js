@@ -49,7 +49,26 @@ export async function GET(request) {
   )
 
   const { data, error } = await supabase.auth.exchangeCodeForSession(code)
-  if (error) return fail(error.message || 'Could not complete sign-in.')
+  if (error) {
+    // "PKCE code verifier not found in storage" is what Supabase says when the
+    // verifier cookie written at the start of the flow is not on this request.
+    // That is almost never broken storage: it is that sign-in began on one
+    // host and finished on another, and a host-only cookie did not follow.
+    // Saying which host we landed on is the difference between a message that
+    // sounds like a browser fault and one that points at the redirect settings.
+    const missingVerifier = /code verifier|code_verifier/i.test(error.message || '')
+    if (missingVerifier) {
+      const hasAny = request.cookies
+        .getAll()
+        .some((c) => c.name.includes('auth-token'))
+      return fail(
+        `Sign-in started somewhere this browser cannot match up. It finished on ` +
+          `${requestUrl.host}${hasAny ? '' : ' with no Supabase cookies at all'}. ` +
+          `Check that this exact address is in Supabase's Redirect URLs.`
+      )
+    }
+    return fail(error.message || 'Could not complete sign-in.')
+  }
 
   const user = data?.session?.user ?? data?.user
   if (!user) return fail('Signed in, but no account came back. Try again.')
