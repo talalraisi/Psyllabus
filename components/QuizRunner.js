@@ -6,6 +6,7 @@ import Link from 'next/link'
 import CopyButton from '@/components/CopyButton'
 import HeatBadge from '@/components/HeatBadge'
 import QuestionFigure from '@/components/QuestionFigure'
+import QuestionStimulus from '@/components/QuestionStimulus'
 import ReportQuestion from '@/components/ReportQuestion'
 import { gradeAnswer } from '@/lib/grading'
 import { createClient } from '@/lib/supabase'
@@ -49,7 +50,9 @@ const MISTAKES_COUNT = 15
 /** One question as plain text: stem, options, and the answer if it is known. */
 function questionAsText(question, { includeAnswer = false } = {}) {
   const opts = (question.options || []).map((o) => `${o.id}) ${o.text}`).join('\n')
-  const parts = [question.stem, opts]
+  // The extract goes with it. Copying a question about an unseen text without
+  // the text produces something nobody can answer later.
+  const parts = [question.stimulus, question.stem, opts]
   if (includeAnswer) {
     parts.push(`Answer: ${question.correct_answer}`)
     if (question.explanation) parts.push(question.explanation)
@@ -726,6 +729,8 @@ export default function QuizRunner({
             </p>
           </div>
         </div>
+
+        <QuestionStimulus text={q.stimulus} kind={q.stimulus_kind} />
 
         <div className="mb-4 flex items-start justify-between gap-3">
           <p className="text-sm font-medium leading-relaxed text-[var(--text)]">{q.stem}</p>

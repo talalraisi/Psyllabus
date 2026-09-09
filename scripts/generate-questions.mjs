@@ -305,6 +305,88 @@ const FIGURE_SCHEMA = {
   },
 };
 
+const STIMULUS_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  required: ["kind", "text"],
+  properties: {
+    kind: { type: "string", enum: ["prose", "poem", "dialogue", "nonfiction"] },
+    text: {
+      type: "string",
+      description:
+        "An ORIGINAL extract of 60 to 140 words, written for this question. Never copied or adapted from any published work. Rich enough that several questions can be asked about its technique and effect.",
+    },
+  },
+};
+
+const HINT_DESCRIPTION_TEXT =
+  "One sentence pointing at where in the extract to look. Never the answer.";
+
+const TEXT_MCQ_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  required: ["stimulus", "questions"],
+  properties: {
+    stimulus: STIMULUS_SCHEMA,
+    questions: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["stem", "options", "correct_answer", "explanation", "hint", "marks", "time_budget_seconds", "difficulty"],
+        properties: {
+          stem: { type: "string" },
+          options: {
+            type: "array",
+            items: {
+              type: "object",
+              additionalProperties: false,
+              required: ["id", "text", "why_wrong"],
+              properties: {
+                id: { type: "string", enum: ["a", "b", "c", "d"] },
+                text: { type: "string" },
+                why_wrong: { type: "string" },
+              },
+            },
+          },
+          correct_answer: { type: "string", enum: ["a", "b", "c", "d"] },
+          explanation: { type: "string" },
+          hint: { type: "string", description: HINT_DESCRIPTION_TEXT },
+          marks: { type: "integer", enum: [1, 2, 3] },
+          time_budget_seconds: { type: "integer", enum: [30, 45, 60, 75, 90, 120, 150, 180] },
+          difficulty: { type: "number" },
+        },
+      },
+    },
+  },
+};
+
+const TEXT_SHORT_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  required: ["stimulus", "questions"],
+  properties: {
+    stimulus: STIMULUS_SCHEMA,
+    questions: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["stem", "accepted_answers", "explanation", "hint", "marks", "time_budget_seconds", "difficulty"],
+        properties: {
+          stem: { type: "string" },
+          accepted_answers: { type: "array", items: { type: "string" }, minItems: 1 },
+          explanation: { type: "string" },
+          hint: { type: "string", description: HINT_DESCRIPTION_TEXT },
+          marks: { type: "integer", enum: [1, 2, 3] },
+          time_budget_seconds: { type: "integer", enum: [30, 45, 60, 75, 90, 120, 150, 180] },
+          difficulty: { type: "number" },
+        },
+      },
+    },
+  },
+};
+
 const HINT_DESCRIPTION =
   "One sentence pointing at the method or the first step. It must not contain the answer, or a number that gives it away.";
 
@@ -698,6 +780,20 @@ function anglesFor(round, count) {
  */
 const DIFFICULTY_PLAN = [0.2, 0.3, 0.45, 0.55, 0.7, 0.85];
 
+/**
+ * Subjects assessed on reading rather than on calculation.
+ *
+ * These get a different generator entirely, not a warning bolted onto the
+ * usual one. Telling a model "no arithmetic" while asking it for exam
+ * questions about genre conventions produced questions about what percentage
+ * of a plot the build-up occupies, because the shape it was asked for wanted a
+ * number and the subject had none to give.
+ */
+const IS_TEXT_SUBJECT =
+  /Literature|Language|Philosophy|Theatre|Film|Visual Arts|Music|Religions|Anthropology/i.test(
+    SUBJECT
+  );
+
 function plannedDifficulties(count, round) {
   const out = [];
   for (let i = 0; i < count; i++) {
@@ -730,6 +826,168 @@ function cleanFigure(figure) {
   return figureIsUsable(figure) ? figure : null;
 }
 
+/**
+ * Literature and language questions, built the way the subject is examined.
+ *
+ * Paper 1 is guided analysis of an unseen text, so the question carries the
+ * text. One original extract per batch, several questions about it, exactly as
+ * a real paper works.
+ *
+ * This is not a stricter prompt bolted onto the general generator; it is a
+ * different shape, because the general shape was the problem. Asked for exam
+ * questions on genre conventions with the numbers taken away, the model wrote
+ * about what percentage of a plot the build-up occupies. Asked to make them
+ * hard, it wrote about Beloved and The Great Gatsby — unanswerable for a
+ * student whose school teaches neither, and IB English A has no set text list,
+ * so most students study neither.
+ *
+ * An original extract fixes all of it at once. Any student can answer it
+ * whatever their school teaches, it tests analysis rather than whether they
+ * read the right novel, and nothing published is reproduced, so the bank stays
+ * clear of copyright.
+ */
+/**
+ * Is this question actually about the extract it was written for?
+ *
+ * The model writes the extract, then writes questions from memory rather than
+ * from the thing in front of it. Given a piece of dialogue it produced
+ * questions about "the second stanza" and quoted the words 'darkness',
+ * 'blanket' and 'heavy', none of which appear anywhere in it. Those are not
+ * hard questions; they are questions about a poem that does not exist.
+ *
+ * Prompting did not fix this and is not the right tool. Whether a quoted
+ * phrase occurs in the extract is a fact, so it is checked as one.
+ */
+function groundedInExtract(q, stimulus, kind) {
+  const hay = normaliseForMatch(stimulus);
+
+  // Structural vocabulary that only means something in verse.
+  if (kind !== "poem" && /\b(stanza|verse|line break|rhyme scheme|refrain)\b/i.test(q.stem)) {
+    return { ok: false, why: `refers to ${kind === "dialogue" ? "stanzas in an exchange" : "stanzas in prose"}` };
+  }
+
+  // Every phrase the question puts in quotes has to be in the extract.
+  const text = [q.stem, ...(q.options || []).map((o) => o.text)].join(" ");
+  // An opening quote has to follow a space or a bracket, and a closing one has
+  // to be followed by space or punctuation. Without that, the apostrophe in
+  // "the writer's choice" reads as a quotation and every question is rejected
+  // for quoting something it never quoted.
+  const quoted = [
+    ...text.matchAll(/(?:^|[\s(\[])["“]([^"”]{6,120})["”](?=[\s).,;:?!\]]|$)/g),
+    ...text.matchAll(/(?:^|[\s(\[])['‘]([^'’]{6,120})['’](?=[\s).,;:?!\]]|$)/g),
+  ].map((m) => m[1]);
+  for (const phrase of quoted) {
+    const needle = normaliseForMatch(phrase);
+    if (needle.length < 6) continue;
+    if (!hay.includes(needle)) {
+      return { ok: false, why: `quotes "${phrase.slice(0, 40)}" which is not in the extract` };
+    }
+  }
+
+  return { ok: true };
+}
+
+/** Loose enough to survive smart quotes and ellipses, strict enough to mean something. */
+function normaliseForMatch(text) {
+  return String(text || "")
+    .toLowerCase()
+    .replace(/[’‘]/g, "'")
+    .replace(/[“”]/g, '"')
+    .replace(/[.…]+/g, " ")
+    .replace(/[^a-z0-9' ]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+async function generateTextBatch(subtopic, topic, count, existingStems, { round = 0, type = "mcq" }) {
+  const plan = plannedDifficulties(count, round);
+  const avoid =
+    existingStems.length > 0
+      ? `\n\nAlready asked, so do not repeat these:\n${existingStems
+          .slice(-AVOID_STEMS)
+          .map((x) => `- ${x}`)
+          .join("\n")}`
+      : "";
+
+  const forms = ["prose", "poem", "dialogue", "nonfiction"];
+  const form = forms[round % forms.length];
+
+  const shared = `You are writing ${CURRICULUM} exam questions for "${SUBJECT}", ${topic}, subtopic "${subtopic}".
+
+FIRST write one ORIGINAL extract, ${form}, 60 to 140 words, that a question about "${subtopic}" can genuinely be asked about. Write it yourself. Do not copy, adapt, or paraphrase any published work, and do not use a real author's characters or lines.
+
+THEN write ${count} questions about THAT EXTRACT.
+
+Rules that decide whether these are usable at all:
+- Every question must be answerable by someone who has read only the extract. This is an unseen-text paper.
+- NEVER name a novel, play, poem or author as the thing being asked about. A student whose school studies different works cannot answer it, and there is no set text list.
+- NO arithmetic. No percentages, word counts, reading speeds, page numbers, durations. If a question has a number in it, it is the wrong question for this subject.
+- Do not invent an error for a student to spot. A question claiming a correct statement is wrong has no answer.
+- Ask about what the writer does and what it achieves: diction, imagery, structure, voice, tone, form, the effect on a reader.
+- Quote the exact words from the extract that a question turns on, so the student knows where to look.
+
+Difficulties, in order:
+${plan.map((d, i) => `${i + 1}. ${d <= 0.3 ? "straightforward: name a technique the extract clearly uses" : d <= 0.55 ? "moderate: link a technique to its effect" : d <= 0.7 ? "hard: compare two choices the writer makes, or read tone against content" : "very hard: an interpretation that has to be argued from precise detail"} (difficulty ${d})`).join("\n")}
+
+Every question carries a hint: one sentence pointing at where in the extract to look, never the answer.${avoid}`;
+
+  if (type === "short_answer") {
+    const prompt = `${shared}
+
+Write them as SHORT ANSWER questions marked by exact comparison, so the answer must be ONE technical term a student would type identically every time: "metaphor", "enjambment", "sibilance", "first person", "iambic pentameter".
+
+Never ask "why", "how" or "what effect" as a short answer: those need a sentence and cannot be marked here. Ask "which technique", "what is the form", "name the device".
+Put every spelling that should pass in accepted_answers, e.g. ["personification"], ["enjambment", "enjambement"].`;
+
+    const data = await callModel(prompt, TEXT_SHORT_SCHEMA);
+    const stim = data.stimulus;
+    if (!stim?.text) return [];
+    return (data.questions || [])
+      .filter((q) => q.stem && q.accepted_answers?.length)
+      .map((q, i) => ({
+        ...q,
+        question_type: "short_answer",
+        answer_kind: "text",
+        stimulus: stim.text,
+        stimulus_kind: stim.kind,
+        figure: null,
+        difficulty: settleDifficulty(plan[i] ?? 0.5, q.difficulty),
+      }))
+      .filter((q) => {
+        const g = groundedInExtract(q, stim.text, stim.kind);
+        if (!g.ok) console.log(`    dropped: ${g.why}`);
+        return g.ok;
+      });
+  }
+
+  const prompt = `${shared}
+
+Write them as multiple choice, 4 options with ids a to d.
+- Exactly one option is true of this extract. The other three must be false of it, not merely less good: an option that is also true makes the question unanswerable.
+- Distractors should be techniques or readings a student might plausibly claim about this extract and be wrong about.
+- Spread the correct option across a, b, c and d.
+- Every wrong option carries why_wrong: the misreading that leads there, in one sentence.`;
+
+  const data = await callModel(prompt, TEXT_MCQ_SCHEMA);
+  const stim = data.stimulus;
+  if (!stim?.text) return [];
+  return (data.questions || [])
+    .filter((q) => q.options?.length === 4 && q.options.some((o) => o.id === q.correct_answer))
+    .map((q, i) => ({
+      ...q,
+      question_type: "mcq",
+      stimulus: stim.text,
+      stimulus_kind: stim.kind,
+      figure: null,
+      difficulty: settleDifficulty(plan[i] ?? 0.5, q.difficulty),
+    }))
+    .filter((q) => {
+      const g = groundedInExtract(q, stim.text, stim.kind);
+      if (!g.ok) console.log(`    dropped: ${g.why}`);
+      return g.ok;
+    });
+}
+
 async function generateBatch(subtopic, topic, count, existingStems, { round = 0, type = "mcq" } = {}) {
   const avoid =
     existingStems.length > 0
@@ -743,21 +1001,14 @@ async function generateBatch(subtopic, topic, count, existingStems, { round = 0,
     .map((a, i) => `${i + 1}. ${a}`)
     .join("\n");
 
+  const isTextSubject = IS_TEXT_SUBJECT;
   const plan = plannedDifficulties(count, round);
   const planned = plan
     .map((d, i) => `${i + 1}. ${d <= 0.3 ? "easy, one step" : d <= 0.55 ? "medium, two steps" : d <= 0.7 ? "hard, multi-step" : "very hard, exam-standard and combining ideas"} (difficulty ${d})`)
     .join("\n");
 
-  // A literature or language paper has no arithmetic in it. Asking for the
-  // percentage of a page taken by a paragraph is not a hard English question,
-  // it is a maths question wearing a costume, and it was being generated.
-  const isTextSubject =
-    /Literature|Language|Philosophy|History|Theatre|Film|Visual Arts|Music|Religions|Anthropology/i.test(
-      SUBJECT
-    );
-  const numericRule = isTextSubject
-    ? `\n\nThis is not a numerate subject. Do NOT write questions that require arithmetic, percentages, counting, or any calculation. Ask about technique, effect, structure, context, interpretation and argument. A question asking what percentage of a page a passage occupies is a maths question in disguise and is worthless here.`
-    : "";
+
+  if (isTextSubject) return generateTextBatch(subtopic, topic, count, existingStems, { round, type });
 
   const shared = `You are writing exam questions for the ${CURRICULUM} subject "${SUBJECT}", ${topic}, subtopic "${subtopic}".
 
@@ -1143,6 +1394,8 @@ async function main() {
                 )
               : null,
             figure: q.figure || null,
+            stimulus: q.stimulus || null,
+            stimulus_kind: q.stimulus_kind || null,
             marks: q.marks,
             time_budget_seconds: q.time_budget_seconds,
             difficulty: q.difficulty,
@@ -1160,9 +1413,10 @@ async function main() {
                    (curriculum, subject, topic, subtopic, question_type, stem, options,
                     correct_answer, accepted_answers, answer_kind, answer_hint,
                     explanation, hint, option_feedback, figure,
+                    stimulus, stimulus_kind,
                     marks, time_budget_seconds, difficulty, source, verified)
                  VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,$9::jsonb,$10,$11,$12,$13,
-                         $14::jsonb,$15::jsonb,$16,$17,$18,$19,$20)
+                         $14::jsonb,$15::jsonb,$16,$17,$18,$19,$20,$21,$22)
                  ON CONFLICT DO NOTHING`,
                 [
                   row.curriculum, row.subject, row.topic, row.subtopic, row.question_type,
@@ -1176,6 +1430,7 @@ async function main() {
                     ? JSON.stringify(row.option_feedback)
                     : null,
                   row.figure ? JSON.stringify(row.figure) : null,
+                  row.stimulus, row.stimulus_kind,
                   row.marks, row.time_budget_seconds, row.difficulty, row.source, row.verified,
                 ]
               );
