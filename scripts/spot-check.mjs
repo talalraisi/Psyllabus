@@ -81,6 +81,22 @@ function show(q, i, total) {
   console.log(line);
   console.log(`\n${q.stem}\n`);
 
+  // Without the extract there is nothing to judge: a literature question is
+  // about a text, and reading the question alone is how I convinced myself a
+  // perfectly good question was hallucinating, by pairing it with the wrong
+  // passage.
+  if (q.stimulus) {
+    const label =
+      q.stimulus_kind === "poem"
+        ? "POEM"
+        : q.stimulus_kind === "dialogue"
+          ? "EXCHANGE"
+          : "EXTRACT";
+    console.log(`  ${label}:`);
+    for (const line of q.stimulus.split("\n")) console.log(`    ${line}`);
+    console.log("");
+  }
+
   if (q.figure) {
     console.log(`  [figure: ${q.figure.kind}] ${q.figure.alt || ""}`);
     if (q.figure.kind === "table") {
