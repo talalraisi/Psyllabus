@@ -88,18 +88,8 @@ export default function HomePreview() {
         }}
       >
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 md:px-8">
-          <span className="flex items-center gap-2.5">
-            <Image src={logoMark} alt="" sizes="56px" style={{ height: 22, width: 'auto' }} priority />
-            <span className="text-[15px] font-semibold tracking-[-0.012em]">Project Syllabus</span>
-          </span>
+          <Image src={logoMark} alt="Project Syllabus" sizes="72px" style={{ height: 26, width: 'auto' }} priority />
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setDark((d) => !d)}
-              className="rounded-full border px-3.5 py-2 text-[13px] font-medium"
-              style={{ borderColor: 'var(--border-strong)', color: 'var(--body)' }}
-            >
-              {dark ? 'Light' : 'Dark'}
-            </button>
             <button className="hidden rounded-full px-3.5 py-2 text-[13px] font-medium sm:block" style={{ color: 'var(--body)' }}>
               Log in
             </button>
@@ -147,21 +137,25 @@ export default function HomePreview() {
               </button>
             </div>
 
-            {/* The curricula, as a quiet row rather than a badge. A pill at the
-                top of a page is a label looking for something to label. */}
-            <div
-              className="mt-20 flex flex-wrap items-center gap-x-8 gap-y-3 border-t pt-6"
-              style={{ borderColor: 'var(--border)' }}
+            {/* The three things a student needs answered in the first ten
+                seconds, not a row of labels. */}
+            <dl
+              className="mt-20 grid gap-px border-t sm:grid-cols-3"
+              style={{ borderColor: 'var(--border)', background: 'var(--border)' }}
             >
-              {['IB Diploma', 'A-Level', 'AP'].map((c) => (
-                <span key={c} className="text-[12.5px] font-medium" style={{ color: 'var(--muted)' }}>
-                  {c}
-                </span>
+              {[
+                ['One subject, free', 'No trial that expires. Keep it as long as you want.'],
+                ['No card, ever, to start', 'A school code opens the rest for nothing.'],
+                ['Your notes stay on your device', 'Nothing you paste or upload is sent anywhere or used to train anything.'],
+              ].map(([term, def]) => (
+                <div key={term} className="px-0 py-6 sm:px-6 sm:first:pl-0" style={{ background: 'var(--bg)' }}>
+                  <dt className="text-[13.5px] font-semibold">{term}</dt>
+                  <dd className="mt-1.5 text-[12.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+                    {def}
+                  </dd>
+                </div>
               ))}
-              <span className="text-[12.5px]" style={{ color: 'var(--faint)' }}>
-                One subject free, with no time limit
-              </span>
-            </div>
+            </dl>
           </div>
         </section>
 
@@ -211,7 +205,7 @@ export default function HomePreview() {
         </Section>
 
         {/* ----------------------------------------------------------- try it */}
-        <Section label="Try it" tint>
+        <Section label="Try it">
           <div className="grid gap-10 md:grid-cols-[1fr_1.15fr] md:gap-14">
             <div>
               <Heading>Sit one, right here</Heading>
@@ -397,7 +391,7 @@ export default function HomePreview() {
               </button>
             </div>
             <Reveal className="rounded-[12px] border p-6" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
-              <Heatmap cols={8} rows={5} readout={false} />
+              <Heatmap cols={8} rows={5} subject="Physics SL · Class of 2028" />
               <p className="mt-4 text-[12.5px]" style={{ color: 'var(--muted)' }}>
                 A teacher sees the same map for a class, without seeing anybody&rsquo;s individual answers.
               </p>
@@ -433,10 +427,17 @@ export default function HomePreview() {
           <p className="text-[13px]" style={{ color: 'var(--faint)' }}>
             © 2026 Project Syllabus · Built in Muscat, Oman
           </p>
-          <nav className="flex flex-wrap gap-x-6 gap-y-2">
+          <nav className="flex flex-wrap items-center gap-x-6 gap-y-2">
             {['About', 'Pricing', 'Privacy', 'Terms', 'Cookies', 'Refunds'].map((l) => (
               <span key={l} className="text-[13px]" style={{ color: 'var(--muted)' }}>{l}</span>
             ))}
+            <button
+              onClick={() => setDark((d) => !d)}
+              className="rounded-full border px-3 py-1.5 text-[12px] font-medium"
+              style={{ borderColor: 'var(--border-strong)', color: 'var(--body)' }}
+            >
+              {dark ? 'Light' : 'Dark'}
+            </button>
           </nav>
         </div>
       </footer>
