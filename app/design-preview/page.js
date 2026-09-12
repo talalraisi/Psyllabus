@@ -161,20 +161,31 @@ export default function HomePreview() {
 
         {/* -------------------------------------------------------- coverage */}
         <Section tint>
-          <div className="flex flex-wrap items-baseline justify-between gap-6">
-            <p className="max-w-xl text-[15.5px] leading-relaxed" style={{ color: 'var(--body)' }}>
-              The syllabus is mapped for{' '}
-              <span className="font-semibold" style={{ color: 'var(--text)' }}>
-                <CountUp to={173} /> subjects
-              </span>{' '}
-              across IB, A-Level and AP —{' '}
-              <span className="font-semibold" style={{ color: 'var(--text)' }}>
-                <CountUp to={5914} /> subtopics
-              </span>
-              . Question coverage is deeper in some subjects than others, and the app tells you
+          <div className="mx-auto grid max-w-4xl grid-cols-2 gap-x-8 gap-y-10 text-center md:grid-cols-4">
+            {[
+              [173, '', 'subjects covered'],
+              [5914, '', 'subtopics mapped'],
+              [3, '', 'curricula'],
+              [5, '', 'levels of mastery'],
+            ].map(([v, suffix, l], i) => (
+              <Reveal key={l} delay={i * 70}>
+                <p className="text-[clamp(2rem,3.6vw,2.8rem)] font-semibold leading-none tracking-[-0.03em]">
+                  <CountUp to={v} suffix={suffix} />
+                </p>
+                <p className="mt-2.5 text-[13px]" style={{ color: 'var(--muted)' }}>{l}</p>
+              </Reveal>
+            ))}
+          </div>
+
+          <Reveal delay={280}>
+            <p
+              className="mx-auto mt-12 max-w-lg text-center text-[13.5px] leading-relaxed"
+              style={{ color: 'var(--faint)' }}
+            >
+              Question coverage is deeper in some subjects than others, and the app tells you
               which rather than hiding it.
             </p>
-          </div>
+          </Reveal>
         </Section>
 
         {/* --------------------------------------------------- how it works */}

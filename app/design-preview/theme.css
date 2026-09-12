@@ -179,3 +179,45 @@
   background: var(--border);
   z-index: -1;
 }
+
+/* --- Reveal on scroll, without JavaScript. -------------------------------
+   Driven by the browser's own scroll timeline. Two reasons this is better than
+   an IntersectionObserver:
+
+   It cannot hide anything. The resting state is visible, and the animation
+   only ever plays where `animation-timeline: view()` is supported. Every
+   earlier attempt started at opacity zero and therefore had a failure mode
+   where the page rendered as a headline above an empty column — first when the
+   observer never fired, then again when the guard against that revealed
+   everything at once on load.
+
+   And it actually tracks the scroll. An observer fires once on a threshold;
+   this is tied to the element's real position in the viewport, so it behaves
+   correctly when the page is restored mid-scroll, resized, or jumped into by
+   an anchor link.
+
+   Where it is unsupported, content simply appears. That is the right trade:
+   the animation is decoration and the words are not.
+   ------------------------------------------------------------------------- */
+
+.rv .rv-reveal {
+  opacity: 1;
+  transform: none;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes rv-enter {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    .rv .rv-reveal {
+      animation: rv-enter linear both;
+      animation-timeline: view();
+      /* Finish well before the element reaches the middle of the screen, so it
+         is settled by the time it is being read rather than still arriving. */
+      animation-range: entry 0% cover 34%;
+    }
+  }
+}

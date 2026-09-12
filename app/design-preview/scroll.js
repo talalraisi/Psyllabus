@@ -17,7 +17,14 @@ import { useState, useEffect, useRef } from 'react'
  * illustration changes — all of which direct attention rather than borrow it.
  */
 
-/** True once the element has been seen. Does not flip back, so nothing re-animates on the way up. */
+/**
+ * True once the element has been seen.
+ *
+ * Only for work that has to happen on arrival, such as starting a counter.
+ * Never use it to decide whether content is visible: if the observer does not
+ * report, nothing should disappear. Callers are expected to render their final
+ * state when this stays false.
+ */
 export function useInView({ threshold = 0.25, rootMargin = '0px 0px -12% 0px' } = {}) {
   const ref = useRef(null)
   const [seen, setSeen] = useState(false)
@@ -46,26 +53,46 @@ export function useInView({ threshold = 0.25, rootMargin = '0px 0px -12% 0px' } 
     io.observe(el)
 
     /**
-     * Fail open.
+     * Fallback, without giving up scroll triggering.
      *
-     * Every reveal on this page starts at opacity zero, so anything that stops
-     * the observer firing does not merely skip an animation, it hides the
-     * content. That is not hypothetical: in a window that is never painted the
-     * callback does not arrive, and the page renders as an empty column with a
-     * headline and nothing else. Whatever the reason, after a second and a
-     * half the content appears.
+     * Every reveal starts at opacity zero, so anything that stops the observer
+     * firing hides the content rather than merely skipping an animation. The
+     * first attempt at guarding that simply revealed everything after a second
+     * and a half — which fixed the hiding and broke the feature, because the
+     * whole page then appeared at once on load regardless of where you were
+     * scrolled to.
      *
-     * The rule this encodes: decoration is allowed to fail, and when it does
-     * the words still have to be there.
+     * So the fallback does the observer's job by hand instead: measure against
+     * the viewport on scroll. Same behaviour, worse performance, only ever used
+     * when the real thing has not reported in.
      */
-    const failOpen = setTimeout(() => {
-      setSeen(true)
-      io.disconnect()
-    }, 1500)
+    let fallbackOn = false
+    const check = () => {
+      const box = el.getBoundingClientRect()
+      if (box.top < window.innerHeight * 0.9 && box.bottom > 0) {
+        setSeen(true)
+        stopFallback()
+      }
+    }
+    const stopFallback = () => {
+      window.removeEventListener('scroll', check)
+      window.removeEventListener('resize', check)
+      fallbackOn = false
+    }
+    const startFallback = () => {
+      if (fallbackOn) return
+      fallbackOn = true
+      window.addEventListener('scroll', check, { passive: true })
+      window.addEventListener('resize', check)
+      check()
+    }
+
+    const arm = setTimeout(startFallback, 1200)
 
     return () => {
       io.disconnect()
-      clearTimeout(failOpen)
+      clearTimeout(arm)
+      stopFallback()
     }
   }, [threshold, rootMargin])
 
@@ -106,19 +133,19 @@ export function useScrollProgress() {
   return [ref, p]
 }
 
-/** Wrap anything to have it arrive as you reach it. */
+/**
+ * Wrap anything to have it arrive as you reach it.
+ *
+ * The animation is CSS, driven by the browser's scroll timeline, so this
+ * component only picks a class and an optional stagger. It carries no state,
+ * which is the point: every JavaScript version of this started at opacity zero
+ * and so had a way of leaving the page blank, twice over.
+ */
 export function Reveal({ children, delay = 0, as: Tag = 'div', className = '', style }) {
-  const [ref, seen] = useInView()
   return (
     <Tag
-      ref={ref}
-      className={className}
-      style={{
-        ...style,
-        opacity: seen ? 1 : 0,
-        transform: seen ? 'none' : 'translateY(14px)',
-        transition: `opacity 620ms cubic-bezier(0.16,1,0.3,1) ${delay}ms, transform 620ms cubic-bezier(0.16,1,0.3,1) ${delay}ms`,
-      }}
+      className={`rv-reveal ${className}`}
+      style={delay ? { ...style, animationDelay: `${delay}ms` } : style}
     >
       {children}
     </Tag>
@@ -158,6 +185,20 @@ export function ScrollBar() {
 export function CountUp({ to, suffix = '', prefix = '', duration = 1100, className = '', style }) {
   const [ref, seen] = useInView({ threshold: 0.6 })
   const [n, setN] = useState(0)
+
+  /**
+   * The number has to be right even if the count never runs.
+   *
+   * Everything that starts the animation depends on the observer reporting,
+   * and when it does not the figure sits at zero — a homepage claiming "0
+   * subjects covered", which is worse than no animation at all. This is the
+   * backstop: if nothing has moved it shortly after mount, show the real value.
+   * Same rule as the reveals. Decoration may fail; the content may not.
+   */
+  useEffect(() => {
+    const backstop = setTimeout(() => setN((current) => (current === 0 ? to : current)), 1800)
+    return () => clearTimeout(backstop)
+  }, [to])
 
   useEffect(() => {
     if (!seen) return
@@ -200,101 +241,143 @@ export function CountUp({ to, suffix = '', prefix = '', duration = 1100, classNa
 /**
  * The forgetting curve, drawn as you arrive at it.
  *
- * This is the one graphic that had to exist. The whole argument for decay is a
- * shape, and a shape is better shown than described: memory falls away steeply
- * and then flattens, and each retest lifts it back up a little higher and
- * flattens it a little more. The stepped line is why spaced practice works,
- * and nobody has to read a paragraph to see it.
+ * Two lines from the same starting point, which is the only way the argument
+ * lands: one shows what happens if you never go back, the other shows the same
+ * memory retested four times. The retested one falls more shallowly after every
+ * retest, and that difference is the entire case for spaced practice.
+ *
+ * The first version of this was wrong in a way that mattered. Each segment's
+ * decay was normalised against the distance to the end of the chart rather than
+ * against its own length, so the falls got steeper as they went right instead
+ * of shallower — it drew the opposite of the thing it was supposed to show, and
+ * looked plausible enough not to notice. Decay is measured in elapsed time now,
+ * with the rate falling at each retest, and each retest is drawn as a visible
+ * lift rather than left implicit in a gap between two lines.
  */
 export function ForgettingCurve() {
-  const [ref, seen] = useInView({ threshold: 0.4 })
+  const [ref, seen] = useInView({ threshold: 0.35 })
+
   const W = 560
-  const H = 260
-  const pad = { l: 38, r: 14, t: 16, b: 34 }
-
-  // Four study events; after each one retention starts higher and falls slower.
-  const events = [0, 0.26, 0.54, 0.8]
-  const decay = [2.6, 1.9, 1.3, 0.85]
-  const peak = [1, 0.94, 0.97, 1]
-
+  const H = 250
+  const pad = { l: 42, r: 16, t: 18, b: 38 }
   const x = (u) => pad.l + u * (W - pad.l - pad.r)
   const y = (v) => H - pad.b - v * (H - pad.t - pad.b)
 
-  const segments = events.map((startU, i) => {
-    const endU = i < events.length - 1 ? events[i + 1] : 1
+  // Time is the x axis, so decay is exp(-rate * elapsed) and nothing is
+  // normalised per segment.
+  const SPAN = 3
+  const retests = [0, 0.26, 0.52, 0.76]
+  const rates = [1.0, 0.62, 0.4, 0.24]
+
+  const line = (from, to, rate, at) => {
     const pts = []
-    const steps = 26
-    for (let s = 0; s <= steps; s++) {
-      const u = startU + ((endU - startU) * s) / steps
-      const local = (u - startU) / Math.max(0.0001, 1 - startU)
-      const retention = peak[i] * Math.exp(-decay[i] * local * 1.7)
-      pts.push(`${x(u).toFixed(1)},${y(Math.max(0.06, retention)).toFixed(1)}`)
+    for (let i = 0; i <= 30; i++) {
+      const u = from + ((to - from) * i) / 30
+      pts.push(`${i ? 'L' : 'M'}${x(u).toFixed(1)},${y(Math.exp(-rate * (u - at) * SPAN)).toFixed(1)}`)
     }
     return pts.join(' ')
-  })
+  }
+
+  const neverAgain = line(0, 1, rates[0], 0)
+  const segments = retests.map((at, i) =>
+    line(at, i < retests.length - 1 ? retests[i + 1] : 1, rates[i], at)
+  )
+  const lowAt = (i) =>
+    Math.exp(-rates[i] * ((i < retests.length - 1 ? retests[i + 1] : 1) - retests[i]) * SPAN)
 
   return (
     <div ref={ref}>
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Retention falls after each study session and falls more slowly each time it is retested">
-        {/* grid */}
-        {[0, 0.25, 0.5, 0.75, 1].map((v) => (
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        className="w-full"
+        role="img"
+        aria-label="Two curves from the same start: without revisiting, retention falls to almost nothing by the exam. Retested four times, each fall is shallower and it stays high."
+      >
+        {[0, 0.5, 1].map((v) => (
+          <line key={v} x1={pad.l} x2={W - pad.r} y1={y(v)} y2={y(v)} stroke="var(--border)" />
+        ))}
+        <text x={pad.l - 8} y={y(1) + 4} textAnchor="end" fontSize="10" fill="var(--faint)">100%</text>
+        <text x={pad.l - 8} y={y(0.5) + 4} textAnchor="end" fontSize="10" fill="var(--faint)">50%</text>
+        <text x={pad.l - 8} y={y(0) + 4} textAnchor="end" fontSize="10" fill="var(--faint)">0</text>
+
+        {/* Never revisited. */}
+        <path
+          d={neverAgain}
+          fill="none"
+          stroke="var(--weak)"
+          strokeWidth="2"
+          strokeLinecap="round"
+          style={{
+            strokeDasharray: 1000,
+            strokeDashoffset: seen ? 0 : 1000,
+            transition: 'stroke-dashoffset 1400ms cubic-bezier(0.4,0,0.2,1)',
+          }}
+        />
+
+        {/* The lift at each retest, drawn so the sawtooth is explicit. */}
+        {retests.slice(1).map((at, i) => (
           <line
-            key={v}
-            x1={pad.l}
-            x2={W - pad.r}
-            y1={y(v)}
-            y2={y(v)}
-            stroke="var(--border)"
-            strokeWidth="1"
-          />
-        ))}
-        <text x={pad.l - 8} y={y(1) + 4} textAnchor="end" fontSize="10" fill="var(--faint)">
-          100%
-        </text>
-        <text x={pad.l - 8} y={y(0) + 4} textAnchor="end" fontSize="10" fill="var(--faint)">
-          0
-        </text>
-        <text x={pad.l} y={H - 10} fontSize="10" fill="var(--faint)">
-          learned it
-        </text>
-        <text x={W - pad.r} y={H - 10} textAnchor="end" fontSize="10" fill="var(--faint)">
-          exam
-        </text>
-
-        {segments.map((pts, i) => (
-          <polyline
-            key={i}
-            points={pts}
-            fill="none"
-            stroke={i === 0 ? 'var(--weak)' : 'var(--proficient)'}
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            style={{
-              strokeDasharray: 900,
-              strokeDashoffset: seen ? 0 : 900,
-              transition: `stroke-dashoffset 1200ms cubic-bezier(0.4,0,0.2,1) ${i * 260}ms`,
-            }}
-          />
-        ))}
-
-        {/* retest markers */}
-        {events.slice(1).map((u, i) => (
-          <g
-            key={u}
+            key={`lift${at}`}
+            x1={x(at)}
+            x2={x(at)}
+            y1={y(lowAt(i))}
+            y2={y(1)}
+            stroke="var(--proficient)"
+            strokeWidth="1.5"
+            strokeDasharray="3 3"
             style={{
               opacity: seen ? 1 : 0,
-              transition: `opacity 420ms ease ${700 + i * 260}ms`,
+              transition: `opacity 300ms ease ${520 + i * 300}ms`,
             }}
-          >
-            <line x1={x(u)} x2={x(u)} y1={y(0)} y2={y(1)} stroke="var(--border-strong)" strokeDasharray="3 3" />
-            <circle cx={x(u)} cy={y(peak[i + 1])} r="4.5" fill="var(--proficient)" />
-          </g>
+          />
         ))}
+
+        {/* Retested. */}
+        {segments.map((d, i) => (
+          <path
+            key={i}
+            d={d}
+            fill="none"
+            stroke="var(--proficient)"
+            strokeWidth="2.75"
+            strokeLinecap="round"
+            style={{
+              strokeDasharray: 600,
+              strokeDashoffset: seen ? 0 : 600,
+              transition: `stroke-dashoffset 700ms cubic-bezier(0.4,0,0.2,1) ${i * 300}ms`,
+            }}
+          />
+        ))}
+
+        {retests.map((at, i) => (
+          <circle
+            key={`dot${at}`}
+            cx={x(at)}
+            cy={y(1)}
+            r="4"
+            fill="var(--proficient)"
+            style={{ opacity: seen ? 1 : 0, transition: `opacity 260ms ease ${i * 300}ms` }}
+          />
+        ))}
+
+        <text x={pad.l} y={H - 12} fontSize="10" fill="var(--faint)">the day you learn it</text>
+        <text x={W - pad.r} y={H - 12} fontSize="10" fill="var(--faint)" textAnchor="end">the exam</text>
       </svg>
 
-      <p className="mt-4 text-[13.5px] leading-relaxed" style={{ color: 'var(--faint)' }}>
-        Red is what happens if you never go back. Each dotted line is a retest, and the curve
-        after it falls more slowly than the one before.
+      <div className="mt-5 flex flex-wrap gap-x-7 gap-y-2">
+        <span className="flex items-center gap-2 text-[12.5px]" style={{ color: 'var(--muted)' }}>
+          <span className="h-[2px] w-5 rounded-full" style={{ background: 'var(--weak)' }} />
+          never went back
+        </span>
+        <span className="flex items-center gap-2 text-[12.5px]" style={{ color: 'var(--muted)' }}>
+          <span className="h-[3px] w-5 rounded-full" style={{ background: 'var(--proficient)' }} />
+          retested four times
+        </span>
+      </div>
+
+      <p className="mt-3 text-[13.5px] leading-relaxed" style={{ color: 'var(--faint)' }}>
+        Same memory, same starting point. Each dotted line is a retest, and every fall after one
+        is shallower than the last.
       </p>
     </div>
   )

@@ -381,8 +381,6 @@ export function DecayDemo() {
       <svg viewBox={`0 0 ${W} ${H}`} className="mt-5 w-full" role="img" aria-label={`Retention after ${weeks} weeks: about ${pct}%`}>
         <line x1="8" x2={W - 8} y1={y(0)} y2={y(0)} stroke="var(--border)" />
         <line x1="8" x2={W - 8} y1={y(1)} y2={y(1)} stroke="var(--border)" strokeDasharray="2 4" />
-        <text x="10" y={y(1) - 4} fontSize="9" fill="var(--faint)">proved it</text>
-        <text x={W - 8} y={y(0) + 10} fontSize="9" fill="var(--faint)" textAnchor="end">9 weeks later</text>
         <path d={path} fill="none" stroke="var(--border-strong)" strokeWidth="1.5" />
         <path
           d={path}
