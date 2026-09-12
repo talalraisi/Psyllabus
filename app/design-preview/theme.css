@@ -84,3 +84,60 @@
 @media (prefers-reduced-motion: reduce) {
   .rv .rise, .rv .cell, .rv .grow { animation: none; }
 }
+
+/* --- Hover. Lift and a border that warms, nothing that glows. -------------- */
+
+.rv .lift {
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 220ms ease,
+              background-color 220ms ease;
+}
+.rv .lift:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-strong);
+}
+
+/* A feature row whose marker grows into a rule as you point at it. */
+.rv .mark {
+  transition: width 260ms cubic-bezier(0.16, 1, 0.3, 1), opacity 260ms ease;
+}
+.rv .feat:hover .mark {
+  width: 3.25rem;
+}
+
+/* Rows in a list: the arrow arrives rather than appearing. */
+.rv .row .go {
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 200ms ease, transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.rv .row:hover .go {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rv .lift, .rv .mark, .rv .row .go { transition: none; }
+  .rv .lift:hover { transform: none; }
+}
+
+/* --- Pinned steps. -------------------------------------------------------
+   Above the breakpoint the section pins and only the active step is lit, so
+   dimming and collapsing carry the sequence. Below it there is no pinning and
+   nothing is "active", so every step has to read in full or two thirds of the
+   copy would be invisible on a phone. ------------------------------------- */
+
+.rv .step { opacity: 1; }
+.rv .step-body { max-height: none; opacity: 1; overflow: visible; }
+
+@media (min-width: 768px) {
+  .rv .step { opacity: 0.38; }
+  .rv .step[data-on='true'] { opacity: 1; }
+  .rv .step-body {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 500ms cubic-bezier(0.16, 1, 0.3, 1), opacity 400ms ease;
+  }
+  .rv .step[data-on='true'] .step-body { max-height: 150px; opacity: 1; }
+}

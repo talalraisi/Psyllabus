@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { IconCheck, IconArrowRight, IconClose } from '@/components/Icons'
 import { HOW_IT_WORKS, FEATURES, WHY, FAQ, ANSWERS } from './content'
 import { Heatmap, TryQuestion, DecayDemo, PlanDemo, Faq } from './interactive'
+import { Reveal, ScrollBar, CountUp, ForgettingCurve, MasteryRing, StickySteps } from './scroll'
+import { FEATURE_MODULES } from './features'
 import './theme.css'
 
 /**
@@ -74,6 +76,8 @@ export default function HomePreview() {
       data-rt={dark ? 'dark' : 'light'}
       style={{ background: 'var(--bg)', color: 'var(--text)' }}
     >
+      <ScrollBar />
+
       <header
         className="sticky top-0 z-20 border-b backdrop-blur-md"
         style={{
@@ -177,39 +181,89 @@ export default function HomePreview() {
         <Section tint>
           <div className="flex flex-wrap items-baseline gap-x-14 gap-y-8">
             {[
-              ['5,000+', 'subtopics mapped'],
-              ['300+', 'questions in the bank'],
-              ['173', 'subjects covered'],
-              ['3', 'curricula'],
-            ].map(([v, l], i) => (
-              <div key={l} className="rise" style={{ animationDelay: `${i * 60}ms` }}>
-                <p className="text-[clamp(1.9rem,3.4vw,2.6rem)] font-semibold leading-none tracking-[-0.03em] tabular-nums">
-                  {v}
+              [5000, '+', 'subtopics mapped'],
+              [300, '+', 'questions in the bank'],
+              [173, '', 'subjects covered'],
+              [3, '', 'curricula'],
+            ].map(([v, suffix, l], i) => (
+              <Reveal key={l} delay={i * 70}>
+                <p className="text-[clamp(1.9rem,3.4vw,2.6rem)] font-semibold leading-none tracking-[-0.03em]">
+                  <CountUp to={v} suffix={suffix} />
                 </p>
                 <p className="mt-2 text-[13px]" style={{ color: 'var(--muted)' }}>{l}</p>
-              </div>
+              </Reveal>
             ))}
           </div>
         </Section>
 
         {/* --------------------------------------------------- how it works */}
-        <Section label="How it works">
-          <Heading className="max-w-xl">Three steps, and the second one is the point</Heading>
-          <div className="mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
-            {HOW_IT_WORKS.map(({ step, title, body }, i) => (
-              <div key={step} className="rise" style={{ animationDelay: `${i * 80}ms` }}>
-                <div className="mb-4 flex items-center gap-3">
-                  <span className="text-[13px] font-semibold tabular-nums" style={{ color: 'var(--brand)' }}>
-                    {step}
-                  </span>
-                  <span className="h-px flex-1" style={{ background: 'var(--border)' }} />
-                </div>
-                <h3 className="text-[17px] font-semibold tracking-[-0.015em]">{title}</h3>
-                <p className="mt-2.5 text-[14.5px] leading-relaxed" style={{ color: 'var(--body)' }}>{body}</p>
+        <section className="border-t" style={{ borderColor: 'var(--border)' }}>
+          <StickySteps
+            steps={HOW_IT_WORKS}
+            render={(active) => (
+              <div
+                className="w-full rounded-2xl border p-6"
+                style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
+              >
+                {active === 0 && (
+                  <>
+                    <p className="mb-4 text-[13px] font-semibold">Your syllabus, all of it</p>
+                    <Heatmap cols={10} rows={7} readout={false} />
+                    <p className="mt-4 text-[12.5px]" style={{ color: 'var(--muted)' }}>
+                      Every subtopic of the official course. Grey is untested, which is most of it
+                      on day one.
+                    </p>
+                  </>
+                )}
+
+                {active === 1 && (
+                  <>
+                    <p className="mb-4 text-[13px] font-semibold">One quiz decides the colour</p>
+                    <div className="flex items-center justify-around py-2">
+                      <MasteryRing pct={30} label="after 3 right" tone="weak" size={116} />
+                      <MasteryRing pct={72} label="after 9 right" tone="proficient" size={116} />
+                    </div>
+                    <p className="mt-4 text-[12.5px]" style={{ color: 'var(--muted)' }}>
+                      Ten points is mastery. A harder question carries more of them, so you cannot
+                      get there on easy ones.
+                    </p>
+                  </>
+                )}
+
+                {active === 2 && (
+                  <>
+                    <p className="mb-4 text-[13px] font-semibold">Tonight, in order</p>
+                    <ul className="flex flex-col">
+                      {[
+                        ['Circular motion', 'Weak, needs work', 'weak'],
+                        ['Wave characteristics', 'Fading, 18 days', 'fading'],
+                        ['Complex numbers', 'Weak, needs work', 'weak'],
+                        ['Thermal concepts', 'Not tested yet', 'untested'],
+                      ].map(([t, why, tone], i) => (
+                        <li
+                          key={t}
+                          className="flex items-center gap-3 border-t py-3 first:border-t-0"
+                          style={{ borderColor: 'var(--border)' }}
+                        >
+                          <span className="w-4 text-[12px] font-semibold tabular-nums" style={{ color: 'var(--faint)' }}>
+                            {i + 1}
+                          </span>
+                          <span className="h-2 w-2 rounded-full" style={{ background: `var(--${tone})` }} />
+                          <span className="flex-1 text-[13.5px] font-medium">{t}</span>
+                          <span className="text-[12px]" style={{ color: 'var(--muted)' }}>{why}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="mt-4 text-[12.5px]" style={{ color: 'var(--muted)' }}>
+                      Ordered by what you got wrong and what is slipping, with a reason on every
+                      line.
+                    </p>
+                  </>
+                )}
               </div>
-            ))}
-          </div>
-        </Section>
+            )}
+          />
+        </section>
 
         {/* ----------------------------------------------------------- try it */}
         <Section label="Try it" tint>
@@ -238,10 +292,12 @@ export default function HomePreview() {
 
           <ul className="mt-10 flex flex-col gap-3">
             {ANSWERS.map((a, i) => (
-              <li
+              <Reveal
                 key={a.them}
-                className="rise grid gap-4 rounded-xl border p-5 md:grid-cols-[1fr_1.3fr] md:gap-8"
-                style={{ borderColor: 'var(--border)', background: 'var(--surface)', animationDelay: `${i * 55}ms` }}
+                as="li"
+                delay={i * 60}
+                className="lift grid gap-4 rounded-xl border p-5 md:grid-cols-[1fr_1.3fr] md:gap-8"
+                style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
               >
                 <div className="flex gap-3">
                   <IconClose width={16} height={16} className="mt-0.5 shrink-0" style={{ color: 'var(--weak)' }} />
@@ -251,7 +307,7 @@ export default function HomePreview() {
                   <IconCheck width={16} height={16} className="mt-0.5 shrink-0" style={{ color: 'var(--proficient)' }} />
                   <p className="text-[14.5px] leading-snug">{a.us}</p>
                 </div>
-              </li>
+              </Reveal>
             ))}
           </ul>
         </Section>
@@ -300,6 +356,13 @@ export default function HomePreview() {
             </div>
             <DecayDemo />
           </div>
+
+          <Reveal
+            className="mt-12 rounded-2xl border p-6 md:p-8"
+            style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
+          >
+            <ForgettingCurve />
+          </Reveal>
         </Section>
 
         {/* --------------------------------------------------------- planner */}
@@ -317,15 +380,37 @@ export default function HomePreview() {
         </Section>
 
         {/* ------------------------------------------------------- features */}
-        <Section label="What you get" tint>
-          <Heading className="max-w-xl">Everything that is already working</Heading>
-          <div className="mt-12 grid gap-x-10 gap-y-9 sm:grid-cols-2 lg:grid-cols-4">
-            {FEATURES.map(([title, body, tone], i) => (
-              <div key={title} className="rise" style={{ animationDelay: `${i * 45}ms` }}>
-                <span className="mb-3 block h-1 w-7 rounded-full" style={{ background: `var(--${tone})` }} />
-                <h3 className="text-[15px] font-semibold tracking-[-0.012em]">{title}</h3>
-                <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: 'var(--body)' }}>{body}</p>
-              </div>
+        <Section label="Every feature" tint>
+          <Heading className="max-w-2xl">What each part actually does</Heading>
+          <p className="mt-4 max-w-lg text-[15.5px] leading-relaxed" style={{ color: 'var(--body)' }}>
+            Eight things, all of them working today. Each one is shown rather than described.
+          </p>
+
+          <div className="mt-14 flex flex-col">
+            {FEATURE_MODULES.map(({ label, title, body, Graphic }, i) => (
+              <Reveal
+                key={title}
+                as="article"
+                delay={40}
+                className="grid gap-8 border-t py-10 md:grid-cols-[0.9fr_1.1fr] md:gap-14 md:py-12"
+                style={{ borderColor: 'var(--border)' }}
+              >
+                <div className={i % 2 === 1 ? 'md:order-2' : undefined}>
+                  <p
+                    className="mb-3 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
+                    style={{ color: 'var(--faint)' }}
+                  >
+                    {String(i + 1).padStart(2, '0')} · {label}
+                  </p>
+                  <h3 className="text-[20px] font-semibold leading-snug tracking-[-0.02em]">{title}</h3>
+                  <p className="mt-3 text-[14.5px] leading-[1.7]" style={{ color: 'var(--body)' }}>
+                    {body}
+                  </p>
+                </div>
+                <div className={i % 2 === 1 ? 'md:order-1' : undefined}>
+                  <Graphic />
+                </div>
+              </Reveal>
             ))}
           </div>
         </Section>
@@ -335,7 +420,7 @@ export default function HomePreview() {
           <Heading className="max-w-2xl">Six reasons, none of them about motivation</Heading>
           <div className="mt-12 grid gap-x-14 gap-y-11 md:grid-cols-2">
             {WHY.map(({ title, body }, i) => (
-              <div key={title} className="rise" style={{ animationDelay: `${i * 55}ms` }}>
+              <Reveal key={title} delay={i * 55}>
                 <div className="mb-3 flex items-baseline gap-3">
                   <span className="text-[12px] font-semibold tabular-nums" style={{ color: 'var(--faint)' }}>
                     {String(i + 1).padStart(2, '0')}
@@ -343,7 +428,7 @@ export default function HomePreview() {
                   <h3 className="text-[17px] font-semibold leading-snug tracking-[-0.015em]">{title}</h3>
                 </div>
                 <p className="text-[14.5px] leading-[1.7]" style={{ color: 'var(--body)' }}>{body}</p>
-              </div>
+              </Reveal>
             ))}
           </div>
         </Section>
