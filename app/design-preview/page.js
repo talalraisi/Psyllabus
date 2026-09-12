@@ -4,8 +4,9 @@ import { useState } from 'react'
 import { IconCheck, IconArrowRight, IconClose } from '@/components/Icons'
 import { HOW_IT_WORKS, FEATURES, WHY, FAQ, ANSWERS } from './content'
 import { Heatmap, TryQuestion, DecayDemo, PlanDemo, Faq } from './interactive'
-import { Reveal, ScrollBar, CountUp, ForgettingCurve, MasteryRing, StickySteps } from './scroll'
+import { Reveal, ScrollBar, CountUp, ForgettingCurve } from './scroll'
 import { FEATURE_MODULES } from './features'
+import { HeroPanel } from './hero'
 import './theme.css'
 
 /**
@@ -159,111 +160,56 @@ export default function HomePreview() {
               </p>
             </div>
 
-            <div
-              className="rise rounded-2xl border p-5"
-              style={{ borderColor: 'var(--border)', background: 'var(--surface)', animationDelay: '140ms' }}
-            >
-              <Heatmap />
-
-              <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 border-t pt-4" style={{ borderColor: 'var(--border)' }}>
-                {STATUSES.map((s) => (
-                  <span key={s} className="flex items-center gap-1.5 text-[11.5px]" style={{ color: 'var(--muted)' }}>
-                    <span className="h-2.5 w-2.5 rounded-[3px]" style={{ background: `var(--${s})` }} />
-                    <span className="capitalize">{s}</span>
-                  </span>
-                ))}
-              </div>
-            </div>
+            <Reveal delay={140}>
+              <HeroPanel />
+            </Reveal>
           </div>
         </section>
 
-        {/* -------------------------------------------------------- numbers */}
+        {/* -------------------------------------------------------- coverage */}
         <Section tint>
-          <div className="flex flex-wrap items-baseline gap-x-14 gap-y-8">
-            {[
-              [5000, '+', 'subtopics mapped'],
-              [300, '+', 'questions in the bank'],
-              [173, '', 'subjects covered'],
-              [3, '', 'curricula'],
-            ].map(([v, suffix, l], i) => (
-              <Reveal key={l} delay={i * 70}>
-                <p className="text-[clamp(1.9rem,3.4vw,2.6rem)] font-semibold leading-none tracking-[-0.03em]">
-                  <CountUp to={v} suffix={suffix} />
-                </p>
-                <p className="mt-2 text-[13px]" style={{ color: 'var(--muted)' }}>{l}</p>
-              </Reveal>
-            ))}
+          <div className="flex flex-wrap items-baseline justify-between gap-6">
+            <p className="max-w-xl text-[15.5px] leading-relaxed" style={{ color: 'var(--body)' }}>
+              The syllabus is mapped for{' '}
+              <span className="font-semibold" style={{ color: 'var(--text)' }}>
+                <CountUp to={173} /> subjects
+              </span>{' '}
+              across IB, A-Level and AP —{' '}
+              <span className="font-semibold" style={{ color: 'var(--text)' }}>
+                <CountUp to={5914} /> subtopics
+              </span>
+              . Question coverage is deeper in some subjects than others, and the app tells you
+              which rather than hiding it.
+            </p>
           </div>
         </Section>
 
         {/* --------------------------------------------------- how it works */}
-        <section className="border-t" style={{ borderColor: 'var(--border)' }}>
-          <StickySteps
-            steps={HOW_IT_WORKS}
-            render={(active) => (
-              <div
-                className="w-full rounded-2xl border p-6"
-                style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
+        <Section label="How it works">
+          <Heading className="max-w-xl">Three steps, and the second one is the point</Heading>
+
+          <div className="mt-14 grid gap-px md:grid-cols-3" style={{ background: 'var(--border)' }}>
+            {HOW_IT_WORKS.map(({ step, title, body }, i) => (
+              <Reveal
+                key={step}
+                delay={i * 80}
+                className="p-7 md:p-8"
+                style={{ background: 'var(--bg)' }}
               >
-                {active === 0 && (
-                  <>
-                    <p className="mb-4 text-[13px] font-semibold">Your syllabus, all of it</p>
-                    <Heatmap cols={10} rows={7} readout={false} />
-                    <p className="mt-4 text-[12.5px]" style={{ color: 'var(--muted)' }}>
-                      Every subtopic of the official course. Grey is untested, which is most of it
-                      on day one.
-                    </p>
-                  </>
-                )}
-
-                {active === 1 && (
-                  <>
-                    <p className="mb-4 text-[13px] font-semibold">One quiz decides the colour</p>
-                    <div className="flex items-center justify-around py-2">
-                      <MasteryRing pct={30} label="after 3 right" tone="weak" size={116} />
-                      <MasteryRing pct={72} label="after 9 right" tone="proficient" size={116} />
-                    </div>
-                    <p className="mt-4 text-[12.5px]" style={{ color: 'var(--muted)' }}>
-                      Ten points is mastery. A harder question carries more of them, so you cannot
-                      get there on easy ones.
-                    </p>
-                  </>
-                )}
-
-                {active === 2 && (
-                  <>
-                    <p className="mb-4 text-[13px] font-semibold">Tonight, in order</p>
-                    <ul className="flex flex-col">
-                      {[
-                        ['Circular motion', 'Weak, needs work', 'weak'],
-                        ['Wave characteristics', 'Fading, 18 days', 'fading'],
-                        ['Complex numbers', 'Weak, needs work', 'weak'],
-                        ['Thermal concepts', 'Not tested yet', 'untested'],
-                      ].map(([t, why, tone], i) => (
-                        <li
-                          key={t}
-                          className="flex items-center gap-3 border-t py-3 first:border-t-0"
-                          style={{ borderColor: 'var(--border)' }}
-                        >
-                          <span className="w-4 text-[12px] font-semibold tabular-nums" style={{ color: 'var(--faint)' }}>
-                            {i + 1}
-                          </span>
-                          <span className="h-2 w-2 rounded-full" style={{ background: `var(--${tone})` }} />
-                          <span className="flex-1 text-[13.5px] font-medium">{t}</span>
-                          <span className="text-[12px]" style={{ color: 'var(--muted)' }}>{why}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <p className="mt-4 text-[12.5px]" style={{ color: 'var(--muted)' }}>
-                      Ordered by what you got wrong and what is slipping, with a reason on every
-                      line.
-                    </p>
-                  </>
-                )}
-              </div>
-            )}
-          />
-        </section>
+                <p
+                  className="mb-5 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
+                  style={{ color: 'var(--faint)' }}
+                >
+                  {step}
+                </p>
+                <h3 className="text-[18px] font-semibold leading-snug tracking-[-0.018em]">{title}</h3>
+                <p className="mt-3 text-[14.5px] leading-[1.7]" style={{ color: 'var(--body)' }}>
+                  {body}
+                </p>
+              </Reveal>
+            ))}
+          </div>
+        </Section>
 
         {/* ----------------------------------------------------------- try it */}
         <Section label="Try it" tint>

@@ -25,10 +25,15 @@ export function useInView({ threshold = 0.25, rootMargin = '0px 0px -12% 0px' } 
   useEffect(() => {
     const el = ref.current
     if (!el) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+
+    if (
+      typeof IntersectionObserver === 'undefined' ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
       setSeen(true)
       return
     }
+
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -39,7 +44,29 @@ export function useInView({ threshold = 0.25, rootMargin = '0px 0px -12% 0px' } 
       { threshold, rootMargin }
     )
     io.observe(el)
-    return () => io.disconnect()
+
+    /**
+     * Fail open.
+     *
+     * Every reveal on this page starts at opacity zero, so anything that stops
+     * the observer firing does not merely skip an animation, it hides the
+     * content. That is not hypothetical: in a window that is never painted the
+     * callback does not arrive, and the page renders as an empty column with a
+     * headline and nothing else. Whatever the reason, after a second and a
+     * half the content appears.
+     *
+     * The rule this encodes: decoration is allowed to fail, and when it does
+     * the words still have to be there.
+     */
+    const failOpen = setTimeout(() => {
+      setSeen(true)
+      io.disconnect()
+    }, 1500)
+
+    return () => {
+      io.disconnect()
+      clearTimeout(failOpen)
+    }
   }, [threshold, rootMargin])
 
   return [ref, seen]
@@ -135,15 +162,28 @@ export function CountUp({ to, suffix = '', prefix = '', duration = 1100, classNa
   useEffect(() => {
     if (!seen) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return setN(to)
+
     const start = performance.now()
-    let raf
+    let raf = 0
     const tick = (now) => {
       const t = Math.min(1, (now - start) / duration)
       setN(Math.round(to * (1 - Math.pow(1 - t, 3))))
       if (t < 1) raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
+
+    // requestAnimationFrame is throttled or paused whenever the page is not
+    // being painted: a background tab, a hidden window, a phone with the
+    // screen off. Without this the number simply stops partway, which is how
+    // the coverage line ended up reading "18 subjects" instead of 173 and
+    // looking like a bug in the data rather than in the animation. The
+    // guarantee is that the true value always lands, animated or not.
+    const settle = setTimeout(() => setN(to), duration + 240)
+
+    return () => {
+      cancelAnimationFrame(raf)
+      clearTimeout(settle)
+    }
   }, [seen, to, duration])
 
   return (
