@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { IconCheck, IconArrowRight, IconClose } from '@/components/Icons'
 import { HOW_IT_WORKS, FEATURES, WHY, FAQ, ANSWERS } from './content'
+import { Heatmap, TryQuestion, DecayDemo, PlanDemo, Faq } from './interactive'
 import './theme.css'
 
 /**
@@ -29,51 +30,6 @@ import './theme.css'
  */
 
 const STATUSES = ['weak', 'developing', 'proficient', 'mastered', 'fading', 'untested']
-
-/**
- * A heatmap that fills in. Deterministic so it renders identically every time,
- * but weighted by row: early topics mostly proved, later ones mostly untested,
- * because that is the shape of a real student halfway through a course. An
- * even spread produced a diagonal stripe that read as a checkerboard.
- */
-function Heatmap({ cols = 12, rows = 8 }) {
-  const noise = (i) => (((i + 1) * 2654435761) >>> 8) % 1000
-  const cells = []
-
-  for (let i = 0; i < cols * rows; i++) {
-    const through = Math.floor(i / cols) / (rows - 1)
-    const r = noise(i) / 1000
-    const untestedChance = 0.08 + through * 0.62
-    if (r < untestedChance) {
-      cells.push('untested')
-    } else {
-      const q = (r - untestedChance) / (1 - untestedChance)
-      const skill = q * 0.55 + (1 - through) * 0.45
-      cells.push(
-        skill > 0.78 ? 'mastered'
-        : skill > 0.54 ? 'proficient'
-        : skill > 0.32 ? 'developing'
-        : skill > 0.14 ? 'weak'
-        : 'fading'
-      )
-    }
-  }
-
-  return (
-    <div className="grid gap-[5px]" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0,1fr))` }}>
-      {cells.map((s, i) => (
-        <span
-          key={i}
-          className="cell aspect-square rounded-[3px]"
-          style={{
-            background: `var(--${s})`,
-            animationDelay: `${200 + (i % cols) * 26 + Math.floor(i / cols) * 46}ms`,
-          }}
-        />
-      ))}
-    </div>
-  )
-}
 
 function Section({ children, label, tint = false, className = '' }) {
   return (
@@ -203,11 +159,6 @@ export default function HomePreview() {
               className="rise rounded-2xl border p-5"
               style={{ borderColor: 'var(--border)', background: 'var(--surface)', animationDelay: '140ms' }}
             >
-              <div className="mb-4 flex items-baseline justify-between">
-                <p className="text-[13px] font-semibold">Physics SL</p>
-                <p className="text-[12px]" style={{ color: 'var(--muted)' }}>96 subtopics</p>
-              </div>
-
               <Heatmap />
 
               <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 border-t pt-4" style={{ borderColor: 'var(--border)' }}>
@@ -257,6 +208,24 @@ export default function HomePreview() {
                 <p className="mt-2.5 text-[14.5px] leading-relaxed" style={{ color: 'var(--body)' }}>{body}</p>
               </div>
             ))}
+          </div>
+        </Section>
+
+        {/* ----------------------------------------------------------- try it */}
+        <Section label="Try it" tint>
+          <div className="grid gap-10 md:grid-cols-[1fr_1.15fr] md:gap-14">
+            <div>
+              <Heading>Sit one, right here</Heading>
+              <p className="mt-5 text-[15.5px] leading-relaxed" style={{ color: 'var(--body)' }}>
+                A real question from the bank. Pick a wrong answer on purpose and it will tell you
+                the specific mistake that leads there, rather than just showing you the right one.
+              </p>
+              <p className="mt-4 text-[15.5px] leading-relaxed" style={{ color: 'var(--body)' }}>
+                Getting it right moves the subtopic by an amount that depends on how hard the
+                question was. Ten points is mastery, and you cannot get there on easy ones alone.
+              </p>
+            </div>
+            <TryQuestion />
           </div>
         </Section>
 
@@ -319,6 +288,34 @@ export default function HomePreview() {
           </p>
         </Section>
 
+        {/* ---------------------------------------------------------- decay */}
+        <Section label="Fading" tint>
+          <div className="grid gap-10 md:grid-cols-[1fr_1fr] md:gap-14">
+            <div>
+              <Heading>Drag time forward</Heading>
+              <p className="mt-5 text-[15.5px] leading-relaxed" style={{ color: 'var(--body)' }}>
+                Something you proved in October is not something you know in May. Move the slider
+                and watch a subtopic you had mastered slip back into your plan.
+              </p>
+            </div>
+            <DecayDemo />
+          </div>
+        </Section>
+
+        {/* --------------------------------------------------------- planner */}
+        <Section label="The plan">
+          <div className="grid gap-10 md:grid-cols-[1fr_1.1fr] md:gap-14">
+            <div>
+              <Heading>Tell it how long you have</Heading>
+              <p className="mt-5 text-[15.5px] leading-relaxed" style={{ color: 'var(--body)' }}>
+                Five minutes or five hours. The list is ordered, and every line carries the reason
+                it is on there, so you can disagree with it rather than trust it.
+              </p>
+            </div>
+            <PlanDemo />
+          </div>
+        </Section>
+
         {/* ------------------------------------------------------- features */}
         <Section label="What you get" tint>
           <Heading className="max-w-xl">Everything that is already working</Heading>
@@ -369,7 +366,7 @@ export default function HomePreview() {
               </button>
             </div>
             <div className="rise rounded-2xl border p-6" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
-              <Heatmap cols={8} rows={5} />
+              <Heatmap cols={8} rows={5} readout={false} />
               <p className="mt-4 text-[12.5px]" style={{ color: 'var(--muted)' }}>
                 A teacher sees the same map for a class, without seeing anybody&rsquo;s individual answers.
               </p>
@@ -379,14 +376,7 @@ export default function HomePreview() {
 
         {/* ------------------------------------------------------------ faq */}
         <Section label="Questions people ask">
-          <div className="grid gap-x-14 gap-y-10 md:grid-cols-2">
-            {FAQ.map(({ q, a }, i) => (
-              <div key={q} className="rise" style={{ animationDelay: `${i * 50}ms` }}>
-                <h3 className="text-[16px] font-semibold leading-snug tracking-[-0.013em]">{q}</h3>
-                <p className="mt-2.5 text-[14.5px] leading-[1.7]" style={{ color: 'var(--body)' }}>{a}</p>
-              </div>
-            ))}
-          </div>
+          <Faq items={FAQ} />
         </Section>
 
         {/* ------------------------------------------------------------ cta */}
