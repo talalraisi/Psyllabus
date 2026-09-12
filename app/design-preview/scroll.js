@@ -260,8 +260,17 @@ export function ForgettingCurve() {
   const W = 560
   const H = 250
   const pad = { l: 42, r: 16, t: 18, b: 38 }
-  const x = (u) => pad.l + u * (W - pad.l - pad.r)
-  const y = (v) => H - pad.b - v * (H - pad.t - pad.b)
+  /**
+   * Rounded, because these numbers are rendered twice.
+   *
+   * Math.exp is not guaranteed to give bit-identical results in two different
+   * JavaScript engines, so the server wrote y1="92.38740335809105" and the
+   * browser computed 92.38740335809103 and React reported a hydration
+   * mismatch. Two decimal places is far below a pixel and identical everywhere.
+   */
+  const r2 = (n) => Math.round(n * 100) / 100
+  const x = (u) => r2(pad.l + u * (W - pad.l - pad.r))
+  const y = (v) => r2(H - pad.b - v * (H - pad.t - pad.b))
 
   // Time is the x axis, so decay is exp(-rate * elapsed) and nothing is
   // normalised per segment.
@@ -273,7 +282,7 @@ export function ForgettingCurve() {
     const pts = []
     for (let i = 0; i <= 30; i++) {
       const u = from + ((to - from) * i) / 30
-      pts.push(`${i ? 'L' : 'M'}${x(u).toFixed(1)},${y(Math.exp(-rate * (u - at) * SPAN)).toFixed(1)}`)
+      pts.push(`${i ? 'L' : 'M'}${x(u)},${y(Math.exp(-rate * (u - at) * SPAN))}`)
     }
     return pts.join(' ')
   }
@@ -283,7 +292,7 @@ export function ForgettingCurve() {
     line(at, i < retests.length - 1 ? retests[i + 1] : 1, rates[i], at)
   )
   const lowAt = (i) =>
-    Math.exp(-rates[i] * ((i < retests.length - 1 ? retests[i + 1] : 1) - retests[i]) * SPAN)
+    r2(Math.exp(-rates[i] * ((i < retests.length - 1 ? retests[i + 1] : 1) - retests[i]) * SPAN))
 
   return (
     <div ref={ref}>

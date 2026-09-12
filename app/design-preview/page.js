@@ -88,7 +88,7 @@ export default function HomePreview() {
         }}
       >
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 md:px-8">
-          <Image src={logoMark} alt="Project Syllabus" sizes="72px" style={{ height: 26, width: 'auto' }} priority />
+          <Image src={logoMark} alt="Project Syllabus" sizes="110px" style={{ height: 38, width: 'auto' }} priority />
           <div className="flex items-center gap-2">
             <button className="hidden rounded-full px-3.5 py-2 text-[13px] font-medium sm:block" style={{ color: 'var(--body)' }}>
               Log in

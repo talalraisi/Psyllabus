@@ -342,12 +342,21 @@ export function DecayDemo() {
 
   const W = 300
   const H = 96
-  const x = (w) => 8 + (w / 9) * (W - 16)
-  const y = (r) => H - 12 - r * (H - 26)
-  const path = Array.from({ length: 46 }, (_, i) => {
-    const w = (i / 45) * 9
-    return `${i === 0 ? 'M' : 'L'}${x(w).toFixed(1)},${y(Math.exp(-0.34 * w)).toFixed(1)}`
-  }).join(' ')
+  // Rounded for the same reason the big curve is: these attributes are
+  // rendered on the server and again in the browser, and Math.exp can differ
+  // in the last bits between engines.
+  const r2 = (n) => Math.round(n * 100) / 100
+  const x = (w) => r2(8 + (w / 9) * (W - 16))
+  const y = (r) => r2(H - 12 - r * (H - 26))
+
+  const curveTo = (end, steps = 45) =>
+    Array.from({ length: steps + 1 }, (_, i) => {
+      const w = (i / steps) * end
+      return `${i === 0 ? 'M' : 'L'}${x(w)},${y(Math.exp(-0.34 * w))}`
+    }).join(' ')
+
+  const path = curveTo(9)
+  const travelled = weeks > 0 ? curveTo(weeks, Math.max(2, Math.round(weeks * 6))) : null
 
   return (
     <div
@@ -382,24 +391,25 @@ export function DecayDemo() {
         <line x1="8" x2={W - 8} y1={y(0)} y2={y(0)} stroke="var(--border)" />
         <line x1="8" x2={W - 8} y1={y(1)} y2={y(1)} stroke="var(--border)" strokeDasharray="2 4" />
         <path d={path} fill="none" stroke="var(--border-strong)" strokeWidth="1.5" />
-        <path
-          d={path}
-          fill="none"
-          stroke={`var(--${status})`}
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          style={{
-            strokeDasharray: 400,
-            strokeDashoffset: 400 - (weeks / 9) * 400,
-            transition: 'stroke-dashoffset 220ms linear, stroke 400ms ease',
-          }}
-        />
+        {travelled && (
+          <path
+            d={travelled}
+            fill="none"
+            stroke={`var(--${status})`}
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            style={{ transition: 'stroke 400ms ease' }}
+          />
+        )}
+        {/* Drawn last so the marker sits on top of the line rather than under
+            it, and so the coloured stroke never crosses over the dot. */}
         <circle
           cx={x(weeks)}
           cy={y(retention)}
           r="4.5"
           fill={`var(--${status})`}
-          style={{ transition: 'all 220ms linear' }}
+          stroke="var(--surface)"
+          strokeWidth="2"
         />
       </svg>
 
