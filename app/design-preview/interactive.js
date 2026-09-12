@@ -271,45 +271,89 @@ export function TryQuestion() {
 
 /* ---------------------------------------------------------------- decay demo */
 
-/** Drag time forward and watch something you proved slip back. */
+/**
+ * Drag time forward and watch something you proved slip back.
+ *
+ * Driven by the forgetting curve itself rather than by a straight line, and
+ * tuned to fall at the rate it actually falls: retention is roughly halved
+ * within a fortnight of doing nothing, not gently eroded over a term. A slider
+ * that drifts down politely misrepresents the one thing this feature exists to
+ * point out.
+ */
 export function DecayDemo() {
   const [weeks, setWeeks] = useState(0)
   const id = useId()
 
-  const status = weeks < 2 ? 'mastered' : weeks < 6 ? 'fading' : 'fading'
-  const strength = Math.max(0, 100 - weeks * 11)
+  // Ebbinghaus in the shape that matters here: steep early, flattening late.
+  const retention = Math.exp(-0.34 * weeks)
+  const pct = Math.round(retention * 100)
+  const status = weeks < 2 ? 'mastered' : 'fading'
   const label = weeks < 2 ? 'Mastered' : 'Fading'
+
+  const W = 300
+  const H = 96
+  const x = (w) => 8 + (w / 9) * (W - 16)
+  const y = (r) => H - 12 - r * (H - 26)
+  const path = Array.from({ length: 46 }, (_, i) => {
+    const w = (i / 45) * 9
+    return `${i === 0 ? 'M' : 'L'}${x(w).toFixed(1)},${y(Math.exp(-0.34 * w)).toFixed(1)}`
+  }).join(' ')
 
   return (
     <div
-      className="rounded-2xl border p-6 md:p-7"
-      style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
+      className="rounded-[12px] border p-6 md:p-7"
+      style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
     >
       <div className="flex items-center gap-4">
         <span
-          className="h-14 w-14 shrink-0 rounded-lg transition-colors duration-500"
+          className="h-12 w-12 shrink-0 rounded-[8px] transition-colors duration-400"
           style={{ background: `var(--${status})` }}
         />
         <div className="min-w-0">
-          <p className="truncate text-[15px] font-semibold">Wave characteristics</p>
-          <p className="text-[13px] font-medium transition-colors duration-500" style={{ color: `var(--${status})` }}>
+          <p className="truncate text-[14.5px] font-semibold">Wave characteristics</p>
+          <p
+            className="text-[12.5px] font-medium transition-colors duration-400"
+            style={{ color: `var(--${status})` }}
+          >
             {label}
-            {weeks >= 2 && ' · back in your plan for a retest'}
+            {weeks >= 2 && ' · back in your plan'}
           </p>
         </div>
+        <span className="ml-auto shrink-0 text-right">
+          <span className="block text-[19px] font-semibold tabular-nums">{pct}%</span>
+          <span className="block text-[10.5px]" style={{ color: 'var(--faint)' }}>
+            retained
+          </span>
+        </span>
       </div>
 
-      <div className="mt-6">
-        <div className="mb-2 h-2 overflow-hidden rounded-full" style={{ background: 'var(--sunken)' }}>
-          <div
-            className="h-full rounded-full transition-all duration-500"
-            style={{ width: `${strength}%`, background: `var(--${status})` }}
-          />
-        </div>
-      </div>
+      {/* The curve, with a marker that tracks the slider. */}
+      <svg viewBox={`0 0 ${W} ${H}`} className="mt-5 w-full" role="img" aria-label={`Retention after ${weeks} weeks: about ${pct}%`}>
+        <line x1="8" x2={W - 8} y1={y(0)} y2={y(0)} stroke="var(--border)" />
+        <path d={path} fill="none" stroke="var(--border-strong)" strokeWidth="1.5" />
+        <path
+          d={path}
+          fill="none"
+          stroke={`var(--${status})`}
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          style={{
+            strokeDasharray: 400,
+            strokeDashoffset: 400 - (weeks / 9) * 400,
+            transition: 'stroke-dashoffset 220ms linear, stroke 400ms ease',
+          }}
+        />
+        <circle
+          cx={x(weeks)}
+          cy={y(retention)}
+          r="4.5"
+          fill={`var(--${status})`}
+          style={{ transition: 'all 220ms linear' }}
+        />
+      </svg>
 
-      <label htmlFor={id} className="mt-5 block text-[13px] font-medium" style={{ color: 'var(--body)' }}>
-        Left untouched for{' '}
+      <label htmlFor={id} className="mt-4 block text-[12.5px] font-medium" style={{ color: 'var(--body)' }}>
+        Untouched for{' '}
         <span className="font-semibold tabular-nums" style={{ color: 'var(--text)' }}>
           {weeks} {weeks === 1 ? 'week' : 'weeks'}
         </span>
@@ -321,13 +365,13 @@ export function DecayDemo() {
         max={9}
         value={weeks}
         onChange={(e) => setWeeks(Number(e.target.value))}
-        className="mt-3 w-full"
+        className="mt-2.5 w-full"
         style={{ accentColor: 'var(--brand)' }}
       />
 
-      <p className="mt-4 text-[13.5px] leading-relaxed" style={{ color: 'var(--faint)' }}>
-        Nothing else on the internet takes a green tick away from you. Forgetting happens
-        whether an app admits it or not, so this one admits it.
+      <p className="mt-4 text-[12.5px] leading-relaxed" style={{ color: 'var(--faint)' }}>
+        Nothing else takes a green tick away from you. Forgetting happens whether an app admits
+        it or not.
       </p>
     </div>
   )
@@ -335,42 +379,67 @@ export function DecayDemo() {
 
 /* ----------------------------------------------------------------- plan demo */
 
+/**
+ * Minutes are per subtopic, and they differ.
+ *
+ * The planner used eight minutes for everything, which is not how long
+ * anything takes: eight minutes is a short quiz, not working through a
+ * subtopic you are weak on. Something you have never been tested on needs
+ * reading before it needs testing, and something merely fading needs a retest
+ * rather than relearning, so the estimates are not uniform either.
+ */
 const QUEUE = [
-  { t: 'Circular motion and gravitation', why: 'Weak, needs work', tone: 'weak', m: 8 },
-  { t: 'Complex numbers', why: 'Weak, needs work', tone: 'weak', m: 8 },
-  { t: 'Wave characteristics', why: 'Fading, last proved 18 days ago', tone: 'fading', m: 8 },
-  { t: 'Price elasticity of demand', why: 'Developing, not secure yet', tone: 'developing', m: 8 },
-  { t: 'Thermal concepts', why: 'Not tested yet', tone: 'untested', m: 8 },
-  { t: 'Momentum and impulse', why: 'Developing, not secure yet', tone: 'developing', m: 8 },
-  { t: 'Standing waves', why: 'Nearly there, a few more points', tone: 'proficient', m: 8 },
-  { t: 'Radioactive decay', why: 'Not tested yet', tone: 'untested', m: 8 },
+  { t: 'Circular motion and gravitation', why: 'Weak, needs work', tone: 'weak', m: 35 },
+  { t: 'Complex numbers', why: 'Weak, needs work', tone: 'weak', m: 35 },
+  { t: 'Wave characteristics', why: 'Fading, last proved 18 days ago', tone: 'fading', m: 15 },
+  { t: 'Price elasticity of demand', why: 'Developing, not secure yet', tone: 'developing', m: 25 },
+  { t: 'Thermal concepts', why: 'Not tested yet', tone: 'untested', m: 40 },
+  { t: 'Momentum and impulse', why: 'Developing, not secure yet', tone: 'developing', m: 25 },
+  { t: 'Standing waves', why: 'Nearly there, a few more points', tone: 'proficient', m: 15 },
+  { t: 'Radioactive decay', why: 'Not tested yet', tone: 'untested', m: 40 },
 ]
 
 /** How long have you got. The list is the answer, and it is ordered. */
 export function PlanDemo() {
-  const [minutes, setMinutes] = useState(40)
+  const [minutes, setMinutes] = useState(90)
   const id = useId()
-  const fits = Math.max(1, Math.floor(minutes / 8))
-  const items = QUEUE.slice(0, Math.min(fits, QUEUE.length))
+
+  // Fill the session with whatever fits, in order, rather than by a flat rate.
+  const items = []
+  let left = minutes
+  for (const q of QUEUE) {
+    if (q.m > left) continue
+    items.push(q)
+    left -= q.m
+  }
+  if (!items.length) items.push(QUEUE[2])
+  const used = items.reduce((sum, q) => sum + q.m, 0)
 
   return (
     <div
       className="rounded-2xl border p-6 md:p-7"
       style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
     >
-      <label htmlFor={id} className="block text-[13px] font-medium" style={{ color: 'var(--body)' }}>
-        I have{' '}
-        <span className="font-semibold tabular-nums" style={{ color: 'var(--text)' }}>
-          {minutes} minutes
-        </span>{' '}
-        tonight
-      </label>
+      <div className="flex items-baseline justify-between gap-4">
+        <label htmlFor={id} className="block text-[13px] font-medium" style={{ color: 'var(--body)' }}>
+          I have{' '}
+          <span className="font-semibold tabular-nums" style={{ color: 'var(--text)' }}>
+            {minutes >= 60
+              ? `${Math.floor(minutes / 60)}h${minutes % 60 ? ` ${minutes % 60}m` : ''}`
+              : `${minutes} min`}
+          </span>{' '}
+          tonight
+        </label>
+        <span className="text-[11.5px] tabular-nums" style={{ color: 'var(--faint)' }}>
+          {used} min planned
+        </span>
+      </div>
       <input
         id={id}
         type="range"
-        min={8}
-        max={64}
-        step={8}
+        min={15}
+        max={240}
+        step={15}
         value={minutes}
         onChange={(e) => setMinutes(Number(e.target.value))}
         className="mt-3 w-full"
@@ -393,7 +462,7 @@ export function PlanDemo() {
               <span className="block text-[12.5px]" style={{ color: 'var(--muted)' }}>{q.why}</span>
             </span>
             <span className="shrink-0 text-[12.5px] tabular-nums" style={{ color: 'var(--faint)' }}>
-              8 min
+              {q.m} min
             </span>
           </li>
         ))}

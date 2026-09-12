@@ -6,7 +6,8 @@ import { HOW_IT_WORKS, FEATURES, WHY, FAQ, ANSWERS } from './content'
 import { Heatmap, TryQuestion, DecayDemo, PlanDemo, Faq } from './interactive'
 import { Reveal, ScrollBar, CountUp, ForgettingCurve } from './scroll'
 import { FEATURE_MODULES } from './features'
-import { HeroPanel } from './hero'
+import Image from 'next/image'
+import logoMark from '@/public/logo-mark.png'
 import './theme.css'
 
 /**
@@ -87,7 +88,10 @@ export default function HomePreview() {
         }}
       >
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 md:px-8">
-          <span className="text-[15px] font-semibold tracking-[-0.012em]">Project Syllabus</span>
+          <span className="flex items-center gap-2.5">
+            <Image src={logoMark} alt="" sizes="56px" style={{ height: 22, width: 'auto' }} priority />
+            <span className="text-[15px] font-semibold tracking-[-0.012em]">Project Syllabus</span>
+          </span>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setDark((d) => !d)}
@@ -111,58 +115,53 @@ export default function HomePreview() {
 
       <main>
         {/* ---------------------------------------------------------- hero */}
-        <section className="px-5 py-16 md:px-8 md:py-24">
-          <div className="mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-[1.05fr_1fr] md:gap-16">
-            <div>
-              <p
-                className="rise mb-5 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-[12px] font-medium"
-                style={{ borderColor: 'var(--border-strong)', color: 'var(--muted)' }}
+        <section className="ground px-5 py-24 md:px-8 md:py-36">
+          <div className="mx-auto max-w-6xl">
+            <h1 className="max-w-3xl text-[clamp(2.6rem,6vw,4.6rem)] font-semibold leading-[0.98] tracking-[-0.038em]">
+              Stop guessing.
+              <br />
+              <span style={{ color: 'var(--brand)' }}>Start progressing.</span>
+            </h1>
+
+            <p
+              className="mt-8 max-w-xl text-[17px] leading-[1.6]"
+              style={{ color: 'var(--body)' }}
+            >
+              Your whole syllabus, subtopic by subtopic, coloured by what you have actually proved
+              in a quiz. Nothing here is filled in by rating yourself out of five.
+            </p>
+
+            <div className="mt-10 flex flex-wrap items-center gap-3">
+              <button
+                className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-[14.5px] font-semibold text-white transition-transform duration-150 hover:-translate-y-px"
+                style={{ background: 'var(--brand-solid)' }}
               >
-                <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--proficient)' }} />
-                IB, A-Level and AP
-              </p>
-
-              <h1
-                className="rise text-[clamp(2.4rem,5.4vw,3.9rem)] font-semibold leading-[1.03] tracking-[-0.034em]"
-                style={{ animationDelay: '60ms' }}
+                Start free with one subject
+                <IconArrowRight width={17} height={17} />
+              </button>
+              <button
+                className="rounded-full border px-5 py-3.5 text-[14.5px] font-medium"
+                style={{ borderColor: 'var(--border-strong)', color: 'var(--body)' }}
               >
-                Know what you know.
-                <br />
-                <span style={{ color: 'var(--muted)' }}>Not what you hope.</span>
-              </h1>
-
-              <p
-                className="rise mt-6 max-w-lg text-[16.5px] leading-[1.65]"
-                style={{ color: 'var(--body)', animationDelay: '120ms' }}
-              >
-                Your whole syllabus, subtopic by subtopic, coloured by what you have actually
-                proved in a quiz. Nothing here is filled in by rating yourself out of five.
-              </p>
-
-              <div className="rise mt-9 flex flex-wrap items-center gap-3" style={{ animationDelay: '180ms' }}>
-                <button
-                  className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-[14.5px] font-semibold text-white transition-transform duration-150 hover:-translate-y-px"
-                  style={{ background: 'var(--brand-solid)' }}
-                >
-                  Start free with one subject
-                  <IconArrowRight width={17} height={17} />
-                </button>
-                <button
-                  className="rounded-full border px-5 py-3.5 text-[14.5px] font-medium"
-                  style={{ borderColor: 'var(--border-strong)', color: 'var(--body)' }}
-                >
-                  See how it works
-                </button>
-              </div>
-
-              <p className="rise mt-5 text-[13px]" style={{ color: 'var(--faint)', animationDelay: '240ms' }}>
-                No card. No trial that expires. A school code opens everything.
-              </p>
+                See how it works
+              </button>
             </div>
 
-            <Reveal delay={140}>
-              <HeroPanel />
-            </Reveal>
+            {/* The curricula, as a quiet row rather than a badge. A pill at the
+                top of a page is a label looking for something to label. */}
+            <div
+              className="mt-20 flex flex-wrap items-center gap-x-8 gap-y-3 border-t pt-6"
+              style={{ borderColor: 'var(--border)' }}
+            >
+              {['IB Diploma', 'A-Level', 'AP'].map((c) => (
+                <span key={c} className="text-[12.5px] font-medium" style={{ color: 'var(--muted)' }}>
+                  {c}
+                </span>
+              ))}
+              <span className="text-[12.5px]" style={{ color: 'var(--faint)' }}>
+                One subject free, with no time limit
+              </span>
+            </div>
           </div>
         </section>
 
@@ -326,10 +325,11 @@ export default function HomePreview() {
         </Section>
 
         {/* ------------------------------------------------------- features */}
-        <Section label="Every feature" tint>
-          <Heading className="max-w-2xl">What each part actually does</Heading>
+        <Section label="Features" tint>
+          <Heading className="max-w-2xl">Eight things, all of them working today</Heading>
           <p className="mt-4 max-w-lg text-[15.5px] leading-relaxed" style={{ color: 'var(--body)' }}>
-            Eight things, all of them working today. Each one is shown rather than described.
+            Shown rather than described, because a list of feature names tells you nothing about
+            whether any of it is any good.
           </p>
 
           <div className="mt-14 flex flex-col">
@@ -396,12 +396,12 @@ export default function HomePreview() {
                 <IconArrowRight width={16} height={16} />
               </button>
             </div>
-            <div className="rise rounded-2xl border p-6" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
+            <Reveal className="rounded-[12px] border p-6" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
               <Heatmap cols={8} rows={5} readout={false} />
               <p className="mt-4 text-[12.5px]" style={{ color: 'var(--muted)' }}>
                 A teacher sees the same map for a class, without seeing anybody&rsquo;s individual answers.
               </p>
-            </div>
+            </Reveal>
           </div>
         </Section>
 

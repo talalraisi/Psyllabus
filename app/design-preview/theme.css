@@ -141,3 +141,41 @@
   }
   .rv .step[data-on='true'] .step-body { max-height: 150px; opacity: 1; }
 }
+
+/* --- Hero ground. --------------------------------------------------------
+   A faint ruled grid, masked so it fades out rather than ending at an edge.
+   Chosen because it reads as drafting paper and precision instruments, which
+   is the register this product wants; a mesh gradient or a glowing blob would
+   read as a landing page template. It is behind the words and never competes
+   with them. ------------------------------------------------------------- */
+
+.rv .ground {
+  position: relative;
+  isolation: isolate;
+}
+
+.rv .ground::before {
+  content: '';
+  position: absolute;
+  inset: -1px 0 0 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+  background-size: 72px 72px;
+  -webkit-mask-image: radial-gradient(ellipse 78% 70% at 22% 34%, #000 0%, transparent 72%);
+  mask-image: radial-gradient(ellipse 78% 70% at 22% 34%, #000 0%, transparent 72%);
+  opacity: 0.75;
+}
+
+/* A single hairline under the hero, so the section ends deliberately. */
+.rv .ground::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--border);
+  z-index: -1;
+}

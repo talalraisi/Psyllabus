@@ -116,7 +116,12 @@ function GraphicMistakes() {
   return (
     <Frame>
       <div ref={ref} className="flex flex-col gap-2">
-        {[['tomorrow', 1], ['in 3 days', 3], ['in a week', 7], ['in 16 days', 16]].map(([when, n], i) => (
+        {[
+          ['due now', 'weak'],
+          ['in 1 day', 'developing'],
+          ['in 5 days', 'proficient'],
+          ['in a week', 'mastered'],
+        ].map(([when, tone], i) => (
           <div
             key={when}
             className="flex items-center justify-between rounded-[6px] border px-3 py-2"
@@ -129,13 +134,17 @@ function GraphicMistakes() {
             }}
           >
             <span className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--weak)' }} />
+              <span className="h-1.5 w-1.5 rounded-full" style={{ background: `var(--${tone})` }} />
               <span className="text-[11.5px]" style={{ color: 'var(--body)' }}>Question you got wrong</span>
             </span>
             <span className="text-[10.5px] tabular-nums" style={{ color: 'var(--faint)' }}>{when}</span>
           </div>
         ))}
       </div>
+      <p className="mt-3 text-[10.5px]" style={{ color: 'var(--faint)' }}>
+        Right each time and the gap widens until it drops out of the bank. Wrong and it starts
+        over.
+      </p>
     </Frame>
   )
 }
@@ -319,7 +328,7 @@ export const FEATURE_MODULES = [
   {
     label: 'Review',
     title: 'A mistake bank that schedules itself',
-    body: 'Every question you get wrong returns on a widening schedule: tomorrow, then three days, then a week, then a fortnight. You end up drilling your own gaps rather than a deck somebody else wrote.',
+    body: 'Every question you get wrong comes back straight away, then after a day, then five, then a week. Keep getting it right and it leaves the bank for good; get it wrong and the schedule restarts. You end up drilling your own gaps rather than a deck somebody else wrote.',
     Graphic: GraphicMistakes,
   },
   {
