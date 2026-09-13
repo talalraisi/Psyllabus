@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import { getSafeNextPath } from '@/lib/auth'
+import { cookieOptionsFor } from '@/lib/cookie-domain'
 
 /**
  * Where Google sends people back to.
@@ -31,17 +32,20 @@ export async function GET(request) {
   // Built up front so the Supabase client can write cookies straight onto it.
   let response = NextResponse.redirect(new URL(next, requestUrl.origin))
 
+  const cookieOptions = cookieOptionsFor(requestUrl.hostname)
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
+      ...(cookieOptions ? { cookieOptions } : {}),
       cookies: {
         getAll() {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options)
+            response.cookies.set(name, value, { ...options, ...cookieOptions })
           })
         },
       },
@@ -58,14 +62,39 @@ export async function GET(request) {
     // sounds like a browser fault and one that points at the redirect settings.
     const missingVerifier = /code verifier|code_verifier/i.test(error.message || '')
     if (missingVerifier) {
-      const hasAny = request.cookies
+      // Which Supabase cookies actually arrived, by name. Names only — the
+      // values are credentials and do not belong in a URL. Guessing at this
+      // from the outside cost a round of "check your redirect settings" when
+      // the real problem was two cookies with one name at two scopes.
+      const names = request.cookies
         .getAll()
-        .some((c) => c.name.includes('auth-token'))
-      return fail(
-        `Sign-in started somewhere this browser cannot match up. It finished on ` +
-          `${requestUrl.host}${hasAny ? '' : ' with no Supabase cookies at all'}. ` +
-          `Check that this exact address is in Supabase's Redirect URLs.`
+        .map((c) => c.name)
+        .filter((n) => n.startsWith('sb-'))
+
+      // Clear them on the way out, at both scopes. A stale host-only cookie
+      // left over from before the domain was unified will shadow the good one
+      // on every retry, so without this the second attempt fails exactly like
+      // the first and it looks like nothing was fixed.
+      const cleared = NextResponse.redirect(
+        new URL(
+          `/login?error=${encodeURIComponent(
+            'That sign-in could not be matched to this browser. Old sign-in cookies have been cleared — press Continue with Google once more.'
+          )}`,
+          requestUrl.origin
+        )
       )
+      for (const name of names) {
+        cleared.cookies.set(name, '', { maxAge: 0, path: '/' })
+        if (cookieOptions?.domain) {
+          cleared.cookies.set(name, '', { maxAge: 0, path: '/', domain: cookieOptions.domain })
+        }
+      }
+      console.error(
+        `[auth/callback] verifier missing on ${requestUrl.host}; sb cookies present: ${
+          names.join(', ') || 'none'
+        }`
+      )
+      return cleared
     }
     return fail(error.message || 'Could not complete sign-in.')
   }

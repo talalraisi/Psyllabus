@@ -1,13 +1,17 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
+import { cookieOptionsFor } from '@/lib/cookie-domain'
 
 export async function middleware(request) {
   let supabaseResponse = NextResponse.next({ request })
+
+  const cookieOptions = cookieOptionsFor(request.nextUrl.hostname)
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
+      ...(cookieOptions ? { cookieOptions } : {}),
       cookies: {
         getAll() {
           return request.cookies.getAll()
@@ -16,7 +20,7 @@ export async function middleware(request) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            supabaseResponse.cookies.set(name, value, { ...options, ...cookieOptions })
           )
         },
       },
