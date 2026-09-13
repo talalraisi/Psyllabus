@@ -134,6 +134,9 @@ export default function QuizRunner({
   timed: timedProp = false,
   focus = null,
   difficulty = null,
+  qtype = null,
+  order = null,
+  minutes = null,
   level = null,
   paper = null,
   backHref = '/dashboard',
@@ -243,6 +246,14 @@ export default function QuizRunner({
         if (banded.length) candidates = banded
       }
 
+      // Only the kind of question you asked for. Filtering rather than
+      // requiring, so choosing "short answer" in a subject that has none gives
+      // you the paper anyway instead of an empty one.
+      if (qtype && qtype !== 'all') {
+        const typed = candidates.filter((q) => (q.question_type || 'mcq') === qtype)
+        if (typed.length) candidates = typed
+      }
+
       // A paper has a shape of its own: which question types it holds, which
       // half of the course it draws from, and how long it runs. It is applied
       // before anything else, because it is the whole point of sitting one.
@@ -330,18 +341,31 @@ export default function QuizRunner({
         .filter((q) => lastSeenAt.has(q.id))
         .sort((a, b) => new Date(lastSeenAt.get(a.id)) - new Date(lastSeenAt.get(b.id)))
 
-      setQuestions([...unseen, ...seen].slice(0, target))
+      const drawn = [...unseen, ...seen].slice(0, target)
+
+      // How the paper is laid out once its questions are chosen. Unseen-first
+      // is how they are picked; this is the order you sit them in.
+      if (order === 'rising') {
+        drawn.sort((a, b) => (a.difficulty ?? 0.5) - (b.difficulty ?? 0.5))
+      } else if (order === 'falling') {
+        drawn.sort((a, b) => (b.difficulty ?? 0.5) - (a.difficulty ?? 0.5))
+      }
+
+      setQuestions(drawn)
       setPhase(PHASE.predict)
     }
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subject, topic, subtopic, mode, count, topics?.join('|'), subjects?.join('|'), focus, difficulty, level, paper])
+  }, [subject, topic, subtopic, mode, count, topics?.join('|'), subjects?.join('|'), focus, difficulty, level, paper, qtype, order])
 
   const startQuiz = () => {
     questionTimesRef.current = {}
     lastSwitchRef.current = Date.now()
     if (timed) {
-      const limit = questions.reduce((sum, q) => sum + (q.time_budget_seconds || 90), 0)
+      // Your own limit if you set one, otherwise the sum of what the questions
+      // are each worth in exam time.
+      const budget = questions.reduce((sum, q) => sum + (q.time_budget_seconds || 90), 0)
+      const limit = minutes ? Math.round(minutes * 60) : budget
       timeLimitRef.current = limit
       setSecondsLeft(limit)
     }
@@ -627,7 +651,8 @@ export default function QuizRunner({
      the landing page states a fact it does not want you to stop on. */
   if (phase === PHASE.predict) {
     const totalMinutes = timed
-      ? Math.round(questions.reduce((s, q) => s + (q.time_budget_seconds || 90), 0) / 60)
+      ? minutes ||
+        Math.round(questions.reduce((s, q) => s + (q.time_budget_seconds || 90), 0) / 60)
       : null
     const totalMarks = questions.reduce((s, q) => s + (q.marks || 1), 0)
     const eyebrow = paperDefinition

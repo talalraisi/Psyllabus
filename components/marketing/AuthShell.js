@@ -15,49 +15,53 @@ import logoMark from '@/public/logo-mark.png'
  *
  * There used to be a column of claims beside the headline. Nobody stops on a
  * sign-in screen to read three paragraphs about decay and where their notes
- * live, and carrying them meant the form sat off to one side to make room. The
- * headline says the one thing worth saying and the form gets the rest.
+ * live, so they went — and once they had gone, the two columns had nothing to
+ * balance. A headline on the left of an empty half page with the form pushed
+ * to the right is a layout for content that is no longer there.
+ *
+ * One centred column now. The eye goes logo, greeting, form, in that order,
+ * down the middle, which is the whole job of this screen.
  */
 export default function AuthShell({ eyebrow, title, intro, children, footer }) {
   return (
     <main className="ground min-h-screen px-5 py-10 md:px-8 md:py-14">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto flex max-w-[26rem] flex-col items-center">
         <Link href="/" aria-label="Project Syllabus home" className="inline-block">
           <Image src={logoMark} alt="Project Syllabus" sizes="110px" style={{ height: 34, width: 'auto' }} priority />
         </Link>
 
-        <div className="mt-16 grid gap-10 md:mt-24 md:grid-cols-[1fr_minmax(0,25rem)] md:items-center md:gap-20">
-          <div className="max-w-lg">
+        <div className="mt-14 w-full text-center md:mt-20">
+          <p
+            className="mb-4 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
+            style={{ color: 'var(--text-faint)' }}
+          >
+            {eyebrow}
+          </p>
+          <h1 className="text-[clamp(1.9rem,5vw,2.5rem)] font-semibold leading-[1.06] tracking-[-0.032em]">
+            {title}
+          </h1>
+          {intro && (
             <p
-              className="mb-4 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
-              style={{ color: 'var(--text-faint)' }}
+              className="mx-auto mt-4 max-w-sm text-[15px] leading-[1.6]"
+              style={{ color: 'var(--text-body)' }}
             >
-              {eyebrow}
+              {intro}
             </p>
-            <h1 className="text-[clamp(2.1rem,4.4vw,3.1rem)] font-semibold leading-[1.04] tracking-[-0.032em]">
-              {title}
-            </h1>
-            {intro && (
-              <p className="mt-5 text-[16px] leading-[1.65]" style={{ color: 'var(--text-body)' }}>
-                {intro}
-              </p>
-            )}
+          )}
+        </div>
 
+        <div className="mt-10 w-full">
+          <div
+            className="rounded-[12px] border p-6 md:p-7"
+            style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+          >
+            {children}
           </div>
-
-          <div>
-            <div
-              className="rounded-[12px] border p-6 md:p-7"
-              style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
-            >
-              {children}
-            </div>
-            {footer && (
-              <p className="mt-5 text-center text-[13px]" style={{ color: 'var(--text-muted)' }}>
-                {footer}
-              </p>
-            )}
-          </div>
+          {footer && (
+            <p className="mt-5 text-center text-[13px]" style={{ color: 'var(--text-muted)' }}>
+              {footer}
+            </p>
+          )}
         </div>
       </div>
     </main>

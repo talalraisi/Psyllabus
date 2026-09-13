@@ -109,6 +109,7 @@ export default function SubjectWheel({
   // than as deliberate.
   const [open, setOpen] = useState(null)
   const [at, setAt] = useState(null) // subject index under the pointer
+  const [coreAt, setCoreAt] = useState(null) // core index under the pointer
 
   if (!subjects.length) return null
 
@@ -122,6 +123,11 @@ export default function SubjectWheel({
   const openCore = open?.kind === 'core' ? core[open.index] : null
   const openTopics = openSubject ? topicsBySubject[openSubject] || [] : []
   const hoveredSubject = at === null ? null : subjects[at]
+  const hoveredCore = coreAt === null ? null : core[coreAt]
+  // One hover model across both rings. Pointing at a subject used to leave the
+  // core at full strength, so the thing you were looking at was the only part
+  // of the wheel that did not stand out.
+  const anyHover = at !== null || coreAt !== null
 
   /**
    * Where the wheel has to get to.
@@ -155,6 +161,7 @@ export default function SubjectWheel({
   const close = () => {
     setOpen(null)
     setAt(null)
+    setCoreAt(null)
   }
 
   return (
@@ -201,29 +208,36 @@ export default function SubjectWheel({
               className="text-[10.5px] font-semibold uppercase tracking-[0.16em]"
               style={{ color: 'var(--text-faint)' }}
             >
-              {hoveredSubject
-                ? lockedSubjects.includes(hoveredSubject)
-                  ? 'Locked on the free plan'
-                  : 'Subject'
-                : 'Your programme'}
+              {hoveredCore
+                ? 'Diploma core'
+                : hoveredSubject
+                  ? lockedSubjects.includes(hoveredSubject)
+                    ? 'Locked on the free plan'
+                    : 'Subject'
+                  : 'Your programme'}
             </p>
             <h3 className="mt-2.5 text-[clamp(1.4rem,3vw,1.9rem)] font-semibold leading-tight tracking-[-0.03em]">
-              {hoveredSubject ||
+              {hoveredCore ||
+                hoveredSubject ||
                 `${subjects.length} subject${subjects.length === 1 ? '' : 's'}${core.length ? ' and the core' : ''}`}
             </h3>
             <p className="mt-2.5 text-[14px] tabular-nums" style={{ color: 'var(--text-muted)' }}>
-              {hoveredSubject
-                ? `${masteredIn(hoveredSubject)} of ${sizeOf(hoveredSubject)} subtopics mastered${
-                    targets[hoveredSubject] ? ` · target ${targets[hoveredSubject]}` : ''
-                  }`
-                : 'Each slice fills as you prove a subtopic. Press one to take it out.'}
+              {hoveredCore
+                ? targets[hoveredCore]
+                  ? `Coursework · target ${targets[hoveredCore]}`
+                  : 'Coursework · no target set'
+                : hoveredSubject
+                  ? `${masteredIn(hoveredSubject)} of ${sizeOf(hoveredSubject)} subtopics mastered${
+                      targets[hoveredSubject] ? ` · target ${targets[hoveredSubject]}` : ''
+                    }`
+                  : 'Each slice fills as you prove a subtopic. Press one to take it out.'}
             </p>
           </>
         )}
       </div>
 
       <div className="relative w-full overflow-hidden">
-        <div className="relative mx-auto w-full max-w-[min(100%,620px)]">
+        <div className="relative mx-auto w-full max-w-[min(100%,760px)]">
         <svg
           viewBox={viewBox}
           className="block w-full overflow-visible"
@@ -233,7 +247,10 @@ export default function SubjectWheel({
               ? `${openSubject}, ${masteredIn(openSubject)} of ${sizeOf(openSubject)} subtopics mastered`
               : `Your ${subjects.length} subjects, ${overall}% of the syllabus mastered`
           }
-          onMouseLeave={() => setAt(null)}
+          onMouseLeave={() => {
+          setAt(null)
+          setCoreAt(null)
+        }}
         >
           {/* The slices. The whole group turns, which is what carries the one you
               pressed down to the bottom. */}
@@ -263,7 +280,7 @@ export default function SubjectWheel({
                 <g
                   key={subject}
                   style={{
-                    opacity: faded ? 0 : !open && at !== null && !on ? 0.32 : 1,
+                    opacity: faded ? 0 : !open && anyHover && !on ? 0.3 : 1,
                     pointerEvents: faded ? 'none' : 'auto',
                     transition: 'opacity 380ms ease',
                   }}
@@ -271,9 +288,9 @@ export default function SubjectWheel({
                   <path
                     d={wedge(R_SUBJ_IN, R_SUBJ_OUT, a0, a1)}
                     fill="var(--surface-sunken)"
-                    stroke={isOpen ? 'var(--border-strong)' : on ? 'var(--text)' : 'var(--border-strong)'}
-                    strokeWidth={isOpen ? 1 / OPEN_SCALE : on ? 2 : 1}
-                    style={{ transition: 'stroke 180ms ease, stroke-width 180ms ease' }}
+                    stroke={on ? 'var(--text)' : 'transparent'}
+                    strokeWidth={isOpen ? 1 / OPEN_SCALE : 1.5}
+                    style={{ transition: 'stroke 180ms ease' }}
                   />
                   {frac > 0 && (
                     <path
@@ -330,11 +347,12 @@ export default function SubjectWheel({
             const grade = targets[component]
             const isOpen = open?.kind === 'core' && open.index === i
             const faded = !!open && !isOpen
+            const on = coreAt === i || isOpen
             return (
               <g
                 key={component}
                 style={{
-                  opacity: faded ? 0 : 1,
+                  opacity: faded ? 0 : !open && anyHover && !on ? 0.3 : 1,
                   pointerEvents: faded ? 'none' : 'auto',
                   transition: 'opacity 380ms ease',
                 }}
@@ -342,8 +360,9 @@ export default function SubjectWheel({
                 <path
                   d={wedge(R_CORE_IN, R_CORE_OUT, a0, a1)}
                   fill="var(--surface)"
-                  stroke={isOpen ? 'var(--text)' : 'var(--border-strong)'}
-                  strokeWidth={isOpen ? 2 : 1}
+                  stroke={on ? 'var(--text)' : 'transparent'}
+                  strokeWidth={isOpen ? 1 / OPEN_SCALE : 1.5}
+                  style={{ transition: 'stroke 180ms ease' }}
                 />
                 <g style={{ opacity: open ? 0 : 1, transition: 'opacity 240ms ease' }}>
                   <text
@@ -375,6 +394,8 @@ export default function SubjectWheel({
                   role="button"
                   aria-label={`${component}${grade ? `, target ${grade}` : ', no target set'}`}
                   style={{ cursor: 'pointer', outline: 'none' }}
+                  onMouseEnter={() => setCoreAt(i)}
+                  onFocus={() => setCoreAt(i)}
                   onClick={() => setOpen(isOpen ? null : { kind: 'core', index: i })}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {

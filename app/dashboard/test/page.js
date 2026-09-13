@@ -16,6 +16,18 @@ import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
 
 const LENGTHS = [10, 20, 30, 45]
 
+const QUESTION_TYPES = [
+  { key: 'all', label: 'Any kind', hint: 'Multiple choice and written answers mixed.' },
+  { key: 'mcq', label: 'Multiple choice', hint: 'Four options, one right. Fast to sit.' },
+  { key: 'short_answer', label: 'Written answer', hint: 'You type it. Marked on what you wrote.' },
+]
+
+const ORDERS = [
+  { key: 'mixed', label: 'Mixed', hint: 'Shuffled, the way a quiz normally runs.' },
+  { key: 'rising', label: 'Easiest first', hint: 'Warm up, then climb. Good for a long session.' },
+  { key: 'falling', label: 'Hardest first', hint: 'Hit the hard ones while you are fresh.' },
+]
+
 const FOCUS_MODES = [
   {
     key: 'weak',
@@ -68,6 +80,12 @@ export default function TestBuilderPage() {
   const [selected, setSelected] = useState([])
   const [length, setLength] = useState(20)
   const [timed, setTimed] = useState(true)
+  const [qtype, setQtype] = useState('all')
+  const [order, setOrder] = useState('mixed')
+  // A length you typed, and a limit you chose. Both are optional: leaving them
+  // alone keeps the presets and the time the questions are actually worth.
+  const [customLength, setCustomLength] = useState('')
+  const [customMinutes, setCustomMinutes] = useState('')
   const [focusMode, setFocusMode] = useState('all')
   const [difficulty, setDifficulty] = useState('mixed')
   const [level, setLevel] = useState('all')
@@ -168,9 +186,11 @@ export default function TestBuilderPage() {
         if (d < diff.range[0] || d > diff.range[1]) return false
       }
 
+      if (qtype !== 'all' && (q.question_type || 'mcq') !== qtype) return false
+
       return true
     })
-  }, [pool, selected, focusMode, difficulty, statusBySubtopic, level, hlBySubtopic])
+  }, [pool, selected, focusMode, difficulty, statusBySubtopic, level, hlBySubtopic, qtype])
 
   const perTopicCounts = useMemo(() => {
     const counts = {}
@@ -189,14 +209,19 @@ export default function TestBuilderPage() {
   const usable = accessibleSubjects(profile).filter((s) => !IB_CORE_SUBJECTS.includes(s))
   const isHLSubject = profile?.curriculum === 'IB' && / HL$/.test(subject)
   const hlCount = Object.values(hlBySubtopic).filter(Boolean).length
-  const actualLength = Math.min(length, eligible.length)
+  // A typed length wins over the presets, clamped to something sittable.
+  const typedLength = Math.min(100, Math.max(1, parseInt(customLength, 10) || 0))
+  const wantedLength = typedLength || length
+  const actualLength = Math.min(wantedLength, eligible.length)
   const canStart = actualLength > 0
 
   // Real paper metrics, taken from the questions that would actually be drawn.
   const sample = eligible.slice(0, actualLength)
   const totalMarks = sample.reduce((s, q) => s + (q.marks || 1), 0)
   const totalSeconds = sample.reduce((s, q) => s + (q.time_budget_seconds || 90), 0)
-  const estMinutes = Math.max(1, Math.round(totalSeconds / 60))
+  const budgetMinutes = Math.max(1, Math.round(totalSeconds / 60))
+  const typedMinutes = Math.min(240, Math.max(1, parseInt(customMinutes, 10) || 0))
+  const estMinutes = timed && typedMinutes ? typedMinutes : budgetMinutes
 
   const toggleTopic = (topic) =>
     setSelected((prev) =>
@@ -212,6 +237,9 @@ export default function TestBuilderPage() {
       back: '/dashboard/test',
     })
     if (timed) params.set('timed', '1')
+    if (qtype !== 'all') params.set('qtype', qtype)
+    if (order !== 'mixed') params.set('order', order)
+    if (timed && typedMinutes) params.set('minutes', String(typedMinutes))
     if (focusMode !== 'all') params.set('focus', focusMode)
     if (difficulty !== 'mixed') params.set('difficulty', difficulty)
     if (level !== 'all') params.set('level', level)
@@ -408,6 +436,57 @@ export default function TestBuilderPage() {
             })}
           </div>
 
+          <p className="text-[14.5px] font-medium">Question type</p>
+          <p className="t-caption mb-3">
+            What the paper is made of. A type your subject has none of is ignored rather than
+            handed back empty.
+          </p>
+          <div className="mb-6 flex flex-wrap gap-2">
+            {QUESTION_TYPES.map((t) => {
+              const n =
+                t.key === 'all'
+                  ? pool.length
+                  : pool.filter((q) => (q.question_type || 'mcq') === t.key).length
+              return (
+                <button
+                  key={t.key}
+                  onClick={() => setQtype(t.key)}
+                  aria-pressed={qtype === t.key}
+                  title={t.hint}
+                  disabled={n === 0}
+                  className={`control-sm rounded-full border px-4 text-[13.5px] font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40 ${
+                    qtype === t.key
+                      ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
+                      : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
+                  }`}
+                >
+                  {t.label}
+                  <span className="ml-2 opacity-60">{n}</span>
+                </button>
+              )
+            })}
+          </div>
+
+          <p className="text-[14.5px] font-medium">Order</p>
+          <p className="t-caption mb-3">The order you sit them in, once they have been chosen.</p>
+          <div className="mb-6 flex flex-wrap gap-2">
+            {ORDERS.map((o) => (
+              <button
+                key={o.key}
+                onClick={() => setOrder(o.key)}
+                aria-pressed={order === o.key}
+                title={o.hint}
+                className={`control-sm rounded-full border px-4 text-[13.5px] font-medium transition-colors duration-150 ${
+                  order === o.key
+                    ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
+                    : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
+                }`}
+              >
+                {o.label}
+              </button>
+            ))}
+          </div>
+
           <p className="mb-3 text-[14.5px] font-medium">Length</p>
           <div className="mb-6 flex flex-wrap gap-2">
             {LENGTHS.map((n) => (
@@ -424,6 +503,17 @@ export default function TestBuilderPage() {
                 {n} questions
               </button>
             ))}
+            <label className="flex items-center gap-2">
+              <input
+                type="text"
+                inputMode="numeric"
+                value={customLength}
+                aria-label="Or type how many questions"
+                placeholder="or type"
+                onChange={(e) => setCustomLength(e.target.value.replace(/[^0-9]/g, ''))}
+                className="input control-md w-[104px] text-center tabular-nums"
+              />
+            </label>
           </div>
 
           <button
@@ -443,10 +533,36 @@ export default function TestBuilderPage() {
                 }`}
               />
             </span>
-            <span className="text-sm text-[var(--text-body)]">
+            <span className="text-[13.5px] text-[var(--text-body)]">
               Exam conditions: countdown and live marks-per-minute pacing
             </span>
           </button>
+
+          {timed && (
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <label className="flex items-center gap-2">
+                <span className="text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
+                  Time limit
+                </span>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={customMinutes}
+                  aria-label="Time limit in minutes"
+                  placeholder={String(budgetMinutes)}
+                  onChange={(e) => setCustomMinutes(e.target.value.replace(/[^0-9]/g, ''))}
+                  className="input control-sm w-[88px] text-center tabular-nums"
+                />
+                <span className="text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
+                  minutes
+                </span>
+              </label>
+              <span className="t-caption">
+                Leave it blank for {budgetMinutes} minutes, which is what these questions are worth
+                in real exam time.
+              </span>
+            </div>
+          )}
         </section>
 
           </div>

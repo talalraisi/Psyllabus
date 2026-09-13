@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -268,6 +268,11 @@ export default function Onboarding() {
   const [expandedGroup, setExpandedGroup] = useState(null)
   const [freePick, setFreePick] = useState('')
   const [savingPick, setSavingPick] = useState(false)
+  // Who this is about to be saved against, and whether that account is already
+  // set up. Both are read once on arrival.
+  const [account, setAccount] = useState(null)
+  const [alreadySetUp, setAlreadySetUp] = useState(false)
+  const [checking, setChecking] = useState(true)
   const router = useRouter()
   const supabase = createClient()
 
@@ -307,12 +312,63 @@ export default function Onboarding() {
       !!targetGrades['Extended Essay']
     : Object.keys(targetGrades).length === selectedSubjects.length
 
+  /**
+   * Whose account is this?
+   *
+   * Onboarding used to write to whatever session happened to be live, without
+   * ever checking whether that account was already set up. On a shared device
+   * that is how one student's answers replaced another's: the friend signed
+   * up, the browser was still signed in as the first student, and onboarding
+   * saved the friend's subjects onto the first student's profile.
+   *
+   * Signing out before a sign-up stops that starting. This stops it finishing.
+   */
+  useEffect(() => {
+    let cancelled = false
+    async function check() {
+      const user = await getCurrentUser(supabase)
+      if (cancelled) return
+      if (!user) {
+        router.push('/login')
+        return
+      }
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('subjects')
+        .eq('id', user.id)
+        .maybeSingle()
+      if (cancelled) return
+      const subjects = Array.isArray(profile?.subjects) ? profile.subjects : []
+      setAccount({ email: user.email, id: user.id })
+      setAlreadySetUp(subjects.length > 0)
+      setChecking(false)
+    }
+    check()
+    return () => {
+      cancelled = true
+    }
+  }, [router, supabase])
+
+  const startOver = async () => {
+    await supabase.auth.signOut()
+    router.push('/signup')
+  }
+
   const handleFinish = async () => {
     setLoading(true)
     try {
       const { data: { user }, error: userError } = await supabase.auth.getUser()
       if (userError || !user) {
         router.push('/login')
+        return
+      }
+      // Checked again at the moment of writing, not only on arrival: a sign-in
+      // in another tab can change who this session belongs to while the form
+      // is being filled in.
+      if (account && user.id !== account.id) {
+        setLoading(false)
+        setAccount({ email: user.email, id: user.id })
+        setAlreadySetUp(true)
         return
       }
       
@@ -385,6 +441,68 @@ export default function Onboarding() {
     router.push('/dashboard')
   }
 
+  const frame = (children) => (
+    <main className="page ground px-5 py-10 md:px-6 md:py-16">
+      <div className="mx-auto max-w-2xl">
+        <div className="mb-12 flex justify-center">
+          <Link href="/">
+            <Logo width={220} height={66} priority className="h-auto w-[170px] md:w-[200px]" />
+          </Link>
+        </div>
+        {children}
+      </div>
+    </main>
+  )
+
+  if (checking) {
+    return frame(
+      <span className="sr-only" role="status" aria-live="polite">
+        Checking your account
+      </span>
+    )
+  }
+
+  /**
+   * This account is already set up, so nothing here is going to be saved over
+   * it. Filling the form in again is how somebody else's subjects replaced a
+   * real student's, and the fix is to say plainly whose account this is before
+   * a single question is asked.
+   */
+  if (alreadySetUp) {
+    return frame(
+      <div className="text-center">
+        <p
+          className="text-[10.5px] font-semibold uppercase tracking-[0.16em]"
+          style={{ color: 'var(--text-faint)' }}
+        >
+          Already set up
+        </p>
+        <h1 className="mt-3 text-[clamp(1.5rem,3.4vw,2.1rem)] font-semibold leading-tight tracking-[-0.03em]">
+          You are signed in as {account?.email}
+        </h1>
+        <p
+          className="mx-auto mt-4 max-w-md text-[14.5px] leading-relaxed"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          This account already has its subjects and targets. Setting them up again here
+          would write over them, so it stops. If you are somebody else on this device,
+          start a new account and you will be signed out of this one first.
+        </p>
+        <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+          <Link href="/dashboard" className="btn btn-solid control-md">
+            Go to my dashboard
+          </Link>
+          <button onClick={startOver} className="btn btn-outline control-md">
+            This is not me, make a new account
+          </button>
+        </div>
+        <p className="mt-8 text-[13px]" style={{ color: 'var(--text-faint)' }}>
+          To change subjects on this account, use Profile rather than this page.
+        </p>
+      </div>
+    )
+  }
+
   return (
     <main className="page ground px-5 py-10 md:px-6 md:py-16">
       <div className="mx-auto max-w-2xl">
@@ -393,6 +511,19 @@ export default function Onboarding() {
             <Logo width={220} height={66} priority className="h-auto w-[170px] md:w-[200px]" />
           </Link>
         </div>
+
+        {/* Whose account this is, said out loud before any of it is filled in. */}
+        {account?.email && (
+          <p
+            className="mb-8 text-center text-[12.5px]"
+            style={{ color: 'var(--text-faint)' }}
+          >
+            Setting up {account.email} ·{' '}
+            <button onClick={startOver} className="underline underline-offset-2">
+              not you?
+            </button>
+          </p>
+        )}
 
         {/* Where you are. A rail rather than four discs: the numbers were
             decoration, and the only thing worth reading is which part you are

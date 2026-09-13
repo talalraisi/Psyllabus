@@ -31,6 +31,11 @@ function Login() {
     setLoading(true)
     setError('')
 
+    // Signing in as somebody else replaces the session rather than layering on
+    // top of it. See the note in the sign-up page: a stale session on a shared
+    // device is how one account's work ends up on another's.
+    await supabase.auth.signOut()
+
     const { data, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,

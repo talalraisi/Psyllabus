@@ -235,10 +235,14 @@ body {
     color: var(--text);
   }
 
+  /* A card title sits above body text, so it is a step up from it and not two.
+     Sixteen against fourteen-and-a-half was reading as a section heading every
+     time one appeared in a row. */
   .t-card-title {
-    font-size: 16px;
-    line-height: 24px;
+    font-size: 14.5px;
+    line-height: 21px;
     font-weight: 600;
+    letter-spacing: -0.012em;
     color: var(--text);
   }
 
@@ -339,21 +343,25 @@ body {
 
   /* Type scales with the control, which it did not before: a 32px "Resources"
      button was set at the same 14px as a full-width primary action, so the
-     quiet buttons read as loudly as the loud ones. */
+     quiet buttons read as loudly as the loud ones.
+     Taken down another notch since: a row action sitting beside 14px body text
+     should be quieter than the sentence it belongs to, not the same weight.
+     Only the type moves — the 32/40/44px control heights are untouched, so
+     nothing gets harder to hit on a phone. */
   .btn.control-sm {
-    font-size: 12.5px;
-    padding-inline: 14px;
-    gap: 6px;
+    font-size: 11.5px;
+    padding-inline: 13px;
+    gap: 5px;
   }
 
   .btn.control-md {
-    font-size: 13.5px;
-    padding-inline: 18px;
+    font-size: 12.5px;
+    padding-inline: 17px;
   }
 
   .btn.control-lg {
-    font-size: 14.5px;
-    padding-inline: 24px;
+    font-size: 13.5px;
+    padding-inline: 23px;
   }
 
   .btn:disabled {

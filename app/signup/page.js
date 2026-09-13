@@ -44,6 +44,15 @@ export default function Signup() {
     setLoading(true)
     setError('')
 
+    // Whoever is signed in on this device is signed out first.
+    //
+    // signUp does not replace an existing session. With email confirmation on
+    // it returns a user and no session at all, so the browser stays logged in
+    // as the previous person — and the new account's onboarding then writes
+    // its answers onto that person's profile. That is not a theoretical race:
+    // it happened, and it replaced a real student's subjects with a friend's.
+    await supabase.auth.signOut()
+
     const { data, error: authError } = await supabase.auth.signUp({
       email,
       password,

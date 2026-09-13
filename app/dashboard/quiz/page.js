@@ -32,6 +32,9 @@ function QuizPageInner() {
   const difficulty = searchParams.get('difficulty') || null
   const level = searchParams.get('level') || null
   const paper = searchParams.get('paper') || null
+  const qtype = searchParams.get('qtype') || null
+  const order = searchParams.get('order') || null
+  const minutes = parseInt(searchParams.get('minutes') || '0', 10) || null
 
   useEffect(() => {
     async function load() {
@@ -91,6 +94,9 @@ function QuizPageInner() {
           difficulty={difficulty}
           level={level}
           paper={paper}
+          qtype={qtype}
+          order={order}
+          minutes={minutes}
           backHref={backHref}
         />
       </Page>

@@ -1,12 +1,21 @@
 'use client'
 
 import { IconArrowLeft, IconChevronRight } from '@/components/Icons'
-import { monthGrid, localDateKey, KIND_DOT } from '@/lib/calendar'
+import { monthGrid, localDateKey, KIND_COLOR } from '@/lib/calendar'
 
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
 /**
- * A month of days with an event dot per entry.
+ * A month, ruled like a sheet, with what is actually on each day written on it.
+ *
+ * Every entry used to be a 6px dot. A dot tells you something is happening and
+ * nothing about what, so the only way to read your own month was to click each
+ * day in turn — which is the opposite of what a calendar is for. Entries are
+ * named now, colour-coded down their left edge, and a day with more than fits
+ * says how many it is hiding.
+ *
+ * The cells are ruled rather than floated: rounded tiles with gaps between
+ * them read as a grid of buttons, and a month is a table.
  *
  * Every cell is the same height whatever it holds, so paging between months
  * never shifts the rest of the page.
@@ -50,13 +59,16 @@ export default function MonthGrid({
         </div>
       </div>
 
-      <div>
+      <div
+        className="overflow-hidden rounded-[10px] border"
+        style={{ borderColor: 'var(--border-strong)' }}
+      >
         <div className="grid grid-cols-7">
           {WEEKDAYS.map((d) => (
             <div
               key={d}
-              className="px-2 pb-3 text-center text-[10.5px] font-semibold uppercase tracking-[0.14em]"
-              style={{ color: 'var(--text-faint)' }}
+              className="border-b px-2 py-2 text-center text-[10px] font-semibold uppercase tracking-[0.14em]"
+              style={{ color: 'var(--text-faint)', borderColor: 'var(--border)' }}
             >
               {d}
             </div>
@@ -71,40 +83,78 @@ export default function MonthGrid({
             const isSelected = key === selected
             const dayEvents = eventsByDay.get(key) || []
             const lastRow = i >= 35
+            const lastCol = i % 7 === 6
+            const shown = dayEvents.slice(0, 2)
+            const hidden = dayEvents.length - shown.length
+
             return (
               <button
                 key={key}
                 onClick={() => onSelect(key)}
                 aria-pressed={isSelected}
                 aria-label={`${day.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })}${dayEvents.length ? `, ${dayEvents.length} event${dayEvents.length === 1 ? '' : 's'}` : ''}`}
-                className={`min-h-[76px] rounded-[8px] p-2 text-left transition-colors duration-150 ${
+                className={`relative flex min-h-[86px] flex-col gap-1 p-1.5 text-left transition-colors duration-150 ${
                   lastRow ? '' : 'border-b'
-                } ${isSelected ? '' : 'hover:bg-[var(--surface-sunken)]'}`}
+                } ${lastCol ? '' : 'border-r'} ${isSelected ? '' : 'hover:bg-[var(--surface-sunken)]'}`}
                 style={{
                   borderColor: 'var(--border)',
-                  background: isSelected ? 'var(--brand-tint)' : undefined,
+                  background: isSelected
+                    ? 'var(--brand-tint)'
+                    : inMonth
+                      ? undefined
+                      : 'color-mix(in oklab, var(--surface-sunken) 45%, transparent)',
                 }}
               >
-                <span
-                  className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-[12px] tabular-nums ${
-                    isToday
-                      ? 'bg-[var(--brand)] font-semibold text-white'
-                      : inMonth
-                        ? 'font-medium text-[var(--text-body)]'
-                        : 'text-[var(--text-faint)]'
-                  }`}
-                >
-                  {day.getDate()}
+                {/* Today is marked, not selected. A filled disc on today made it
+                    look like the day you had picked, which it usually is not. */}
+                <span className="flex items-baseline gap-1.5">
+                  <span
+                    className="text-[12px] tabular-nums"
+                    style={{
+                      color: isToday
+                        ? 'var(--brand)'
+                        : inMonth
+                          ? 'var(--text-body)'
+                          : 'var(--text-faint)',
+                      fontWeight: isToday ? 700 : inMonth ? 500 : 400,
+                    }}
+                  >
+                    {day.getDate()}
+                  </span>
+                  {isToday && (
+                    <span
+                      className="h-1 w-1 rounded-full"
+                      style={{ background: 'var(--brand)' }}
+                      aria-hidden="true"
+                    />
+                  )}
                 </span>
-                {dayEvents.length > 0 && (
-                  <span className="mt-1.5 flex flex-wrap gap-1">
-                    {dayEvents.slice(0, 4).map((e) => (
-                      <span
-                        key={e.id}
-                        title={e.title}
-                        className={`h-1.5 w-1.5 rounded-full ${KIND_DOT[e.kind]} ${e.completed ? 'opacity-30' : ''}`}
-                      />
-                    ))}
+
+                {shown.map((e) => (
+                  <span
+                    key={e.id}
+                    title={e.title}
+                    className="flex min-w-0 items-center gap-1 border-l-2 pl-1"
+                    style={{
+                      borderColor: KIND_COLOR[e.kind] || KIND_COLOR.other,
+                      opacity: e.completed ? 0.4 : 1,
+                    }}
+                  >
+                    <span
+                      className="min-w-0 truncate text-[10.5px] leading-[1.35]"
+                      style={{
+                        color: 'var(--text-body)',
+                        textDecoration: e.completed ? 'line-through' : undefined,
+                      }}
+                    >
+                      {e.title}
+                    </span>
+                  </span>
+                ))}
+
+                {hidden > 0 && (
+                  <span className="text-[10px]" style={{ color: 'var(--text-faint)' }}>
+                    +{hidden} more
                   </span>
                 )}
               </button>
