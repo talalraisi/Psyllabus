@@ -147,7 +147,6 @@ export default function QuizRunner({
   const [mistakeRowsById, setMistakeRowsById] = useState({})
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState({})
-  const [predictedScore, setPredictedScore] = useState('')
   const [results, setResults] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [userId, setUserId] = useState(null)
@@ -437,7 +436,8 @@ export default function QuizRunner({
     const elapsed = timed
       ? timeLimitRef.current - Math.max(0, secondsLeft ?? 0)
       : graded.reduce((sum, g) => sum + g.timeSpent, 0)
-    const prediction = predictedScore !== '' ? parseInt(predictedScore, 10) : null
+    // Nothing asks for one any more; the column stays so old rows still read.
+    const prediction = null
 
     const { data: attempt } = await supabase
       .from('quiz_attempts')
@@ -626,7 +626,7 @@ export default function QuizRunner({
     })
     setPhase(PHASE.results)
     setSubmitting(false)
-  }, [userId, submitting, questions, currentIndex, secondsLeft, predictedScore, mode, subject, topic, subtopic, timed, mistakeRowsById, commitTime, supabase])
+  }, [userId, submitting, questions, currentIndex, secondsLeft, mode, subject, topic, subtopic, timed, mistakeRowsById, commitTime, supabase])
 
   finishRef.current = finishQuiz
 
@@ -713,39 +713,6 @@ export default function QuizRunner({
             timed from the questions it actually contains.
           </p>
         )}
-
-        <div className="mt-8 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
-          <label
-            htmlFor="predicted-score"
-            className="block text-[14.5px] font-medium"
-          >
-            How many will you get right?
-          </label>
-          <p className="mt-1 text-[13px]" style={{ color: 'var(--text-muted)' }}>
-            Optional. It is how the app learns whether your confidence matches your marks.
-          </p>
-          <input
-            id="predicted-score"
-            type="number"
-            min={0}
-            max={questions.length}
-            value={predictedScore}
-            onChange={(e) => {
-              // Number inputs accept 'e', '+', '-' and any magnitude, so the
-              // value is sanitised rather than trusted.
-              const digits = e.target.value.replace(/[^0-9]/g, '')
-              if (digits === '') return setPredictedScore('')
-              const clamped = Math.min(questions.length, parseInt(digits, 10))
-              setPredictedScore(String(clamped))
-            }}
-            onKeyDown={(e) => {
-              if (['e', 'E', '+', '-', '.'].includes(e.key)) e.preventDefault()
-            }}
-            inputMode="numeric"
-            placeholder={`0–${questions.length}`}
-            className="input mt-4 max-w-[160px] tabular-nums"
-          />
-        </div>
 
         <div className="mt-10">
           <button onClick={startQuiz} className="btn btn-solid control-lg">
@@ -980,17 +947,6 @@ export default function QuizRunner({
         </h1>
         <p className="mt-3 text-[14.5px]" style={{ color: 'var(--text-muted)' }}>
           {pct}% accuracy
-          {results.prediction != null && (
-            <>
-              {' · '}
-              you predicted {results.prediction},{' '}
-              {results.prediction > results.score
-                ? 'slightly overconfident this time'
-                : results.prediction < results.score
-                  ? 'you underestimated yourself'
-                  : 'perfectly calibrated'}
-            </>
-          )}
         </p>
 
         {results.clearedFromBank > 0 && (

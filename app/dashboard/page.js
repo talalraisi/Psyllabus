@@ -59,20 +59,26 @@ export default function Dashboard() {
         return
       }
 
-      const profileData = await getProfile(supabase, user.id, { onFresh: setProfile })
-
-      if (!profileData) {
-        router.push('/onboarding')
-        return
-      }
-
-      setProfile(profileData)
-      const subjects = profileData.subjects || []
-
-      const [syllabusRows, { data: progressRows }, { count: dueCount }, eventsResult] =
+      /**
+       * Three round trips became two.
+       *
+       * The profile was awaited on its own before anything else started, even
+       * though progress, mistakes and calendar only need the user id, which we
+       * already have. They now go out alongside it. Only the syllabus genuinely
+       * depends on the subject list, so it is the only thing left waiting.
+       *
+       * On a database in Singapore that is a couple of hundred milliseconds off
+       * every dashboard load, every time.
+       */
+      const [profileData, { data: progressRows }, { count: dueCount }, eventsResult] =
         await Promise.all([
-          getSyllabus(supabase, subjects),
-          supabase.from('progress').select('*').eq('user_id', user.id),
+          getProfile(supabase, user.id, { onFresh: setProfile }),
+          supabase
+            .from('progress')
+            // Only what the maps read. select('*') pulled every column of every
+            // row across six subjects to use four of them.
+            .select('subject, topic, subtopic, status, mastery_points, updated_at, last_correct_at')
+            .eq('user_id', user.id),
           supabase
             .from('mistakes')
             .select('id', { count: 'exact', head: true })
@@ -84,6 +90,16 @@ export default function Dashboard() {
             .eq('user_id', user.id)
             .eq('completed', false),
         ])
+
+      if (!profileData) {
+        router.push('/onboarding')
+        return
+      }
+
+      setProfile(profileData)
+      const subjects = profileData.subjects || []
+
+      const syllabusRows = await getSyllabus(supabase, subjects)
 
       const progressMap = buildEffectiveProgressMap(progressRows)
       const merged = (syllabusRows || []).map((row) => ({
@@ -150,7 +166,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <DashboardLayout profile={null}>
-        <PageLoading title="Dashboard" width="wide" stats rows={4} />
+        <PageLoading title="Dashboard" width="wide" variant="wheel" />
       </DashboardLayout>
     )
   }
@@ -242,7 +258,7 @@ export default function Dashboard() {
           </>
         ) : (
           <>
-            <div className="mb-14">
+            <div className="mb-10">
               <SubjectWheel
                 subjects={subjects}
                 core={core}
@@ -255,6 +271,21 @@ export default function Dashboard() {
               />
             </div>
 
+            {/* The numbers, as reference under a rule. They are what the page
+                is measured on, not what it opens with. */}
+            <div className="mb-14">
+              <StatRow
+                stats={[
+                  { label: 'mastered', value: counts.mastered, tone: 'var(--status-mastered)' },
+                  { label: 'fading', value: counts.decaying, tone: 'var(--status-fading)' },
+                  { label: 'weak', value: counts.weak, tone: 'var(--status-weak)' },
+                  { label: 'reviews due', value: counts.due },
+                  { label: 'of the syllabus mastered', value: `${overall}%`, tone: 'var(--brand)' },
+                ]}
+              />
+            </div>
+
+            <div className="grid gap-x-14 gap-y-0 lg:grid-cols-2">
             {/* What the planner would have you do, in the order it would have
                 you do it. Four at most: the whole queue lives on the study
                 plan, and a dashboard listing nine subtopics is a to-do list
@@ -316,22 +347,6 @@ export default function Dashboard() {
                 </ul>
               </Section>
             )}
-
-            {/* The numbers, as reference under a rule. They are what the page
-                is measured on, not what it opens with. */}
-            <div className="mb-14">
-              <StatRow
-                stats={[
-                  { label: 'mastered', value: counts.mastered, tone: 'var(--status-mastered)' },
-                  { label: 'fading', value: counts.decaying, tone: 'var(--status-fading)' },
-                  { label: 'weak', value: counts.weak, tone: 'var(--status-weak)' },
-                  { label: 'reviews due', value: counts.due },
-                  { label: 'of the syllabus mastered', value: `${overall}%`, tone: 'var(--brand)' },
-                ]}
-              />
-            </div>
-          </>
-        )}
 
         {/* Subjects */}
         <Section
@@ -409,7 +424,9 @@ export default function Dashboard() {
             </Link>
           )}
         </Section>
-
+            </div>
+          </>
+        )}
       </Page>
     </DashboardLayout>
   )

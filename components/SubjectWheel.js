@@ -174,7 +174,7 @@ export default function SubjectWheel({
     <div className="flex flex-col items-center">
       {/* What the wheel is showing, written above it. Fixed height, so opening
           a slice does not shunt the wheel up and down the page. */}
-      <div className="flex min-h-[118px] w-full max-w-2xl flex-col items-center justify-end pb-5 text-center">
+      <div className="flex min-h-[104px] w-full max-w-2xl flex-col items-center justify-end pb-4 text-center">
         {openSubject || openCore ? (
           <>
             <button
@@ -243,7 +243,7 @@ export default function SubjectWheel({
       </div>
 
       <div className="relative w-full overflow-hidden">
-        <div className="relative mx-auto w-full max-w-[min(100%,760px)]">
+        <div className="relative mx-auto w-full max-w-[min(100%,520px)]">
         <svg
           viewBox={viewBox}
           className="block w-full overflow-visible"
@@ -291,8 +291,8 @@ export default function SubjectWheel({
                   <path
                     d={wedge(R_SUBJ_IN, R_SUBJ_OUT, a0, a1)}
                     fill="var(--surface-sunken)"
-                    stroke={on ? 'var(--text)' : 'transparent'}
-                    strokeWidth={isOpen ? 1 / OPEN_SCALE : 1.5}
+                    stroke={on && !isOpen ? 'var(--text)' : 'transparent'}
+                    strokeWidth={1.5}
                     style={{ transition: 'stroke 180ms ease' }}
                   />
                   {frac > 0 && (
@@ -363,8 +363,8 @@ export default function SubjectWheel({
                 <path
                   d={wedge(R_CORE_IN, R_CORE_OUT, a0, a1)}
                   fill="var(--surface)"
-                  stroke={on ? 'var(--text)' : 'transparent'}
-                  strokeWidth={isOpen ? 1 / OPEN_SCALE : 1.5}
+                  stroke={on && !isOpen ? 'var(--text)' : 'transparent'}
+                  strokeWidth={1.5}
                   style={{ transition: 'stroke 180ms ease' }}
                 />
                 <g style={{ opacity: open ? 0 : 1, transition: 'opacity 240ms ease' }}>
@@ -500,7 +500,7 @@ export default function SubjectWheel({
         </div>
       </div>
 
-      <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
         {openCore ? (
           <Link href="/dashboard/prediction" className="btn btn-solid control-md">
             {targets[openCore] ? 'Change the target' : 'Set a target'}
