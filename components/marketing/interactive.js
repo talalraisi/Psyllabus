@@ -103,10 +103,10 @@ export function Heatmap({ cols = 12, rows = 8, subject = 'Physics SL' }) {
           <>
             <div className="min-w-0">
               <p className="truncate text-[12.5px] font-semibold">
-                <span className="tabular-nums" style={{ color: 'var(--muted)' }}>{meta.ref}</span>{' '}
+                <span className="tabular-nums" style={{ color: 'var(--text-muted)' }}>{meta.ref}</span>{' '}
                 {meta.name}
               </p>
-              <p className="truncate text-[11px]" style={{ color: 'var(--faint)' }}>
+              <p className="truncate text-[11px]" style={{ color: 'var(--text-faint)' }}>
                 Topic {meta.ref.split('.')[0]} · {meta.topic}
               </p>
             </div>
@@ -114,7 +114,7 @@ export function Heatmap({ cols = 12, rows = 8, subject = 'Physics SL' }) {
               <p className="text-[12px] font-semibold" style={{ color: `var(--${active.status})` }}>
                 {STATUS_LABEL[active.status]}
               </p>
-              <p className="text-[11px] tabular-nums" style={{ color: 'var(--faint)' }}>
+              <p className="text-[11px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
                 {active.status === 'untested' ? 'no points yet' : `${active.points.toFixed(1)} / 10`}
               </p>
             </div>
@@ -123,11 +123,11 @@ export function Heatmap({ cols = 12, rows = 8, subject = 'Physics SL' }) {
           <>
             <div>
               <p className="text-[12.5px] font-semibold">{subject}</p>
-              <p className="text-[11px]" style={{ color: 'var(--faint)' }}>
+              <p className="text-[11px]" style={{ color: 'var(--text-faint)' }}>
                 {count} subtopics · point at one
               </p>
             </div>
-            <p className="shrink-0 text-[11px] tabular-nums" style={{ color: 'var(--faint)' }}>
+            <p className="shrink-0 text-[11px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
               {cells.filter((c) => c.status === 'mastered').length} mastered
             </p>
           </>
@@ -151,7 +151,7 @@ export function Heatmap({ cols = 12, rows = 8, subject = 'Physics SL' }) {
               aria-label={`${m.ref} ${m.name}, ${STATUS_LABEL[c.status]}`}
               className="aspect-square rounded-[3px] transition-transform duration-100 hover:scale-[1.2]"
               style={{
-                background: `var(--${c.status})`,
+                background: `var(--status-${c.status})`,
                 outline: at === i ? '2px solid var(--text)' : 'none',
                 outlineOffset: '1px',
               }}
@@ -207,7 +207,7 @@ export function TryQuestion() {
         >
           {DEMO.heat} · {DEMO.points} point
         </span>
-        <span className="text-[12px]" style={{ color: 'var(--muted)' }}>
+        <span className="text-[12px]" style={{ color: 'var(--text-muted)' }}>
           Physics SL · Circular motion
         </span>
       </div>
@@ -228,13 +228,18 @@ export function TryQuestion() {
               onClick={() => setPicked(o.id)}
               className="flex items-center gap-3 rounded-xl border px-4 py-3 text-left text-[14.5px] transition-colors duration-150 disabled:cursor-default"
               style={{
-                borderColor: tone ? `var(--${tone})` : 'var(--border-strong)',
-                background: tone ? `color-mix(in oklab, var(--${tone}) 12%, transparent)` : 'transparent',
+                borderColor: tone ? `var(--status-${tone})` : 'var(--border-strong)',
+                background: tone ? `color-mix(in oklab, var(--status-${tone}) 12%, transparent)` : 'transparent',
+                // Set rather than inherited. A button with no author colour
+                // falls back to the system `buttontext`, which follows
+                // color-scheme instead of the palette, and in light mode that
+                // rendered these options as near-white text on white.
+                color: 'var(--text)',
               }}
             >
               <span
                 className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[11px] font-semibold"
-                style={{ borderColor: tone ? `var(--${tone})` : 'var(--border-strong)', color: tone ? `var(--${tone})` : 'var(--muted)' }}
+                style={{ borderColor: tone ? `var(--status-${tone})` : 'var(--border-strong)', color: tone ? `var(--status-${tone})` : 'var(--text-muted)' }}
               >
                 {answered && isAnswer ? <IconCheck width={11} height={11} /> : answered && isPicked ? <IconClose width={11} height={11} /> : o.id}
               </span>
@@ -247,7 +252,7 @@ export function TryQuestion() {
       {!answered && (
         <div className="mt-5 flex items-center gap-4">
           {showHint ? (
-            <p className="text-[13.5px]" style={{ color: 'var(--body)' }}>
+            <p className="text-[13.5px]" style={{ color: 'var(--text-body)' }}>
               <span className="font-semibold">Hint. </span>
               {DEMO.hint}
             </p>
@@ -255,7 +260,7 @@ export function TryQuestion() {
             <button
               onClick={() => setShowHint(true)}
               className="text-[13px] font-medium underline underline-offset-2"
-              style={{ color: 'var(--muted)' }}
+              style={{ color: 'var(--text-muted)' }}
             >
               Show a hint
             </button>
@@ -266,28 +271,28 @@ export function TryQuestion() {
       {answered && (
         <div className="rise mt-6 border-t pt-5" style={{ borderColor: 'var(--border)' }}>
           {!right && chosen?.why && (
-            <p className="text-[14px] leading-relaxed" style={{ color: 'var(--weak)' }}>
+            <p className="text-[14px] leading-relaxed" style={{ color: 'var(--status-weak)' }}>
               <span className="font-semibold">You picked {picked.toUpperCase()}. </span>
               {chosen.why}
             </p>
           )}
-          <p className="mt-2 text-[14px] leading-relaxed" style={{ color: 'var(--body)' }}>
+          <p className="mt-2 text-[14px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
             {DEMO.working}
           </p>
 
           <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
             <div className="min-w-[200px] flex-1">
               <div className="mb-2 flex items-baseline justify-between text-[12.5px]">
-                <span style={{ color: 'var(--muted)' }}>Mastery of this subtopic</span>
+                <span style={{ color: 'var(--text-muted)' }}>Mastery of this subtopic</span>
                 <span className="font-semibold tabular-nums">{after.toFixed(2)} / 10</span>
               </div>
-              <div className="h-2 overflow-hidden rounded-full" style={{ background: 'var(--sunken)' }}>
+              <div className="h-2 overflow-hidden rounded-full" style={{ background: 'var(--surface-sunken)' }}>
                 <div
                   className="h-full rounded-full transition-[width] duration-700 ease-out"
-                  style={{ width: `${after * 10}%`, background: 'var(--proficient)' }}
+                  style={{ width: `${after * 10}%`, background: 'var(--status-proficient)' }}
                 />
               </div>
-              <p className="mt-2 text-[12.5px]" style={{ color: 'var(--faint)' }}>
+              <p className="mt-2 text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
                 {right
                   ? `A Hot question is worth ${DEMO.points} point. Easy ones are worth half of that.`
                   : 'Only correct answers pay, and each question pays once.'}
@@ -300,7 +305,7 @@ export function TryQuestion() {
                 setShowHint(false)
               }}
               className="rounded-full border px-4 py-2.5 text-[13px] font-medium"
-              style={{ borderColor: 'var(--border-strong)', color: 'var(--body)' }}
+              style={{ borderColor: 'var(--border-strong)', color: 'var(--text-body)' }}
             >
               Try again
             </button>
@@ -366,13 +371,13 @@ export function DecayDemo() {
       <div className="flex items-center gap-4">
         <span
           className="h-12 w-12 shrink-0 rounded-[8px] transition-colors duration-400"
-          style={{ background: `var(--${status})` }}
+          style={{ background: `var(--status-${status})` }}
         />
         <div className="min-w-0">
           <p className="truncate text-[14.5px] font-semibold">Wave characteristics</p>
           <p
             className="text-[12.5px] font-medium transition-colors duration-400"
-            style={{ color: `var(--${status})` }}
+            style={{ color: `var(--status-${status})` }}
           >
             {label}
             {note && ` · ${note}`}
@@ -380,7 +385,7 @@ export function DecayDemo() {
         </div>
         <span className="ml-auto shrink-0 text-right">
           <span className="block text-[19px] font-semibold tabular-nums">{pct}%</span>
-          <span className="block text-[10.5px]" style={{ color: 'var(--faint)' }}>
+          <span className="block text-[10.5px]" style={{ color: 'var(--text-faint)' }}>
             retained
           </span>
         </span>
@@ -395,7 +400,7 @@ export function DecayDemo() {
           <path
             d={travelled}
             fill="none"
-            stroke={`var(--${status})`}
+            stroke={`var(--status-${status})`}
             strokeWidth="2.5"
             strokeLinecap="round"
             style={{ transition: 'stroke 400ms ease' }}
@@ -407,13 +412,13 @@ export function DecayDemo() {
           cx={x(weeks)}
           cy={y(retention)}
           r="4.5"
-          fill={`var(--${status})`}
+          fill={`var(--status-${status})`}
           stroke="var(--surface)"
           strokeWidth="2"
         />
       </svg>
 
-      <label htmlFor={id} className="mt-4 block text-[12.5px] font-medium" style={{ color: 'var(--body)' }}>
+      <label htmlFor={id} className="mt-4 block text-[12.5px] font-medium" style={{ color: 'var(--text-body)' }}>
         Untouched for{' '}
         <span className="font-semibold tabular-nums" style={{ color: 'var(--text)' }}>
           {weeks} {weeks === 1 ? 'week' : 'weeks'}
@@ -430,7 +435,7 @@ export function DecayDemo() {
         style={{ accentColor: 'var(--brand)' }}
       />
 
-      <p className="mt-4 text-[12.5px] leading-relaxed" style={{ color: 'var(--faint)' }}>
+      <p className="mt-4 text-[12.5px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
         Nothing else takes a green tick away from you. Forgetting happens whether an app admits
         it or not.
       </p>
@@ -482,7 +487,7 @@ export function PlanDemo() {
       style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
     >
       <div className="flex items-baseline justify-between gap-4">
-        <label htmlFor={id} className="block text-[13px] font-medium" style={{ color: 'var(--body)' }}>
+        <label htmlFor={id} className="block text-[13px] font-medium" style={{ color: 'var(--text-body)' }}>
           I have{' '}
           <span className="font-semibold tabular-nums" style={{ color: 'var(--text)' }}>
             {minutes >= 60
@@ -491,7 +496,7 @@ export function PlanDemo() {
           </span>{' '}
           tonight
         </label>
-        <span className="text-[11.5px] tabular-nums" style={{ color: 'var(--faint)' }}>
+        <span className="text-[11.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
           {used} min planned
         </span>
       </div>
@@ -514,22 +519,22 @@ export function PlanDemo() {
             className="flex items-center gap-3 border-t py-3 first:border-t-0"
             style={{ borderColor: 'var(--border)' }}
           >
-            <span className="w-5 shrink-0 text-[12px] font-semibold tabular-nums" style={{ color: 'var(--faint)' }}>
+            <span className="w-5 shrink-0 text-[12px] font-semibold tabular-nums" style={{ color: 'var(--text-faint)' }}>
               {i + 1}
             </span>
-            <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: `var(--${q.tone})` }} />
+            <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: `var(--status-${q.tone})` }} />
             <span className="min-w-0 flex-1">
               <span className="block truncate text-[14px] font-medium">{q.t}</span>
-              <span className="block text-[12.5px]" style={{ color: 'var(--muted)' }}>{q.why}</span>
+              <span className="block text-[12.5px]" style={{ color: 'var(--text-muted)' }}>{q.why}</span>
             </span>
-            <span className="shrink-0 text-[12.5px] tabular-nums" style={{ color: 'var(--faint)' }}>
+            <span className="shrink-0 text-[12.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
               {q.m} min
             </span>
           </li>
         ))}
       </ul>
 
-      <p className="mt-5 text-[13.5px] leading-relaxed" style={{ color: 'var(--faint)' }}>
+      <p className="mt-5 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
         Ordered by what you got wrong, what is fading, and which foundations unlock later
         topics. Every line says why it is there, so you can disagree with it.
       </p>
@@ -559,7 +564,7 @@ export function Faq({ items }) {
               </span>
               <span
                 className="shrink-0 transition-transform duration-200"
-                style={{ transform: isOpen ? 'rotate(45deg)' : 'none', color: 'var(--muted)' }}
+                style={{ transform: isOpen ? 'rotate(45deg)' : 'none', color: 'var(--text-muted)' }}
                 aria-hidden="true"
               >
                 <IconClose width={16} height={16} />
@@ -571,7 +576,7 @@ export function Faq({ items }) {
             >
               <p
                 className="overflow-hidden text-[14.5px] leading-[1.7]"
-                style={{ color: 'var(--body)' }}
+                style={{ color: 'var(--text-body)' }}
               >
                 <span className="block pb-6 pr-10">{a}</span>
               </p>

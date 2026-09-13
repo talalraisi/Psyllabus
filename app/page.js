@@ -1,9 +1,13 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import logoMark from '@/public/logo-mark.png'
-import { IconCheck, IconArrowRight } from '@/components/Icons'
+import { IconCheck, IconArrowRight, IconClose } from '@/components/Icons'
 import ThemeToggle from '@/components/ThemeToggle'
 import { operatorLine, OPERATOR } from '@/lib/legal'
+import { HOW_IT_WORKS, FEATURES, WHY, FAQ, ANSWERS } from '@/components/marketing/content'
+import { Heatmap, TryQuestion, DecayDemo, PlanDemo, Faq } from '@/components/marketing/interactive'
+import { Reveal, ScrollBar, CountUp, ForgettingCurve } from '@/components/marketing/scroll'
+import { FeatureModules } from '@/components/marketing/features'
 
 export const metadata = {
   title: 'Project Syllabus',
@@ -11,47 +15,14 @@ export const metadata = {
     'Project Syllabus tracks your IB, A-Level or AP syllabus topic by topic. Where you stand is set by testing, not by how confident you feel.',
 }
 
-const HOW_IT_WORKS = [
-  {
-    step: '01',
-    title: 'Map your syllabus',
-    body: 'Pick your subjects and see every topic and subtopic from the official course outline on one screen.',
-  },
-  {
-    step: '02',
-    title: 'Prove what you know',
-    body: 'Take a quiz on any subtopic. Where you stand comes from how many you got right, not from how you felt about it.',
-  },
-  {
-    step: '03',
-    title: 'Study what actually matters',
-    body: 'Weak and fading subtopics rise to the top of your plan, and every question you got wrong comes back for review.',
-  },
-]
-
-const FEATURES = [
-  ['Heatmap you cannot fake', 'Five levels, from Weak to Mastered, every one set by a quiz rather than by how you feel.'],
-  ['Topics that fade', 'Nail something, leave it two weeks untouched and it fades back into your plan for a retest.'],
-  ['Mistake bank', 'Questions you got wrong come back on a spaced schedule, so you drill your own gaps.'],
-  ['Timed papers', 'Build a paper from any mix of topics and sit it against a live marks-per-minute clock.'],
-  ['Calendar and reminders', 'Put your tests and IA deadlines in, and the planner moves that subject up as they get close.'],
-  ['A session timer that follows you', 'Start a study block and it keeps running while you work through quizzes.'],
-  ['Real resources on every subtopic', 'Hand-picked lessons, videos and notes for the exact thing you got wrong, not a search box.'],
-  ['Predicted grade', 'A running prediction out of 45, built from your quiz results, next to the grades you told us you want.'],
-]
-
-
 /**
- * The numbers on the homepage are read from the database, not typed here.
+ * The numbers are read from the database rather than typed here.
  *
- * They used to be constants updated by hand after a generation run, and the
- * page was advertising 98 questions while the bank held 304. Understating is
- * harmless; the problem is that a number maintained by remembering to maintain
- * it eventually overstates, and a marketing claim has to stay defensible
- * without anyone thinking about it.
- *
- * Rounded down to a round number so it reads as a claim rather than a live
- * counter, and so it is always true rather than true for an hour.
+ * They were constants updated by hand after a generation run, and the page
+ * advertised 98 questions while the bank held 304. Understating is harmless;
+ * the problem is that a number maintained by remembering to maintain it
+ * eventually overstates, and a marketing claim has to stay defensible without
+ * anyone thinking about it.
  */
 async function bankCounts() {
   try {
@@ -75,96 +46,45 @@ async function bankCounts() {
   }
 }
 
-/** 304 -> "300+". Never rounds up, so the claim cannot overstate. */
-function roundDown(n) {
-  if (!n) return null
-  if (n < 100) return String(Math.floor(n / 10) * 10)
-  const step = n < 1000 ? 100 : 1000
-  return `${Math.floor(n / step) * step}+`
+function Section({ children, label, tint = false, className = '' }) {
+  return (
+    <section
+      className={`border-t px-5 py-20 md:px-8 md:py-28 ${className}`}
+      style={{
+        borderColor: 'var(--border)',
+        background: tint ? 'var(--surface-sunken)' : 'transparent',
+      }}
+    >
+      <div className="mx-auto max-w-6xl">
+        {label && (
+          <p
+            className="mb-4 text-[11.5px] font-semibold uppercase tracking-[0.14em]"
+            style={{ color: 'var(--text-faint)' }}
+          >
+            {label}
+          </p>
+        )}
+        {children}
+      </div>
+    </section>
+  )
 }
 
-const WHY = [
-  {
-    title: 'Because you cannot mark your own homework',
-    body: 'Asking students to rate their own confidence produces a map of their mood, not their knowledge. The effect is well documented: the less someone knows about a topic, the more likely they are to overrate themselves on it. Every status here comes from questions you either got right or did not, which is the one signal that cannot flatter you.',
-  },
-  {
-    title: 'Because forgetting is the default, not the exception',
-    body: 'Memory decays on a curve unless it is used, and the gap between learning something in October and being examined on it in May is where most marks quietly disappear. Rather than assume a topic stays learned, anything you had proved starts Fading after about two weeks untouched and returns for a short retest. Spacing practice out like this is one of the most reliably supported findings in learning research.',
-  },
-  {
-    title: 'Because testing is studying, not just measuring',
-    body: 'Retrieving an answer from memory strengthens it far more than reading the same page again. Every quiz here is doing two jobs at once: telling the planner where you stand, and making the thing you just recalled harder to forget. That is why the app tests you constantly rather than saving it for a mock.',
-  },
-  {
-    title: 'Because your own mistakes are better practice than anyone else\u2019s',
-    body: 'A question you got wrong is worth more than ten you got right, and it goes straight into a bank that brings it back on a widening schedule: a day later, then three, then a week. You end up drilling your specific gaps instead of generic cards written for somebody else.',
-  },
-  {
-    title: 'Because knowing what to do is most of the battle',
-    body: 'Most students do not lack material, they lack direction, and picking a subject to revise at 8pm is a decision made on guesswork and guilt. Tell the planner how long you have and it hands you an ordered list, with a reason attached to each item so you can disagree with it.',
-  },
-  {
-    title: 'Because a number you can check beats a feeling',
-    body: 'A predicted grade out of 45 next to the one you are aiming for turns a vague worry into a gap you can close. It says how much of your syllabus it is actually based on, so a prediction from three quizzes is labelled low confidence rather than presented as a forecast.',
-  },
-]
-
-const FAQ = [
-  {
-    q: 'What is Project Syllabus?',
-    a: 'Project Syllabus is a study tracker for students taking the International Baccalaureate Diploma, A-Levels or AP exams. It lays out every topic and subtopic of your official course, works out which parts you are weak on by testing you, and tells you what to study today. It was built in Muscat, Oman by an IB Diploma student.',
-  },
-  {
-    q: 'How is it different from a revision app or flashcards?',
-    a: 'Most trackers ask you to rate your own confidence, and most students are poor judges of what they actually know. Project Syllabus never asks. Every subtopic is coloured by how many questions you got right, so the map of your course reflects tested ability rather than how you happen to feel about a topic.',
-  },
-  {
-    q: 'How does the syllabus tracking work?',
-    a: 'Pick your subjects and you get the full course broken into topics and subtopics, taken from the official course outlines. Each subtopic then sits at one of five levels: Weak, Developing, Proficient, Mastered, or Fading once something you had proved starts slipping. Anything you have not been tested on stays grey, because untested is not a level, it is the absence of one.',
-  },
-  {
-    q: 'What does the study plan actually do?',
-    a: 'Tell it how long you have, from five minutes to eight hours, and it builds a session that fits. It ranks subtopics by what you have got wrong, what is fading, what a test is coming up on, and which foundations unlock later topics. Every item says why it is there, so you can disagree with it.',
-  },
-  {
-    q: 'What is skill decay?',
-    a: 'Knowledge fades when you leave it alone. Reach Proficient or Mastered on a subtopic and stop practising it, and after about two weeks Project Syllabus marks it Fading and puts it back into your plan for a short retest. This keeps what you learned in October from quietly disappearing before May.',
-  },
-  {
-    q: 'How is my predicted grade calculated?',
-    a: 'Quiz accuracy across each subject is converted into a predicted grade from 1 to 7, then totalled with the TOK and Extended Essay bonus into a score out of 45, shown against the target you set. It also tells you how much of your syllabus you have actually tested, so a prediction built on three quizzes is labelled low confidence instead of being dressed up as a forecast.',
-  },
-  {
-    q: 'Is it free?',
-    a: 'One subject is free with no time limit and no card: every topic, every quiz, its own study plan and heatmap. You choose which subject when you sign up, and you can change it later, though not every day. Unlocking all your subjects is $12 a month or $108 a year, and schools can buy a licence from $500 to $2,000 a year that covers their students.',
-  },
-  {
-    q: 'How do school codes work, and what stops one leaking?',
-    a: 'A school gets a code tied to its own email domain, so it only works for someone signing up with a school address and is useless to anyone outside. Schools whose students use personal email get a set of one-per-student codes instead, each of which stops working after one account. Either way a code can be switched off, and every account it let in goes back to the free plan.',
-  },
-  {
-    q: 'Does it work on a phone?',
-    a: 'Yes. It is a web app, so there is nothing to install, and adding it to your home screen makes it open like an app. There is a dark mode, and reminders for tests and study blocks work while it is open in a tab.',
-  },
-  {
-    q: 'Do teachers see my results?',
-    a: 'No. There are no teacher accounts and no class dashboards. A school licence is a code that unlocks the app for its students, and nothing more. Your results are yours.',
-  },
-  {
-    q: 'Which subjects are covered?',
-    a: 'All six IB Diploma subject groups are mapped, along with Theory of Knowledge, the Extended Essay and CAS, which are treated as the Diploma core rather than as optional subjects. A-Level and AP course structures are next.',
-  },
-  {
-    q: 'Where does the question bank come from?',
-    a: 'Questions are generated against each subtopic and then checked by a separate verification pass that solves each one independently before it reaches you. Anything that fails is thrown away. The bank is deepening subject by subject rather than being complete on day one, and we would rather say that than pretend otherwise.',
-  },
-]
+function Heading({ children, className = '' }) {
+  return (
+    <h2
+      className={`text-[clamp(1.7rem,3.2vw,2.4rem)] font-semibold leading-[1.12] tracking-[-0.028em] ${className}`}
+    >
+      {children}
+    </h2>
+  )
+}
 
 export default async function Home() {
   const counts = await bankCounts()
+
   return (
-    <main className="min-h-screen bg-[var(--bg)]">
+    <div className="min-h-screen" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
       {/* Lets search engines answer these questions directly. */}
       <script
         type="application/ld+json"
@@ -180,245 +100,368 @@ export default async function Home() {
           }),
         }}
       />
-      {/* Navigation with the real entry points */}
-      <nav className="sticky top-0 z-40 border-b border-[var(--border)] bg-[var(--surface)]">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 md:px-8">
+
+      <ScrollBar />
+
+      <header
+        className="sticky top-0 z-20 border-b backdrop-blur-md"
+        style={{
+          borderColor: 'var(--border)',
+          background: 'color-mix(in oklab, var(--bg) 82%, transparent)',
+        }}
+      >
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 md:px-8">
           <Link href="/" aria-label="Project Syllabus home" className="shrink-0">
-            <Image
-              src={logoMark}
-              alt="Project Syllabus"
-              priority
-              sizes="72px"
-              className="h-9 w-auto md:h-8"
-            />
+            <Image src={logoMark} alt="Project Syllabus" sizes="110px" style={{ height: 38, width: 'auto' }} priority />
           </Link>
-          {/* Two ways in and nothing else. Pricing lives in the footer, and the
-              theme control sits there too so it is reachable on a phone, where
-              a third and fourth nav button would not fit anyway. */}
-          <div className="flex min-w-0 items-center gap-2">
+          <div className="flex items-center gap-2">
             <Link
               href="/login"
-              className="btn btn-quiet control-md px-4 text-sm"
+              className="hidden rounded-full px-3.5 py-2 text-[13px] font-medium sm:block"
+              style={{ color: 'var(--text-body)' }}
             >
               Log in
             </Link>
             <Link
               href="/signup"
-              className="btn btn-solid control-md px-4 text-sm"
+              className="rounded-full px-4 py-2 text-[13px] font-semibold text-white"
+              style={{ background: 'var(--brand-solid)' }}
             >
               Get started
             </Link>
           </div>
         </div>
-      </nav>
+      </header>
 
-      {/* Hero */}
-      <section className="marketing-hero-grid border-b border-[var(--border)] px-5 py-20 md:px-8 md:py-28">
-        <div className="mx-auto max-w-3xl text-center">
-          <h1 className="mb-6 text-4xl font-bold leading-[1.1] tracking-tight text-[var(--text)] sm:text-6xl">
-            Stop guessing.
-            <br />
-            <span className="text-[var(--brand)]">Start progressing.</span>
-          </h1>
+      <main>
+        {/* ---------------------------------------------------------- hero */}
+        <section className="ground px-5 py-24 md:px-8 md:py-36">
+          <div className="mx-auto max-w-6xl">
+            <h1 className="max-w-3xl text-[clamp(2.6rem,6vw,4.6rem)] font-semibold leading-[0.98] tracking-[-0.038em]">
+              Stop guessing.
+              <br />
+              <span style={{ color: 'var(--brand)' }}>Start progressing.</span>
+            </h1>
 
-          <p className="mx-auto mb-10 max-w-xl text-lg leading-relaxed text-[var(--text-muted)]">
-            Project Syllabus lays out your IB, A-Level or AP course topic by topic, then tells you
-            what to work on today based on where you are actually behind.
-          </p>
-
-          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href="/signup" className="btn btn-solid control-lg w-full px-8 sm:w-auto">
-              Create a free account
-            </Link>
-            <Link href="/login" className="btn btn-quiet control-lg w-full px-8 sm:w-auto">
-              I already have an account
-            </Link>
-          </div>
-          <p className="mt-4 text-sm text-[var(--text-faint)]">
-            No card needed. One subject free, and your school code unlocks the rest.
-          </p>
-        </div>
-      </section>
-
-      {/* Proof points */}
-      <section className="border-b border-[var(--border)] bg-[var(--surface-sunken)] px-5 py-10 md:px-8">
-        <div className="mx-auto grid max-w-3xl grid-cols-3 gap-4 text-center">
-          {[
-            [roundDown(counts?.subtopics) || '5,000+', 'Subtopics mapped'],
-            [roundDown(counts?.questions) || '300+', 'Questions in the question bank'],
-            [String(counts?.subjects || 170), 'Subjects covered'],
-          ].map(([value, label]) => (
-            <div key={label}>
-              <p className="t-stat text-[var(--text)]">{value}</p>
-              <p className="mt-1 text-sm text-[var(--text-muted)]">{label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="px-5 py-20 md:px-8">
-        <div className="mx-auto max-w-5xl">
-          <h2 className="t-overline mb-3">How it works</h2>
-          <p className="mb-10 max-w-2xl text-2xl font-semibold leading-snug text-[var(--text)]">
-            Feeling ready and being ready are two different things. Project Syllabus only ever
-            measures the second one.
-          </p>
-
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-            {HOW_IT_WORKS.map(({ step, title, body }) => (
-              <div key={step} className="surface p-6">
-                <span className="t-caption font-semibold text-[var(--brand)]">{step}</span>
-                <h3 className="t-card-title mt-3">{title}</h3>
-                <p className="t-small mt-2">{body}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section className="border-t border-[var(--border)] px-5 py-20 md:px-8">
-        <div className="mx-auto max-w-5xl">
-          <h2 className="t-overline mb-3">What you get</h2>
-          <p className="mb-10 max-w-2xl text-2xl font-semibold leading-snug text-[var(--text)]">
-            Everything you need to revise properly, in one place.
-          </p>
-
-          <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
-            {FEATURES.map(([title, body]) => (
-              <div key={title} className="flex gap-3">
-                <IconCheck width={18} height={18} className="mt-1 shrink-0 text-[var(--brand)]" />
-                <div>
-                  <h3 className="text-sm font-semibold text-[var(--text)]">{title}</h3>
-                  <p className="t-small mt-1">{body}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-
-      {/* Why it works */}
-      <section className="border-t border-[var(--border)] bg-[var(--surface-sunken)] px-5 py-20 md:px-8">
-        <div className="mx-auto max-w-5xl">
-          <h2 className="t-overline mb-3">Why it works</h2>
-          <p className="mb-10 max-w-2xl text-2xl font-semibold leading-snug text-[var(--text)]">
-            None of this is a gimmick. Each part is built on something already
-            known about how people learn and forget.
-          </p>
-
-          <div className="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-2">
-            {WHY.map(({ title, body }) => (
-              <div key={title}>
-                <h3 className="mb-2 text-base font-semibold text-[var(--text)]">{title}</h3>
-                <p className="text-sm leading-relaxed text-[var(--text-body)]">{body}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Schools */}
-      <section className="border-t border-[var(--border)] bg-[var(--surface-sunken)] px-5 py-20 md:px-8">
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 className="mb-4 text-2xl font-semibold text-[var(--text)]">
-            Getting Project Syllabus into your school
-          </h2>
-          <p className="mx-auto mb-8 max-w-xl text-[var(--text-body)]">
-            A school buys one code and hands it to its students. Everyone who types it in gets every
-            subject unlocked. There is nothing for teachers to set up and nothing for them to log
-            into, because your results are yours and nobody else sees them.
-          </p>
-          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link href="/pricing" className="btn btn-solid control-md px-6">
-              See how school access works
-            </Link>
-            <a
-              href="mailto:talalraisi1@gmail.com?subject=Project%20Syllabus%20for%20our%20school"
-              className="btn btn-quiet control-md px-6"
+            <p
+              className="mt-8 max-w-xl text-[17px] leading-[1.6]"
+              style={{ color: 'var(--text-body)' }}
             >
-              Contact us
-            </a>
+              Your whole syllabus, subtopic by subtopic, coloured by what you have actually proved
+              in a quiz. Nothing here is filled in by rating yourself out of five.
+            </p>
+
+            <div className="mt-10 flex flex-wrap items-center gap-3">
+              <button
+                className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-[14.5px] font-semibold text-white transition-transform duration-150 hover:-translate-y-px"
+                style={{ background: 'var(--brand-solid)' }}
+              >
+                Start free with one subject
+                <IconArrowRight width={17} height={17} />
+              </button>
+              <button
+                className="rounded-full border px-5 py-3.5 text-[14.5px] font-medium"
+                style={{ borderColor: 'var(--border-strong)', color: 'var(--text-body)' }}
+              >
+                See how it works
+              </button>
+            </div>
+
+            {/* The three things a student needs answered in the first ten
+                seconds, not a row of labels. */}
+            <dl
+              className="mt-20 grid gap-px border-t sm:grid-cols-3"
+              style={{ borderColor: 'var(--border)', background: 'var(--border)' }}
+            >
+              {[
+                ['One subject, free', 'No trial that expires. Keep it as long as you want.'],
+                ['No card, ever, to start', 'A school code opens the rest for nothing.'],
+                ['Your notes stay on your device', 'Nothing you paste or upload is sent anywhere or used to train anything.'],
+              ].map(([term, def]) => (
+                <div key={term} className="px-0 py-6 sm:px-6 sm:first:pl-0" style={{ background: 'var(--bg)' }}>
+                  <dt className="text-[13.5px] font-semibold">{term}</dt>
+                  <dd className="mt-1.5 text-[12.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                    {def}
+                  </dd>
+                </div>
+              ))}
+            </dl>
           </div>
-        </div>
-      </section>
+        </section>
 
-
-      {/* Detail. Written to be read by a person and quoted by a search engine. */}
-      <section className="border-t border-[var(--border)] px-5 py-20 md:px-8">
-        <div className="mx-auto max-w-5xl">
-          <h2 className="t-overline mb-3">Questions people ask</h2>
-          <p className="mb-10 max-w-2xl text-2xl font-semibold leading-snug text-[var(--text)]">
-            What Project Syllabus is, and how it works.
-          </p>
-
-          <div className="grid grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-2">
-            {FAQ.map(({ q, a }) => (
-              <div key={q}>
-                <h3 className="mb-2 text-base font-semibold text-[var(--text)]">{q}</h3>
-                <p className="text-sm leading-relaxed text-[var(--text-body)]">{a}</p>
-              </div>
+        {/* -------------------------------------------------------- coverage */}
+        <Section tint>
+          <div className="mx-auto grid max-w-4xl grid-cols-2 gap-x-8 gap-y-10 text-center md:grid-cols-4">
+            {[
+              [counts?.subjects ?? 173, '', 'subjects covered'],
+              [counts?.subtopics ?? 5914, '', 'subtopics mapped'],
+              [3, '', 'curricula'],
+              [5, '', 'levels of mastery'],
+            ].map(([v, suffix, l], i) => (
+              <Reveal key={l} delay={i * 70}>
+                <p className="text-[clamp(2rem,3.6vw,2.8rem)] font-semibold leading-none tracking-[-0.03em]">
+                  <CountUp to={v} suffix={suffix} />
+                </p>
+                <p className="mt-2.5 text-[13px]" style={{ color: 'var(--text-muted)' }}>{l}</p>
+              </Reveal>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Final call to action */}
-      <section className="px-5 py-20 md:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="mb-4 text-2xl font-semibold text-[var(--text)]">
-            Find out where you stand before the exam tells you.
-          </h2>
-          <Link href="/signup" className="btn btn-solid control-lg mt-2 px-8">
-            Create a free account
-            <IconArrowRight width={18} height={18} />
-          </Link>
-        </div>
-      </section>
+          <Reveal delay={280}>
+            <p
+              className="mx-auto mt-12 max-w-lg text-center text-[13.5px] leading-relaxed"
+              style={{ color: 'var(--text-faint)' }}
+            >
+              Question coverage is deeper in some subjects than others, and the app tells you
+              which rather than hiding it.
+            </p>
+          </Reveal>
+        </Section>
 
-      <footer className="border-t border-[var(--border)] bg-[var(--surface)] px-5 py-10 md:px-8">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 sm:flex-row">
-          <Image src={logoMark} alt="Project Syllabus" sizes="96px" style={{ height: 36, width: 'auto' }} />
-          <nav className="flex flex-wrap items-center justify-center gap-6">
-            <Link href="/about" className="t-small hover:text-[var(--text)]">
-              About
-            </Link>
-            <Link href="/pricing" className="t-small hover:text-[var(--text)]">
-              Pricing
-            </Link>
-            <Link href="/privacy" className="t-small hover:text-[var(--text)]">
-              Privacy
-            </Link>
-            <Link href="/terms" className="t-small hover:text-[var(--text)]">
-              Terms
-            </Link>
-            <Link href="/cookies" className="t-small hover:text-[var(--text)]">
-              Cookies
-            </Link>
-            <Link href="/refunds" className="t-small hover:text-[var(--text)]">
-              Refunds
-            </Link>
-            <Link href="/login" className="t-small hover:text-[var(--text)]">
-              Log in
-            </Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <ThemeToggle />
+        {/* --------------------------------------------------- how it works */}
+        <Section label="How it works">
+          <Heading className="max-w-xl">Three steps, and the second one is the point</Heading>
+
+          <div className="mt-14 grid gap-px md:grid-cols-3" style={{ background: 'var(--border)' }}>
+            {HOW_IT_WORKS.map(({ step, title, body }, i) => (
+              <Reveal
+                key={step}
+                delay={i * 80}
+                className="p-7 md:p-8"
+                style={{ background: 'var(--bg)' }}
+              >
+                <p
+                  className="mb-5 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
+                  style={{ color: 'var(--text-faint)' }}
+                >
+                  {step}
+                </p>
+                <h3 className="text-[18px] font-semibold leading-snug tracking-[-0.018em]">{title}</h3>
+                <p className="mt-3 text-[14.5px] leading-[1.7]" style={{ color: 'var(--text-body)' }}>
+                  {body}
+                </p>
+              </Reveal>
+            ))}
           </div>
-        </div>
+        </Section>
 
-        <div className="mx-auto mt-8 max-w-6xl border-t border-[var(--border)] pt-6 text-center">
-          <p className="t-caption">{operatorLine()}</p>
-          <p className="t-caption mt-1">
-            Student data handled under the {OPERATOR.law.en}.{' '}
-            <Link href="/privacy" className="text-[var(--brand)] hover:underline">
-              Privacy policy
-            </Link>
+        {/* ----------------------------------------------------------- try it */}
+        <Section label="Try it">
+          <div className="grid gap-10 md:grid-cols-[1fr_1.15fr] md:gap-14">
+            <div>
+              <Heading>Sit one, right here</Heading>
+              <p className="mt-5 text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                A real question from the bank. Pick a wrong answer on purpose and it will tell you
+                the specific mistake that leads there, rather than just showing you the right one.
+              </p>
+              <p className="mt-4 text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                Getting it right moves the subtopic by an amount that depends on how hard the
+                question was. Ten points is mastery, and you cannot get there on easy ones alone.
+              </p>
+            </div>
+            <TryQuestion />
+          </div>
+        </Section>
+
+        {/* ------------------------------------------------------ objections */}
+        <Section tint>
+          <Heading className="max-w-2xl">What students say goes wrong with tools like this</Heading>
+          <p className="mt-4 max-w-lg text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+            Taken from what IB students actually complain about. Here is what this does instead.
           </p>
+
+          <ul className="mt-10 flex flex-col gap-3">
+            {ANSWERS.map((a, i) => (
+              <Reveal
+                key={a.them}
+                as="li"
+                delay={i * 60}
+                className="lift grid gap-4 rounded-xl border p-5 md:grid-cols-[1fr_1.3fr] md:gap-8"
+                style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
+              >
+                <div className="flex gap-3">
+                  <IconClose width={16} height={16} className="mt-0.5 shrink-0" style={{ color: 'var(--weak)' }} />
+                  <p className="text-[14.5px] leading-snug" style={{ color: 'var(--text-muted)' }}>{a.them}</p>
+                </div>
+                <div className="flex gap-3">
+                  <IconCheck width={16} height={16} className="mt-0.5 shrink-0" style={{ color: 'var(--proficient)' }} />
+                  <p className="text-[14.5px] leading-snug">{a.us}</p>
+                </div>
+              </Reveal>
+            ))}
+          </ul>
+        </Section>
+
+        {/* --------------------------------------------------------- levels */}
+        <Section label="The ladder">
+          <Heading>Five levels, and only a quiz moves you</Heading>
+
+          <div className="mt-12 flex items-end gap-2 md:gap-3">
+            {[['Weak', 'weak', 26], ['Developing', 'developing', 44], ['Proficient', 'proficient', 66], ['Mastered', 'mastered', 100]].map(
+              ([label, key, h], i) => (
+                <div key={key} className="flex-1">
+                  <div
+                    className="cell rounded-t-lg"
+                    style={{ height: `${h * 1.5}px`, background: `var(--${key})`, animationDelay: `${i * 90}ms` }}
+                  />
+                  <p className="mt-3 text-[12.5px] font-medium">{label}</p>
+                </div>
+              )
+            )}
+            <div className="flex-1">
+              <div
+                className="cell rounded-lg border border-dashed"
+                style={{ height: '50px', borderColor: 'var(--fading)', animationDelay: '400ms' }}
+              />
+              <p className="mt-3 text-[12.5px] font-medium" style={{ color: 'var(--fading)' }}>Fading</p>
+            </div>
+          </div>
+
+          <p className="mt-9 max-w-xl text-[15px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+            Mastery is worth ten points and a harder question is worth more of them. Leave a
+            subtopic alone for long enough and it fades back, because that is what actually
+            happens to it.
+          </p>
+        </Section>
+
+        {/* ---------------------------------------------------------- decay */}
+        <Section label="Fading" tint>
+          <div className="grid gap-10 md:grid-cols-[1fr_1fr] md:gap-14">
+            <div>
+              <Heading>Drag time forward</Heading>
+              <p className="mt-5 text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                Something you proved in October is not something you know in May. Move the slider
+                and watch a subtopic you had mastered slip back into your plan.
+              </p>
+            </div>
+            <DecayDemo />
+          </div>
+
+          <Reveal
+            className="mt-12 rounded-2xl border p-6 md:p-8"
+            style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
+          >
+            <ForgettingCurve />
+          </Reveal>
+        </Section>
+
+        {/* --------------------------------------------------------- planner */}
+        <Section label="The plan">
+          <div className="grid gap-10 md:grid-cols-[1fr_1.1fr] md:gap-14">
+            <div>
+              <Heading>Tell it how long you have</Heading>
+              <p className="mt-5 text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                Five minutes or five hours. The list is ordered, and every line carries the reason
+                it is on there, so you can disagree with it rather than trust it.
+              </p>
+            </div>
+            <PlanDemo />
+          </div>
+        </Section>
+
+        {/* ------------------------------------------------------- features */}
+        <Section label="Features" tint>
+          <Heading className="max-w-2xl">Eight things, all of them working today</Heading>
+          <p className="mt-4 max-w-lg text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+            Shown rather than described, because a list of feature names tells you nothing about
+            whether any of it is any good.
+          </p>
+
+          <FeatureModules />
+
+        </Section>
+
+        {/* ---------------------------------------------------- why it works */}
+        <Section label="Why it works">
+          <Heading className="max-w-2xl">Six reasons, none of them about motivation</Heading>
+          <div className="mt-12 grid gap-x-14 gap-y-11 md:grid-cols-2">
+            {WHY.map(({ title, body }, i) => (
+              <Reveal key={title} delay={i * 55}>
+                <div className="mb-3 flex items-baseline gap-3">
+                  <span className="text-[12px] font-semibold tabular-nums" style={{ color: 'var(--text-faint)' }}>
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <h3 className="text-[17px] font-semibold leading-snug tracking-[-0.015em]">{title}</h3>
+                </div>
+                <p className="text-[14.5px] leading-[1.7]" style={{ color: 'var(--text-body)' }}>{body}</p>
+              </Reveal>
+            ))}
+          </div>
+        </Section>
+
+        {/* -------------------------------------------------------- schools */}
+        <Section tint>
+          <div className="grid items-center gap-10 md:grid-cols-[1.1fr_1fr]">
+            <div>
+              <Heading className="max-w-lg">One code opens it for the whole year group</Heading>
+              <p className="mt-5 max-w-lg text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                Students type the code in once. No cards, no seat counting, and every code has a
+                redemption limit so it cannot quietly become a public unlock.
+              </p>
+              <a
+                href={`mailto:${OPERATOR.dpoEmail}?subject=Project%20Syllabus%20for%20our%20school`}
+                className="mt-8 inline-flex items-center gap-2 rounded-full border px-5 py-3.5 text-[14.5px] font-medium"
+                style={{ borderColor: 'var(--border-strong)', color: 'var(--text-body)' }}
+              >
+                Talk to us about your school
+                <IconArrowRight width={16} height={16} />
+              </a>
+            </div>
+            <Reveal className="rounded-[12px] border p-6" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
+              <Heatmap cols={8} rows={5} subject="Physics SL · Class of 2028" />
+              <p className="mt-4 text-[12.5px]" style={{ color: 'var(--text-muted)' }}>
+                A teacher sees the same map for a class, without seeing anybody&rsquo;s individual answers.
+              </p>
+            </Reveal>
+          </div>
+        </Section>
+
+        {/* ------------------------------------------------------------ faq */}
+        <Section label="Questions people ask">
+          <Faq items={FAQ} />
+        </Section>
+
+        {/* ------------------------------------------------------------ cta */}
+        <Section>
+          <div className="mx-auto max-w-2xl text-center">
+            <Heading>Start with one subject. It stays free.</Heading>
+            <p className="mx-auto mt-5 max-w-lg text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+              One quiz is enough to fill in your first subtopic and start the plan.
+            </p>
+            <Link
+              href="/signup"
+              className="mt-9 inline-flex items-center gap-2 rounded-full px-7 py-4 text-[15px] font-semibold text-white transition-transform duration-150 hover:-translate-y-px"
+              style={{ background: 'var(--brand-solid)' }}
+            >
+              Create a free account
+              <IconArrowRight width={18} height={18} />
+            </Link>
+          </div>
+        </Section>
+      </main>
+
+      <footer className="border-t px-5 py-12 md:px-8" style={{ borderColor: 'var(--border)' }}>
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-6">
+          <p className="text-[13px]" style={{ color: 'var(--text-faint)' }}>
+            {operatorLine()}
+          </p>
+          <nav className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            {[
+              ['About', '/about'],
+              ['Pricing', '/pricing'],
+              ['Privacy', '/privacy'],
+              ['Terms', '/terms'],
+              ['Cookies', '/cookies'],
+              ['Refunds', '/refunds'],
+            ].map(([label, href]) => (
+              <Link key={href} href={href} className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
+                {label}
+              </Link>
+            ))}
+            <ThemeToggle />
+          </nav>
         </div>
       </footer>
-    </main>
+    </div>
   )
 }

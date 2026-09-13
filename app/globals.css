@@ -27,16 +27,33 @@
   --border-hover: #d1d5db;
 
   /* --- Status. Five levels of knowledge, plus untested. --------------------
+     Rebuilt in OKLCH, where equal numbers look equally light to the eye. These
+     were Tailwind defaults — blue-500, red-500, yellow-500, green-600,
+     violet-600 — five unrelated hues at the same punchy saturation sharing
+     nothing with each other or with the brand. All five now sit at one
+     lightness and one restrained chroma with hue doing the work: clay, ochre,
+     green, indigo, steel. Weak to Mastered reads as a progression rather than
+     five alarms, and a heatmap of them looks designed rather than assembled.
+     Kept muted on purpose: saturated primaries make an interface feel like a
+     game, and this one exists to tell students the truth.
      Untested is not a level, it is the absence of one, so it stays neutral
      grey and never competes with the colours that carry meaning. Mastered is
      purple rather than the brand green so that "the best state" is not the
      same colour as every button on the page. ------------------------------- */
-  --status-fading: #3b82f6;      /* was mastered, slipping */
-  --status-weak: #ef4444;        /* proven wrong */
-  --status-developing: #eab308;  /* getting there */
-  --status-proficient: #16a34a;  /* reliable */
-  --status-mastered: #7c3aed;    /* solid and recent */
+  --status-fading: oklch(0.60 0.07 240);      /* was mastered, slipping */
+  --status-weak: oklch(0.56 0.13 35);        /* proven wrong */
+  --status-developing: oklch(0.62 0.11 75);  /* getting there */
+  --status-proficient: oklch(0.56 0.11 155);  /* reliable */
+  --status-mastered: oklch(0.52 0.11 285);    /* solid and recent */
   --status-untested: #e5e7eb;
+
+  /* Declared explicitly, because the dark block declares its own.
+     Without this the browser keeps its dark UA defaults whenever the operating
+     system prefers dark, even with data-theme="light" set — and the system
+     default that leaks through is `buttontext`, which is white. Every button
+     that does not set its own colour then renders white text on a white
+     surface in light mode. */
+  color-scheme: light;
 
   /* A solid button's background is a different job from a link's colour, and
      they need different greens to stay readable. Kept apart so darkening the
@@ -124,11 +141,11 @@
   --border-strong: #2f3833;
   --border-hover: #414d46;
 
-  --status-fading: #60a5fa;
-  --status-weak: #f0645f;
-  --status-developing: #d9b545;
-  --status-proficient: #4fb87a;
-  --status-mastered: #a78bfa;
+  --status-fading: oklch(0.64 0.08 240);
+  --status-weak: oklch(0.62 0.14 35);
+  --status-developing: oklch(0.68 0.12 75);
+  --status-proficient: oklch(0.66 0.13 155);
+  --status-mastered: oklch(0.62 0.14 285);
   --status-untested: #2f3833;
 
   /* White text on #4c9c74 is 3.33:1, so the primary call to action failed on
@@ -177,6 +194,16 @@
   --color-review: var(--status-decaying);
   --color-solid: var(--success-text);
   --color-mastered: var(--status-mastered);
+}
+
+/* Form controls default to system colours such as `buttontext`, which follow
+   color-scheme rather than the palette. Inheriting keeps them on the theme. */
+button,
+input,
+select,
+textarea {
+  color: inherit;
+  font: inherit;
 }
 
 body {
@@ -634,4 +661,175 @@ body {
   .card-flip { transition: none; }
   .card-enter-next,
   .card-enter-prev { animation: none; }
+}
+
+/* ===========================================================================
+   Marketing motion.
+
+   Used by the homepage only. Reveals are driven by the browser's own scroll
+   timeline rather than by JavaScript, for two reasons: the resting state is
+   visible, so a failure can never leave the page blank, and being tied to real
+   viewport position means it behaves when the page is restored mid-scroll or
+   jumped into by an anchor. Where scroll timelines are unsupported the content
+   simply appears, which is the right trade — the animation is decoration and
+   the words are not.
+   =========================================================================== */
+/* --- Motion: entrances, once, fast. --------------------------------------- */
+
+@keyframes rv-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes rv-cell {
+  from { opacity: 0; transform: scale(0.72); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes rv-grow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+.rise { animation: rv-rise 560ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.cell { animation: rv-cell 420ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.grow { transform-origin: left; animation: rv-grow 820ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rise, .cell, .grow { animation: none; }
+}
+
+/* --- Hover. Lift and a border that warms, nothing that glows. -------------- */
+
+.lift {
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 220ms ease,
+              background-color 220ms ease;
+}
+.lift:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-strong);
+}
+
+/* A feature row whose marker grows into a rule as you point at it. */
+.mark {
+  transition: width 260ms cubic-bezier(0.16, 1, 0.3, 1), opacity 260ms ease;
+}
+.feat:hover .mark {
+  width: 3.25rem;
+}
+
+/* Rows in a list: the arrow arrives rather than appearing. */
+.row .go {
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 200ms ease, transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.row:hover .go {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lift, .mark, .row .go { transition: none; }
+  .lift:hover { transform: none; }
+}
+
+/* --- Pinned steps. -------------------------------------------------------
+   Above the breakpoint the section pins and only the active step is lit, so
+   dimming and collapsing carry the sequence. Below it there is no pinning and
+   nothing is "active", so every step has to read in full or two thirds of the
+   copy would be invisible on a phone. ------------------------------------- */
+
+.step { opacity: 1; }
+.step-body { max-height: none; opacity: 1; overflow: visible; }
+
+@media (min-width: 768px) {
+  .step { opacity: 0.38; }
+  .step[data-on='true'] { opacity: 1; }
+  .step-body {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 500ms cubic-bezier(0.16, 1, 0.3, 1), opacity 400ms ease;
+  }
+  .step[data-on='true'] .step-body { max-height: 150px; opacity: 1; }
+}
+
+/* --- Hero ground. --------------------------------------------------------
+   A faint ruled grid, masked so it fades out rather than ending at an edge.
+   Chosen because it reads as drafting paper and precision instruments, which
+   is the register this product wants; a mesh gradient or a glowing blob would
+   read as a landing page template. It is behind the words and never competes
+   with them. ------------------------------------------------------------- */
+
+.ground {
+  position: relative;
+  isolation: isolate;
+}
+
+.ground::before {
+  content: '';
+  position: absolute;
+  inset: -1px 0 0 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+  background-size: 72px 72px;
+  -webkit-mask-image: radial-gradient(ellipse 78% 70% at 22% 34%, #000 0%, transparent 72%);
+  mask-image: radial-gradient(ellipse 78% 70% at 22% 34%, #000 0%, transparent 72%);
+  opacity: 0.75;
+}
+
+/* A single hairline under the hero, so the section ends deliberately. */
+.ground::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--border);
+  z-index: -1;
+}
+
+/* --- Reveal on scroll, without JavaScript. -------------------------------
+   Driven by the browser's own scroll timeline. Two reasons this is better than
+   an IntersectionObserver:
+
+   It cannot hide anything. The resting state is visible, and the animation
+   only ever plays where `animation-timeline: view()` is supported. Every
+   earlier attempt started at opacity zero and therefore had a failure mode
+   where the page rendered as a headline above an empty column — first when the
+   observer never fired, then again when the guard against that revealed
+   everything at once on load.
+
+   And it actually tracks the scroll. An observer fires once on a threshold;
+   this is tied to the element's real position in the viewport, so it behaves
+   correctly when the page is restored mid-scroll, resized, or jumped into by
+   an anchor link.
+
+   Where it is unsupported, content simply appears. That is the right trade:
+   the animation is decoration and the words are not.
+   ------------------------------------------------------------------------- */
+
+.rv-reveal {
+  opacity: 1;
+  transform: none;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes rv-enter {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    .rv-reveal {
+      animation: rv-enter linear both;
+      animation-timeline: view();
+      /* Finish well before the element reaches the middle of the screen, so it
+         is settled by the time it is being read rather than still arriving. */
+      animation-range: entry 0% cover 34%;
+    }
+  }
 }

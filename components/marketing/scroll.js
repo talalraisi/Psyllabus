@@ -305,15 +305,15 @@ export function ForgettingCurve() {
         {[0, 0.5, 1].map((v) => (
           <line key={v} x1={pad.l} x2={W - pad.r} y1={y(v)} y2={y(v)} stroke="var(--border)" />
         ))}
-        <text x={pad.l - 8} y={y(1) + 4} textAnchor="end" fontSize="10" fill="var(--faint)">100%</text>
-        <text x={pad.l - 8} y={y(0.5) + 4} textAnchor="end" fontSize="10" fill="var(--faint)">50%</text>
-        <text x={pad.l - 8} y={y(0) + 4} textAnchor="end" fontSize="10" fill="var(--faint)">0</text>
+        <text x={pad.l - 8} y={y(1) + 4} textAnchor="end" fontSize="10" fill="var(--text-faint)">100%</text>
+        <text x={pad.l - 8} y={y(0.5) + 4} textAnchor="end" fontSize="10" fill="var(--text-faint)">50%</text>
+        <text x={pad.l - 8} y={y(0) + 4} textAnchor="end" fontSize="10" fill="var(--text-faint)">0</text>
 
         {/* Never revisited. */}
         <path
           d={neverAgain}
           fill="none"
-          stroke="var(--weak)"
+          stroke="var(--status-weak)"
           strokeWidth="2"
           strokeLinecap="round"
           style={{
@@ -331,7 +331,7 @@ export function ForgettingCurve() {
             x2={x(at)}
             y1={y(lowAt(i))}
             y2={y(1)}
-            stroke="var(--proficient)"
+            stroke="var(--status-proficient)"
             strokeWidth="1.5"
             strokeDasharray="3 3"
             style={{
@@ -347,7 +347,7 @@ export function ForgettingCurve() {
             key={i}
             d={d}
             fill="none"
-            stroke="var(--proficient)"
+            stroke="var(--status-proficient)"
             strokeWidth="2.75"
             strokeLinecap="round"
             style={{
@@ -364,27 +364,27 @@ export function ForgettingCurve() {
             cx={x(at)}
             cy={y(1)}
             r="4"
-            fill="var(--proficient)"
+            fill="var(--status-proficient)"
             style={{ opacity: seen ? 1 : 0, transition: `opacity 260ms ease ${i * 300}ms` }}
           />
         ))}
 
-        <text x={pad.l} y={H - 12} fontSize="10" fill="var(--faint)">the day you learn it</text>
-        <text x={W - pad.r} y={H - 12} fontSize="10" fill="var(--faint)" textAnchor="end">the exam</text>
+        <text x={pad.l} y={H - 12} fontSize="10" fill="var(--text-faint)">the day you learn it</text>
+        <text x={W - pad.r} y={H - 12} fontSize="10" fill="var(--text-faint)" textAnchor="end">the exam</text>
       </svg>
 
       <div className="mt-5 flex flex-wrap gap-x-7 gap-y-2">
-        <span className="flex items-center gap-2 text-[12.5px]" style={{ color: 'var(--muted)' }}>
-          <span className="h-[2px] w-5 rounded-full" style={{ background: 'var(--weak)' }} />
+        <span className="flex items-center gap-2 text-[12.5px]" style={{ color: 'var(--text-muted)' }}>
+          <span className="h-[2px] w-5 rounded-full" style={{ background: 'var(--status-weak)' }} />
           never went back
         </span>
-        <span className="flex items-center gap-2 text-[12.5px]" style={{ color: 'var(--muted)' }}>
-          <span className="h-[3px] w-5 rounded-full" style={{ background: 'var(--proficient)' }} />
+        <span className="flex items-center gap-2 text-[12.5px]" style={{ color: 'var(--text-muted)' }}>
+          <span className="h-[3px] w-5 rounded-full" style={{ background: 'var(--status-proficient)' }} />
           retested four times
         </span>
       </div>
 
-      <p className="mt-3 text-[13.5px] leading-relaxed" style={{ color: 'var(--faint)' }}>
+      <p className="mt-3 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
         Same memory, same starting point. Each dotted line is a retest, and every fall after one
         is shallower than the last.
       </p>
@@ -401,13 +401,13 @@ export function MasteryRing({ pct, label, tone = 'proficient', size = 132 }) {
   return (
     <div ref={ref} className="flex flex-col items-center">
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--sunken)" strokeWidth="9" />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--surface-sunken)" strokeWidth="9" />
         <circle
           cx={size / 2}
           cy={size / 2}
           r={r}
           fill="none"
-          stroke={`var(--${tone})`}
+          stroke={`var(--status-${tone})`}
           strokeWidth="9"
           strokeLinecap="round"
           strokeDasharray={c}
@@ -418,7 +418,7 @@ export function MasteryRing({ pct, label, tone = 'proficient', size = 132 }) {
         />
       </svg>
       <p className="-mt-[calc(50%+6px)] text-[22px] font-semibold tabular-nums">{pct}%</p>
-      <p className="mt-[calc(50%-14px)] text-[12.5px]" style={{ color: 'var(--muted)' }}>
+      <p className="mt-[calc(50%-14px)] text-[12.5px]" style={{ color: 'var(--text-muted)' }}>
         {label}
       </p>
     </div>
@@ -455,11 +455,11 @@ export function StickySteps({ steps, render }) {
                   data-on={on ? 'true' : 'false'}
                   style={{ borderColor: on ? 'var(--brand)' : 'var(--border)' }}
                 >
-                  <p className="mb-1.5 text-[12px] font-semibold tabular-nums" style={{ color: on ? 'var(--brand)' : 'var(--faint)' }}>
+                  <p className="mb-1.5 text-[12px] font-semibold tabular-nums" style={{ color: on ? 'var(--brand)' : 'var(--text-faint)' }}>
                     {s.step}
                   </p>
                   <h3 className="text-[19px] font-semibold tracking-[-0.018em]">{s.title}</h3>
-                  <p className="step-body mt-2 text-[14.5px] leading-relaxed" style={{ color: 'var(--body)' }}>
+                  <p className="step-body mt-2 text-[14.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
                     {s.body}
                   </p>
                 </div>

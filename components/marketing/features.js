@@ -26,7 +26,7 @@ function Label({ children }) {
   return (
     <p
       className="text-[10.5px] font-semibold uppercase tracking-[0.16em]"
-      style={{ color: 'var(--faint)' }}
+      style={{ color: 'var(--text-faint)' }}
     >
       {children}
     </p>
@@ -67,7 +67,7 @@ function GraphicHeatmap() {
             key={i}
             className="aspect-square rounded-[2px]"
             style={{
-              background: `var(--${t})`,
+              background: `var(--status-${t})`,
               opacity: seen ? 1 : 0,
               transform: seen ? 'none' : 'scale(0.7)',
               transition: `all 320ms cubic-bezier(0.16,1,0.3,1) ${i * 26}ms`,
@@ -92,13 +92,13 @@ function GraphicFade() {
           ['Day 24', 'fading', 22],
         ].map(([d, tone, w], i) => (
           <div key={d} className="flex items-center gap-3">
-            <span className="w-12 text-[10.5px] tabular-nums" style={{ color: 'var(--faint)' }}>{d}</span>
+            <span className="w-12 text-[10.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>{d}</span>
             <span className="h-[7px] flex-1 overflow-hidden rounded-full" style={{ background: 'var(--border)' }}>
               <span
                 className="block h-full rounded-full"
                 style={{
                   width: seen ? `${w}%` : 0,
-                  background: `var(--${tone})`,
+                  background: `var(--status-${tone})`,
                   transition: `width 700ms cubic-bezier(0.16,1,0.3,1) ${i * 110}ms`,
                 }}
               />
@@ -134,14 +134,14 @@ function GraphicMistakes() {
             }}
           >
             <span className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full" style={{ background: `var(--${tone})` }} />
-              <span className="text-[11.5px]" style={{ color: 'var(--body)' }}>Question you got wrong</span>
+              <span className="h-1.5 w-1.5 rounded-full" style={{ background: `var(--status-${tone})` }} />
+              <span className="text-[11.5px]" style={{ color: 'var(--text-body)' }}>Question you got wrong</span>
             </span>
-            <span className="text-[10.5px] tabular-nums" style={{ color: 'var(--faint)' }}>{when}</span>
+            <span className="text-[10.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>{when}</span>
           </div>
         ))}
       </div>
-      <p className="mt-3 text-[10.5px]" style={{ color: 'var(--faint)' }}>
+      <p className="mt-3 text-[10.5px]" style={{ color: 'var(--text-faint)' }}>
         Right each time and the gap widens until it drops out of the bank. Wrong and it starts
         over.
       </p>
@@ -157,7 +157,7 @@ function GraphicPacing() {
       <div ref={ref}>
         <div className="mb-3 flex items-baseline justify-between">
           <span className="text-[19px] font-semibold tabular-nums">42:08</span>
-          <span className="text-[10.5px] tabular-nums" style={{ color: 'var(--muted)' }}>
+          <span className="text-[10.5px] tabular-nums" style={{ color: 'var(--text-muted)' }}>
             1.4 / 1.6 marks per min
           </span>
         </div>
@@ -166,13 +166,13 @@ function GraphicPacing() {
             className="absolute inset-y-0 left-0 rounded-full"
             style={{
               width: seen ? '62%' : 0,
-              background: 'var(--developing)',
+              background: 'var(--status-developing)',
               transition: 'width 900ms cubic-bezier(0.16,1,0.3,1)',
             }}
           />
           <span className="absolute inset-y-0 w-[2px]" style={{ left: '72%', background: 'var(--text)' }} />
         </div>
-        <p className="mt-2.5 text-[10.5px]" style={{ color: 'var(--faint)' }}>
+        <p className="mt-2.5 text-[10.5px]" style={{ color: 'var(--text-faint)' }}>
           The tick is the pace you need. You are behind it.
         </p>
       </div>
@@ -190,20 +190,32 @@ function GraphicCalendar() {
         {Array.from({ length: 28 }, (_, i) => (
           <span
             key={i}
-            className="flex aspect-square items-center justify-center rounded-[3px] text-[9.5px] tabular-nums"
+            className="relative flex aspect-square items-center justify-center rounded-[3px] text-[9.5px] tabular-nums"
             style={{
-              background: marks[i] ? `var(--${marks[i]})` : 'var(--surface)',
-              color: marks[i] ? '#fff' : 'var(--faint)',
-              border: marks[i] ? 'none' : '1px solid var(--border)',
+              background: 'var(--surface)',
+              // White numerals on a light status colour came out at 2.9:1 at
+              // ten pixels. A marked day is now ringed and underlined instead,
+              // so the colour still says which day it is without a legibility
+              // problem, and the number stays on the surface it was designed
+              // against.
+              color: marks[i] ? 'var(--text)' : 'var(--text-faint)',
+              border: `1px solid ${marks[i] ? `var(--status-${marks[i]})` : 'var(--border)'}`,
+              fontWeight: marks[i] ? 600 : 400,
               opacity: seen ? 1 : 0,
               transition: `opacity 300ms ease ${i * 14}ms`,
             }}
           >
             {i + 1}
+            {marks[i] && (
+              <span
+                className="absolute inset-x-1 bottom-[2px] h-[2px] rounded-full"
+                style={{ background: `var(--status-${marks[i]})` }}
+              />
+            )}
           </span>
         ))}
       </div>
-      <p className="mt-3 text-[10.5px]" style={{ color: 'var(--faint)' }}>
+      <p className="mt-3 text-[10.5px]" style={{ color: 'var(--text-faint)' }}>
         A test on the 11th pulls that subject up the plan from the 4th.
       </p>
     </Frame>
@@ -232,7 +244,7 @@ function GraphicTimer() {
       </div>
       <div>
         <p className="text-[17px] font-semibold tabular-nums">27:14</p>
-        <p className="text-[10.5px]" style={{ color: 'var(--faint)' }}>
+        <p className="text-[10.5px]" style={{ color: 'var(--text-faint)' }}>
           block 2 of 3 · keeps running as you move around
         </p>
       </div>
@@ -265,12 +277,12 @@ function GraphicResources() {
               >
                 {kind}
               </span>
-              <span className="truncate text-[11.5px]" style={{ color: 'var(--body)' }}>{title}</span>
+              <span className="truncate text-[11.5px]" style={{ color: 'var(--text-body)' }}>{title}</span>
             </div>
           )
         )}
       </div>
-      <p className="mt-3 text-[10.5px]" style={{ color: 'var(--faint)' }}>
+      <p className="mt-3 text-[10.5px]" style={{ color: 'var(--text-faint)' }}>
         Opens on the creator&rsquo;s own site. Nothing rehosted.
       </p>
     </Frame>
@@ -286,10 +298,10 @@ function GraphicPrediction() {
         <div className="mb-3 flex items-end justify-between">
           <span>
             <span className="text-[27px] font-semibold tabular-nums">34</span>
-            <span className="text-[13px]" style={{ color: 'var(--muted)' }}> / 45</span>
+            <span className="text-[13px]" style={{ color: 'var(--text-muted)' }}> / 45</span>
           </span>
           <span className="text-right">
-            <span className="block text-[10.5px]" style={{ color: 'var(--faint)' }}>you want</span>
+            <span className="block text-[10.5px]" style={{ color: 'var(--text-faint)' }}>you want</span>
             <span className="text-[15px] font-semibold tabular-nums">38</span>
           </span>
         </div>
@@ -298,13 +310,13 @@ function GraphicPrediction() {
             className="absolute inset-y-0 left-0 rounded-full"
             style={{
               width: seen ? '75.5%' : 0,
-              background: 'var(--proficient)',
+              background: 'var(--status-proficient)',
               transition: 'width 900ms cubic-bezier(0.16,1,0.3,1)',
             }}
           />
           <span className="absolute inset-y-0 w-[2px]" style={{ left: '84.4%', background: 'var(--text)' }} />
         </div>
-        <p className="mt-2.5 text-[10.5px]" style={{ color: 'var(--faint)' }}>
+        <p className="mt-2.5 text-[10.5px]" style={{ color: 'var(--text-faint)' }}>
           Based on 41% of your syllabus, so it says medium confidence.
         </p>
       </div>
@@ -312,7 +324,7 @@ function GraphicPrediction() {
   )
 }
 
-export const FEATURE_MODULES = [
+const FEATURE_MODULES = [
   {
     label: 'The map',
     title: 'A heatmap you cannot fake',
@@ -362,5 +374,44 @@ export const FEATURE_MODULES = [
     Graphic: GraphicPrediction,
   },
 ]
+
+/**
+ * The modules render themselves.
+ *
+ * FEATURE_MODULES holds references to client components, so a server component
+ * importing the array receives a client reference rather than the array and
+ * `.map` is not a function. Keeping the loop on this side of the boundary is
+ * the fix, and it keeps the graphics private to this file, which they should
+ * be anyway.
+ */
+export function FeatureModules() {
+  return (
+    <div className="mt-14 flex flex-col">
+      {FEATURE_MODULES.map(({ label, title, body, Graphic }, i) => (
+        <article
+          key={title}
+          className="rv-reveal grid gap-8 border-t py-10 md:grid-cols-[0.9fr_1.1fr] md:gap-14 md:py-12"
+          style={{ borderColor: 'var(--border)' }}
+        >
+          <div className={i % 2 === 1 ? 'md:order-2' : undefined}>
+            <p
+              className="mb-3 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
+              style={{ color: 'var(--text-faint)' }}
+            >
+              {String(i + 1).padStart(2, '0')} · {label}
+            </p>
+            <h3 className="text-[20px] font-semibold leading-snug tracking-[-0.02em]">{title}</h3>
+            <p className="mt-3 text-[14.5px] leading-[1.7]" style={{ color: 'var(--text-body)' }}>
+              {body}
+            </p>
+          </div>
+          <div className={i % 2 === 1 ? 'md:order-1' : undefined}>
+            <Graphic />
+          </div>
+        </article>
+      ))}
+    </div>
+  )
+}
 
 export { Label }
