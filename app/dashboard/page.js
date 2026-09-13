@@ -10,6 +10,7 @@ import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader, Section, StatRow, PageLoading } from '@/components/PageShell'
 import { IconChevronRight, IconArrowRight, IconCheck, IconClock } from '@/components/Icons'
 import { buildQueue, buildSession } from '@/lib/planner'
+import { relativeDay } from '@/lib/calendar'
 import SubjectWheel from '@/components/SubjectWheel'
 import { getSlugForSubject } from '@/lib/subject-map'
 import {
@@ -25,8 +26,8 @@ import { buildEffectiveProgressMap, buildProgressDetailMap } from '@/lib/decay'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
 import { isPremium, isSubjectLocked } from '@/lib/access'
 
-function greeting() {
-  const hour = new Date().getHours()
+function greeting(now) {
+  const hour = now.getHours()
   if (hour < 12) return 'Good morning'
   if (hour < 18) return 'Good afternoon'
   return 'Good evening'
@@ -38,6 +39,11 @@ export default function Dashboard() {
   const [breakdown, setBreakdown] = useState({})
   const [sizes, setSizes] = useState({})
   const [topics, setTopics] = useState({})
+  // The greeting and the date are read once, on the client, when the data
+  // lands. Reading the clock while rendering makes the component impure, and
+  // the answer would be the server's time zone rather than the student's.
+  const [now, setNow] = useState(null)
+  const [nextEvent, setNextEvent] = useState(null)
   const [overall, setOverall] = useState(0)
   const [counts, setCounts] = useState({ mastered: 0, weak: 0, decaying: 0, due: 0, tested: 0 })
   const [session, setSession] = useState({ items: [], perItemMinutes: 0 })
@@ -127,6 +133,11 @@ export default function Dashboard() {
       })
       setSession(buildSession(queue, { minutes: profileData.session_minutes || undefined }))
 
+      const pending = (eventsResult?.data || [])
+        .filter((e) => new Date(e.due_at).getTime() >= Date.now())
+        .sort((a, b) => new Date(a.due_at) - new Date(b.due_at))
+      setNextEvent(pending[0] || null)
+      setNow(new Date())
       setSubjectStats(stats)
       setBreakdown(tallies)
       setTopics(byTopic)
@@ -158,6 +169,24 @@ export default function Dashboard() {
   // study plan; a dashboard that lists nine subtopics is a to-do list, and a
   // to-do list that long is one nobody opens.
   const rest = session.items.slice(0, 4)
+
+  /**
+   * The second line of the header.
+   *
+   * It used to read "IB · Class of 2027", which is two facts the student
+   * entered themselves and has not needed since. Today's date and what is
+   * actually waiting is the same amount of room spent on something they might
+   * not know.
+   */
+  const subtitle = !hasActivity
+    ? 'Welcome to Project Syllabus'
+    : [
+        now?.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' }),
+        counts.due > 0 ? `${counts.due} review${counts.due === 1 ? '' : 's'} due` : null,
+        nextEvent ? `${nextEvent.title} ${relativeDay(nextEvent.due_at)}` : null,
+      ]
+        .filter(Boolean)
+        .join(' · ')
   const firstSubject = subjects[0]
   const startHref = firstSubject
     ? `/dashboard/syllabus/${getSlugForSubject(firstSubject)}`
@@ -167,12 +196,8 @@ export default function Dashboard() {
     <DashboardLayout profile={profile}>
       <Page width="wide">
         <PageHeader
-          title={`${greeting()}, ${firstName}`}
-          subtitle={
-            hasActivity
-              ? `${profile.curriculum} · Class of ${profile.grad_year}`
-              : 'Welcome to Project Syllabus'
-          }
+          title={`${now ? greeting(now) : 'Hello'}, ${firstName}`}
+          subtitle={subtitle}
         />
 
         {!hasActivity ? (
