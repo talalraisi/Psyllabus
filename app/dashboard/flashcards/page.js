@@ -295,13 +295,17 @@ export default function FlashcardsPage() {
               </button>
             )}
 
-            <ul className="surface">
+            <ul className="flex flex-col">
               {inScope.map((c, i) => (
-                <li key={c.id} className={i > 0 ? 'border-t border-[var(--border)]' : undefined}>
-                  <div className="flex items-start gap-4 px-5 py-4">
+                <li
+                  key={c.id}
+                  className="border-b last:border-b-0"
+                  style={{ borderColor: 'var(--border)' }}
+                >
+                  <div className="flex items-start gap-4 px-1 py-3.5">
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-[var(--text)]">{c.front}</p>
-                      <p className="t-small mt-1 line-clamp-2">{c.back}</p>
+                      <p className="text-[14.5px] font-medium">{c.front}</p>
+                      <p className="mt-1 line-clamp-2 text-[13.5px]" style={{ color: 'var(--text-muted)' }}>{c.back}</p>
                       <p className="t-caption mt-2">
                         {c.subtopic ? `${displaySubtopic(c.subtopic)} · ` : ''}
                         <span className={isDue(c) ? 'text-[var(--brand)]' : ''}>{dueLabel(c)}</span>
@@ -341,7 +345,7 @@ export default function FlashcardsPage() {
             />
 
             {error && (
-              <div className="mb-6 rounded-[var(--r-md)] border border-[var(--danger-border)] bg-[var(--danger-bg)] px-4 py-3">
+              <div className="mb-6 border-l-2 pl-4" style={{ borderColor: 'var(--danger)' }}>
                 <p className="text-sm text-[var(--danger)]">{error}</p>
               </div>
             )}
@@ -360,27 +364,38 @@ export default function FlashcardsPage() {
                       setOpenDeck(d.subject)
                       setOpenSubtopic(null)
                     }}
-                    className="surface surface-interactive flex flex-col justify-between gap-4 p-5 text-left"
+                    className="flex flex-col justify-between gap-5 rounded-[12px] border p-5 text-left transition-colors duration-150 hover:border-[var(--border-hover)]"
+                    style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <h3 className="text-sm font-semibold text-[var(--text)]">{d.subject}</h3>
-                      <span className="text-[var(--text-faint)]">
-                        <IconCards width={18} height={18} />
+                      <h3 className="text-[15px] font-semibold tracking-[-0.015em]">{d.subject}</h3>
+                      <span style={{ color: 'var(--text-faint)' }}>
+                        <IconCards width={17} height={17} />
                       </span>
                     </div>
                     <div>
-                      <p className="t-stat text-[var(--text)]">{d.total}</p>
-                      <p className="t-caption mt-0.5">
+                      <p className="text-[26px] font-semibold leading-none tracking-[-0.028em] tabular-nums">
+                        {d.total}
+                      </p>
+                      <p className="mt-2 text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
                         {d.due > 0 ? (
-                          <span className="font-medium text-[var(--brand)]">{d.due} due now</span>
+                          <span className="font-medium" style={{ color: 'var(--brand)' }}>
+                            {d.due} due now
+                          </span>
                         ) : (
                           'nothing due'
                         )}
                       </p>
-                      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[var(--surface-sunken)]">
+                      <div
+                        className="mt-4 h-1 overflow-hidden rounded-full"
+                        style={{ background: 'var(--border-strong)' }}
+                      >
                         <div
-                          className="h-full rounded-full bg-[var(--brand)]"
-                          style={{ width: `${d.total ? (d.due / d.total) * 100 : 0}%` }}
+                          className="h-full rounded-full"
+                          style={{
+                            width: `${d.total ? (d.due / d.total) * 100 : 0}%`,
+                            background: 'var(--brand)',
+                          }}
                         />
                       </div>
                     </div>
@@ -391,11 +406,11 @@ export default function FlashcardsPage() {
 
             {/* ----------------------------------------------------- adding */}
 
-            <div className="surface p-5">
+            <div className="border-t pt-6" style={{ borderColor: 'var(--border)' }}>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="min-w-0">
-                  <h2 className="text-sm font-semibold text-[var(--text)]">Add cards</h2>
-                  <p className="t-caption mt-0.5">
+                  <h2 className="text-[15px] font-semibold tracking-[-0.012em]">Add cards</h2>
+                  <p className="mt-1 text-[13px]" style={{ color: 'var(--text-muted)' }}>
                     Write them one at a time, or turn a page of notes into a set.
                   </p>
                 </div>
@@ -500,15 +515,19 @@ export default function FlashcardsPage() {
             {/* Approval. Whatever made the cards, they are checked the same way
                 before anything is written. */}
             {proposed?.length > 0 && (
-              <div className="surface mt-3 p-5">
+              <div className="mt-6 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
                 <p className="t-small mb-3">
                   {proposed.length} card{proposed.length === 1 ? '' : 's'} found. Check them before
                   adding.
                 </p>
                 <ul className="mb-4 flex max-h-72 flex-col gap-2 overflow-y-auto">
                   {proposed.map((c, i) => (
-                    <li key={i} className="rounded-[var(--r-md)] border border-[var(--border-strong)] p-3">
-                      <p className="text-sm font-medium text-[var(--text)]">{c.front}</p>
+                    <li
+                      key={i}
+                      className="rounded-xl border p-4"
+                      style={{ borderColor: 'var(--border-strong)' }}
+                    >
+                      <p className="text-[14.5px] font-medium">{c.front}</p>
                       <p className="t-small mt-1">{c.back}</p>
                     </li>
                   ))}

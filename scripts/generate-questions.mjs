@@ -1010,6 +1010,13 @@ async function generateBatch(subtopic, topic, count, existingStems, { round = 0,
 
   if (isTextSubject) return generateTextBatch(subtopic, topic, count, existingStems, { round, type });
 
+  // This was referenced in the prompt below but never defined, so every batch
+  // for a non-literature subject threw a ReferenceError before a single
+  // question was written. Only calculation subjects get past the return above,
+  // so the rule applies unconditionally here.
+  const numericRule =
+    "\n\nWhere a question is a calculation, work it out in full yourself before writing the options, and give the answer to a sensible number of significant figures with its unit. Every distractor must be a value a student could actually arrive at by making one identifiable mistake.";
+
   const shared = `You are writing exam questions for the ${CURRICULUM} subject "${SUBJECT}", ${topic}, subtopic "${subtopic}".
 
 Write them at these difficulties, in this order:

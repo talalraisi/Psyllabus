@@ -8,6 +8,8 @@ import HeatBadge from '@/components/HeatBadge'
 import QuestionFigure from '@/components/QuestionFigure'
 import QuestionStimulus from '@/components/QuestionStimulus'
 import ReportQuestion from '@/components/ReportQuestion'
+import { EmptyState } from '@/components/PageShell'
+import { IconCheck, IconClose } from '@/components/Icons'
 import { gradeAnswer } from '@/lib/grading'
 import { createClient } from '@/lib/supabase'
 import {
@@ -89,14 +91,25 @@ function formatClock(totalSeconds) {
 // Bands live in lib/progress.js so the quiz, the heatmap and the legend can
 // never disagree about what a score means.
 
+/** Mirrors the quiz itself: rail, stem, four options. No card, because the
+ *  quiz has no card either, and a skeleton that is the wrong shape reads as
+ *  the page breaking rather than loading. */
 function Skeleton() {
   return (
-    <div className="surface p-6 animate-pulse space-y-4">
-      <div className="h-4 w-24 bg-[var(--surface-sunken)] rounded" />
-      <div className="h-6 w-2/3 bg-[var(--surface-sunken)] rounded" />
-      <div className="h-10 w-full bg-[var(--surface-sunken)] rounded-lg" />
-      <div className="h-10 w-full bg-[var(--surface-sunken)] rounded-lg" />
-      <div className="h-10 w-full bg-[var(--surface-sunken)] rounded-lg" />
+    <div aria-hidden="true">
+      <div className="flex gap-1">
+        {Array.from({ length: 10 }).map((_, i) => (
+          <div key={i} className="skeleton h-1 flex-1 rounded-full" />
+        ))}
+      </div>
+      <div className="skeleton mt-6 h-3.5 w-40 rounded" />
+      <div className="skeleton mt-6 h-4 w-full rounded" />
+      <div className="skeleton mt-2 h-4 w-2/3 rounded" />
+      <div className="mt-7 flex flex-col gap-2">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="skeleton h-[52px] w-full rounded-xl" />
+        ))}
+      </div>
     </div>
   )
 }
@@ -104,7 +117,7 @@ function Skeleton() {
 function Spinner() {
   return (
     <span
-      className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin align-middle"
+      className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent align-middle opacity-70"
       aria-hidden="true"
     />
   )
@@ -586,65 +599,97 @@ export default function QuizRunner({
 
   if (phase === PHASE.empty) {
     return (
-      <div className="surface p-10 text-center">
-        <h2 className="text-base font-semibold text-[var(--text)]">
-          {mode === 'mistakes' ? 'Nothing to review' : 'Questions coming soon'}
-        </h2>
-        <p className="text-sm text-[var(--text-muted)] mt-2">{emptyMessage}</p>
-        <Link
-          href={backHref}
-          className="btn btn-solid control-md mt-6"
-        >
-          Go back
-        </Link>
-      </div>
+      <EmptyState
+        title={mode === 'mistakes' ? 'Nothing to review' : 'Questions coming soon'}
+        description={emptyMessage}
+        action={
+          <Link href={backHref} className="btn btn-solid control-md">
+            Go back
+          </Link>
+        }
+      />
     )
   }
 
+  /* The brief. One thing to read, one thing to press. Everything that used to
+     sit in a tinted box is now reference type under a hairline, which is how
+     the landing page states a fact it does not want you to stop on. */
   if (phase === PHASE.predict) {
     const totalMinutes = timed
       ? Math.round(questions.reduce((s, q) => s + (q.time_budget_seconds || 90), 0) / 60)
       : null
+    const totalMarks = questions.reduce((s, q) => s + (q.marks || 1), 0)
+    const eyebrow = paperDefinition
+      ? `${paperDefinition.name} · ${subject}`
+      : mode === 'mock'
+        ? 'Timed mock'
+        : mode === 'mistakes'
+          ? 'Mistake review'
+          : mode === 'custom'
+            ? 'Custom test'
+            : mode === 'topic'
+              ? 'Topic test'
+              : 'Mini-quiz'
+
+    const facts = [
+      ['Questions', String(questions.length)],
+      ['Marks', String(totalMarks)],
+      timed ? ['Time limit', `${totalMinutes} min`] : ['Timing', 'Untimed'],
+    ]
+
     return (
-      <div className="surface p-6">
-        <p className="t-overline mb-2">
-          {paperDefinition
-            ? `${paperDefinition.name} · ${subject}`
-            : mode === 'mock'
-            ? 'Timed Mock'
-            : mode === 'mistakes'
-              ? 'Mistake Review'
-              : mode === 'custom'
-                ? 'Custom Test'
-                : mode === 'topic'
-                  ? 'Topic Test'
-                  : 'Mini-Quiz'}
+      <div>
+        <p
+          className="mb-3 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
+          style={{ color: 'var(--text-faint)' }}
+        >
+          {eyebrow}
         </p>
-        <h1 className="text-xl font-bold text-[var(--text)] mb-1">
+        <h1 className="text-[clamp(1.7rem,3.4vw,2.3rem)] font-semibold leading-[1.1] tracking-[-0.03em]">
           {paperDefinition
             ? paperDefinition.blurb
             : mode === 'mistakes'
-            ? 'Your past mistakes'
-            : mode === 'topic'
-              ? topic
-              : subtopic || subject}
+              ? 'Your past mistakes'
+              : mode === 'topic'
+                ? topic
+                : subtopic || subject}
         </h1>
-        <p className="text-sm text-[var(--text-muted)] mb-6">
-          {questions.length} question{questions.length !== 1 ? 's' : ''} · auto-graded
-          {timed ? ` · ${totalMinutes} min limit` : ''}
-        </p>
+
+        <dl
+          className="mt-8 flex flex-wrap gap-x-12 gap-y-5 border-t pt-6"
+          style={{ borderColor: 'var(--border)' }}
+        >
+          {facts.map(([label, value]) => (
+            <div key={label}>
+              <dt className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
+                {label}
+              </dt>
+              <dd className="mt-1.5 text-[22px] font-semibold leading-none tracking-[-0.025em] tabular-nums">
+                {value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+
         {paperDefinition && paperDefinition.minutes && (
-          <p className="t-caption -mt-4 mb-6">
+          <p className="mt-5 text-[13px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
             The real {paperDefinition.name} runs {paperDefinition.minutes} minutes. This one is
             timed from the questions it actually contains.
           </p>
         )}
 
-        <div className="mb-6 p-4 rounded-lg border border-[var(--border)] bg-[var(--surface-sunken)]">
-          <label className="block text-sm font-medium text-[var(--text)] mb-2">
-            How many will you get right? (optional)
+        <div className="mt-8 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
+          <label
+            htmlFor="predicted-score"
+            className="block text-[14.5px] font-medium"
+          >
+            How many will you get right?
           </label>
+          <p className="mt-1 text-[13px]" style={{ color: 'var(--text-muted)' }}>
+            Optional. It is how the app learns whether your confidence matches your marks.
+          </p>
           <input
+            id="predicted-score"
             type="number"
             min={0}
             max={questions.length}
@@ -660,21 +705,17 @@ export default function QuizRunner({
             onKeyDown={(e) => {
               if (['e', 'E', '+', '-', '.'].includes(e.key)) e.preventDefault()
             }}
-            inputMode="numeric" 
+            inputMode="numeric"
             placeholder={`0–${questions.length}`}
-            className="w-full rounded-lg border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--text)] outline-none focus:border-[var(--brand)]"
+            className="input mt-4 max-w-[160px] tabular-nums"
           />
-          <p className="text-xs text-[var(--text-faint)] mt-2">
-            Tracks your confidence calibration over time.
-          </p>
         </div>
 
-        <button
-          onClick={startQuiz}
-          className="w-full btn btn-solid control-md"
-        >
-          {timed ? 'Start timed mock' : 'Start quiz'}
-        </button>
+        <div className="mt-10">
+          <button onClick={startQuiz} className="btn btn-solid control-lg">
+            {timed ? 'Start timed mock' : 'Start quiz'}
+          </button>
+        </div>
       </div>
     )
   }
@@ -685,9 +726,9 @@ export default function QuizRunner({
     const selected = answers[q.id]
     // An empty box is not an answer. != null alone was true for '', so a
     // short-answer paper counted itself finished before anything was typed.
-    const answeredCount = questions.filter(
-      (question) => answers[question.id] != null && String(answers[question.id]).trim() !== ''
-    ).length
+    const isAnswered = (question) =>
+      answers[question.id] != null && String(answers[question.id]).trim() !== ''
+    const answeredCount = questions.filter(isAnswered).length
 
     let paceBlock = null
     if (timed && secondsLeft != null) {
@@ -700,14 +741,20 @@ export default function QuizRunner({
       const actualPace = elapsedSec >= 30 ? marksAnswered / (elapsedSec / 60) : null
       const behind = actualPace != null && actualPace < requiredPace
       paceBlock = (
-        <div className="flex items-center justify-between mb-4 px-4 py-2 rounded-lg bg-[var(--surface-sunken)] border border-[var(--border)] text-sm">
-          <span className={`font-semibold tabular-nums ${secondsLeft < 60 ? 'text-[var(--danger)]' : 'text-[var(--text)]'}`}>
-            {formatClock(secondsLeft)} left
+        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+          <span
+            className="text-[20px] font-semibold leading-none tracking-[-0.02em] tabular-nums"
+            style={{ color: secondsLeft < 60 ? 'var(--status-weak)' : 'var(--text)' }}
+          >
+            {formatClock(secondsLeft)}
           </span>
-          <span className={behind ? 'text-[var(--warning-text)] font-medium' : 'text-[var(--text-muted)]'}>
+          <span
+            className="text-[12.5px] tabular-nums"
+            style={{ color: behind ? 'var(--status-fading)' : 'var(--text-muted)' }}
+          >
             {actualPace != null
-              ? `Pace ${actualPace.toFixed(1)} marks/min · target ${requiredPace.toFixed(1)}`
-              : `Target pace ${requiredPace.toFixed(1)} marks/min`}
+              ? `${actualPace.toFixed(1)} marks/min · ${requiredPace.toFixed(1)} needed`
+              : `${requiredPace.toFixed(1)} marks/min needed`}
             {behind ? ' · behind' : ''}
           </span>
         </div>
@@ -715,53 +762,56 @@ export default function QuizRunner({
     }
 
     return (
-      <div className="surface p-6">
-        {paceBlock}
-
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-sm text-[var(--text-muted)]">
-            Question {currentIndex + 1} of {questions.length}
-          </p>
-          <div className="flex items-center gap-3">
-            <HeatBadge difficulty={q.difficulty} />
-            <p className="text-xs text-[var(--text-faint)]">
-              {q.marks || 1} mark{(q.marks || 1) !== 1 ? 's' : ''} · {answeredCount}/{questions.length} answered
+      <div>
+        {/* Where you are, as a rail rather than a sentence. Every question is
+            one segment: filled if it has an answer, brand if it is the one on
+            screen, and each is a button so you can go back to the one you
+            skipped without pressing Back eight times. */}
+        <div className="mb-6">
+          {paceBlock}
+          <div className={`flex gap-1 ${paceBlock ? 'mt-4' : ''}`}>
+            {questions.map((question, i) => (
+              <button
+                key={question.id}
+                onClick={() => goTo(i)}
+                aria-label={`Question ${i + 1}${isAnswered(question) ? ', answered' : ''}`}
+                aria-current={i === currentIndex ? 'true' : undefined}
+                className="h-1 flex-1 rounded-full transition-colors duration-150"
+                style={{
+                  background:
+                    i === currentIndex
+                      ? 'var(--brand)'
+                      : isAnswered(question)
+                        ? 'var(--text-faint)'
+                        : 'var(--border-strong)',
+                }}
+              />
+            ))}
+          </div>
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+            <p className="text-[12.5px] tabular-nums" style={{ color: 'var(--text-muted)' }}>
+              Question {currentIndex + 1} of {questions.length} · {answeredCount} answered
             </p>
+            <div className="flex items-center gap-4">
+              <HeatBadge difficulty={q.difficulty} />
+              <span className="text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
+                {q.marks || 1} mark{(q.marks || 1) !== 1 ? 's' : ''}
+              </span>
+            </div>
           </div>
         </div>
 
         <QuestionStimulus text={q.stimulus} kind={q.stimulus_kind} />
 
-        <div className="mb-4 flex items-start justify-between gap-3">
-          <p className="text-sm font-medium leading-relaxed text-[var(--text)]">{q.stem}</p>
-          <CopyButton text={questionAsText(q)} label="Copy" />
+        <div className="flex items-start justify-between gap-4">
+          <p className="text-[17px] font-medium leading-relaxed">{q.stem}</p>
+          <CopyButton text={questionAsText(q)} label="" />
         </div>
 
         <QuestionFigure figure={q.figure} />
 
-        {/* A hint is offered rather than shown. Reading it before trying is the
-            fastest way to feel like you understood something you could not
-            have done, so it costs a click and says so on the results. */}
-        {q.hint && (
-          <div className="mb-5">
-            {hintsShown[q.id] ? (
-              <div className="rounded-[var(--r-md)] border border-[var(--border)] bg-[var(--surface-sunken)] px-4 py-3">
-                <p className="t-overline mb-1">Hint</p>
-                <p className="text-sm text-[var(--text-body)]">{q.hint}</p>
-              </div>
-            ) : (
-              <button
-                onClick={() => setHintsShown((h) => ({ ...h, [q.id]: true }))}
-                className="btn btn-quiet control-sm text-xs"
-              >
-                Show a hint
-              </button>
-            )}
-          </div>
-        )}
-
         {q.question_type === 'short_answer' ? (
-          <div className="mb-6">
+          <div className="mt-6">
             <label className="t-overline" htmlFor="short-answer">
               Your answer
             </label>
@@ -774,9 +824,9 @@ export default function QuizRunner({
               value={selected ?? ''}
               onChange={(e) => selectAnswer(q.id, e.target.value)}
               placeholder={q.answer_kind === 'numeric' ? 'e.g. 9.81' : 'Type your answer'}
-              className="input mt-1"
+              className="input mt-2"
             />
-            <p className="t-caption mt-2">
+            <p className="mt-2 text-[13px]" style={{ color: 'var(--text-faint)' }}>
               {q.answer_hint ||
                 (q.answer_kind === 'numeric'
                   ? 'Units are optional, and close counts. Write the number.'
@@ -784,36 +834,78 @@ export default function QuizRunner({
             </p>
           </div>
         ) : (
-          <div className="space-y-2 mb-6">
-            {options.map((opt) => (
-              <button
-                key={opt.id}
-                onClick={() => selectAnswer(q.id, opt.id)}
-                className={`w-full text-left px-4 py-3 rounded-lg border text-sm transition-colors duration-150 ${
-                  selected === opt.id
-                    ? 'border-[var(--brand)] bg-[var(--brand-tint)] text-[var(--text)]'
-                    : 'border-[var(--border-strong)] bg-[var(--surface)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
-                }`}
-              >
-                {opt.text}
-              </button>
-            ))}
+          <div className="mt-6 flex flex-col gap-2">
+            {options.map((opt) => {
+              const isPicked = selected === opt.id
+              return (
+                <button
+                  key={opt.id}
+                  onClick={() => selectAnswer(q.id, opt.id)}
+                  className="flex items-center gap-3 rounded-xl border px-4 py-3.5 text-left text-[14.5px] leading-relaxed transition-colors duration-150"
+                  style={{
+                    borderColor: isPicked ? 'var(--brand)' : 'var(--border-strong)',
+                    background: isPicked ? 'var(--brand-tint)' : 'transparent',
+                    // Set rather than inherited: an author-less button falls
+                    // back to the system `buttontext`, which follows
+                    // color-scheme instead of the palette.
+                    color: 'var(--text)',
+                  }}
+                >
+                  <span
+                    className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[11px] font-semibold"
+                    style={{
+                      borderColor: isPicked ? 'var(--brand)' : 'var(--border-strong)',
+                      color: isPicked ? 'var(--brand)' : 'var(--text-muted)',
+                    }}
+                  >
+                    {opt.id}
+                  </span>
+                  <span className="flex-1">{opt.text}</span>
+                </button>
+              )
+            })}
           </div>
         )}
 
-        <div className="flex gap-2">
+        {/* A hint is offered rather than shown. Reading it before trying is the
+            fastest way to feel like you understood something you could not
+            have done, so it costs a click and says so on the results. */}
+        {q.hint && (
+          <div className="mt-5">
+            {hintsShown[q.id] ? (
+              <p className="text-[13.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                <span className="font-semibold">Hint. </span>
+                {q.hint}
+              </p>
+            ) : (
+              <button
+                onClick={() => setHintsShown((h) => ({ ...h, [q.id]: true }))}
+                className="text-[13px] font-medium underline underline-offset-2"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                Show a hint
+              </button>
+            )}
+          </div>
+        )}
+
+        <div
+          className="mt-10 flex items-center gap-3 border-t pt-6"
+          style={{ borderColor: 'var(--border)' }}
+        >
           <button
             onClick={() => goTo(currentIndex - 1)}
             disabled={currentIndex === 0}
-            className="flex-1 btn btn-quiet control-md disabled:opacity-40"
+            className="btn btn-quiet control-md disabled:opacity-40"
           >
             Back
           </button>
+          <div className="flex-1" />
           {currentIndex < questions.length - 1 ? (
             <button
               onClick={() => goTo(currentIndex + 1)}
               disabled={selected == null || String(selected).trim() === ''}
-              className="flex-1 btn btn-solid control-md disabled:opacity-40"
+              className="btn btn-solid control-md disabled:opacity-40"
             >
               Next
             </button>
@@ -821,7 +913,7 @@ export default function QuizRunner({
             <button
               onClick={finishQuiz}
               disabled={(!timed && answeredCount < questions.length) || submitting}
-              className="flex-1 btn btn-solid control-md disabled:opacity-40 flex items-center justify-center gap-2"
+              className="btn btn-solid control-md flex items-center gap-2 disabled:opacity-40"
             >
               {submitting ? <Spinner /> : null}
               {submitting ? 'Submitting' : 'Finish'}
@@ -839,26 +931,37 @@ export default function QuizRunner({
     )
 
     return (
-      <div className="surface p-6">
-        <p className="t-overline mb-2">
-          Quiz Complete
+      <div>
+        <p
+          className="mb-3 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
+          style={{ color: 'var(--text-faint)' }}
+        >
+          Result
         </p>
-        <h1 className="text-[32px] font-bold text-[var(--brand)] leading-tight">
-          {results.score}/{results.total}
+        <h1 className="text-[clamp(2.4rem,6vw,3.4rem)] font-semibold leading-[1] tracking-[-0.035em] tabular-nums">
+          {results.score}
+          <span style={{ color: 'var(--text-faint)' }}>/{results.total}</span>
         </h1>
-        <p className="text-sm text-[var(--text-muted)] mt-1">{pct}% accuracy</p>
-        {results.prediction != null && (
-          <p className="text-xs text-[var(--text-faint)] mt-1">
-            You predicted {results.prediction}: {results.prediction > results.score
-              ? 'slightly overconfident this time'
-              : results.prediction < results.score
-                ? 'you underestimated yourself'
-                : 'perfectly calibrated'}
-          </p>
-        )}
+        <p className="mt-3 text-[14.5px]" style={{ color: 'var(--text-muted)' }}>
+          {pct}% accuracy
+          {results.prediction != null && (
+            <>
+              {' · '}
+              you predicted {results.prediction},{' '}
+              {results.prediction > results.score
+                ? 'slightly overconfident this time'
+                : results.prediction < results.score
+                  ? 'you underestimated yourself'
+                  : 'perfectly calibrated'}
+            </>
+          )}
+        </p>
 
         {results.clearedFromBank > 0 && (
-          <p className="mt-4 rounded-[var(--r-md)] border border-[var(--success-border)] bg-[var(--success-bg)] px-4 py-3 text-sm text-[var(--success-text)]">
+          <p
+            className="mt-6 border-l-2 pl-4 text-[14px] leading-relaxed"
+            style={{ borderColor: 'var(--status-proficient)', color: 'var(--text-body)' }}
+          >
             {results.clearedFromBank} question{results.clearedFromBank === 1 ? '' : 's'} left your
             mistake bank. Three correct reviews and it is considered fixed.
           </p>
@@ -868,30 +971,39 @@ export default function QuizRunner({
             Without this the level looks arbitrary: a perfect score that leaves
             you on Weak needs explaining, and the explanation is the point. */}
         {results.earned?.length > 0 && (
-          <div className="mt-5 rounded-[var(--r-md)] border border-[var(--border-strong)] p-4">
-            <p className="t-overline mb-3">Mastery</p>
-            <ul className="flex flex-col gap-3">
+          <section className="mt-10">
+            <div
+              className="mb-5 flex items-baseline justify-between gap-4 border-b pb-3"
+              style={{ borderColor: 'var(--border)' }}
+            >
+              <h2 className="text-[15px] font-semibold tracking-[-0.012em]">Mastery</h2>
+              <span className="text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
+                {MASTERY_TARGET} points to Mastered
+              </span>
+            </div>
+            <ul className="flex flex-col gap-5">
               {results.earned.map((e) => {
                 const next = pointsToNextLevel(e.points)
                 return (
                   <li key={e.subtopic}>
                     <div className="flex items-baseline justify-between gap-3">
-                      <span className="min-w-0 truncate text-sm text-[var(--text-body)]">
-                        {e.subtopic}
-                      </span>
+                      <span className="min-w-0 truncate text-[14.5px]">{e.subtopic}</span>
                       <span
-                        className={`shrink-0 text-xs font-semibold ${STATUS_TEXT_COLORS[e.status]}`}
+                        className={`shrink-0 text-[12.5px] font-semibold ${STATUS_TEXT_COLORS[e.status]}`}
                       >
                         {STATUS_LABELS[e.status]}
                       </span>
                     </div>
-                    <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-[var(--surface-sunken)]">
+                    <div
+                      className="mt-2 h-1 w-full overflow-hidden rounded-full"
+                      style={{ background: 'var(--border-strong)' }}
+                    >
                       <div
                         className={`h-full rounded-full ${STATUS_COLORS[e.status]}`}
                         style={{ width: `${masteryFraction(e.points) * 100}%` }}
                       />
                     </div>
-                    <p className="t-caption mt-1">
+                    <p className="mt-2 text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
                       {e.points} of {MASTERY_TARGET} points
                       {next ? ` · ${next.points} more for ${STATUS_LABELS[next.status]}` : ''}
                     </p>
@@ -899,53 +1011,75 @@ export default function QuizRunner({
                 )
               })}
             </ul>
-            <p className="t-caption mt-3">
+            <p className="mt-6 text-[13px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
               A question is worth points by heat: Low 0.5, Medium 0.75, Hot 1, Extremely hot 1.25,
               Burning 1.5. Only correct answers pay, and each question pays once, so the same easy
               question cannot be farmed.
             </p>
-          </div>
+          </section>
         )}
 
         {timed && (
-          <div className="mt-5 p-4 rounded-lg border border-[var(--border)] bg-[var(--surface-sunken)]">
-            <p className="text-sm font-semibold text-[var(--text)] mb-1">Pacing</p>
-            <p className="text-sm text-[var(--text-muted)]">
+          <section className="mt-10">
+            <div
+              className="mb-5 flex items-baseline justify-between gap-4 border-b pb-3"
+              style={{ borderColor: 'var(--border)' }}
+            >
+              <h2 className="text-[15px] font-semibold tracking-[-0.012em]">Pacing</h2>
+            </div>
+            <p className="text-[14px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
               Finished in {formatClock(results.elapsed)} of {formatClock(timeLimitRef.current)} ·{' '}
               {(results.totalMarks / (timeLimitRef.current / 60)).toFixed(1)} marks/min required
             </p>
-            {overBudget.length > 0 ? (
-              <p className="text-sm text-[var(--warning-text)] mt-1">
-                Pacing penalty: {overBudget.length} question{overBudget.length !== 1 ? 's' : ''} went
-                over the exam time budget.
-              </p>
-            ) : (
-              <p className="text-sm text-[var(--success-text)] mt-1">
-                All questions inside the exam time budget.
-              </p>
-            )}
-          </div>
+            <p
+              className="mt-2 text-[14px]"
+              style={{
+                color: overBudget.length
+                  ? 'var(--status-fading)'
+                  : 'var(--status-proficient)',
+              }}
+            >
+              {overBudget.length > 0
+                ? `${overBudget.length} question${overBudget.length !== 1 ? 's' : ''} went over the exam time budget.`
+                : 'All questions inside the exam time budget.'}
+            </p>
+          </section>
         )}
 
-        <div className="mt-5 space-y-2">
-          {results.graded.map((g) => {
-            const budget = g.question.time_budget_seconds || 90
-            const slow = g.timeSpent > budget
-            return (
-              <div
-                key={g.question.id}
-                className="p-4 rounded-lg border border-[var(--border)] bg-[var(--surface-sunken)]"
-              >
-                <div className="flex items-start gap-2">
+        <section className="mt-10">
+          <div
+            className="mb-1 flex items-baseline justify-between gap-4 border-b pb-3"
+            style={{ borderColor: 'var(--border)' }}
+          >
+            <h2 className="text-[15px] font-semibold tracking-[-0.012em]">Every question</h2>
+            <CopyButton text={paperAsText(results.graded)} label="Copy all" />
+          </div>
+
+          <ul className="flex flex-col">
+            {results.graded.map((g) => {
+              const budget = g.question.time_budget_seconds || 90
+              const slow = g.timeSpent > budget
+              const tone = g.correct ? 'var(--status-proficient)' : 'var(--status-weak)'
+              return (
+                <li
+                  key={g.question.id}
+                  className="flex items-start gap-4 border-b py-5 last:border-b-0"
+                  style={{ borderColor: 'var(--border)' }}
+                >
                   <span
-                    className={`text-xs font-bold mt-1 ${g.correct ? 'text-[var(--success-text)]' : 'text-[var(--danger)]'}`}
+                    className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border"
+                    style={{ borderColor: tone, color: tone }}
                     aria-label={g.correct ? 'Correct' : 'Incorrect'}
                   >
-                    {g.correct ? '✓' : '✗'}
+                    {g.correct ? (
+                      <IconCheck width={11} height={11} />
+                    ) : (
+                      <IconClose width={11} height={11} />
+                    )}
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-3">
-                      <p className="text-sm text-[var(--text)]">{g.question.stem}</p>
+                      <p className="text-[14.5px] leading-relaxed">{g.question.stem}</p>
                       <CopyButton
                         text={questionAsText(g.question, { includeAnswer: true })}
                         label=""
@@ -956,44 +1090,49 @@ export default function QuizRunner({
                         names the mistake you actually made. Both are shown,
                         the specific one first. */}
                     {!g.correct && g.question.option_feedback?.[g.selected] && (
-                      <p className="mt-1.5 text-xs text-[var(--danger)]">
-                        You picked {String(g.selected).toUpperCase()}:{' '}
+                      <p
+                        className="mt-2 text-[13.5px] leading-relaxed"
+                        style={{ color: 'var(--status-weak)' }}
+                      >
+                        <span className="font-semibold">
+                          You picked {String(g.selected).toUpperCase()}.
+                        </span>{' '}
                         {g.question.option_feedback[g.selected]}
                       </p>
                     )}
                     {!g.correct && g.question.explanation && (
-                      <p className="text-xs text-[var(--text-muted)] mt-1">{g.question.explanation}</p>
-                    )}
-                    <ReportQuestion questionId={g.question.id} />
-                    <div className="mt-1.5 flex flex-wrap items-center gap-3">
-                      <HeatBadge difficulty={g.question.difficulty} showPoints />
-                      <p className={`text-xs ${slow && timed ? 'text-[var(--warning-text)]' : 'text-[var(--text-faint)]'}`}>
-                        {g.timeSpent}s spent · {budget}s budget{slow && timed ? ' · over budget' : ''}
+                      <p
+                        className="mt-2 text-[13.5px] leading-relaxed"
+                        style={{ color: 'var(--text-muted)' }}
+                      >
+                        {g.question.explanation}
                       </p>
+                    )}
+                    <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
+                      <HeatBadge difficulty={g.question.difficulty} showPoints />
+                      <span
+                        className="text-[12.5px] tabular-nums"
+                        style={{
+                          color: slow && timed ? 'var(--status-fading)' : 'var(--text-faint)',
+                        }}
+                      >
+                        {g.timeSpent}s of {budget}s{slow && timed ? ' · over budget' : ''}
+                      </span>
                     </div>
+                    <ReportQuestion questionId={g.question.id} />
                   </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
+                </li>
+              )
+            })}
+          </ul>
+        </section>
 
-        <div className="mt-4 flex justify-end">
-          <CopyButton text={paperAsText(results.graded)} label="Copy all questions and answers" />
-        </div>
-
-        <div className="mt-6 flex gap-2">
-          <Link
-            href={backHref}
-            className="flex-1 text-center btn btn-quiet control-md"
-          >
-            Done
-          </Link>
-          <Link
-            href="/dashboard/mistakes"
-            className="flex-1 text-center btn btn-solid control-md"
-          >
+        <div className="mt-10 flex flex-wrap items-center gap-3">
+          <Link href="/dashboard/mistakes" className="btn btn-solid control-md">
             Open Mistake Bank
+          </Link>
+          <Link href={backHref} className="btn btn-quiet control-md">
+            Done
           </Link>
         </div>
       </div>

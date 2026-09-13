@@ -150,29 +150,37 @@ export default function Dashboard() {
 
         {!hasActivity ? (
           <>
-            <div className="surface mb-10 p-6">
-              <h2 className="t-card-title mb-2">Start with one quiz</h2>
-              <p className="t-body mb-6 max-w-xl">
+            <div className="mb-12 border-t pt-8" style={{ borderColor: 'var(--border)' }}>
+              <h2 className="text-[19px] font-semibold tracking-[-0.02em]">Start with one quiz</h2>
+              <p className="mt-3 max-w-xl text-[14.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
                 Nothing here is filled in by guessing. Take a short quiz on any subtopic and
                 Project Syllabus marks it from your answers, then works out what you should study next.
               </p>
 
-              <ol className="mb-6 flex flex-col gap-3">
+              {/* Numbered the way the landing page numbers its steps: the
+                  figure is reference, set small and faint, and the sentence is
+                  the thing you read. */}
+              <ol className="mt-8 grid gap-7 sm:grid-cols-3">
                 {[
                   'Open a subject and pick a subtopic that looks shaky.',
                   'Answer ten questions. It takes a few minutes.',
                   'Your heatmap and study plan build themselves from the result.',
                 ].map((step, i) => (
-                  <li key={step} className="flex gap-3">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--brand-tint)] text-xs font-semibold text-[var(--brand)]">
-                      {i + 1}
+                  <li key={step} className="border-t pt-4" style={{ borderColor: 'var(--border)' }}>
+                    <span
+                      className="text-[11px] font-semibold tabular-nums tracking-[0.16em]"
+                      style={{ color: 'var(--text-faint)' }}
+                    >
+                      {String(i + 1).padStart(2, '0')}
                     </span>
-                    <span className="text-sm text-[var(--text-body)]">{step}</span>
+                    <p className="mt-2 text-[14px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                      {step}
+                    </p>
                   </li>
                 ))}
               </ol>
 
-              <Link href={startHref} className="btn btn-solid control-lg max-w-full px-6">
+              <Link href={startHref} className="btn btn-solid control-lg mt-9 max-w-full px-6">
                 <span className="min-w-0 truncate">
                   {firstSubject ? `Open ${firstSubject}` : 'Choose a subject'}
                 </span>

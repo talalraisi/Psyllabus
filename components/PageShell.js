@@ -1,9 +1,14 @@
 /**
  * Layout primitives. Every dashboard page composes these rather than
  * hand-rolling padding and headings, which is what keeps the vertical rhythm
- * and container widths identical across the app.
+ * and container widths identical across the app — and what makes it possible
+ * to restyle the whole product by editing this file.
  *
- * Vertical rhythm: header 32px below, sections 40px apart, cards 12px apart.
+ * These now carry the landing page's language: a display title at tight
+ * tracking, uppercase micro-labels above sections, hairlines instead of boxes
+ * around everything, and panels with an edge rather than a shadow. The rule
+ * behind all of it is that a page should have one thing that is obviously
+ * first, and everything else should look like reference.
  */
 
 const WIDTHS = {
@@ -18,12 +23,26 @@ export function Page({ children, width = 'default' }) {
   )
 }
 
-export function PageHeader({ title, subtitle, action }) {
+export function PageHeader({ title, subtitle, action, eyebrow }) {
   return (
-    <header className="mb-8 flex flex-wrap items-start justify-between gap-4">
+    <header className="mb-10 flex flex-wrap items-end justify-between gap-4">
       <div className="min-w-0">
-        <h1 className="t-page-title">{title}</h1>
-        {subtitle && <p className="t-small mt-1">{subtitle}</p>}
+        {eyebrow && (
+          <p
+            className="mb-3 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
+            style={{ color: 'var(--text-faint)' }}
+          >
+            {eyebrow}
+          </p>
+        )}
+        <h1 className="text-[clamp(1.7rem,3.4vw,2.3rem)] font-semibold leading-[1.1] tracking-[-0.03em]">
+          {title}
+        </h1>
+        {subtitle && (
+          <p className="mt-2.5 text-[14.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+            {subtitle}
+          </p>
+        )}
       </div>
       {action && <div className="shrink-0">{action}</div>}
     </header>
@@ -32,10 +51,15 @@ export function PageHeader({ title, subtitle, action }) {
 
 export function Section({ title, action, children, className = '' }) {
   return (
-    <section className={`mb-10 ${className}`}>
+    <section className={`mb-12 ${className}`}>
       {(title || action) && (
-        <div className="mb-3 flex items-center justify-between gap-4">
-          {title && <h2 className="t-overline">{title}</h2>}
+        <div
+          className="mb-5 flex items-baseline justify-between gap-4 border-b pb-3"
+          style={{ borderColor: 'var(--border)' }}
+        >
+          {title && (
+            <h2 className="text-[15px] font-semibold tracking-[-0.012em]">{title}</h2>
+          )}
           {action}
         </div>
       )}
@@ -44,11 +68,55 @@ export function Section({ title, action, children, className = '' }) {
   )
 }
 
+/**
+ * A row list without a box around it.
+ *
+ * The app wrapped every list in a card and then ruled between the rows, which
+ * is two kinds of separation doing one job and is most of what made the
+ * interface feel heavy. Rows sit on the page and light up on hover instead.
+ */
+export function Rows({ children, className = '' }) {
+  return <ul className={`flex flex-col gap-0.5 ${className}`}>{children}</ul>
+}
+
+export function Row({ children, className = '', as: Tag = 'li' }) {
+  return (
+    <Tag className={className}>
+      <div className="flex items-center gap-4 rounded-[10px] px-3 py-3.5">{children}</div>
+    </Tag>
+  )
+}
+
+/** Numbers as reference: no cards, grouped by a hairline, colour only where it means something. */
+export function StatRow({ stats, className = '' }) {
+  return (
+    <div
+      className={`flex flex-wrap items-baseline gap-x-12 gap-y-6 border-t pt-6 ${className}`}
+      style={{ borderColor: 'var(--border)' }}
+    >
+      {stats.map(({ label, value, tone }) => (
+        <div key={label}>
+          <p
+            className="text-[30px] font-semibold leading-none tracking-[-0.028em] tabular-nums"
+            style={{ color: tone || 'var(--text)' }}
+          >
+            {value}
+          </p>
+          <p className="mt-2 text-[13px]" style={{ color: 'var(--text-muted)' }}>
+            {label}
+          </p>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 /** Bordered white panel. `flush` removes padding for full-bleed lists. */
 export function Card({ children, className = '', interactive = false, flush = false }) {
   return (
     <div
-      className={`surface ${interactive ? 'surface-interactive' : ''} ${flush ? '' : 'p-5'} ${className}`}
+      className={`rounded-[12px] border ${interactive ? 'surface-interactive' : ''} ${flush ? '' : 'p-5'} ${className}`}
+      style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
     >
       {children}
     </div>
@@ -57,10 +125,20 @@ export function Card({ children, className = '', interactive = false, flush = fa
 
 export function EmptyState({ title, description, action }) {
   return (
-    <div className="surface px-6 py-10 text-center">
-      <p className="t-card-title">{title}</p>
-      {description && <p className="t-small mx-auto mt-2 max-w-md">{description}</p>}
-      {action && <div className="mt-6 flex justify-center">{action}</div>}
+    <div
+      className="rounded-[12px] border border-dashed px-6 py-12 text-center"
+      style={{ borderColor: 'var(--border-strong)' }}
+    >
+      <p className="text-[16px] font-semibold tracking-[-0.015em]">{title}</p>
+      {description && (
+        <p
+          className="mx-auto mt-2.5 max-w-md text-[14px] leading-relaxed"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          {description}
+        </p>
+      )}
+      {action && <div className="mt-7 flex justify-center">{action}</div>}
     </div>
   )
 }

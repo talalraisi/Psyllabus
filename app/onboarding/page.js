@@ -386,50 +386,50 @@ export default function Onboarding() {
   }
 
   return (
-    <main className="page px-4 py-8 md:px-6 md:py-12">
-      
-      <div className="max-w-2xl mx-auto">
-
-        <div className="flex justify-center mb-10">
+    <main className="page ground px-5 py-10 md:px-6 md:py-16">
+      <div className="mx-auto max-w-2xl">
+        <div className="mb-12 flex justify-center">
           <Link href="/">
-            <Logo width={220} height={66} priority className="h-auto w-[180px] md:w-[220px]" />
+            <Logo width={220} height={66} priority className="h-auto w-[170px] md:w-[200px]" />
           </Link>
         </div>
 
-        {/* Progress steps */}
-        <div className="mb-10 flex items-center justify-center gap-1 sm:gap-2">
-          {[
-            {n: 1, label: 'Setup'},
-            {n: 2, label: 'Subjects'},
-            {n: 3, label: 'Goals'},
-            {n: 4, label: 'Start'}
-          ].map((s, i) => (
-            <div key={s.n} className="flex items-center gap-2">
-              <div className="flex flex-col items-center gap-1">
-                <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full
-                text-sm font-bold transition-all ${step >= s.n
-                  ? 'bg-accent text-white'
-                  : 'bg-bg-subtle text-text-faint border border-border'}`}>
-                  {s.n}
-                </div>
-                <span className={`text-[11px] sm:text-xs ${step >= s.n ? 'text-accent font-semibold' : 'text-text-faint'}`}>
-                  {s.label}
-                </span>
-              </div>
-              {i < 3 && (
-                <div className={`mb-4 h-px w-5 sm:w-12 ${step > s.n ? 'bg-accent' : 'bg-border'}`} />
-              )}
-            </div>
-          ))}
+        {/* Where you are. A rail rather than four discs: the numbers were
+            decoration, and the only thing worth reading is which part you are
+            on and how much is left. */}
+        <div className="mb-12">
+          <div className="flex gap-1.5">
+            {[1, 2, 3, 4].map((n) => (
+              <span
+                key={n}
+                className="h-1 flex-1 rounded-full transition-colors duration-300"
+                style={{ background: step >= n ? 'var(--brand)' : 'var(--border-strong)' }}
+              />
+            ))}
+          </div>
+          <div className="mt-3 flex items-baseline justify-between">
+            <p
+              className="text-[10.5px] font-semibold uppercase tracking-[0.16em]"
+              style={{ color: 'var(--text-faint)' }}
+            >
+              {['Setup', 'Subjects', 'Goals', 'Start'][step - 1]}
+            </p>
+            <p className="text-[12px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
+              Step {step} of 4
+            </p>
+          </div>
         </div>
 
         {/* Step 1, Curriculum and year */}
         {step === 1 && (
-          <div className="card p-5 md:p-8">
-            <h1 className="text-2xl font-bold text-text mb-2">
+          <div
+            className="rounded-[14px] border p-6 md:p-9"
+            style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+          >
+            <h1 className="text-[clamp(1.5rem,3vw,1.9rem)] font-semibold leading-[1.15] tracking-[-0.03em]">
               Let&rsquo;s set up your profile
             </h1>
-            <p className="text-text-muted text-sm mb-8">
+            <p className="mb-9 mt-3 text-[14.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
               Tell us about your curriculum so we can map your exact syllabus.
             </p>
 
@@ -444,7 +444,7 @@ export default function Onboarding() {
                     setSelectedSubjects([])
                     setTargetGrades({})
                   }}
-                  className={`py-4 rounded-[var(--radius-sm)] font-bold text-sm transition-all border
+                  className={`rounded-full border py-3.5 text-[13.5px] font-semibold transition-colors duration-150
                   ${curriculum === c ? 'chip-active' : 'chip hover:border-border-strong'}`}>
                     {c}
                   </button>
@@ -459,7 +459,7 @@ export default function Onboarding() {
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-4" role="group" aria-labelledby="gradyear-label">
                 {GRAD_YEARS.map(y => (
                   <button key={y} aria-pressed={gradYear === y} onClick={() => setGradYear(y)}
-                  className={`control-lg rounded-[var(--r-md)] border text-sm font-semibold tabular-nums transition-colors duration-150
+                  className={`control-lg rounded-full border text-[13.5px] font-semibold tabular-nums transition-colors duration-150
                   ${gradYear === y ? 'chip-active' : 'chip hover:border-border-strong'}`}>
                     {y}
                   </button>
@@ -478,22 +478,25 @@ export default function Onboarding() {
 
         {/* Step 2, Subject selection by group */}
         {step === 2 && currentCurriculum && (
-          <div className="card p-5 md:p-8">
-            <h1 className="text-2xl font-bold text-text mb-2">
+          <div
+            className="rounded-[14px] border p-6 md:p-9"
+            style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+          >
+            <h1 className="text-[clamp(1.5rem,3vw,1.9rem)] font-semibold leading-[1.15] tracking-[-0.03em]">
               Select your subjects
             </h1>
-            <p className="text-text-muted text-sm mb-1">
+            <p className="mt-3 text-[14.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
               {curriculum === 'IB' && 'Pick the six subjects you actually take. Theory of Knowledge, the Extended Essay and CAS are added for you.'}
               {curriculum === 'AP' && 'Select the AP courses you are taking.'}
               {curriculum === 'A-Level' && 'Most students take 3-4 A-Level subjects.'}
             </p>
-            <p className="text-accent text-xs font-bold mb-6">
+            <p className="mb-8 mt-2 text-[12.5px] font-semibold tabular-nums" style={{ color: 'var(--brand)' }}>
               {selectedSubjects.length}/{currentCurriculum.maxSubjects} selected
             </p>
 
             <div className="space-y-3 mb-8 max-h-96 overflow-y-auto pr-1">
               {currentCurriculum.groups.map((group, gi) => (
-                <div key={gi} className="border border-border rounded-[var(--radius-sm)] overflow-hidden">
+                <div key={gi} className="overflow-hidden rounded-xl border border-border">
                   <button
                     onClick={() => setExpandedGroup(expandedGroup === gi ? null : gi)}
                     className="w-full px-4 py-3 flex items-center justify-between
@@ -520,8 +523,7 @@ export default function Onboarding() {
                     <div className="px-4 pb-4 grid grid-cols-2 gap-2">
                       {group.subjects.map(subject => (
                         <button key={subject} onClick={() => toggleSubject(subject)}
-                        className={`px-3 py-2 rounded-[var(--radius-sm)] text-xs font-medium 
-                        text-left transition-all border
+                        className={`rounded-full border px-3.5 py-2 text-left text-[12.5px] font-medium transition-colors duration-150
                         ${selectedSubjects.includes(subject) ? 'chip-active' : 'chip hover:border-border-strong'}`}>
                           {subject}
                         </button>
@@ -533,8 +535,8 @@ export default function Onboarding() {
             </div>
 
             {selectedSubjects.length > 0 && (
-              <div className="mb-6 p-4 rounded-[var(--radius-sm)] border border-border bg-accent-soft">
-                <p className="section-label mb-2">
+              <div className="mb-7 border-t pt-5" style={{ borderColor: 'var(--border)' }}>
+                <p className="section-label mb-3">
                   Your subjects
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -549,9 +551,9 @@ export default function Onboarding() {
 
             {/* The DP core is compulsory, so it is shown as included rather than offered. */}
             {isIB && coreSubjects.length > 0 && (
-              <div className="mb-6 p-4 rounded-[var(--radius-sm)] border border-border bg-bg-subtle">
-                <p className="text-text font-medium text-sm mb-1">Included automatically</p>
-                <p className="text-text-muted text-xs mb-3">
+              <div className="mb-7 border-t pt-5" style={{ borderColor: 'var(--border)' }}>
+                <p className="text-[14px] font-medium">Included automatically</p>
+                <p className="mb-4 mt-1.5 text-[12.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
                   Every Diploma candidate takes the core, so we add it for you. TOK and the
                   Extended Essay are worth up to 3 bonus points.
                 </p>
@@ -579,27 +581,32 @@ export default function Onboarding() {
 
         {/* Step 3, Target grades */}
         {step === 3 && currentCurriculum && (
-          <div className="card p-5 md:p-8">
-            <h1 className="text-2xl font-bold text-text mb-2">
+          <div
+            className="rounded-[14px] border p-6 md:p-9"
+            style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+          >
+            <h1 className="text-[clamp(1.5rem,3vw,1.9rem)] font-semibold leading-[1.15] tracking-[-0.03em]">
               Set your target grades
             </h1>
-            <p className="text-text-muted text-sm mb-3">
+            <p className="mt-3 text-[14.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
               What are you aiming for in each one? Everything on your dashboard is measured
               against these, so set them where you honestly intend to land.
             </p>
-            <p className="text-sm mb-8 rounded-[var(--r-md)] border border-[var(--sand)] bg-[var(--sand)]/25 px-4 py-3 text-[var(--text-body)]">
+            <p
+              className="mb-9 mt-5 border-l-2 pl-4 text-[14px] leading-relaxed"
+              style={{ borderColor: 'var(--border-strong)', color: 'var(--text-body)' }}
+            >
               {realismNote({ curriculum })} You can raise them whenever you get there.
             </p>
 
             <div className="space-y-4 mb-6 max-h-80 overflow-y-auto pr-1">
               {selectedSubjects.map(subject => (
-                <div key={subject} className="p-4 rounded-[var(--radius-sm)] border border-border bg-bg-subtle">
-                  <p className="text-text font-medium text-sm mb-3">{subject}</p>
+                <div key={subject} className="border-b pb-4" style={{ borderColor: 'var(--border)' }}>
+                  <p className="mb-3 text-[14px] font-medium">{subject}</p>
                   <div className="flex gap-2 flex-wrap">
                     {currentCurriculum.grades.map(grade => (
                       <button key={grade} onClick={() => setGrade(subject, grade)}
-                      className={`w-10 h-10 rounded-[var(--radius-sm)] font-bold text-sm
-                      transition-all border
+                      className={`h-10 w-10 rounded-full border text-[13.5px] font-semibold transition-colors duration-150
                       ${targetGrades[subject] === grade ? 'chip-active' : 'chip hover:border-border-strong'}`}>
                         {grade}
                       </button>
@@ -610,14 +617,15 @@ export default function Onboarding() {
 
               {/* TOK and EE are graded A-E and combine for up to 3 bonus points. */}
               {isIB && ['Theory of Knowledge', 'Extended Essay'].map(component => (
-                <div key={component} className="p-4 rounded-[var(--radius-sm)] border border-border bg-bg-subtle">
-                  <p className="text-text font-medium text-sm mb-1">{component}</p>
-                  <p className="text-text-faint text-xs mb-3">Graded A to E</p>
+                <div key={component} className="border-b pb-4" style={{ borderColor: 'var(--border)' }}>
+                  <p className="text-[14px] font-medium">{component}</p>
+                  <p className="mb-3 mt-1 text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
+                    Graded A to E
+                  </p>
                   <div className="flex gap-2 flex-wrap">
                     {CORE_GRADES.map(grade => (
                       <button key={grade} onClick={() => setGrade(component, grade)}
-                      className={`w-10 h-10 rounded-[var(--radius-sm)] font-bold text-sm
-                      transition-all border
+                      className={`h-10 w-10 rounded-full border text-[13.5px] font-semibold transition-colors duration-150
                       ${targetGrades[component] === grade ? 'chip-active' : 'chip hover:border-border-strong'}`}>
                         {grade}
                       </button>
@@ -629,15 +637,20 @@ export default function Onboarding() {
 
             {/* Live Diploma total */}
             {isIB && (
-              <div className="mb-8 p-4 rounded-[var(--radius-sm)] border border-border bg-bg-elevated">
-                <div className="flex items-baseline justify-between">
-                  <span className="text-text font-medium text-sm">Target Diploma total</span>
-                  <span className="text-2xl font-bold text-accent tabular-nums">
+              <div className="mb-9 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
+                <div className="flex items-baseline justify-between gap-4">
+                  <span className="text-[14px] font-medium">Target Diploma total</span>
+                  <span
+                    className="text-[30px] font-semibold leading-none tracking-[-0.028em] tabular-nums"
+                    style={{ color: 'var(--brand)' }}
+                  >
                     {ibTotal.total}
-                    <span className="text-text-faint text-sm font-medium">/{MAX_TOTAL_POINTS}</span>
+                    <span className="text-[14px] font-normal" style={{ color: 'var(--text-faint)' }}>
+                      /{MAX_TOTAL_POINTS}
+                    </span>
                   </span>
                 </div>
-                <p className="text-text-muted text-xs mt-2">
+                <p className="mt-3 text-[12.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
                   {ibTotal.subjectPoints} from {ibTotal.gradedCount} subject
                   {ibTotal.gradedCount === 1 ? '' : 's'}
                   {typeof ibTotal.bonus === 'number'
@@ -646,7 +659,7 @@ export default function Onboarding() {
                       ? '. A grade of E in TOK or the Extended Essay is a failing condition.'
                       : '. Set TOK and Extended Essay grades to see your bonus points.'}
                 </p>
-                <p className="text-text-faint text-xs mt-2">
+                <p className="mt-2 text-[12.5px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
                   This is what you are aiming for, not a prediction. Your dashboard predicts the{' '}
                   {MAX_SUBJECT_POINTS} points from your six subjects, because those are the ones it
                   can measure. The TOK and Extended Essay points arrive when that coursework is
@@ -671,9 +684,14 @@ export default function Onboarding() {
 
         {/* Step 4, the one subject a free account starts with */}
         {step === 4 && (
-          <div className="surface p-6 md:p-8">
-            <h1 className="t-page-title mb-2">Which subject do you want to start with?</h1>
-            <p className="t-small mb-6">
+          <div
+            className="rounded-[14px] border p-6 md:p-9"
+            style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+          >
+            <h1 className="text-[clamp(1.5rem,3vw,1.9rem)] font-semibold leading-[1.15] tracking-[-0.03em]">
+              Which subject do you want to start with?
+            </h1>
+            <p className="mb-8 mt-3 text-[14.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
               The free plan opens one subject completely: every topic, every quiz, its own study
               plan. Pick the one you most need to get on top of. You can change it later, though
               not straight away, so choose the subject you are actually revising.
@@ -685,10 +703,10 @@ export default function Onboarding() {
                   key={subject}
                   onClick={() => setFreePick(subject)}
                   aria-pressed={freePick === subject}
-                  className={`flex items-center gap-3 rounded-[var(--r-md)] border px-4 py-3 text-left transition-colors duration-150 ${
+                  className={`flex items-center gap-3 rounded-xl border px-4 py-3.5 text-left transition-colors duration-150 ${
                     freePick === subject
                       ? 'border-[var(--brand)] bg-[var(--brand-tint)]'
-                      : 'border-[var(--border-strong)] hover:bg-[var(--surface-sunken)]'
+                      : 'border-[var(--border-strong)] hover:border-[var(--border-hover)]'
                   }`}
                 >
                   <span
@@ -700,7 +718,7 @@ export default function Onboarding() {
                       <span className="h-2 w-2 rounded-full bg-[var(--brand)]" />
                     )}
                   </span>
-                  <span className="text-sm font-medium text-[var(--text)]">{subject}</span>
+                  <span className="text-[14.5px] font-medium">{subject}</span>
                 </button>
               ))}
             </div>

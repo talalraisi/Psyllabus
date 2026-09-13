@@ -209,11 +209,12 @@ export default function StudyPlanPage() {
 
         {/* What is actually coming up */}
         {nextEvents.length > 0 && (
-          <ul className="surface mb-6">
-            {nextEvents.map((event, i) => (
+          <ul className="mb-10 flex flex-col">
+            {nextEvents.map((event) => (
               <li
                 key={event.id}
-                className={`flex items-center gap-3 px-5 py-3 ${i > 0 ? 'border-t border-[var(--border)]' : ''}`}
+                className="flex items-center gap-3 border-b py-3 last:border-b-0"
+                style={{ borderColor: 'var(--border)' }}
               >
                 <span
                   className={`h-2 w-2 shrink-0 rounded-full ${KIND_DOT[event.kind]}`}
@@ -224,7 +225,7 @@ export default function StudyPlanPage() {
                     {KIND_LABEL[event.kind]}
                     {event.subject ? ` · ${event.subject}` : ''}
                   </p>
-                  <p className="truncate text-sm font-medium text-[var(--text)]">{event.title}</p>
+                  <p className="truncate text-[14.5px] font-medium">{event.title}</p>
                 </div>
                 <span className="t-caption shrink-0">{relativeDay(event.due_at)}</span>
               </li>
@@ -233,10 +234,13 @@ export default function StudyPlanPage() {
         )}
 
         {notificationsSupported() && permission === 'default' && (
-          <div className="mb-6 flex flex-wrap items-center gap-4 rounded-[var(--r-md)] border border-[var(--sand)] bg-[var(--sand)]/30 px-4 py-3">
+          <div
+            className="mb-10 flex flex-wrap items-center gap-4 border-l-2 pl-4"
+            style={{ borderColor: 'var(--border-strong)' }}
+          >
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium text-[var(--text)]">Turn on reminders</p>
-              <p className="t-caption mt-0.5">
+              <p className="text-[14.5px] font-medium">Turn on reminders</p>
+              <p className="mt-1 text-[13px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
                 Alerts before tests and deadlines, and when a study block ends. They arrive while
                 Project Syllabus is open, so add it to your home screen to keep it running.
               </p>
@@ -264,7 +268,7 @@ export default function StudyPlanPage() {
         ) : (
           <>
             {/* View switch */}
-            <div className="mb-6 inline-flex rounded-[var(--r-md)] border border-[var(--border-strong)] p-1">
+            <div className="mb-8 flex flex-wrap gap-2">
               {[
                 ['today', "Today's session"],
                 ['all', 'Full priority list'],
@@ -273,10 +277,10 @@ export default function StudyPlanPage() {
                   key={key}
                   onClick={() => setView(key)}
                   aria-pressed={view === key}
-                  className={`control-sm rounded-[var(--r-sm)] px-4 text-sm font-medium transition-colors duration-150 ${
+                  className={`control-sm rounded-full border px-4 text-[13.5px] font-medium transition-colors duration-150 ${
                     view === key
-                      ? 'bg-[var(--brand)] text-white'
-                      : 'text-[var(--text-body)] hover:bg-[var(--surface-sunken)]'
+                      ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
+                      : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
                   }`}
                 >
                   {label}
@@ -286,12 +290,15 @@ export default function StudyPlanPage() {
 
             {view === 'today' ? (
               <>
-                <div className="surface mb-3 p-5">
-                  <div className="mb-4">
-                    <p className="t-card-title">
+                <div className="mb-10">
+                  <div className="mb-6 border-b pb-3" style={{ borderColor: 'var(--border)' }}>
+                    <p className="text-[15px] font-semibold tracking-[-0.012em]">
                       {sessionComplete ? 'Session complete' : "Today's session"}
                     </p>
-                    <p className="t-small mt-1 inline-flex items-center gap-2">
+                    <p
+                      className="mt-1.5 inline-flex items-center gap-2 text-[13px]"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
                       <IconClock width={14} height={14} />
                       {session.items.length} subtopics · about {session.minutes} minutes of work
                       {completedCount > 0 && ` · ${completedCount} done`}
@@ -299,7 +306,7 @@ export default function StudyPlanPage() {
                   </div>
 
                   {/* How long you actually have */}
-                  <div className="mb-4 flex flex-wrap items-end gap-4 rounded-[var(--r-md)] bg-[var(--surface-sunken)] p-4">
+                  <div className="mb-6 flex flex-wrap items-end gap-5">
                     <label className="shrink-0">
                       <span className="t-overline">I have</span>
                       <div className="mt-1 flex items-center gap-2">
@@ -319,38 +326,38 @@ export default function StudyPlanPage() {
                         <span className="text-sm text-[var(--text-muted)]">minutes</span>
                       </div>
                     </label>
-                    <p className="t-caption flex-1 min-w-[12rem]">
+                    <p
+                      className="min-w-[12rem] flex-1 text-[13px] leading-relaxed"
+                      style={{ color: 'var(--text-faint)' }}
+                    >
                       Anything from {MIN_MINUTES} minutes to {MAX_MINUTES / 60} hours. The plan
                       below is cut to fit.
                     </p>
                   </div>
 
-                  <div className="mb-4">
+                  <div className="mb-6">
                     <SessionTimer minutes={minutes} />
                   </div>
 
                   {sessionComplete ? (
-                    <div className="rounded-[var(--r-md)] border border-[var(--success-border)] bg-[var(--success-bg)] px-4 py-3">
-                      <p className="text-sm font-medium text-[var(--success-text)]">
+                    <div className="border-l-2 pl-4" style={{ borderColor: 'var(--status-proficient)' }}>
+                      <p className="text-[14.5px] font-medium" style={{ color: 'var(--status-proficient)' }}>
                         You worked through everything planned for today.
                       </p>
-                      <p className="t-small mt-1">
+                      <p className="mt-1.5 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
                         Increase the time above to keep going, or come back tomorrow when the queue
                         has re-ranked.
                       </p>
                     </div>
                   ) : (
-                    <ol className="flex flex-col gap-2">
+                    <ol className="flex flex-col">
                       {session.items.map((item) => {
                         const isDone = done.has(item.id)
                         return (
                           <li
                             key={item.id}
-                            className={`flex flex-wrap items-center gap-3 rounded-[var(--r-md)] border p-3 transition-colors duration-150 ${
-                              isDone
-                                ? 'border-[var(--border)] bg-[var(--surface-sunken)]'
-                                : 'border-[var(--border-strong)]'
-                            }`}
+                            className="flex flex-wrap items-center gap-3 border-b py-3.5 last:border-b-0"
+                            style={{ borderColor: 'var(--border)' }}
                           >
                             <button
                               onClick={() => toggleDone(item.id)}
@@ -370,7 +377,7 @@ export default function StudyPlanPage() {
                                 {item.subject} · {item.topic}
                               </p>
                               <p
-                                className={`truncate text-sm ${isDone ? 'text-[var(--text-faint)] line-through' : 'text-[var(--text-body)]'}`}
+                                className={`truncate text-[14.5px] ${isDone ? 'text-[var(--text-faint)] line-through' : 'text-[var(--text-body)]'}`}
                               >
                                 {displaySubtopic(item.subtopic)}
                               </p>
@@ -414,13 +421,14 @@ export default function StudyPlanPage() {
                 {dueReviews > 0 && (
                   <Link
                     href="/dashboard/mistakes"
-                    className="surface surface-interactive flex items-center gap-4 p-5"
+                    className="group flex items-center gap-4 border-t py-5"
+                    style={{ borderColor: 'var(--border)' }}
                   >
                     <div className="min-w-0 flex-1">
-                      <p className="t-card-title">
+                      <p className="text-[15px] font-semibold tracking-[-0.012em]">
                         {dueReviews} past mistake{dueReviews === 1 ? '' : 's'} due for review
                       </p>
-                      <p className="t-small mt-1">
+                      <p className="mt-1 text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
                         Spaced repetition on questions you have already got wrong.
                       </p>
                     </div>
@@ -431,12 +439,13 @@ export default function StudyPlanPage() {
                 {events.length === 0 && (
                   <Link
                     href="/dashboard/calendar"
-                    className="surface surface-interactive mt-3 flex items-center gap-4 p-5"
+                    className="group flex items-center gap-4 border-t py-5"
+                    style={{ borderColor: 'var(--border)' }}
                   >
-                    <IconCalendar width={18} height={18} className="shrink-0 text-[var(--brand)]" />
+                    <IconCalendar width={17} height={17} className="shrink-0 text-[var(--brand)]" />
                     <div className="min-w-0 flex-1">
-                      <p className="t-card-title">Add your next test</p>
-                      <p className="t-small mt-1">
+                      <p className="text-[15px] font-semibold tracking-[-0.012em]">Add your next test</p>
+                      <p className="mt-1 text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
                         With a date on the calendar, the planner puts that subject first as it
                         approaches.
                       </p>
@@ -458,13 +467,14 @@ export default function StudyPlanPage() {
                         Open syllabus
                       </Link>
                     </div>
-                    <ul className="surface">
+                    <ul className="flex flex-col">
                       {subjectItems.slice(0, 12).map((item, i) => (
                         <li
-                          key={item.id}
-                          className={i > 0 ? 'border-t border-[var(--border)]' : undefined}
-                        >
-                          <div className="flex flex-wrap items-center gap-3 px-5 py-4">
+                  key={item.id}
+                  className="border-b last:border-b-0"
+                  style={{ borderColor: 'var(--border)' }}
+                >
+                          <div className="flex flex-wrap items-center gap-3 px-1 py-3.5">
                             <span
                               className={`h-2 w-2 shrink-0 rounded-full ${STATUS_COLORS[item.status]}`}
                               aria-hidden="true"
@@ -511,7 +521,8 @@ export default function StudyPlanPage() {
             {!isPremium(profile) && (profile.subjects || []).length > 1 && (
               <Link
                 href="/dashboard/profile#unlock"
-                className="mt-8 flex items-center gap-3 rounded-[var(--r-md)] border border-[var(--sand)] bg-[var(--sand)]/30 px-4 py-3"
+                className="mt-10 flex items-center gap-3 border-l-2 pl-4"
+                style={{ borderColor: 'var(--border-strong)' }}
               >
                 <IconCheck width={16} height={16} className="shrink-0 text-[var(--brand)]" />
                 <span className="text-sm text-[var(--text-body)]">

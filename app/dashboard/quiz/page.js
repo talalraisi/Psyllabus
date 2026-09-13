@@ -7,6 +7,8 @@ import { getCurrentUser } from '@/lib/auth'
 import { getProfile } from '@/lib/cache'
 import DashboardLayout from '@/components/DashboardLayout'
 import QuizRunner from '@/components/QuizRunner'
+import { Page } from '@/components/PageShell'
+import { IconArrowLeft } from '@/components/Icons'
 
 function QuizPageInner() {
   const searchParams = useSearchParams()
@@ -53,20 +55,26 @@ function QuizPageInner() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[var(--bg)] flex items-center justify-center">
-        <p className="text-sm text-[var(--text-muted)]">Loading quiz…</p>
-      </div>
+      <DashboardLayout profile={null}>
+        <Page width="narrow">
+          <span className="sr-only" role="status" aria-live="polite">
+            Loading quiz
+          </span>
+        </Page>
+      </DashboardLayout>
     )
   }
 
   return (
     <DashboardLayout profile={profile}>
-      <div className="px-5 py-6 md:px-12 md:py-10 max-w-2xl mx-auto">
+      <Page width="narrow">
         <button
           onClick={() => router.push(backHref)}
-          className="text-sm font-medium text-[var(--brand)] mb-6 hover:underline"
+          className="mb-8 inline-flex items-center gap-1.5 text-[13px] font-medium transition-colors duration-150 hover:text-[var(--text)]"
+          style={{ color: 'var(--text-muted)' }}
         >
-          ← Back
+          <IconArrowLeft width={13} height={13} />
+          Back
         </button>
         <QuizRunner
           subject={subject}
@@ -82,7 +90,7 @@ function QuizPageInner() {
           paper={paper}
           backHref={backHref}
         />
-      </div>
+      </Page>
     </DashboardLayout>
   )
 }

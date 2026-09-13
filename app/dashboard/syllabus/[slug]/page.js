@@ -9,6 +9,8 @@ import { getSyllabus, getProfile } from '@/lib/cache'
 import DashboardLayout from '@/components/DashboardLayout'
 import ResourceHubDrawer from '@/components/ResourceHubDrawer'
 import PaperPicker from '@/components/PaperPicker'
+import { Page, PageHeader, EmptyState } from '@/components/PageShell'
+import { IconArrowLeft, IconChevronRight } from '@/components/Icons'
 import { resolveSubjectFromSlug } from '@/lib/subject-map'
 import { isSubjectLocked, isPremium } from '@/lib/access'
 import {
@@ -134,31 +136,24 @@ export default function SyllabusPage() {
 
   return (
     <DashboardLayout profile={profile}>
-      <div className="px-5 py-6 md:px-12 md:py-10 max-w-4xl mx-auto">
-        <header className="mb-8">
-          <button
-            onClick={() => router.push('/dashboard/subjects')}
-            className="text-sm font-medium text-[var(--brand)] mb-4 hover:underline"
-          >
-            ← Back to My Subjects
-          </button>
-          <div className="flex items-center justify-between gap-4">
-            <h1 className="t-page-title">{subjectName}</h1>
-            <span className="shrink-0 rounded-full bg-[var(--brand-tint)] text-[var(--brand)] text-sm font-semibold px-3 py-1">
-              {completion}% mastered
-            </span>
-          </div>
-          <div className="flex flex-wrap items-center justify-between gap-3 mt-4">
-            <p className="text-sm text-[var(--text-muted)]">
-              {topicCount} topic{topicCount !== 1 ? 's' : ''} · {syllabusData.length} subtopic
-              {syllabusData.length !== 1 ? 's' : ''}
-            </p>
-            <div className="flex items-center gap-3">
+      <Page width="default">
+        <button
+          onClick={() => router.push('/dashboard/subjects')}
+          className="mb-8 inline-flex items-center gap-1.5 text-[13px] font-medium transition-colors duration-150 hover:text-[var(--text)]"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          <IconArrowLeft width={13} height={13} />
+          My Subjects
+        </button>
+
+        <PageHeader
+          eyebrow="Syllabus"
+          title={subjectName}
+          subtitle={`${topicCount} topic${topicCount !== 1 ? 's' : ''} · ${syllabusData.length} subtopic${syllabusData.length !== 1 ? 's' : ''}`}
+          action={
+            <div className="flex items-center gap-2">
               {syllabusData.length > 0 && (
-                <button
-                  onClick={() => setAllTopics(!anyOpen)}
-                  className="btn btn-quiet control-sm text-xs"
-                >
+                <button onClick={() => setAllTopics(!anyOpen)} className="btn btn-quiet control-sm">
                   {anyOpen ? 'Collapse all' : 'Expand all'}
                 </button>
               )}
@@ -168,25 +163,41 @@ export default function SyllabusPage() {
                 </button>
               )}
             </div>
-          </div>
+          }
+        />
 
-          <div className="mt-5 h-2 bg-[var(--surface-sunken)] rounded-full overflow-hidden">
+        {/* Mastery, stated once and large, rather than as a pill beside the
+            title where it competed with the subject name. */}
+        <div className="mb-12 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
+          <div className="flex items-baseline justify-between gap-4">
+            <span
+              className="text-[30px] font-semibold leading-none tracking-[-0.028em] tabular-nums"
+              style={{ color: 'var(--brand)' }}
+            >
+              {completion}%
+            </span>
+            <span className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
+              mastered
+            </span>
+          </div>
+          <div
+            className="mt-4 h-1 w-full overflow-hidden rounded-full"
+            style={{ background: 'var(--border-strong)' }}
+          >
             <div
-              className="h-full bg-[var(--brand)] rounded-full transition-all duration-300"
-              style={{ width: `${completion}%` }}
+              className="h-full rounded-full transition-[width] duration-500 ease-out"
+              style={{ width: `${completion}%`, background: 'var(--brand)' }}
             />
           </div>
-        </header>
+        </div>
 
         {syllabusData.length === 0 ? (
-          <div className="surface p-10 text-center">
-            <h2 className="text-base font-semibold text-[var(--text)]">Syllabus coming soon</h2>
-            <p className="text-sm text-[var(--text-muted)] mt-2">
-              We are still preparing the content for this subject. Check back soon.
-            </p>
-          </div>
+          <EmptyState
+            title="Syllabus coming soon"
+            description="We are still preparing the content for this subject. Check back soon."
+          />
         ) : (
-          <div className="space-y-3">
+          <div className="flex flex-col">
             {sortTopics(Object.entries(groupedByTopic)).map(([topic, subtopics]) => {
               const topicMastered = subtopics.filter(
                 (s) => progress[progressKey(subjectName, s.subtopic)] === 'mastered'
@@ -194,50 +205,43 @@ export default function SyllabusPage() {
               const expanded = !!expandedTopics[topic]
 
               return (
-                <div
+                <section
                   key={topic}
-                  className="surface overflow-hidden"
+                  className="border-t last:border-b"
+                  style={{ borderColor: 'var(--border)' }}
                 >
-                  <button
-                    onClick={() => toggleTopic(topic)}
-                    className="w-full bg-[var(--surface-sunken)] px-5 py-4 flex items-center justify-between hover:bg-[var(--surface-sunken)] transition-colors"
-                    aria-expanded={expanded}
-                  >
-                    <div className="text-left">
-                      <h3 className="text-sm font-bold text-[var(--text)]">{topic}</h3>
-                      <p className="text-xs text-[var(--text-muted)] mt-1">
-                        {subtopics.length} subtopic{subtopics.length !== 1 ? 's' : ''} · {topicMastered} mastered
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3 shrink-0">
-                      {hasQuestions && (
-                        <span
-                          role="link"
-                          tabIndex={0}
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            router.push(
-                              `/dashboard/quiz?subject=${encodeURIComponent(subjectName)}&topic=${encodeURIComponent(topic)}&mode=topic&back=${encodeURIComponent(slugPath)}`
-                            )
-                          }}
-                          className="btn btn-outline control-sm text-xs cursor-pointer"
-                        >
-                          Topic test
+                  <div className="flex items-center gap-4 py-4">
+                    <button
+                      onClick={() => toggleTopic(topic)}
+                      aria-expanded={expanded}
+                      className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                    >
+                      <IconChevronRight
+                        width={13}
+                        height={13}
+                        className={`shrink-0 transition-transform duration-150 ${expanded ? 'rotate-90' : ''}`}
+                        style={{ color: 'var(--text-faint)' }}
+                      />
+                      <span className="min-w-0">
+                        <span className="block text-[14.5px] font-medium">{topic}</span>
+                        <span className="mt-0.5 block text-[12px]" style={{ color: 'var(--text-faint)' }}>
+                          {subtopics.length} subtopic{subtopics.length !== 1 ? 's' : ''} ·{' '}
+                          {topicMastered} mastered
                         </span>
-                      )}
-                      <span
-                        className={`text-[var(--text-faint)] text-xs transition-transform duration-150 ${
-                          expanded ? 'rotate-90' : ''
-                        }`}
-                        aria-hidden="true"
-                      >
-                        ▶
                       </span>
-                    </div>
-                  </button>
+                    </button>
+                    {hasQuestions && (
+                      <Link
+                        href={`/dashboard/quiz?subject=${encodeURIComponent(subjectName)}&topic=${encodeURIComponent(topic)}&mode=topic&back=${encodeURIComponent(slugPath)}`}
+                        className="btn btn-quiet control-sm shrink-0"
+                      >
+                        Topic test
+                      </Link>
+                    )}
+                  </div>
 
                   {expanded && (
-                    <div className="divide-y divide-[var(--border)]">
+                    <ul className="mb-3 flex flex-col pl-6">
                       {subtopics.map((item) => {
                         const key = progressKey(subjectName, item.subtopic)
                         const currentStatus = isDecayed(
@@ -248,14 +252,20 @@ export default function SyllabusPage() {
                           : progress[key] || 'not_started'
 
                         return (
-                          <div
+                          <li
                             key={item.id}
-                            className="px-5 py-3 flex flex-col sm:flex-row sm:items-center gap-3"
+                            className="group flex flex-col gap-2 border-t py-3 sm:flex-row sm:items-center sm:gap-4"
+                            style={{ borderColor: 'var(--border)' }}
                           >
-                            <div className="flex-1 min-w-0">
+                            <span
+                              className={`hidden h-2 w-2 shrink-0 rounded-full sm:block ${STATUS_COLORS[currentStatus]}`}
+                              aria-hidden="true"
+                            />
+                            <div className="min-w-0 flex-1">
                               <button
                                 onClick={() => setDrawerItem(item)}
-                                className="text-left text-sm text-[var(--text-body)] hover:text-[var(--brand)] hover:underline underline-offset-2 transition-colors"
+                                className="text-left text-[14px] underline-offset-2 transition-colors hover:text-[var(--brand)] hover:underline"
+                                style={{ color: 'var(--text-body)' }}
                                 title="Open resources and practice quiz"
                               >
                                 {displaySubtopic(item.subtopic)}
@@ -263,49 +273,50 @@ export default function SyllabusPage() {
                               {item.hl_only && (
                                 <span
                                   title="Higher level only"
-                                  className="ml-2 align-middle text-[10px] font-semibold uppercase tracking-wide text-[var(--text-faint)]"
+                                  className="ml-2 align-middle text-[10px] font-semibold uppercase tracking-[0.1em]"
+                                  style={{ color: 'var(--text-faint)' }}
                                 >
                                   HL
                                 </span>
                               )}
                             </div>
-                            <div className="flex items-center gap-3 shrink-0">
-                              <button
-                                onClick={() => setDrawerItem(item)}
-                                className="btn btn-quiet control-sm text-xs"
-                                title="Lessons, videos and notes for this subtopic"
-                              >
-                                Resources
-                              </button>
+                            <div className="flex shrink-0 items-center gap-4">
                               <span
-                                className={`flex items-center gap-2 text-xs font-medium ${STATUS_TEXT_COLORS[currentStatus]}`}
+                                className={`text-[12.5px] font-medium ${STATUS_TEXT_COLORS[currentStatus]}`}
                                 title={
                                   currentStatus === 'decaying'
                                     ? `Mastered ${daysSince(progressDetail[key]?.updatedAt)} days ago. Retest within the ${DECAY_DAYS}-day window to keep it green.`
                                     : 'Status is set by quiz results only'
                                 }
                               >
-                                <span className={`w-2.5 h-2.5 rounded-full ${STATUS_COLORS[currentStatus]}`} />
                                 {STATUS_LABELS[currentStatus]}
                               </span>
+                              <button
+                                onClick={() => setDrawerItem(item)}
+                                className="text-[12.5px] font-medium underline-offset-2 hover:underline"
+                                style={{ color: 'var(--text-muted)' }}
+                                title="Lessons, videos and notes for this subtopic"
+                              >
+                                Resources
+                              </button>
                               <Link
                                 href={`/dashboard/quiz?subject=${encodeURIComponent(subjectName)}&topic=${encodeURIComponent(item.topic)}&subtopic=${encodeURIComponent(item.subtopic)}&back=${encodeURIComponent(slugPath)}`}
-                                className="btn btn-outline control-sm text-xs"
+                                className="btn btn-outline control-sm"
                               >
-                                Practice quiz
+                                Practice
                               </Link>
                             </div>
-                          </div>
+                          </li>
                         )
                       })}
-                    </div>
+                    </ul>
                   )}
-                </div>
+                </section>
               )
             })}
           </div>
         )}
-      </div>
+      </Page>
 
       <PaperPicker
         open={papersOpen}

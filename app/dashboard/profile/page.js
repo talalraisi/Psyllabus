@@ -245,9 +245,13 @@ export default function ProfilePage() {
       <DashboardLayout profile={null}>
         <Page width="narrow">
           <PageHeader title="Profile" />
-          <div className="surface p-6">
-            <p className="t-card-title mb-2">We could not load your profile</p>
-            <p className="t-small mb-6">{loadError || 'Please try again.'}</p>
+          <div>
+            <p className="text-[16px] font-semibold tracking-[-0.015em]">
+              We could not load your profile
+            </p>
+            <p className="mb-7 mt-2 text-[14px]" style={{ color: 'var(--text-muted)' }}>
+              {loadError || 'Please try again.'}
+            </p>
             <button onClick={() => location.reload()} className="btn btn-solid control-md">
               Reload
             </button>
@@ -266,13 +270,16 @@ export default function ProfilePage() {
         <PageHeader title="Profile" subtitle="Your account and access" />
 
         {message && (
-          <p className="mb-4 rounded-[var(--r-md)] border border-[var(--success-border)] bg-[var(--brand-tint)] px-4 py-3 text-sm text-[var(--success-text)]">
+          <p
+            className="mb-8 border-l-2 pl-4 text-[14px]"
+            style={{ borderColor: 'var(--status-proficient)', color: 'var(--text-body)' }}
+          >
             {message}
           </p>
         )}
 
         {/* Photo */}
-        <div className="surface mb-3 p-5">
+        <div className="mb-10">
           <div className="flex items-center gap-5">
             {avatarUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -310,9 +317,9 @@ export default function ProfilePage() {
         </div>
 
         {/* Details */}
-        <form onSubmit={onSave} className="surface mb-3 space-y-5 p-5">
+        <form onSubmit={onSave} className="mb-12 space-y-6 border-t pt-8" style={{ borderColor: 'var(--border)' }}>
           <div>
-            <label htmlFor="fullName" className="t-small mb-2 block font-medium text-[var(--text)]">
+            <label htmlFor="fullName" className="mb-2 block text-[14px] font-medium">
               Full name
             </label>
             <input
@@ -324,29 +331,30 @@ export default function ProfilePage() {
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <dl className="grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-3">
             {[
               ['Email', profile.email || 'Not available'],
               ['Curriculum', profile.curriculum || 'Not set'],
               ['Graduation', profile.grad_year ? `Class of ${profile.grad_year}` : 'Not set'],
             ].map(([label, value]) => (
-              <div
-                key={label}
-                className="rounded-[var(--r-md)] border border-[var(--border)] bg-[var(--surface-sunken)] p-3"
-              >
-                <p className="t-caption">{label}</p>
-                <p className="mt-1 truncate text-sm text-[var(--text-body)]">{value}</p>
+              <div key={label} className="min-w-0">
+                <dt className="text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
+                  {label}
+                </dt>
+                <dd className="mt-1 truncate text-[14px]" style={{ color: 'var(--text-body)' }}>
+                  {value}
+                </dd>
               </div>
             ))}
-          </div>
+          </dl>
 
           {error && (
-            <p className="rounded-[var(--r-md)] border border-[var(--danger-border)] bg-[var(--danger-bg)] px-4 py-3 text-sm text-[var(--danger)]">
+            <p className="border-l-2 pl-4 text-[14px]" style={{ borderColor: 'var(--danger)', color: 'var(--danger)' }}>
               {error}
             </p>
           )}
 
-          <button type="submit" disabled={saving} className="btn btn-solid control-md w-full">
+          <button type="submit" disabled={saving} className="btn btn-solid control-md">
             {saving && <Spinner />}
             {saving ? 'Saving' : 'Save changes'}
           </button>
@@ -354,18 +362,21 @@ export default function ProfilePage() {
 
         {/* Access */}
         <Section title="Access" className="mb-0">
-          <div id="unlock" className="surface p-5">
-            <div className="mb-4 flex items-center justify-between gap-4">
+          <div id="unlock">
+            <div className="mb-6 flex items-center justify-between gap-4">
               <div>
-                <p className="t-card-title">{planLabel(profile)}</p>
-                <p className="t-small mt-1">
+                <p className="text-[15px] font-semibold tracking-[-0.012em]">{planLabel(profile)}</p>
+                <p className="mt-1.5 text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
                   {premium
                     ? 'Every subject and feature is unlocked.'
                     : `Free accounts track ${FREE_SUBJECT_LIMIT} subject.`}
                 </p>
               </div>
               {premium && (
-                <span className="shrink-0 rounded-full bg-[var(--sand)] px-3 py-1 text-xs font-medium text-[var(--text)]">
+                <span
+                  className="shrink-0 rounded-full border px-3 py-1 text-[11.5px] font-medium"
+                  style={{ borderColor: 'var(--border-strong)', color: 'var(--text-muted)' }}
+                >
                   Full access
                 </span>
               )}
@@ -391,7 +402,10 @@ export default function ProfilePage() {
                   </button>
                 </form>
                 {codeError && (
-                  <p className="mt-3 rounded-[var(--r-md)] border border-[var(--danger-border)] bg-[var(--danger-bg)] px-4 py-3 text-sm text-[var(--danger)]">
+                  <p
+                    className="mt-4 border-l-2 pl-4 text-[14px]"
+                    style={{ borderColor: 'var(--danger)', color: 'var(--danger)' }}
+                  >
                     {codeError}
                   </p>
                 )}
@@ -410,8 +424,8 @@ export default function ProfilePage() {
             department will ask for it before anything else. It has to actually
             delete, not flag as inactive. */}
         <Section title="Your data">
-          <div className="surface p-5">
-            <p className="t-small">
+          <div>
+            <p className="text-[14px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
               Everything Project Syllabus holds about you is yours: your name, your email, your
               subjects and every answer you have given. You can take all of it away at any time,
               and it is removed rather than hidden.
@@ -425,8 +439,8 @@ export default function ProfilePage() {
                 Delete my account and data
               </button>
             ) : (
-              <div className="mt-4 rounded-[var(--r-md)] border border-[var(--danger-border)] bg-[var(--danger-bg)] p-4">
-                <p className="text-sm font-semibold text-[var(--danger)]">
+              <div className="mt-6 border-l-2 pl-4" style={{ borderColor: 'var(--danger)' }}>
+                <p className="text-[14.5px] font-semibold" style={{ color: 'var(--danger)' }}>
                   This cannot be undone.
                 </p>
                 <p className="t-small mt-2">

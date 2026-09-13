@@ -8,7 +8,6 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader, Section, PageLoading } from '@/components/PageShell'
-import ProgressRing from '@/components/ProgressRing'
 import { getSlugForSubject } from '@/lib/subject-map'
 import { computeCompletionPercent } from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
@@ -115,16 +114,39 @@ export default function SubjectsPage() {
 
     return (
       // Fixed column layout with the action pinned to the bottom, so cards line
-      // up regardless of how the subject name wraps.
-      <div className="surface surface-interactive flex flex-col p-5">
-        <div className="mb-5 flex items-start gap-4">
-          <ProgressRing progress={locked ? 0 : pct} size={64} />
-          <div className="min-w-0 flex-1">
-            <h2 className="t-card-title leading-snug">{subject}</h2>
-            <p className="t-small mt-1">
-              {count} subtopic{count === 1 ? '' : 's'}
-              {target ? ` · Target ${target}` : ''}
-            </p>
+      // up regardless of how the subject name wraps. The ring is gone: the rest
+      // of the product states mastery as a bar against a target, and a second
+      // shape for the same number made the two look like different measures.
+      <div
+        className="flex flex-col rounded-[12px] border p-5"
+        style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+      >
+        <h2 className="text-[15.5px] font-semibold leading-snug tracking-[-0.015em]">{subject}</h2>
+        <p className="mt-1.5 text-[13px]" style={{ color: 'var(--text-muted)' }}>
+          {count} subtopic{count === 1 ? '' : 's'}
+          {target ? ` · Target ${target}` : ''}
+        </p>
+
+        <div className="mt-5 mb-6">
+          <div className="flex items-baseline justify-between gap-3">
+            <span
+              className="text-[24px] font-semibold leading-none tracking-[-0.028em] tabular-nums"
+              style={{ color: locked ? 'var(--text-faint)' : 'var(--brand)' }}
+            >
+              {locked ? '—' : `${pct}%`}
+            </span>
+            <span className="text-[12px]" style={{ color: 'var(--text-faint)' }}>
+              {locked ? 'locked' : 'mastered'}
+            </span>
+          </div>
+          <div
+            className="mt-3 h-1 w-full overflow-hidden rounded-full"
+            style={{ background: 'var(--border-strong)' }}
+          >
+            <div
+              className="h-full rounded-full transition-[width] duration-500 ease-out"
+              style={{ width: `${locked ? 0 : pct}%`, background: 'var(--brand)' }}
+            />
           </div>
         </div>
 
@@ -182,15 +204,15 @@ export default function SubjectsPage() {
           </div>
 
           {!isPremium(profile) && subjects.length > 1 && (
-            <div className="mt-3 rounded-[var(--r-md)] border border-[var(--sand)] bg-[var(--sand)]/30 px-4 py-3">
-              <p className="text-sm text-[var(--text-body)]">
+            <div className="mt-6 border-l-2 pl-4" style={{ borderColor: 'var(--border-strong)' }}>
+              <p className="text-[14px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
                 You are on the free plan, which opens one subject at a time. Right now that is{' '}
                 <strong className="text-[var(--text)]">{freeSubject(profile)}</strong>. Switch to a
                 different one whenever you like, as often as you like.
               </p>
               <Link
                 href="/dashboard/profile#unlock"
-                className="mt-1 inline-block text-sm font-medium text-[var(--brand)] hover:underline"
+                className="mt-2 inline-block text-[13.5px] font-medium text-[var(--brand)] hover:underline"
               >
                 Open all of them with a school code
               </Link>

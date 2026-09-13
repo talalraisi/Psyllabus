@@ -8,7 +8,8 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import { displaySubtopic } from '@/lib/progress'
-import { PageLoading } from '@/components/PageShell'
+import { Page, PageHeader, Section, StatRow, EmptyState, PageLoading } from '@/components/PageShell'
+import { IconChevronRight } from '@/components/Icons'
 
 function relativeDue(nextReviewAt, now = Date.now()) {
   const diff = new Date(nextReviewAt).getTime() - now
@@ -72,48 +73,48 @@ export default function MistakeBankPage() {
 
   return (
     <DashboardLayout profile={profile}>
-      <div className="px-5 py-6 md:px-12 md:py-10 max-w-4xl mx-auto">
-        <header className="mb-8">
-          <h1 className="t-page-title mb-1">Mistake Bank</h1>
-          <p className="text-sm text-[var(--text-muted)]">
-            Every wrong answer becomes a spaced-repetition review, so you drill your own
-            failures instead of generic flashcards
-          </p>
-        </header>
+      <Page width="default">
+        <PageHeader
+          title="Mistake Bank"
+          subtitle="Every wrong answer becomes a spaced review, so you drill your own failures rather than generic cards"
+          action={
+            due.length > 0 ? (
+              <Link
+                href="/dashboard/quiz?mode=mistakes&back=/dashboard/mistakes"
+                className="btn btn-solid control-md"
+              >
+                Review {due.length} due
+              </Link>
+            ) : null
+          }
+        />
 
-        <div className="grid grid-cols-2 gap-3 mb-8 max-w-md">
-          <div className="surface p-5">
-            <p className="t-stat text-[var(--warning-text)]">{due.length}</p>
-            <p className="text-sm text-[var(--text-muted)] mt-1">Due for review</p>
-          </div>
-          <div className="surface p-5">
-            <p className="t-stat text-[var(--text)]">{mistakes.length}</p>
-            <p className="text-sm text-[var(--text-muted)] mt-1">Total logged</p>
-          </div>
-        </div>
-
-        {due.length > 0 ? (
-          <Link
-            href="/dashboard/quiz?mode=mistakes&back=/dashboard/mistakes"
-            className="btn btn-solid control-md mb-10 px-6"
-          >
-            Review {due.length} due mistake{due.length !== 1 ? 's' : ''}
-          </Link>
-        ) : mistakes.length > 0 ? (
-          <p className="mb-10 text-sm text-[var(--text-muted)]">
-            Nothing due right now. Your next review unlocks automatically.
-          </p>
-        ) : null}
+        <StatRow
+          className="mb-12"
+          stats={[
+            { label: 'due for review', value: due.length, tone: due.length ? 'var(--status-fading)' : 'var(--text)' },
+            { label: 'logged in total', value: mistakes.length },
+            {
+              label: 'cleared so far',
+              value: mistakes.filter((m) => m.review_count >= 3).length,
+              tone: 'var(--status-proficient)',
+            },
+          ]}
+        />
 
         {mistakes.length === 0 ? (
-          <div className="surface p-10 text-center">
-            <h2 className="text-base font-semibold text-[var(--text)]">No mistakes logged yet</h2>
-            <p className="text-sm text-[var(--text-muted)] mt-2">
-              Take a quiz from any syllabus subtopic and wrong answers land here automatically.
-            </p>
-          </div>
+          <EmptyState
+            title="No mistakes logged yet"
+            description="Take a quiz from any syllabus subtopic and wrong answers land here automatically, on a schedule that brings each one back until you have it three times running."
+          />
         ) : (
-          <div className="space-y-3">
+          <>
+            {due.length === 0 && (
+              <p className="mb-10 text-[14px]" style={{ color: 'var(--text-muted)' }}>
+                Nothing due right now. Your next review unlocks on its own.
+              </p>
+            )}
+
             {Object.entries(bySubject).map(([subject, items]) => {
               const dueHere = items.filter(
                 (m) => new Date(m.next_review_at).getTime() <= now
@@ -121,68 +122,79 @@ export default function MistakeBankPage() {
               const open = !!expanded[subject]
 
               return (
-              <section key={subject} className="surface overflow-hidden">
-                <button
-                  onClick={() =>
-                    setExpanded((prev) => ({ ...prev, [subject]: !prev[subject] }))
+                <Section
+                  key={subject}
+                  title={
+                    <button
+                      onClick={() =>
+                        setExpanded((prev) => ({ ...prev, [subject]: !prev[subject] }))
+                      }
+                      aria-expanded={open}
+                      className="flex items-center gap-2 text-left"
+                    >
+                      <IconChevronRight
+                        width={13}
+                        height={13}
+                        className={`shrink-0 transition-transform duration-150 ${open ? 'rotate-90' : ''}`}
+                        style={{ color: 'var(--text-faint)' }}
+                      />
+                      <span className="text-[15px] font-semibold tracking-[-0.012em]">{subject}</span>
+                    </button>
                   }
-                  aria-expanded={open}
-                  className="flex w-full items-center justify-between gap-4 bg-[var(--surface-sunken)] px-5 py-4 text-left"
-                >
-                  <div className="min-w-0">
-                    <h2 className="text-sm font-bold text-[var(--text)]">{subject}</h2>
-                    <p className="text-xs text-[var(--text-muted)] mt-1">
+                  action={
+                    <span className="text-[12.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
                       {items.length} logged
                       {dueHere > 0 && (
-                        <span className="text-[var(--warning-text)]"> · {dueHere} due</span>
+                        <span style={{ color: 'var(--status-fading)' }}> · {dueHere} due</span>
                       )}
-                    </p>
-                  </div>
-                  <span
-                    className={`shrink-0 text-xs text-[var(--text-faint)] transition-transform duration-150 ${
-                      open ? 'rotate-90' : ''
-                    }`}
-                    aria-hidden="true"
-                  >
-                    &#9654;
-                  </span>
-                </button>
-
-                {open && (
-                <div className="divide-y divide-[var(--border)]">
-                  {items.map((m) => {
-                    const isDue = new Date(m.next_review_at).getTime() <= now
-                    return (
-                      <div key={m.id} className="px-5 py-3 flex items-center gap-4">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs text-[var(--text-faint)]">{displaySubtopic(m.questions.subtopic)}</p>
-                          <p className="text-sm text-[var(--text-body)] truncate">{m.questions.stem}</p>
-                        </div>
-                        <span className="shrink-0 text-xs text-[var(--text-faint)]">
-                          {m.review_count > 0
-                            ? `${m.review_count} correct review${m.review_count !== 1 ? 's' : ''}`
-                            : 'Not yet recovered'}
-                        </span>
-                        <span
-                          className={`shrink-0 text-xs font-medium px-3 py-1 rounded-full ${
-                            isDue
-                              ? 'bg-[var(--sand)]/30 text-[var(--warning-text)]'
-                              : 'bg-[var(--surface-sunken)] text-[var(--text-muted)]'
-                          }`}
-                        >
-                          {relativeDue(m.next_review_at, now)}
-                        </span>
-                      </div>
-                    )
-                  })}
-                </div>
-                )}
-              </section>
+                    </span>
+                  }
+                >
+                  {open && (
+                    <ul className="flex flex-col">
+                      {items.map((m) => {
+                        const isDue = new Date(m.next_review_at).getTime() <= now
+                        return (
+                          <li
+                            key={m.id}
+                            className="flex items-center gap-4 border-b py-3.5 last:border-b-0"
+                            style={{ borderColor: 'var(--border)' }}
+                          >
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
+                                {displaySubtopic(m.questions.subtopic)}
+                              </p>
+                              <p className="mt-1 truncate text-[14px]" style={{ color: 'var(--text-body)' }}>
+                                {m.questions.stem}
+                              </p>
+                            </div>
+                            <span
+                              className="hidden shrink-0 text-[12.5px] sm:block"
+                              style={{ color: 'var(--text-faint)' }}
+                            >
+                              {m.review_count > 0
+                                ? `${m.review_count} correct review${m.review_count !== 1 ? 's' : ''}`
+                                : 'Not yet recovered'}
+                            </span>
+                            <span
+                              className="shrink-0 text-[12.5px] font-medium tabular-nums"
+                              style={{
+                                color: isDue ? 'var(--status-fading)' : 'var(--text-muted)',
+                              }}
+                            >
+                              {relativeDue(m.next_review_at, now)}
+                            </span>
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  )}
+                </Section>
               )
             })}
-          </div>
+          </>
         )}
-      </div>
+      </Page>
     </DashboardLayout>
   )
 }

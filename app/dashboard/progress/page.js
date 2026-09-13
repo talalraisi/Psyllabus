@@ -7,16 +7,19 @@ import { getProfile, getSyllabus } from '@/lib/cache'
 import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 import Heatmap from '@/components/Heatmap'
+import { Page, PageHeader, Section, StatRow } from '@/components/PageShell'
 import { mergeSyllabusWithProgress } from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 
+// Read left to right this is the ladder itself: everything tracked, then the
+// same subtopics sorted by how well they are actually held.
 const STAT_CARDS = [
-  { key: 'total', label: 'Total tracked', color: 'text-[var(--text)]' },
-  { key: 'mastered', label: 'Mastered', color: 'text-[var(--status-mastered)]' },
-  { key: 'proficient', label: 'Proficient', color: 'text-[var(--status-proficient)]' },
-  { key: 'confident', label: 'Developing', color: 'text-[var(--status-developing)]' },
-  { key: 'inProgress', label: 'Weak', color: 'text-[var(--status-weak)]' },
-  { key: 'decaying', label: 'Fading', color: 'text-[var(--status-fading)]' },
+  { key: 'total', label: 'tracked', tone: 'var(--text)' },
+  { key: 'mastered', label: 'mastered', tone: 'var(--status-mastered)' },
+  { key: 'proficient', label: 'proficient', tone: 'var(--status-proficient)' },
+  { key: 'confident', label: 'developing', tone: 'var(--status-developing)' },
+  { key: 'inProgress', label: 'weak', tone: 'var(--status-weak)' },
+  { key: 'decaying', label: 'fading', tone: 'var(--status-fading)' },
 ]
 
 export default function ProgressPage() {
@@ -103,54 +106,50 @@ export default function ProgressPage() {
 
   return (
     <DashboardLayout profile={profile}>
-      <div className="px-5 py-6 md:px-12 md:py-10 max-w-6xl mx-auto">
-        <header className="mb-8">
-          <h1 className="t-page-title mb-1">Progress</h1>
-          <p className="text-sm text-[var(--text-muted)]">
-            {overallPercent}% of all subtopics mastered across {subjects.length} subject{subjects.length !== 1 ? 's' : ''}
-          </p>
-        </header>
+      <Page width="wide">
+        <PageHeader
+          title="Progress"
+          subtitle={`${overallPercent}% of all subtopics mastered across ${subjects.length} subject${subjects.length !== 1 ? 's' : ''}`}
+        />
 
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-10">
-          {STAT_CARDS.map((stat) => (
-            <div
-              key={stat.key}
-              className="surface p-5"
-            >
-              <p className={`t-stat ${stat.color}`}>
-                {summary[stat.key]}
-              </p>
-              <p className="text-sm text-[var(--text-muted)] mt-1">{stat.label}</p>
-            </div>
-          ))}
-        </div>
+        <StatRow
+          className="mb-14"
+          stats={STAT_CARDS.map((stat) => ({
+            label: stat.label,
+            value: summary[stat.key],
+            tone: stat.tone,
+          }))}
+        />
 
         {bySubject.length > 0 && (
-          <section className="mb-10">
-            <h2 className="t-overline mb-3">
-              By Subject
-            </h2>
-            <div className="surface p-5 space-y-4">
+          <Section title="By subject">
+            <ul className="flex flex-col gap-4">
               {bySubject.map(({ subject, percent }) => (
-                <div key={subject} className="flex items-center gap-4">
-                  <span className="w-56 shrink-0 text-sm text-[var(--text-body)] truncate">{subject}</span>
-                  <div className="flex-1 h-2 bg-[var(--surface-sunken)] rounded-full overflow-hidden">
+                <li key={subject} className="flex items-center gap-5">
+                  <span className="w-56 shrink-0 truncate text-[14px]">{subject}</span>
+                  <div
+                    className="h-1 flex-1 overflow-hidden rounded-full"
+                    style={{ background: 'var(--border-strong)' }}
+                  >
                     <div
-                      className="h-full bg-[var(--brand)] rounded-full transition-all duration-300"
-                      style={{ width: `${percent}%` }}
+                      className="h-full rounded-full transition-[width] duration-500 ease-out"
+                      style={{ width: `${percent}%`, background: 'var(--brand)' }}
                     />
                   </div>
-                  <span className="w-10 shrink-0 text-right text-sm font-semibold text-[var(--brand)]">
+                  <span
+                    className="w-11 shrink-0 text-right text-[13.5px] font-semibold tabular-nums"
+                    style={{ color: 'var(--brand)' }}
+                  >
                     {percent}%
                   </span>
-                </div>
+                </li>
               ))}
-            </div>
-          </section>
+            </ul>
+          </Section>
         )}
 
         <Heatmap items={heatmapItems} subjects={subjects} />
-      </div>
+      </Page>
     </DashboardLayout>
   )
 }

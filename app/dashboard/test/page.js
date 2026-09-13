@@ -227,8 +227,8 @@ export default function TestBuilderPage() {
         />
 
         {/* Subject */}
-        <div className="surface mb-3 p-5">
-          <label htmlFor="subject" className="t-small mb-2 block font-medium text-[var(--text)]">
+        <section className="mb-9 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
+          <label htmlFor="subject" className="mb-2 block text-[14.5px] font-medium">
             Subject
           </label>
           <select
@@ -251,12 +251,12 @@ export default function TestBuilderPage() {
               </Link>
             </p>
           )}
-        </div>
+        </section>
 
         {/* Level. Only an IB HL subject has two halves to choose between. */}
         {isHLSubject && hlCount > 0 && (
-          <div className="surface mb-3 p-5">
-            <p className="t-small mb-1 font-medium text-[var(--text)]">Level</p>
+          <section className="mb-9 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
+            <p className="text-[14.5px] font-medium">Level</p>
             <p className="t-caption mb-3">
               {hlCount} of your subtopics in this subject are HL extension.
             </p>
@@ -267,29 +267,29 @@ export default function TestBuilderPage() {
                   onClick={() => setLevel(l.key)}
                   aria-pressed={level === l.key}
                   title={l.hint}
-                  className={`control-sm rounded-[var(--r-md)] border px-4 text-sm font-medium transition-colors duration-150 ${
+                  className={`control-sm rounded-full border px-4 text-[13.5px] font-medium transition-colors duration-150 ${
                     level === l.key
                       ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
-                      : 'border-[var(--border-strong)] text-[var(--text-body)] hover:bg-[var(--surface-sunken)]'
+                      : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
                   }`}
                 >
                   {l.label}
                 </button>
               ))}
             </div>
-          </div>
+          </section>
         )}
 
         {/* What to draw from */}
-        <div className="surface mb-3 p-5">
-          <p className="t-small mb-3 font-medium text-[var(--text)]">What should this test cover?</p>
+        <section className="mb-9 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
+          <p className="mb-3 text-[14.5px] font-medium">What should this test cover?</p>
           <div className="flex flex-col gap-2">
             {FOCUS_MODES.map((mode) => (
               <button
                 key={mode.key}
                 onClick={() => setFocusMode(mode.key)}
                 aria-pressed={focusMode === mode.key}
-                className={`flex items-start gap-3 rounded-[var(--r-md)] border p-3 text-left transition-colors duration-150 ${
+                className={`flex items-start gap-3 rounded-xl border px-4 py-3 text-left transition-colors duration-150 ${
                   focusMode === mode.key
                     ? 'border-[var(--brand)] bg-[var(--brand-tint)]'
                     : 'border-[var(--border-strong)] hover:border-[var(--border-hover)]'
@@ -311,12 +311,12 @@ export default function TestBuilderPage() {
               </button>
             ))}
           </div>
-        </div>
+        </section>
 
         {/* Topics */}
-        <div className="surface mb-3 p-5">
+        <section className="mb-9 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
           <div className="mb-3 flex items-center justify-between">
-            <p className="t-small font-medium text-[var(--text)]">Topics</p>
+            <p className="text-[14.5px] font-medium">Topics</p>
             <button
               onClick={() => setSelected(selected.length === topics.length ? [] : topics)}
               className="text-xs font-medium text-[var(--brand)] hover:underline"
@@ -343,7 +343,7 @@ export default function TestBuilderPage() {
                     key={topic}
                     onClick={() => toggleTopic(topic)}
                     aria-pressed={isSelected}
-                    className={`flex items-center gap-3 rounded-[var(--r-md)] border px-3 py-2 text-left transition-colors duration-150 ${
+                    className={`flex items-center gap-3 rounded-xl border px-4 py-2.5 text-left transition-colors duration-150 ${
                       isSelected
                         ? 'border-[var(--brand)] bg-[var(--brand-tint)]'
                         : 'border-[var(--border-strong)] hover:border-[var(--border-hover)]'
@@ -369,11 +369,11 @@ export default function TestBuilderPage() {
               })}
             </div>
           )}
-        </div>
+        </section>
 
         {/* Difficulty and length */}
-        <div className="surface mb-3 p-5">
-          <p className="t-small mb-1 font-medium text-[var(--text)]">Heat</p>
+        <section className="mb-9 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
+          <p className="text-[14.5px] font-medium">Heat</p>
           <p className="t-caption mb-3">
             How hard the questions are. Burning is the hardest end of the paper.
           </p>
@@ -391,10 +391,10 @@ export default function TestBuilderPage() {
                   onClick={() => setDifficulty(d.key)}
                   aria-pressed={difficulty === d.key}
                   disabled={n === 0}
-                  className={`control-sm rounded-[var(--r-md)] border px-4 text-sm font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40 ${
+                  className={`control-sm rounded-full border px-4 text-[13.5px] font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40 ${
                     difficulty === d.key
                       ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
-                      : 'border-[var(--border-strong)] text-[var(--text-body)] hover:bg-[var(--surface-sunken)]'
+                      : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
                   }`}
                 >
                   {d.label}
@@ -404,17 +404,17 @@ export default function TestBuilderPage() {
             })}
           </div>
 
-          <p className="t-small mb-3 font-medium text-[var(--text)]">Length</p>
+          <p className="mb-3 text-[14.5px] font-medium">Length</p>
           <div className="mb-6 flex flex-wrap gap-2">
             {LENGTHS.map((n) => (
               <button
                 key={n}
                 onClick={() => setLength(n)}
                 aria-pressed={length === n}
-                className={`control-md rounded-[var(--r-md)] border px-4 text-sm font-medium transition-colors duration-150 ${
+                className={`control-md rounded-full border px-4 text-[13.5px] font-medium transition-colors duration-150 ${
                   length === n
                     ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
-                    : 'border-[var(--border-strong)] text-[var(--text-body)] hover:bg-[var(--surface-sunken)]'
+                    : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
                 }`}
               >
                 {n} questions
@@ -443,27 +443,28 @@ export default function TestBuilderPage() {
               Exam conditions: countdown and live marks-per-minute pacing
             </span>
           </button>
-        </div>
+        </section>
 
         {/* Summary */}
-        <div className="surface p-5">
+        <section className="mt-12 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
           {canStart ? (
             <>
-              <div className="mb-4 grid grid-cols-3 gap-3">
+              <dl className="mb-8 flex flex-wrap gap-x-12 gap-y-5">
                 {[
                   ['Questions', actualLength],
                   ['Marks', totalMarks],
                   [timed ? 'Time limit' : 'Est. time', `${estMinutes}m`],
                 ].map(([label, value]) => (
-                  <div
-                    key={label}
-                    className="rounded-[var(--r-md)] border border-[var(--border)] bg-[var(--surface-sunken)] p-3"
-                  >
-                    <p className="text-lg font-bold tabular-nums text-[var(--text)]">{value}</p>
-                    <p className="t-caption">{label}</p>
+                  <div key={label}>
+                    <dt className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
+                      {label}
+                    </dt>
+                    <dd className="mt-1.5 text-[26px] font-semibold leading-none tracking-[-0.028em] tabular-nums">
+                      {value}
+                    </dd>
                   </div>
                 ))}
-              </div>
+              </dl>
 
               {actualLength < length && (
                 <p className="t-caption mb-4">
@@ -473,7 +474,7 @@ export default function TestBuilderPage() {
                 </p>
               )}
 
-              <button onClick={startTest} className="btn btn-solid control-lg w-full">
+              <button onClick={startTest} className="btn btn-solid control-lg">
                 {timed && <IconClock width={18} height={18} />}
                 Start {timed ? 'timed test' : 'test'}
               </button>
@@ -488,7 +489,7 @@ export default function TestBuilderPage() {
               }
             />
           )}
-        </div>
+        </section>
       </Page>
     </DashboardLayout>
   )

@@ -161,7 +161,10 @@ export default function ResourceHubDrawer({
               <p className="t-caption">{topic}</p>
               <h2 className="mt-1 text-base font-semibold text-[var(--text)]">{subtopic}</h2>
               {hlOnly && (
-                <span className="mt-2 inline-block rounded-full bg-[var(--sand)] px-2 py-1 text-[11px] font-medium text-[var(--text)]">
+                <span
+                  className="mt-2 inline-block rounded-full border px-2.5 py-1 text-[11px] font-medium"
+                  style={{ borderColor: 'var(--border-strong)', color: 'var(--text-muted)' }}
+                >
                   HL only
                 </span>
               )}

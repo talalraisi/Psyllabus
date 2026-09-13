@@ -145,8 +145,13 @@ export default function DashboardLayout({ children, profile }) {
       <div className="mx-4 border-t border-[var(--border)]" />
 
       <nav className="flex-1 overflow-y-auto px-3 pt-4" aria-label="Main">
-        <p className="t-overline px-3 pb-2">Menu</p>
-        <ul className="flex flex-col gap-1">
+        <p
+          className="px-3 pb-3 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
+          style={{ color: 'var(--text-faint)' }}
+        >
+          Menu
+        </p>
+        <ul className="flex flex-col gap-0.5">
           {NAV_ITEMS.map(({ href, label, Icon, match }) => {
             const active = match(pathname)
             return (
@@ -154,16 +159,24 @@ export default function DashboardLayout({ children, profile }) {
                 <Link
                   href={href}
                   aria-current={active ? 'page' : undefined}
-                  className={`control-md flex items-center gap-3 rounded-[var(--r-md)] px-3 text-sm transition-colors duration-150 ${
-                    active
-                      ? 'bg-[var(--brand-tint)] text-[var(--brand)] font-semibold'
-                      : 'text-[var(--text-body)] font-medium hover:bg-[var(--surface-sunken)]'
-                  }`}
+                  className="relative flex items-center gap-3 rounded-[8px] py-2.5 pl-3 pr-3 text-[13.5px] transition-colors duration-150"
+                  style={{
+                    color: active ? 'var(--text)' : 'var(--text-muted)',
+                    fontWeight: active ? 600 : 500,
+                    background: active ? 'var(--surface-sunken)' : 'transparent',
+                  }}
                 >
+                  {active && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute left-0 top-1/2 h-4 w-[2px] -translate-y-1/2 rounded-full"
+                      style={{ background: 'var(--brand)' }}
+                    />
+                  )}
                   <Icon
-                    width={18}
-                    height={18}
-                    className={active ? 'text-[var(--brand)]' : 'text-[var(--text-faint)]'}
+                    width={17}
+                    height={17}
+                    style={{ color: active ? 'var(--brand)' : 'var(--text-faint)' }}
                   />
                   {label}
                 </Link>
@@ -177,7 +190,7 @@ export default function DashboardLayout({ children, profile }) {
 
       <div className="p-3">
         {profile && (
-          <div className="mb-2 flex items-center gap-3 rounded-[var(--r-md)] bg-[var(--surface-sunken)] p-3">
+          <div className="mb-2 flex items-center gap-3 rounded-[10px] p-3">
             <Avatar profile={profile} size={32} />
             <div className="min-w-0">
               <p className="truncate text-[13px] font-semibold text-[var(--text)]">
@@ -193,7 +206,8 @@ export default function DashboardLayout({ children, profile }) {
         {profile && !isPremium(profile) && (
           <Link
             href="/dashboard/profile#unlock"
-            className="mb-2 block rounded-[var(--r-md)] border border-[var(--sand)] bg-[var(--sand)]/30 px-3 py-2"
+            className="mb-3 ml-3 block border-l-2 py-1 pl-3"
+            style={{ borderColor: 'var(--brand)' }}
           >
             <p className="text-[13px] font-semibold text-[var(--text)]">{planLabel(profile)}</p>
             <p className="t-caption">Have a school code? Unlock everything.</p>

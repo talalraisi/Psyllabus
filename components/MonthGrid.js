@@ -51,7 +51,7 @@ export default function MonthGrid({
       </div>
 
       <div className="surface overflow-hidden">
-        <div className="grid grid-cols-7 border-b border-[var(--border)] bg-[var(--surface-sunken)]">
+        <div className="grid grid-cols-7 border-b" style={{ borderColor: 'var(--border)' }}>
           {WEEKDAYS.map((d) => (
             <div key={d} className="t-overline px-2 py-2 text-center">
               {d}

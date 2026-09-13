@@ -128,89 +128,122 @@ export default function PredictionPage() {
           />
         ) : (
           <>
-            {/* Headline */}
-            <div className="surface mb-3 p-6">
-              <div className="flex flex-wrap items-end justify-between gap-6">
+            {/* Headline. The predicted total is the one number on this page
+                that matters, so it is the only thing set large; the target and
+                the distance to it are reference beneath it. */}
+            <div className="mb-14">
+              <p
+                className="mb-3 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
+                style={{ color: 'var(--text-faint)' }}
+              >
+                {rules.hasCore ? 'Predicted subject points' : 'Predicted total'}
+              </p>
+              <p className="flex items-baseline gap-3">
+                <span
+                  className="text-[clamp(3rem,9vw,4.5rem)] font-semibold leading-[0.95] tracking-[-0.04em] tabular-nums"
+                  style={{ color: 'var(--brand)' }}
+                >
+                  {prediction.predictedTotal}
+                </span>
+                <span className="text-[17px]" style={{ color: 'var(--text-faint)' }}>
+                  / {rules.maxSubjectPoints}
+                </span>
+              </p>
+
+              <div
+                className="mt-8 flex flex-wrap gap-x-12 gap-y-5 border-t pt-6"
+                style={{ borderColor: 'var(--border)' }}
+              >
                 <div>
-                  <p className="t-overline mb-2">
-                    {rules.hasCore ? 'Predicted subject points' : 'Predicted total'}
+                  <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
+                    Your target
                   </p>
-                  <p className="flex items-baseline gap-2">
-                    <span className="text-[44px] font-bold leading-none tabular-nums text-[var(--brand)]">
-                      {prediction.predictedTotal}
+                  <p className="mt-1.5 text-[22px] font-semibold leading-none tracking-[-0.025em] tabular-nums">
+                    {prediction.targetTotal}
+                    <span className="text-[14px] font-normal" style={{ color: 'var(--text-faint)' }}>
+                      {' '}/ {rules.maxSubjectPoints}
                     </span>
-                    <span className="t-small">/ {rules.maxSubjectPoints}</span>
                   </p>
                 </div>
-
-                <div className="text-right">
-                  <p className="t-overline mb-2">Your target</p>
-                  <p className="flex items-baseline justify-end gap-2">
-                    <span className="text-[28px] font-bold leading-none tabular-nums text-[var(--text)]">
-                      {prediction.targetTotal}
-                    </span>
-                    <span className="t-small">/ {rules.maxSubjectPoints}</span>
+                <div>
+                  <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
+                    Toward that target
                   </p>
-                </div>
-              </div>
-
-              {/* Distance to target */}
-              <div className="mt-6">
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="t-small">Progress toward your target</span>
-                  <span
-                    className={`text-sm font-semibold tabular-nums ${
-                      prediction.onTrack ? 'text-[var(--success-text)]' : 'text-[var(--warning-text)]'
-                    }`}
+                  <p
+                    className="mt-1.5 text-[22px] font-semibold leading-none tracking-[-0.025em] tabular-nums"
+                    style={{
+                      color: prediction.onTrack
+                        ? 'var(--status-proficient)'
+                        : 'var(--status-fading)',
+                    }}
                   >
                     {Math.min(100, prediction.percentToTarget)}%
-                  </span>
+                  </p>
                 </div>
-                <div className="h-2 overflow-hidden rounded-full bg-[var(--surface-sunken)]">
-                  <div
-                    className={`h-full rounded-full transition-[width] duration-500 ${
-                      prediction.onTrack ? 'bg-[var(--success-text)]' : 'bg-[var(--brand)]'
-                    }`}
-                    style={{ width: `${Math.min(100, prediction.percentToTarget)}%` }}
-                  />
+                <div>
+                  <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
+                    Syllabus tested
+                  </p>
+                  <p className="mt-1.5 text-[22px] font-semibold leading-none tracking-[-0.025em] tabular-nums">
+                    {Math.round(prediction.coverage * 100)}%
+                  </p>
                 </div>
-
-                <p className="mt-3 text-sm text-[var(--text-body)]">
-                  {prediction.onTrack ? (
-                    <>
-                      You are <strong className="text-[var(--success-text)]">on track</strong>, and
-                      currently {prediction.gap === 0 ? 'exactly at' : `${prediction.gap} point${Math.abs(prediction.gap) === 1 ? '' : 's'} above`}{' '}
-                      your target.
-                    </>
-                  ) : (
-                    <>
-                      You are{' '}
-                      <strong className="text-[var(--warning-text)]">
-                        {Math.abs(prediction.gap)} point{Math.abs(prediction.gap) === 1 ? '' : 's'}
-                      </strong>{' '}
-                      short of your target.
-                    </>
-                  )}
-                </p>
-
-                <p className="t-caption mt-2">
-                  {CONFIDENCE_COPY[prediction.confidence]} You have tested{' '}
-                  {Math.round(prediction.coverage * 100)}% of your syllabus.
-                </p>
               </div>
+
+              <div
+                className="mt-6 h-1 overflow-hidden rounded-full"
+                style={{ background: 'var(--border-strong)' }}
+              >
+                <div
+                  className="h-full rounded-full transition-[width] duration-500"
+                  style={{
+                    width: `${Math.min(100, prediction.percentToTarget)}%`,
+                    background: prediction.onTrack
+                      ? 'var(--status-proficient)'
+                      : 'var(--brand)',
+                  }}
+                />
+              </div>
+
+              <p className="mt-5 text-[14.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                {prediction.onTrack ? (
+                  <>
+                    You are{' '}
+                    <strong style={{ color: 'var(--status-proficient)' }}>on track</strong>, and
+                    currently{' '}
+                    {prediction.gap === 0
+                      ? 'exactly at'
+                      : `${prediction.gap} point${Math.abs(prediction.gap) === 1 ? '' : 's'} above`}{' '}
+                    your target.
+                  </>
+                ) : (
+                  <>
+                    You are{' '}
+                    <strong style={{ color: 'var(--status-fading)' }}>
+                      {Math.abs(prediction.gap)} point{Math.abs(prediction.gap) === 1 ? '' : 's'}
+                    </strong>{' '}
+                    short of your target.
+                  </>
+                )}
+              </p>
+
+              <p className="mt-2 text-[13px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
+                {CONFIDENCE_COPY[prediction.confidence]}
+              </p>
             </div>
 
             {/* Per subject */}
             <Section title="By subject">
-              <ul className="surface">
+              <ul className="flex flex-col">
                 {prediction.subjects.map((s, i) => {
                   const behind = s.gap !== null && s.gap < 0
                   return (
                     <li
                       key={s.subject}
-                      className={i > 0 ? 'border-t border-[var(--border)]' : undefined}
+                      className="border-b last:border-b-0"
+                      style={{ borderColor: 'var(--border)' }}
                     >
-                      <div className="flex flex-wrap items-center gap-4 px-5 py-4">
+                      <div className="flex flex-wrap items-center gap-4 py-3.5">
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-sm font-medium text-[var(--text)]">
                             {s.subject}
@@ -260,9 +293,12 @@ export default function PredictionPage() {
 
         {/* Targets, editable */}
         <Section title="Your targets">
-          <div className="surface p-5">
+          <div>
             {saved && (
-              <p className="mb-4 rounded-[var(--r-md)] border border-[var(--success-border)] bg-[var(--success-bg)] px-4 py-3 text-sm text-[var(--success-text)]">
+              <p
+                className="mb-6 border-l-2 pl-4 text-[14px]"
+                style={{ borderColor: 'var(--status-proficient)', color: 'var(--text-body)' }}
+              >
                 Targets updated
               </p>
             )}
@@ -354,17 +390,17 @@ export default function PredictionPage() {
                     .filter((s) => !rules.hasCore || !IB_CORE_SUBJECTS.includes(s))
                     .map((subject) => (
                       <div key={subject}>
-                        <p className="t-small mb-2 font-medium text-[var(--text)]">{subject}</p>
+                        <p className="mb-2.5 text-[14px] font-medium">{subject}</p>
                         <div className="flex flex-wrap gap-2">
                           {gradeScale.map((g) => (
                             <button
                               key={g}
                               onClick={() => setTarget(subject, String(g))}
                               aria-pressed={String(targets[subject]) === String(g)}
-                              className={`control-sm w-10 rounded-[var(--r-md)] border text-sm font-semibold transition-colors duration-150 ${
+                              className={`control-sm w-10 rounded-full border text-[13.5px] font-semibold transition-colors duration-150 ${
                                 String(targets[subject]) === String(g)
                                   ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
-                                  : 'border-[var(--border-strong)] text-[var(--text-body)] hover:bg-[var(--surface-sunken)]'
+                                  : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
                               }`}
                             >
                               {g}
@@ -377,7 +413,7 @@ export default function PredictionPage() {
                   {rules.hasCore &&
                     ['Theory of Knowledge', 'Extended Essay'].map((component) => (
                     <div key={component}>
-                      <p className="t-small mb-2 font-medium text-[var(--text)]">
+                      <p className="mb-2.5 text-[14px] font-medium">
                         {component} <span className="t-caption">(A to E)</span>
                       </p>
                       <div className="flex flex-wrap gap-2">
@@ -386,10 +422,10 @@ export default function PredictionPage() {
                             key={g}
                             onClick={() => setTarget(component, g)}
                             aria-pressed={targets[component] === g}
-                            className={`control-sm w-10 rounded-[var(--r-md)] border text-sm font-semibold transition-colors duration-150 ${
+                            className={`control-sm w-10 rounded-full border text-[13.5px] font-semibold transition-colors duration-150 ${
                               targets[component] === g
                                 ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
-                                : 'border-[var(--border-strong)] text-[var(--text-body)] hover:bg-[var(--surface-sunken)]'
+                                : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
                             }`}
                           >
                             {g}
@@ -401,8 +437,11 @@ export default function PredictionPage() {
                 </div>
 
                 {rules.hasCore && (
-                <div className="mb-5 rounded-[var(--r-md)] border border-[var(--border)] bg-[var(--surface-sunken)] p-4">
-                  <p className="t-small">
+                <div
+                  className="mb-6 border-l-2 pl-4"
+                  style={{ borderColor: 'var(--border-strong)' }}
+                >
+                  <p className="text-[14px]" style={{ color: 'var(--text-body)' }}>
                     Core bonus:{' '}
                     <strong className="text-[var(--text)]">
                       {bonus === 'F'

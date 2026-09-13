@@ -197,15 +197,19 @@ export default function CalendarPage() {
         />
 
         {error && (
-          <div className="mb-6 rounded-[var(--r-md)] border border-[var(--danger-border)] bg-[var(--danger-bg)] px-4 py-3">
-            <p className="text-sm text-[var(--status-weak)]">{error}</p>
+          <div className="mb-8 border-l-2 pl-4" style={{ borderColor: 'var(--danger)' }}>
+            <p className="text-[14px]" style={{ color: 'var(--status-weak)' }}>{error}</p>
           </div>
         )}
 
         {draft && (
-          <form onSubmit={saveEvent} className="surface mb-8 p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <p className="t-card-title">New event</p>
+          <form
+            onSubmit={saveEvent}
+            className="mb-10 rounded-[12px] border p-5"
+            style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+          >
+            <div className="mb-5 flex items-center justify-between">
+              <p className="text-[15px] font-semibold tracking-[-0.012em]">New event</p>
               <button
                 type="button"
                 onClick={() => setDraft(null)}
@@ -355,13 +359,17 @@ export default function CalendarPage() {
           }
         >
           {selectedEvents.length === 0 ? (
-            <div className="surface px-5 py-6">
-              <p className="t-small">Nothing scheduled.</p>
-            </div>
+            <p className="py-2 text-[14px]" style={{ color: 'var(--text-muted)' }}>
+              Nothing scheduled.
+            </p>
           ) : (
-            <ul className="surface">
+            <ul className="flex flex-col">
               {selectedEvents.map((event, i) => (
-                <li key={event.id} className={i > 0 ? 'border-t border-[var(--border)]' : undefined}>
+                <li
+                  key={event.id}
+                  className="border-b last:border-b-0"
+                  style={{ borderColor: 'var(--border)' }}
+                >
                   <EventRow
                     event={event}
                     onToggle={() => toggleComplete(event)}
@@ -389,9 +397,13 @@ export default function CalendarPage() {
               }
             />
           ) : (
-            <ul className="surface">
+            <ul className="flex flex-col">
               {next.map((event, i) => (
-                <li key={event.id} className={i > 0 ? 'border-t border-[var(--border)]' : undefined}>
+                <li
+                  key={event.id}
+                  className="border-b last:border-b-0"
+                  style={{ borderColor: 'var(--border)' }}
+                >
                   <EventRow
                     event={event}
                     showRelative
