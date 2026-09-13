@@ -11,6 +11,27 @@ import { displaySubtopic } from '@/lib/progress'
 import { IconChevronRight } from '@/components/Icons'
 import { Page, PageHeader, EmptyState, PageLoading } from '@/components/PageShell'
 
+const DAY = 24 * 60 * 60 * 1000
+
+/** Three correct recalls and a question leaves the bank. */
+const REVIEWS_TO_CLEAR = 3
+
+/** Which shelf a question sits on, and in what order the shelves read. */
+const BUCKETS = [
+  { key: 'now', label: 'Due now', hint: 'Waiting for you.' },
+  { key: 'tomorrow', label: 'Tomorrow', hint: null },
+  { key: 'week', label: 'Later this week', hint: null },
+  { key: 'later', label: 'Further out', hint: null },
+]
+
+function bucketFor(nextReviewAt, now) {
+  const diff = new Date(nextReviewAt).getTime() - now
+  if (diff <= 0) return 'now'
+  if (diff <= DAY) return 'tomorrow'
+  if (diff <= 7 * DAY) return 'week'
+  return 'later'
+}
+
 function relativeDue(nextReviewAt, now = Date.now()) {
   const diff = new Date(nextReviewAt).getTime() - now
   if (diff <= 0) return 'Due now'
@@ -21,9 +42,9 @@ function relativeDue(nextReviewAt, now = Date.now()) {
 export default function MistakeBankPage() {
   const [profile, setProfile] = useState(null)
   const [picked, setPicked] = useState([])
-  // Folded state per subject. Absent means open, so the page still shows its
+  // Folded state per shelf. Absent means open, so the page still shows its
   // contents the first time you arrive.
-  const [openSubjects, setOpenSubjects] = useState({})
+  const [openBuckets, setOpenBuckets] = useState({})
   const [mistakes, setMistakes] = useState([])
   const [loading, setLoading] = useState(true)
   const router = useRouter()
@@ -79,11 +100,6 @@ export default function MistakeBankPage() {
   // the page should not make you choose before it shows you anything.
   const scope = picked.length ? picked : subjects
   const inScope = mistakes.filter((m) => scope.includes(m.questions.subject || 'Other'))
-  // Subjects that actually have something in the current scope, in the order
-  // the picker shows them.
-  const subjectsInScope = subjects.filter((subject) =>
-    inScope.some((m) => (m.questions.subject || 'Other') === subject)
-  )
   const dueInScope = inScope.filter((m) => new Date(m.next_review_at).getTime() <= now)
 
   const toggle = (subject) =>
@@ -187,27 +203,22 @@ export default function MistakeBankPage() {
               </p>
             )}
 
-            {/* Grouped by subject and foldable. A flat list of thirty-five is
-                a wall; folded, you can see which subject the damage is in and
-                open only that one. */}
             <div className="flex flex-col">
-              {subjectsInScope.map((subject) => {
-                const items = inScope.filter((m) => m.questions.subject === subject)
-                const dueHere = items.filter(
-                  (m) => new Date(m.next_review_at).getTime() <= now
-                ).length
-                const isOpen = openSubjects[subject] !== false // open unless folded
+              {BUCKETS.map(({ key, label, hint }) => {
+                const items = inScope.filter(
+                  (m) => bucketFor(m.next_review_at, now) === key
+                )
+                if (!items.length) return null
+                const isOpen = openBuckets[key] !== false // open unless folded
 
                 return (
                   <section
-                    key={subject}
+                    key={key}
                     className="border-t last:border-b"
                     style={{ borderColor: 'var(--border)' }}
                   >
                     <button
-                      onClick={() =>
-                        setOpenSubjects((prev) => ({ ...prev, [subject]: !isOpen }))
-                      }
+                      onClick={() => setOpenBuckets((prev) => ({ ...prev, [key]: !isOpen }))}
                       aria-expanded={isOpen}
                       className="flex w-full items-center gap-3 py-3.5 text-left"
                     >
@@ -217,72 +228,76 @@ export default function MistakeBankPage() {
                         className={`shrink-0 transition-transform duration-150 ${isOpen ? 'rotate-90' : ''}`}
                         style={{ color: 'var(--text-faint)' }}
                       />
-                      <span className="min-w-0 flex-1 truncate text-[13.5px] font-medium">
-                        {subject}
-                      </span>
                       <span
-                        className="shrink-0 text-[12px] tabular-nums"
+                        className="text-[13.5px] font-medium"
+                        style={{ color: key === 'now' ? 'var(--status-fading)' : 'var(--text)' }}
+                      >
+                        {label}
+                      </span>
+                      {hint && (
+                        <span className="hidden text-[12px] sm:block" style={{ color: 'var(--text-faint)' }}>
+                          {hint}
+                        </span>
+                      )}
+                      <span
+                        className="ml-auto shrink-0 text-[12px] tabular-nums"
                         style={{ color: 'var(--text-faint)' }}
                       >
-                        {dueHere > 0 && (
-                          <span style={{ color: 'var(--status-fading)' }}>{dueHere} due · </span>
-                        )}
-                        {items.length} logged
+                        {items.length}
                       </span>
                     </button>
 
                     {isOpen && (
                       <ul className="flex flex-col pb-2 pl-6">
-                        {items.map((m) => {
-                          const isDue = new Date(m.next_review_at).getTime() <= now
-                          return (
-                            <li
-                              key={m.id}
-                              className="flex items-center gap-4 border-t py-3"
-                              style={{ borderColor: 'var(--border)' }}
+                        {items.map((m) => (
+                          <li
+                            key={m.id}
+                            className="flex items-center gap-4 border-t py-3"
+                            style={{ borderColor: 'var(--border)' }}
+                          >
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
+                                {m.questions.subject} · {displaySubtopic(m.questions.subtopic)}
+                              </p>
+                              <p
+                                className="mt-0.5 truncate text-[13.5px]"
+                                style={{ color: 'var(--text-body)' }}
+                              >
+                                {m.questions.stem}
+                              </p>
+                            </div>
+
+                            {/* Three correct reviews clears it, so the count is
+                                three marks rather than a fraction to parse. */}
+                            <span
+                              className="flex shrink-0 items-center gap-1"
+                              title={`${m.review_count || 0} of ${REVIEWS_TO_CLEAR} correct reviews`}
+                              aria-label={`${m.review_count || 0} of ${REVIEWS_TO_CLEAR} correct reviews`}
                             >
-                              <span
-                                className="h-1.5 w-1.5 shrink-0 rounded-full"
-                                style={{
-                                  background: isDue
-                                    ? 'var(--status-fading)'
-                                    : 'var(--border-strong)',
-                                }}
-                                aria-hidden="true"
-                              />
-                              <div className="min-w-0 flex-1">
-                                <p
-                                  className="truncate text-[11.5px]"
-                                  style={{ color: 'var(--text-faint)' }}
-                                >
-                                  {displaySubtopic(m.questions.subtopic)}
-                                </p>
-                                <p
-                                  className="mt-0.5 truncate text-[13.5px]"
-                                  style={{ color: 'var(--text-body)' }}
-                                >
-                                  {m.questions.stem}
-                                </p>
-                              </div>
-                              <span
-                                className="hidden shrink-0 text-[12px] tabular-nums sm:block"
-                                style={{ color: 'var(--text-faint)' }}
-                              >
-                                {m.review_count > 0
-                                  ? `${m.review_count}/3 recovered`
-                                  : 'not yet'}
-                              </span>
-                              <span
-                                className="w-[74px] shrink-0 text-right text-[12.5px] font-medium tabular-nums"
-                                style={{
-                                  color: isDue ? 'var(--status-fading)' : 'var(--text-muted)',
-                                }}
-                              >
-                                {relativeDue(m.next_review_at, now)}
-                              </span>
-                            </li>
-                          )
-                        })}
+                              {Array.from({ length: REVIEWS_TO_CLEAR }).map((_, i) => (
+                                <span
+                                  key={i}
+                                  className="h-1.5 w-1.5 rounded-full"
+                                  style={{
+                                    background:
+                                      i < (m.review_count || 0)
+                                        ? 'var(--status-proficient)'
+                                        : 'var(--border-strong)',
+                                  }}
+                                />
+                              ))}
+                            </span>
+
+                            <span
+                              className="w-[74px] shrink-0 text-right text-[12.5px] font-medium tabular-nums"
+                              style={{
+                                color: key === 'now' ? 'var(--status-fading)' : 'var(--text-muted)',
+                              }}
+                            >
+                              {relativeDue(m.next_review_at, now)}
+                            </span>
+                          </li>
+                        ))}
                       </ul>
                     )}
                   </section>

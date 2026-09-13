@@ -71,6 +71,39 @@ const DIFFICULTIES = [
   ...HEAT_LEVELS.map((h) => ({ key: h.key, label: h.label, range: HEAT_RANGES[h.key] })),
 ]
 
+/**
+ * One decision per block, numbered.
+ *
+ * This page was nine sections in a column, each with its own rule and heading,
+ * which is a wall of controls rather than a thing you are building. They fall
+ * into three questions — what goes in it, how hard and how long, and how you
+ * sit it — so those are the three blocks now, and the settings inside them are
+ * no longer separated from each other as though they were unrelated.
+ */
+function Step({ n, title, hint, children }) {
+  return (
+    <section className="mb-10 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
+      <div className="mb-6 flex items-baseline gap-3">
+        <span
+          className="text-[11px] font-semibold tabular-nums tracking-[0.16em]"
+          style={{ color: 'var(--text-faint)' }}
+        >
+          {String(n).padStart(2, '0')}
+        </span>
+        <div className="min-w-0">
+          <h2 className="text-[16px] font-semibold tracking-[-0.018em]">{title}</h2>
+          {hint && (
+            <p className="mt-1 text-[13px]" style={{ color: 'var(--text-muted)' }}>
+              {hint}
+            </p>
+          )}
+        </div>
+      </div>
+      {children}
+    </section>
+  )
+}
+
 export default function TestBuilderPage() {
   const [profile, setProfile] = useState(null)
   const [subject, setSubject] = useState('')
@@ -266,9 +299,10 @@ export default function TestBuilderPage() {
         <div className="grid gap-10 lg:grid-cols-[1fr_20rem] lg:gap-14">
           <div>
 
+        <Step n={1} title="What goes in it" hint="The subject, the half of the course, and which topics it draws from.">
         {/* Subject */}
-        <section className="mb-9 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
-          <label htmlFor="subject" className="mb-2 block text-[14.5px] font-medium">
+        <div className="mb-7">
+          <label htmlFor="subject" className="mb-2 block text-[13.5px] font-medium">
             Subject
           </label>
           <select
@@ -291,12 +325,12 @@ export default function TestBuilderPage() {
               </Link>
             </p>
           )}
-        </section>
+        </div>
 
         {/* Level. Only an IB HL subject has two halves to choose between. */}
         {isHLSubject && hlCount > 0 && (
-          <section className="mb-9 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
-            <p className="text-[14.5px] font-medium">Level</p>
+          <div className="mb-7">
+            <p className="text-[13.5px] font-medium">Level</p>
             <p className="t-caption mb-3">
               {hlCount} of your subtopics in this subject are HL extension.
             </p>
@@ -313,12 +347,12 @@ export default function TestBuilderPage() {
                 </button>
               ))}
             </div>
-          </section>
+          </div>
         )}
 
         {/* What to draw from */}
-        <section className="mb-9 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
-          <p className="mb-3 text-[14.5px] font-medium">What should this test cover?</p>
+        <div className="mb-7">
+          <p className="mb-3 text-[13.5px] font-medium">What should this test cover?</p>
           <div className="flex flex-col gap-2">
             {FOCUS_MODES.map((mode) => (
               <button
@@ -347,12 +381,12 @@ export default function TestBuilderPage() {
               </button>
             ))}
           </div>
-        </section>
+        </div>
 
         {/* Topics */}
-        <section className="mb-9 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
+        <div className="mb-7">
           <div className="mb-3 flex items-center justify-between">
-            <p className="text-[14.5px] font-medium">Topics</p>
+            <p className="text-[13.5px] font-medium">Topics</p>
             <button
               onClick={() => setSelected(selected.length === topics.length ? [] : topics)}
               className="text-xs font-medium text-[var(--brand)] hover:underline"
@@ -405,11 +439,14 @@ export default function TestBuilderPage() {
               })}
             </div>
           )}
-        </section>
+        </div>
 
+        </Step>
+
+        <Step n={2} title="How hard, and how long" hint="Heat sets the difficulty; the rest sets the shape of the paper.">
         {/* Difficulty and length */}
-        <section className="mb-9 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
-          <p className="text-[14.5px] font-medium">Heat</p>
+        <div className="mb-7">
+          <p className="text-[13.5px] font-medium">Heat</p>
           <p className="t-caption mb-3">
             How hard the questions are. Burning is the hardest end of the paper.
           </p>
@@ -436,7 +473,7 @@ export default function TestBuilderPage() {
             })}
           </div>
 
-          <p className="text-[14.5px] font-medium">Question type</p>
+          <p className="text-[13.5px] font-medium">Question type</p>
           <p className="t-caption mb-3">
             What the paper is made of. A type your subject has none of is ignored rather than
             handed back empty.
@@ -463,7 +500,7 @@ export default function TestBuilderPage() {
             })}
           </div>
 
-          <p className="text-[14.5px] font-medium">Order</p>
+          <p className="text-[13.5px] font-medium">Order</p>
           <p className="t-caption mb-3">The order you sit them in, once they have been chosen.</p>
           <div className="mb-6 flex flex-wrap gap-2">
             {ORDERS.map((o) => (
@@ -479,7 +516,7 @@ export default function TestBuilderPage() {
             ))}
           </div>
 
-          <p className="mb-3 text-[14.5px] font-medium">Length</p>
+          <p className="mb-3 text-[13.5px] font-medium">Length</p>
           <div className="mb-6 flex flex-wrap gap-2">
             {LENGTHS.map((n) => (
               <button
@@ -503,7 +540,10 @@ export default function TestBuilderPage() {
               />
             </label>
           </div>
+        </div>
+        </Step>
 
+        <Step n={3} title="How you sit it" hint="Untimed to learn, timed to rehearse the real thing.">
           <button
             onClick={() => setTimed(!timed)}
             role="switch"
@@ -551,7 +591,7 @@ export default function TestBuilderPage() {
               </span>
             </div>
           )}
-        </section>
+        </Step>
 
           </div>
 
