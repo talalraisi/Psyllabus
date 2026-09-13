@@ -101,11 +101,11 @@ export default function SessionTimer({ minutes }) {
 
         <div className="flex items-center gap-2">
           {timer.state !== 'running' ? (
-            <button onClick={start} className="btn btn-solid control-sm text-xs">
+            <button onClick={start} className="btn btn-solid control-sm">
               {timer.state === 'paused' ? 'Resume' : timer.state === 'done' ? 'Start again' : 'Start'}
             </button>
           ) : (
-            <button onClick={pauseTimer} className="btn btn-outline control-sm text-xs">
+            <button onClick={pauseTimer} className="btn btn-outline control-sm">
               Pause
             </button>
           )}
@@ -115,7 +115,7 @@ export default function SessionTimer({ minutes }) {
                 firedRef.current = false
                 resetTimer(minutes)
               }}
-              className="btn btn-quiet control-sm text-xs"
+              className="btn btn-quiet control-sm"
             >
               Reset
             </button>

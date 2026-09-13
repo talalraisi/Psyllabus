@@ -10,14 +10,15 @@ import logoMark from '@/public/logo-mark.png'
  * The auth pages were a centred card on an empty page, which is what every
  * template does and looks nothing like the rest of the product. This is the
  * homepage's language applied to a form: a headline set in the same tight
- * display size, an uppercase micro-label above it, a panel with an edge rather
- * than a shadow, and a column of plain claims down the side that answers the
- * question somebody hesitating on this screen is actually asking.
+ * display size, an uppercase micro-label above it, and a panel with an edge
+ * rather than a shadow.
  *
- * Two columns on a wide screen so the form is not floating in the middle of
- * nowhere, one column on a phone where the reassurance goes underneath.
+ * There used to be a column of claims beside the headline. Nobody stops on a
+ * sign-in screen to read three paragraphs about decay and where their notes
+ * live, and carrying them meant the form sat off to one side to make room. The
+ * headline says the one thing worth saying and the form gets the rest.
  */
-export default function AuthShell({ eyebrow, title, intro, aside, children, footer }) {
+export default function AuthShell({ eyebrow, title, intro, children, footer }) {
   return (
     <main className="ground min-h-screen px-5 py-10 md:px-8 md:py-14">
       <div className="mx-auto max-w-6xl">
@@ -25,7 +26,7 @@ export default function AuthShell({ eyebrow, title, intro, aside, children, foot
           <Image src={logoMark} alt="Project Syllabus" sizes="110px" style={{ height: 34, width: 'auto' }} priority />
         </Link>
 
-        <div className="mt-14 grid gap-12 md:mt-20 md:grid-cols-[1fr_minmax(0,26rem)] md:gap-20">
+        <div className="mt-16 grid gap-10 md:mt-24 md:grid-cols-[1fr_minmax(0,25rem)] md:items-center md:gap-20">
           <div className="max-w-lg">
             <p
               className="mb-4 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
@@ -42,18 +43,6 @@ export default function AuthShell({ eyebrow, title, intro, aside, children, foot
               </p>
             )}
 
-            {aside && (
-              <dl className="mt-12 hidden border-t md:block" style={{ borderColor: 'var(--border)' }}>
-                {aside.map(([term, def]) => (
-                  <div key={term} className="border-b py-5" style={{ borderColor: 'var(--border)' }}>
-                    <dt className="text-[13.5px] font-semibold">{term}</dt>
-                    <dd className="mt-1.5 text-[12.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                      {def}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            )}
           </div>
 
           <div>

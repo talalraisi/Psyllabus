@@ -93,11 +93,6 @@ function Login() {
       eyebrow="Sign in"
       title="Welcome back."
       intro="Pick up where your last quiz left you."
-      aside={[
-        ['Your levels are where you left them', 'Nothing decays because you were away from the app. Only time away from the subtopic counts.'],
-        ['One subject is still free', 'No trial running out in the background.'],
-        ['Your notes never left this device', 'Nothing you pasted or uploaded was sent anywhere.'],
-      ]}
       footer={
         <>
           New here?{' '}

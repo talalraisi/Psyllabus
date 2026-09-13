@@ -195,11 +195,6 @@ export default function Signup() {
       eyebrow="Create an account"
       title="One subject, free, for as long as you want."
       intro="No card, no trial running out. Add a school code and every subject opens."
-      aside={[
-        ['Nothing is filled in by guessing', 'Every level comes from questions you got right or did not. There is no confidence slider anywhere in this product.'],
-        ['Your notes stay on your device', 'Anything you paste or upload is read in the browser and never sent anywhere or used to train anything.'],
-        ['Delete it all whenever you like', 'One button on your profile removes the account and everything in it, permanently.'],
-      ]}
       footer={
         <>
           Already have an account?{' '}

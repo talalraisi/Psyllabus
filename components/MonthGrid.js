@@ -25,8 +25,8 @@ export default function MonthGrid({
 
   return (
     <>
-      <div className="mb-3 flex items-center justify-between gap-4">
-        <h2 className="t-overline">
+      <div className="mb-5 flex items-center justify-between gap-4">
+        <h2 className="text-[17px] font-semibold tracking-[-0.02em]">
           {cursor.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
         </h2>
         <div className="flex items-center gap-1">
@@ -37,7 +37,7 @@ export default function MonthGrid({
           >
             <IconArrowLeft width={16} height={16} />
           </button>
-          <button onClick={onToday} className="btn btn-quiet control-sm text-xs">
+          <button onClick={onToday} className="btn btn-quiet control-sm">
             Today
           </button>
           <button
@@ -50,10 +50,14 @@ export default function MonthGrid({
         </div>
       </div>
 
-      <div className="surface overflow-hidden">
-        <div className="grid grid-cols-7 border-b" style={{ borderColor: 'var(--border)' }}>
+      <div>
+        <div className="grid grid-cols-7">
           {WEEKDAYS.map((d) => (
-            <div key={d} className="t-overline px-2 py-2 text-center">
+            <div
+              key={d}
+              className="px-2 pb-3 text-center text-[10.5px] font-semibold uppercase tracking-[0.14em]"
+              style={{ color: 'var(--text-faint)' }}
+            >
               {d}
             </div>
           ))}
@@ -66,7 +70,6 @@ export default function MonthGrid({
             const isToday = key === todayKey
             const isSelected = key === selected
             const dayEvents = eventsByDay.get(key) || []
-            const lastColumn = i % 7 === 6
             const lastRow = i >= 35
             return (
               <button
@@ -74,14 +77,16 @@ export default function MonthGrid({
                 onClick={() => onSelect(key)}
                 aria-pressed={isSelected}
                 aria-label={`${day.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })}${dayEvents.length ? `, ${dayEvents.length} event${dayEvents.length === 1 ? '' : 's'}` : ''}`}
-                className={`min-h-[72px] p-2 text-left transition-colors duration-150 ${
-                  lastColumn ? '' : 'border-r border-[var(--border)]'
-                } ${lastRow ? '' : 'border-b border-[var(--border)]'} ${
-                  isSelected ? 'bg-[var(--brand-tint)]' : 'hover:bg-[var(--surface-sunken)]'
-                }`}
+                className={`min-h-[76px] rounded-[8px] p-2 text-left transition-colors duration-150 ${
+                  lastRow ? '' : 'border-b'
+                } ${isSelected ? '' : 'hover:bg-[var(--surface-sunken)]'}`}
+                style={{
+                  borderColor: 'var(--border)',
+                  background: isSelected ? 'var(--brand-tint)' : undefined,
+                }}
               >
                 <span
-                  className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-xs ${
+                  className={`inline-flex h-6 w-6 items-center justify-center rounded-full text-[12px] tabular-nums ${
                     isToday
                       ? 'bg-[var(--brand)] font-semibold text-white'
                       : inMonth

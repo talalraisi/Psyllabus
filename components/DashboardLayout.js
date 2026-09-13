@@ -20,6 +20,7 @@ import {
   IconLogout,
   IconMenu,
   IconClose,
+  IconChevronRight,
 } from '@/components/Icons'
 import { planLabel, isPremium } from '@/lib/access'
 import { clearCache } from '@/lib/cache'
@@ -107,7 +108,32 @@ export default function DashboardLayout({ children, profile }) {
   const router = useRouter()
   const supabase = createClient()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [collapsed, setCollapsed] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
+
+  // Read after mount rather than during render: the server has no idea what
+  // this browser last chose, and rendering the collapsed state straight away
+  // would not match what it sends.
+  useEffect(() => {
+    try {
+      setCollapsed(localStorage.getItem('psyllabus:sidebar') === 'collapsed')
+    } catch {
+      // Private windows and blocked site data both throw here. The sidebar
+      // simply starts open, which is the state it had before this existed.
+    }
+  }, [])
+
+  const toggleCollapsed = () => {
+    setCollapsed((prev) => {
+      const next = !prev
+      try {
+        localStorage.setItem('psyllabus:sidebar', next ? 'collapsed' : 'open')
+      } catch {
+        // Not being able to remember the choice is not a reason to refuse it.
+      }
+      return next
+    })
+  }
 
   useEffect(() => {
     setMobileOpen(false)
@@ -134,23 +160,50 @@ export default function DashboardLayout({ children, profile }) {
   }
 
 
-  const sidebar = (
+  // `compact` is the icons-only desktop sidebar. The mobile drawer never
+  // passes it: a drawer you deliberately opened should show you its labels.
+  const sidebar = (compact = false) => (
     <>
-      <div className="px-4 pt-5 pb-6">
-        <Link href="/" className="inline-block" aria-label="Project Syllabus home">
-          <Image src={logoMark} alt="Project Syllabus" sizes="68px" style={{ height: 28, width: 'auto' }} />
-        </Link>
+      <div
+        className={`flex pb-6 pt-5 ${
+          compact ? 'flex-col items-center gap-4 px-2' : 'items-center justify-between px-4'
+        }`}
+      >
+        {/* The logo is a mark plus a wordmark and there is no mark-only
+            version of it, so cropping it to 64px shows a sliver of letters.
+            Collapsing is a request for space; the logo comes back with the
+            labels, one click away. */}
+        {!compact && (
+          <Link href="/" className="inline-block" aria-label="Project Syllabus home">
+            <Image src={logoMark} alt="Project Syllabus" sizes="68px" style={{ height: 26, width: 'auto' }} />
+          </Link>
+        )}
+        <button
+          onClick={toggleCollapsed}
+          aria-label={compact ? 'Expand sidebar' : 'Collapse sidebar'}
+          title={compact ? 'Expand sidebar' : 'Collapse sidebar'}
+          className="hidden h-8 w-8 items-center justify-center rounded-[8px] transition-colors duration-150 hover:bg-[var(--surface-sunken)] md:flex"
+          style={{ color: 'var(--text-faint)' }}
+        >
+          <IconChevronRight
+            width={16}
+            height={16}
+            style={{ transform: compact ? 'none' : 'rotate(180deg)' }}
+          />
+        </button>
       </div>
 
       <div className="mx-4 border-t border-[var(--border)]" />
 
       <nav className="flex-1 overflow-y-auto px-3 pt-4" aria-label="Main">
-        <p
-          className="px-3 pb-3 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
-          style={{ color: 'var(--text-faint)' }}
-        >
-          Menu
-        </p>
+        {!compact && (
+          <p
+            className="px-3 pb-3 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
+            style={{ color: 'var(--text-faint)' }}
+          >
+            Menu
+          </p>
+        )}
         <ul className="flex flex-col gap-0.5">
           {NAV_ITEMS.map(({ href, label, Icon, match }) => {
             const active = match(pathname)
@@ -159,14 +212,17 @@ export default function DashboardLayout({ children, profile }) {
                 <Link
                   href={href}
                   aria-current={active ? 'page' : undefined}
-                  className="relative flex items-center gap-3 rounded-[8px] py-2.5 pl-3 pr-3 text-[13.5px] transition-colors duration-150"
+                  title={compact ? label : undefined}
+                  className={`relative flex items-center gap-3 rounded-[8px] py-2.5 text-[13.5px] transition-colors duration-150 ${
+                    compact ? 'justify-center px-0' : 'px-3'
+                  }`}
                   style={{
                     color: active ? 'var(--text)' : 'var(--text-muted)',
                     fontWeight: active ? 600 : 500,
                     background: active ? 'var(--surface-sunken)' : 'transparent',
                   }}
                 >
-                  {active && (
+                  {active && !compact && (
                     <span
                       aria-hidden="true"
                       className="absolute left-0 top-1/2 h-4 w-[2px] -translate-y-1/2 rounded-full"
@@ -178,7 +234,7 @@ export default function DashboardLayout({ children, profile }) {
                     height={17}
                     style={{ color: active ? 'var(--brand)' : 'var(--text-faint)' }}
                   />
-                  {label}
+                  {!compact && label}
                 </Link>
               </li>
             )
@@ -188,11 +244,11 @@ export default function DashboardLayout({ children, profile }) {
 
       <div className="mx-4 border-t border-[var(--border)]" />
 
-      <div className="p-3">
+      <div className={compact ? 'p-2' : 'p-3'}>
         {profile && (
-          <div className="mb-2 flex items-center gap-3 rounded-[10px] p-3">
+          <div className={`mb-2 flex items-center gap-3 rounded-[10px] ${compact ? 'justify-center p-1' : 'p-3'}`}>
             <Avatar profile={profile} size={32} />
-            <div className="min-w-0">
+            <div className={`min-w-0 ${compact ? 'hidden' : ''}`}>
               <p className="truncate text-[13px] font-semibold text-[var(--text)]">
                 {profile.full_name || 'Student'}
               </p>
@@ -203,7 +259,7 @@ export default function DashboardLayout({ children, profile }) {
           </div>
         )}
 
-        {profile && !isPremium(profile) && (
+        {profile && !isPremium(profile) && !compact && (
           <Link
             href="/dashboard/profile#unlock"
             className="mb-3 ml-3 block border-l-2 py-1 pl-3"
@@ -216,22 +272,28 @@ export default function DashboardLayout({ children, profile }) {
 
         <Link
           href="/dashboard/profile"
-          className="control-md flex items-center gap-3 rounded-[var(--r-md)] px-3 text-sm font-medium text-[var(--text-body)] transition-colors duration-150 hover:bg-[var(--surface-sunken)]"
+          title={compact ? 'Profile' : undefined}
+          className={`control-md flex items-center gap-3 rounded-[8px] text-[13.5px] font-medium text-[var(--text-body)] transition-colors duration-150 hover:bg-[var(--surface-sunken)] ${
+            compact ? 'justify-center px-0' : 'px-3'
+          }`}
         >
-          <IconUser width={18} height={18} className="text-[var(--text-faint)]" />
-          Profile
+          <IconUser width={17} height={17} className="text-[var(--text-faint)]" />
+          {!compact && 'Profile'}
         </Link>
 
         <button
           onClick={handleLogout}
           disabled={signingOut}
-          className="control-md flex w-full items-center gap-3 rounded-[var(--r-md)] px-3 text-sm font-medium text-[var(--text-body)] transition-colors duration-150 hover:bg-[var(--surface-sunken)] disabled:opacity-50"
+          title={compact ? 'Sign out' : undefined}
+          className={`control-md flex w-full items-center gap-3 rounded-[8px] text-[13.5px] font-medium text-[var(--text-body)] transition-colors duration-150 hover:bg-[var(--surface-sunken)] disabled:opacity-50 ${
+            compact ? 'justify-center px-0' : 'px-3'
+          }`}
         >
-          <IconLogout width={18} height={18} className="text-[var(--text-faint)]" />
-          {signingOut ? 'Signing out…' : 'Sign out'}
+          <IconLogout width={17} height={17} className="text-[var(--text-faint)]" />
+          {!compact && (signingOut ? 'Signing out…' : 'Sign out')}
         </button>
 
-        <div className="flex items-center gap-4 px-3 pt-3">
+        <div className={`flex items-center gap-4 pt-3 ${compact ? 'hidden' : 'px-3'}`}>
           <Link href="/privacy?from=dashboard" className="t-caption hover:text-[var(--text-muted)]">
             Privacy
           </Link>
@@ -279,14 +341,17 @@ export default function DashboardLayout({ children, profile }) {
             >
               <IconClose width={18} height={18} />
             </button>
-            {sidebar}
+            {sidebar(false)}
           </aside>
         </div>
       )}
 
       {/* Desktop sidebar */}
-      <aside className="sticky top-0 hidden h-screen w-[240px] shrink-0 flex-col border-r border-[var(--border)] bg-[var(--surface)] md:flex">
-        {sidebar}
+      <aside
+        className="sticky top-0 hidden h-screen shrink-0 flex-col border-r border-[var(--border)] bg-[var(--surface)] transition-[width] duration-200 ease-out md:flex"
+        style={{ width: collapsed ? 64 : 240 }}
+      >
+        {sidebar(collapsed)}
       </aside>
 
       <main className="min-w-0 flex-1">{children}</main>

@@ -102,13 +102,13 @@ export default function ReportQuestion({ questionId }) {
       )}
 
       <div className="mt-3 flex gap-2">
-        <button onClick={() => setOpen(false)} className="btn btn-quiet control-sm text-xs">
+        <button onClick={() => setOpen(false)} className="btn btn-quiet control-sm">
           Cancel
         </button>
         <button
           onClick={submit}
           disabled={!reason || state === 'saving'}
-          className="btn btn-solid control-sm text-xs"
+          className="btn btn-solid control-sm"
         >
           {state === 'saving' ? 'Sending…' : 'Send'}
         </button>

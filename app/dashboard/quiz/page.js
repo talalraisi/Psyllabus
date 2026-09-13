@@ -25,6 +25,8 @@ function QuizPageInner() {
   const count = parseInt(searchParams.get('count') || '0', 10) || undefined
   const topicsParam = searchParams.get('topics')
   const topics = topicsParam ? topicsParam.split('~~') : undefined
+  const subjectsParam = searchParams.get('subjects')
+  const subjects = subjectsParam ? subjectsParam.split('~~') : undefined
   const timed = searchParams.get('timed') === '1'
   const focus = searchParams.get('focus') || null
   const difficulty = searchParams.get('difficulty') || null
@@ -83,6 +85,7 @@ function QuizPageInner() {
           mode={mode}
           count={count}
           topics={topics}
+          subjects={subjects}
           timed={timed}
           focus={focus}
           difficulty={difficulty}

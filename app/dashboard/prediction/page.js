@@ -277,7 +277,7 @@ export default function PredictionPage() {
                           </div>
                           <Link
                             href={`/dashboard/syllabus/${getSlugForSubject(s.subject)}`}
-                            className="btn btn-outline control-sm text-xs"
+                            className="btn btn-outline control-sm"
                           >
                             {behind ? 'Close the gap' : 'Open'}
                           </Link>

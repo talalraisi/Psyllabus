@@ -329,6 +329,36 @@ export default function CalendarPage() {
           </form>
         )}
 
+        {/* How long you have. */}
+        {next.length > 0 && (
+          <div className="mb-12 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
+            <p
+              className="mb-3 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
+              style={{ color: 'var(--text-faint)' }}
+            >
+              Next up
+            </p>
+            <div className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2">
+              <div className="min-w-0">
+                <p className="text-[clamp(1.3rem,3vw,1.7rem)] font-semibold leading-tight tracking-[-0.025em]">
+                  {next[0].title}
+                </p>
+                <p className="mt-1.5 text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
+                  {KIND_LABEL[next[0].kind]}
+                  {next[0].subject ? ` · ${next[0].subject}` : ''} ·{' '}
+                  {formatEventDate(next[0].due_at, next[0].all_day)}
+                </p>
+              </div>
+              <p
+                className="text-[22px] font-semibold leading-none tracking-[-0.025em] tabular-nums"
+                style={{ color: 'var(--status-fading)' }}
+              >
+                {relativeDay(next[0].due_at)}
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Month grid */}
         <Section>
           <MonthGrid

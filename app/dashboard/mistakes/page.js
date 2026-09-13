@@ -8,19 +8,18 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import { displaySubtopic } from '@/lib/progress'
-import { Page, PageHeader, Section, StatRow, EmptyState, PageLoading } from '@/components/PageShell'
-import { IconChevronRight } from '@/components/Icons'
+import { Page, PageHeader, EmptyState, PageLoading } from '@/components/PageShell'
 
 function relativeDue(nextReviewAt, now = Date.now()) {
   const diff = new Date(nextReviewAt).getTime() - now
   if (diff <= 0) return 'Due now'
   const days = Math.ceil(diff / (24 * 60 * 60 * 1000))
-  return days === 1 ? 'Due tomorrow' : `Due in ${days} days`
+  return days === 1 ? 'Tomorrow' : days <= 7 ? `In ${days} days` : `In ${Math.round(days / 7)} weeks`
 }
 
 export default function MistakeBankPage() {
   const [profile, setProfile] = useState(null)
-  const [expanded, setExpanded] = useState({})
+  const [picked, setPicked] = useState([])
   const [mistakes, setMistakes] = useState([])
   const [loading, setLoading] = useState(true)
   const router = useRouter()
@@ -71,35 +70,36 @@ export default function MistakeBankPage() {
     return acc
   }, {})
 
+  const subjects = Object.keys(bySubject).sort()
+  // Nothing picked means everything, which is the state you want on arrival:
+  // the page should not make you choose before it shows you anything.
+  const scope = picked.length ? picked : subjects
+  const inScope = mistakes.filter((m) => scope.includes(m.questions.subject || 'Other'))
+  const dueInScope = inScope.filter((m) => new Date(m.next_review_at).getTime() <= now)
+
+  const toggle = (subject) =>
+    setPicked((prev) =>
+      prev.includes(subject) ? prev.filter((s) => s !== subject) : [...prev, subject]
+    )
+
+  const reviewHref =
+    picked.length && picked.length < subjects.length
+      ? `/dashboard/quiz?mode=mistakes&subjects=${encodeURIComponent(picked.join('~~'))}&back=/dashboard/mistakes`
+      : '/dashboard/quiz?mode=mistakes&back=/dashboard/mistakes'
+
   return (
     <DashboardLayout profile={profile}>
       <Page width="default">
         <PageHeader
           title="Mistake Bank"
-          subtitle="Every wrong answer becomes a spaced review, so you drill your own failures rather than generic cards"
+          subtitle="Every wrong answer comes back on a schedule until you have it three times running"
           action={
-            due.length > 0 ? (
-              <Link
-                href="/dashboard/quiz?mode=mistakes&back=/dashboard/mistakes"
-                className="btn btn-solid control-md"
-              >
-                Review {due.length} due
+            dueInScope.length > 0 ? (
+              <Link href={reviewHref} className="btn btn-solid control-md">
+                Review {dueInScope.length}
               </Link>
             ) : null
           }
-        />
-
-        <StatRow
-          className="mb-12"
-          stats={[
-            { label: 'due for review', value: due.length, tone: due.length ? 'var(--status-fading)' : 'var(--text)' },
-            { label: 'logged in total', value: mistakes.length },
-            {
-              label: 'cleared so far',
-              value: mistakes.filter((m) => m.review_count >= 3).length,
-              tone: 'var(--status-proficient)',
-            },
-          ]}
         />
 
         {mistakes.length === 0 ? (
@@ -109,89 +109,123 @@ export default function MistakeBankPage() {
           />
         ) : (
           <>
-            {due.length === 0 && (
-              <p className="mb-10 text-[14px]" style={{ color: 'var(--text-muted)' }}>
-                Nothing due right now. Your next review unlocks on its own.
+            {/* Pick the subjects to work on. The review button follows the
+                picker, so "only Physics tonight" is one tap rather than a
+                different page. */}
+            {subjects.length > 1 && (
+              <div className="mb-10 flex flex-wrap items-center gap-2">
+                <button
+                  onClick={() => setPicked([])}
+                  aria-pressed={picked.length === 0}
+                  className={`control-sm rounded-full border px-4 text-[13px] font-medium transition-colors duration-150 ${
+                    picked.length === 0
+                      ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
+                      : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
+                  }`}
+                >
+                  All subjects
+                </button>
+                {subjects.map((subject) => {
+                  const dueHere = bySubject[subject].filter(
+                    (m) => new Date(m.next_review_at).getTime() <= now
+                  ).length
+                  const on = picked.includes(subject)
+                  return (
+                    <button
+                      key={subject}
+                      onClick={() => toggle(subject)}
+                      aria-pressed={on}
+                      className={`control-sm rounded-full border px-4 text-[13px] font-medium transition-colors duration-150 ${
+                        on
+                          ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
+                          : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
+                      }`}
+                    >
+                      {subject}
+                      <span className="ml-2 tabular-nums opacity-60">
+                        {dueHere > 0 ? `${dueHere} due` : bySubject[subject].length}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+
+            {/* The three numbers used to take a screen on their own. Same
+                figures, one line, above the thing you came here to do. */}
+            <p
+              className="mb-3 flex flex-wrap gap-x-6 gap-y-1 text-[13.5px] tabular-nums"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              <span>
+                <strong
+                  className="font-semibold"
+                  style={{ color: dueInScope.length ? 'var(--status-fading)' : 'var(--text)' }}
+                >
+                  {dueInScope.length}
+                </strong>{' '}
+                due now
+              </span>
+              <span>
+                <strong className="font-semibold" style={{ color: 'var(--text)' }}>
+                  {inScope.length}
+                </strong>{' '}
+                in the bank
+              </span>
+              <span>
+                <strong className="font-semibold" style={{ color: 'var(--status-proficient)' }}>
+                  {inScope.filter((m) => m.review_count > 0).length}
+                </strong>{' '}
+                on their way out
+              </span>
+            </p>
+
+            {dueInScope.length === 0 && (
+              <p className="mb-8 text-[14px]" style={{ color: 'var(--text-faint)' }}>
+                Nothing due here right now. The next one unlocks on its own.
               </p>
             )}
 
-            {Object.entries(bySubject).map(([subject, items]) => {
-              const dueHere = items.filter(
-                (m) => new Date(m.next_review_at).getTime() <= now
-              ).length
-              const open = !!expanded[subject]
-
-              return (
-                <Section
-                  key={subject}
-                  title={
-                    <button
-                      onClick={() =>
-                        setExpanded((prev) => ({ ...prev, [subject]: !prev[subject] }))
-                      }
-                      aria-expanded={open}
-                      className="flex items-center gap-2 text-left"
+            <ul className="flex flex-col">
+              {inScope.map((m) => {
+                const isDue = new Date(m.next_review_at).getTime() <= now
+                return (
+                  <li
+                    key={m.id}
+                    className="flex items-center gap-4 border-b py-3.5"
+                    style={{ borderColor: 'var(--border)' }}
+                  >
+                    <span
+                      className="h-1.5 w-1.5 shrink-0 rounded-full"
+                      style={{
+                        background: isDue ? 'var(--status-fading)' : 'var(--border-strong)',
+                      }}
+                      aria-hidden="true"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
+                        {m.questions.subject} · {displaySubtopic(m.questions.subtopic)}
+                      </p>
+                      <p className="mt-0.5 truncate text-[14px]" style={{ color: 'var(--text-body)' }}>
+                        {m.questions.stem}
+                      </p>
+                    </div>
+                    <span
+                      className="hidden shrink-0 text-[12px] tabular-nums sm:block"
+                      style={{ color: 'var(--text-faint)' }}
                     >
-                      <IconChevronRight
-                        width={13}
-                        height={13}
-                        className={`shrink-0 transition-transform duration-150 ${open ? 'rotate-90' : ''}`}
-                        style={{ color: 'var(--text-faint)' }}
-                      />
-                      <span className="text-[15px] font-semibold tracking-[-0.012em]">{subject}</span>
-                    </button>
-                  }
-                  action={
-                    <span className="text-[12.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
-                      {items.length} logged
-                      {dueHere > 0 && (
-                        <span style={{ color: 'var(--status-fading)' }}> · {dueHere} due</span>
-                      )}
+                      {m.review_count > 0 ? `${m.review_count}/3 recovered` : 'not yet'}
                     </span>
-                  }
-                >
-                  {open && (
-                    <ul className="flex flex-col">
-                      {items.map((m) => {
-                        const isDue = new Date(m.next_review_at).getTime() <= now
-                        return (
-                          <li
-                            key={m.id}
-                            className="flex items-center gap-4 border-b py-3.5 last:border-b-0"
-                            style={{ borderColor: 'var(--border)' }}
-                          >
-                            <div className="min-w-0 flex-1">
-                              <p className="text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
-                                {displaySubtopic(m.questions.subtopic)}
-                              </p>
-                              <p className="mt-1 truncate text-[14px]" style={{ color: 'var(--text-body)' }}>
-                                {m.questions.stem}
-                              </p>
-                            </div>
-                            <span
-                              className="hidden shrink-0 text-[12.5px] sm:block"
-                              style={{ color: 'var(--text-faint)' }}
-                            >
-                              {m.review_count > 0
-                                ? `${m.review_count} correct review${m.review_count !== 1 ? 's' : ''}`
-                                : 'Not yet recovered'}
-                            </span>
-                            <span
-                              className="shrink-0 text-[12.5px] font-medium tabular-nums"
-                              style={{
-                                color: isDue ? 'var(--status-fading)' : 'var(--text-muted)',
-                              }}
-                            >
-                              {relativeDue(m.next_review_at, now)}
-                            </span>
-                          </li>
-                        )
-                      })}
-                    </ul>
-                  )}
-                </Section>
-              )
-            })}
+                    <span
+                      className="w-[74px] shrink-0 text-right text-[12.5px] font-medium tabular-nums"
+                      style={{ color: isDue ? 'var(--status-fading)' : 'var(--text-muted)' }}
+                    >
+                      {relativeDue(m.next_review_at, now)}
+                    </span>
+                  </li>
+                )
+              })}
+            </ul>
           </>
         )}
       </Page>

@@ -7,7 +7,7 @@ import { getSyllabus, getProfile } from '@/lib/cache'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
-import { Page, PageHeader, EmptyState, PageLoading, SkeletonLine } from '@/components/PageShell'
+import { Page, PageHeader, PageLoading, SkeletonLine } from '@/components/PageShell'
 import { IconClock, IconCheck } from '@/components/Icons'
 import { sortTopics, progressKey, HEAT_LEVELS, HEAT_RANGES } from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
@@ -220,11 +220,15 @@ export default function TestBuilderPage() {
 
   return (
     <DashboardLayout profile={profile}>
-      <Page width="default">
+      <Page width="wide">
         <PageHeader
+          eyebrow="Test builder"
           title="Build a Test"
-          subtitle="Compose a paper from any mix of topics, then sit it under exam conditions."
+          subtitle="Set the paper on the left. It takes shape on the right as you go."
         />
+
+        <div className="grid gap-10 lg:grid-cols-[1fr_20rem] lg:gap-14">
+          <div>
 
         {/* Subject */}
         <section className="mb-9 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
@@ -445,51 +449,75 @@ export default function TestBuilderPage() {
           </button>
         </section>
 
-        {/* Summary */}
-        <section className="mt-12 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
-          {canStart ? (
-            <>
-              <dl className="mb-8 flex flex-wrap gap-x-12 gap-y-5">
-                {[
-                  ['Questions', actualLength],
-                  ['Marks', totalMarks],
-                  [timed ? 'Time limit' : 'Est. time', `${estMinutes}m`],
-                ].map(([label, value]) => (
-                  <div key={label}>
-                    <dt className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
-                      {label}
-                    </dt>
-                    <dd className="mt-1.5 text-[26px] font-semibold leading-none tracking-[-0.028em] tabular-nums">
-                      {value}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
+          </div>
 
-              {actualLength < length && (
-                <p className="t-caption mb-4">
-                  Only {eligible.length} question{eligible.length === 1 ? '' : 's'} match these
-                  filters, so the paper will be {actualLength} long. Widen the topics or
-                  difficulty for more.
+          {/* The paper, as it currently stands. */}
+          <aside className="lg:sticky lg:top-10 lg:self-start">
+            <div
+              className="rounded-[12px] border p-5"
+              style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+            >
+              <p
+                className="mb-4 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
+                style={{ color: 'var(--text-faint)' }}
+              >
+                Your paper
+              </p>
+              <p className="text-[15px] font-semibold leading-snug tracking-[-0.015em]">{subject}</p>
+              <p className="mt-1 text-[12.5px]" style={{ color: 'var(--text-muted)' }}>
+                {selected.length === topics.length
+                  ? 'All topics'
+                  : `${selected.length} of ${topics.length} topic${topics.length === 1 ? '' : 's'}`}
+                {level !== 'all' ? ` · ${LEVELS.find((l) => l.key === level)?.label}` : ''}
+                {difficulty !== 'mixed'
+                  ? ` · ${DIFFICULTIES.find((d) => d.key === difficulty)?.label}`
+                  : ''}
+              </p>
+
+              <div className="my-5 h-px" style={{ background: 'var(--border)' }} />
+
+              {canStart ? (
+                <>
+                  <dl className="mb-7 flex flex-wrap gap-x-9 gap-y-5">
+                    {[
+                      ['Questions', actualLength],
+                      ['Marks', totalMarks],
+                      [timed ? 'Time limit' : 'Est. time', `${estMinutes}m`],
+                    ].map(([label, value]) => (
+                      <div key={label}>
+                        <dt className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
+                          {label}
+                        </dt>
+                        <dd className="mt-1.5 text-[24px] font-semibold leading-none tracking-[-0.028em] tabular-nums">
+                          {value}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+
+                  {actualLength < length && (
+                    <p className="mb-5 text-[12.5px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
+                      Only {eligible.length} question{eligible.length === 1 ? '' : 's'} match these
+                      filters, so the paper will be {actualLength} long. Widen the topics or
+                      difficulty for more.
+                    </p>
+                  )}
+
+                  <button onClick={startTest} className="btn btn-solid control-lg w-full">
+                    {timed && <IconClock width={18} height={18} />}
+                    Start {timed ? 'timed test' : 'test'}
+                  </button>
+                </>
+              ) : (
+                <p className="text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                  {selected.length === 0
+                    ? 'Select at least one topic to build a paper.'
+                    : 'Nothing matches these settings. Try a different focus, a wider heat range, or more topics.'}
                 </p>
               )}
-
-              <button onClick={startTest} className="btn btn-solid control-lg">
-                {timed && <IconClock width={18} height={18} />}
-                Start {timed ? 'timed test' : 'test'}
-              </button>
-            </>
-          ) : (
-            <EmptyState
-              title="No questions match these settings"
-              description={
-                selected.length === 0
-                  ? 'Select at least one topic.'
-                  : 'Try a different focus, a wider difficulty range, or more topics.'
-              }
-            />
-          )}
-        </section>
+            </div>
+          </aside>
+        </div>
       </Page>
     </DashboardLayout>
   )

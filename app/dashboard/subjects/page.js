@@ -9,7 +9,7 @@ import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader, Section, PageLoading } from '@/components/PageShell'
 import { getSlugForSubject } from '@/lib/subject-map'
-import { computeCompletionPercent } from '@/lib/progress'
+import { progressKey, STATUS_LABELS } from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
 import {
@@ -20,10 +20,22 @@ import {
   freeSubjectLockUntil,
 } from '@/lib/access'
 
+/** Status keys as stored, mapped to the one palette the whole product uses. */
+const STATUS_VAR = {
+  mastered: 'var(--status-mastered)',
+  proficient: 'var(--status-proficient)',
+  confident: 'var(--status-developing)',
+  in_progress: 'var(--status-weak)',
+  decaying: 'var(--status-fading)',
+  not_started: 'var(--status-untested)',
+}
+
+const LADDER = ['mastered', 'proficient', 'confident', 'decaying', 'in_progress', 'not_started']
+
 export default function SubjectsPage() {
   const [profile, setProfile] = useState(null)
-  const [stats, setStats] = useState({})
   const [counts, setCounts] = useState({})
+  const [breakdown, setBreakdown] = useState({})
   const [loading, setLoading] = useState(true)
   const [switching, setSwitching] = useState('')
   const router = useRouter()
@@ -53,16 +65,22 @@ export default function SubjectsPage() {
       ])
 
       const effective = buildEffectiveProgressMap(progressRows)
-      const nextStats = {}
       const nextCounts = {}
+      const nextBreakdown = {}
       for (const subject of subjects) {
         const rows = (syllabusRows || []).filter((r) => r.subject === subject)
         nextCounts[subject] = rows.length
-        nextStats[subject] = computeCompletionPercent(rows, effective, subject)
+        // How the subject is actually made up, not just one average of it.
+        const tally = {}
+        for (const row of rows) {
+          const status = effective[progressKey(subject, row.subtopic)] || 'not_started'
+          tally[status] = (tally[status] || 0) + 1
+        }
+        nextBreakdown[subject] = tally
       }
 
-      setStats(nextStats)
       setCounts(nextCounts)
+      setBreakdown(nextBreakdown)
       setLoading(false)
     }
     loadData()
@@ -108,9 +126,13 @@ export default function SubjectsPage() {
   const canSwitch = canSwitchFreeSubject(profile)
 
   const SubjectCard = ({ subject, locked }) => {
-    const pct = stats[subject] ?? 0
     const count = counts[subject] ?? 0
     const target = profile.target_grades?.[subject]
+    const tally = breakdown[subject] || {}
+    const masteredCount = tally.mastered || 0
+    // Left to right in the order the ladder is climbed, so the bar reads the
+    // way the levels do.
+    const segments = LADDER.map((key) => ({ key, n: tally[key] || 0 })).filter((seg) => seg.n > 0)
 
     return (
       // Fixed column layout with the action pinned to the bottom, so cards line
@@ -127,27 +149,67 @@ export default function SubjectsPage() {
           {target ? ` · Target ${target}` : ''}
         </p>
 
-        <div className="mt-5 mb-6">
-          <div className="flex items-baseline justify-between gap-3">
+        {/* One percentage said how much was mastered and hid everything else,
+            so a subject that was 20% mastered and 70% weak looked the same as
+            one that was 20% mastered and untouched. This is the whole subject
+            at a glance: how many are proved, and what the rest are. */}
+        <div className="mb-6 mt-6">
+          <div className="flex items-baseline gap-2">
             <span
-              className="text-[24px] font-semibold leading-none tracking-[-0.028em] tabular-nums"
-              style={{ color: locked ? 'var(--text-faint)' : 'var(--brand)' }}
+              className="text-[26px] font-semibold leading-none tracking-[-0.028em] tabular-nums"
+              style={{ color: locked ? 'var(--text-faint)' : 'var(--text)' }}
             >
-              {locked ? '—' : `${pct}%`}
+              {locked ? '—' : masteredCount}
             </span>
-            <span className="text-[12px]" style={{ color: 'var(--text-faint)' }}>
-              {locked ? 'locked' : 'mastered'}
+            <span className="text-[13px]" style={{ color: 'var(--text-faint)' }}>
+              {locked ? 'locked' : `of ${count} mastered`}
             </span>
           </div>
+
           <div
-            className="mt-3 h-1 w-full overflow-hidden rounded-full"
+            className="mt-4 flex h-1.5 w-full overflow-hidden rounded-full"
             style={{ background: 'var(--border-strong)' }}
+            role="img"
+            aria-label={
+              locked
+                ? 'Locked'
+                : segments
+                    .map((seg) => `${seg.n} ${STATUS_LABELS[seg.key] || 'Untested'}`)
+                    .join(', ') || 'Nothing tested yet'
+            }
           >
-            <div
-              className="h-full rounded-full transition-[width] duration-500 ease-out"
-              style={{ width: `${locked ? 0 : pct}%`, background: 'var(--brand)' }}
-            />
+            {!locked &&
+              segments.map((seg) => (
+                <span
+                  key={seg.key}
+                  className="h-full transition-[width] duration-500 ease-out"
+                  style={{
+                    width: `${(seg.n / Math.max(1, count)) * 100}%`,
+                    background: STATUS_VAR[seg.key],
+                  }}
+                />
+              ))}
           </div>
+
+          {!locked && (
+            <ul className="mt-3.5 flex flex-wrap gap-x-4 gap-y-1.5">
+              {segments
+                .filter((seg) => seg.key !== 'not_started')
+                .map((seg) => (
+                  <li
+                    key={seg.key}
+                    className="flex items-center gap-1.5 text-[11.5px] tabular-nums"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    <span
+                      className="h-[7px] w-[7px] rounded-full"
+                      style={{ background: STATUS_VAR[seg.key] }}
+                    />
+                    {seg.n} {(STATUS_LABELS[seg.key] || '').toLowerCase()}
+                  </li>
+                ))}
+            </ul>
+          )}
         </div>
 
         {locked ? (

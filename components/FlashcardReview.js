@@ -112,7 +112,7 @@ export default function FlashcardReview({ cards, onMark, onExit, stats }) {
               </span>
             )}
           </p>
-          <button onClick={() => onExit({ finished: false })} className="btn btn-quiet control-sm text-xs">
+          <button onClick={() => onExit({ finished: false })} className="btn btn-quiet control-sm">
             <IconClose width={14} height={14} />
             End
           </button>

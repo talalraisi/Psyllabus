@@ -130,6 +130,7 @@ export default function QuizRunner({
   mode = 'subtopic',
   count,
   topics,
+  subjects,
   timed: timedProp = false,
   focus = null,
   difficulty = null,
@@ -172,17 +173,27 @@ export default function QuizRunner({
       setUserId(user.id)
 
       if (mode === 'mistakes') {
-        const { data: rows } = await supabase
+        // !inner so the subject filter can be applied to the joined question
+        // rather than pulled back and filtered here, which would interact
+        // badly with the limit below.
+        let query = supabase
           .from('mistakes')
-          .select('*, questions(*)')
+          .select('*, questions!inner(*)')
           .eq('user_id', user.id)
           .lte('next_review_at', new Date().toISOString())
+        if (subjects?.length) query = query.in('questions.subject', subjects)
+
+        const { data: rows } = await query
           .order('next_review_at', { ascending: true })
           .limit(MISTAKES_COUNT)
 
         const withQuestions = (rows || []).filter((r) => r.questions)
         if (!withQuestions.length) {
-          setEmptyMessage('No reviews due right now. Mistakes you make in quizzes will queue up here.')
+          setEmptyMessage(
+            subjects?.length
+              ? `No reviews due in ${subjects.length === 1 ? subjects[0] : 'those subjects'} right now.`
+              : 'No reviews due right now. Mistakes you make in quizzes will queue up here.'
+          )
           setPhase(PHASE.empty)
           return
         }
@@ -324,7 +335,7 @@ export default function QuizRunner({
     }
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subject, topic, subtopic, mode, count, topics?.join('|'), focus, difficulty, level, paper])
+  }, [subject, topic, subtopic, mode, count, topics?.join('|'), subjects?.join('|'), focus, difficulty, level, paper])
 
   const startQuiz = () => {
     questionTimesRef.current = {}

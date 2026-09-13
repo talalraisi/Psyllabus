@@ -32,7 +32,9 @@ import {
   notify,
 } from '@/lib/notify'
 
-const MIN_MINUTES = 5
+// Below this there is no session to plan: one subtopic costs about 22 minutes,
+// so a five-minute block could only ever promise something it cannot deliver.
+const MIN_MINUTES = 15
 // Eight hours. Past that it is not a study session, it is a whole day, and the
 // queue would be padded with subtopics nobody is getting to.
 const MAX_MINUTES = 480
@@ -300,7 +302,8 @@ export default function StudyPlanPage() {
                       style={{ color: 'var(--text-muted)' }}
                     >
                       <IconClock width={14} height={14} />
-                      {session.items.length} subtopics · about {session.minutes} minutes of work
+                      {session.items.length} subtopic{session.items.length === 1 ? '' : 's'} ·
+                      about {session.perItemMinutes} minutes each
                       {completedCount > 0 && ` · ${completedCount} done`}
                     </p>
                   </div>
@@ -330,8 +333,9 @@ export default function StudyPlanPage() {
                       className="min-w-[12rem] flex-1 text-[13px] leading-relaxed"
                       style={{ color: 'var(--text-faint)' }}
                     >
-                      Anything from {MIN_MINUTES} minutes to {MAX_MINUTES / 60} hours. The plan
-                      below is cut to fit.
+                      A subtopic takes about {session.perItemMinutes} minutes to recover: read
+                      it, sit the quiz, then go back over what you got wrong. The plan below is
+                      cut to fit the time you have.
                     </p>
                   </div>
 
@@ -399,13 +403,13 @@ export default function StudyPlanPage() {
                               <div className="flex shrink-0 items-center gap-2">
                                 <button
                                   onClick={() => setDrawerItem(item)}
-                                  className="btn btn-quiet control-sm text-xs"
+                                  className="btn btn-quiet control-sm"
                                 >
                                   Resources
                                 </button>
                                 <Link
                                   href={quizHref(item)}
-                                  className="btn btn-outline control-sm text-xs"
+                                  className="btn btn-outline control-sm"
                                 >
                                   Practise
                                 </Link>
@@ -493,13 +497,13 @@ export default function StudyPlanPage() {
                             <div className="flex shrink-0 items-center gap-2">
                               <button
                                 onClick={() => setDrawerItem(item)}
-                                className="btn btn-quiet control-sm text-xs"
+                                className="btn btn-quiet control-sm"
                               >
                                 Resources
                               </button>
                               <Link
                                 href={quizHref(item)}
-                                className="btn btn-outline control-sm text-xs"
+                                className="btn btn-outline control-sm"
                               >
                                 Practise
                               </Link>

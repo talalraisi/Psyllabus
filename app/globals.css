@@ -337,6 +337,25 @@ body {
     line-height: 1;
   }
 
+  /* Type scales with the control, which it did not before: a 32px "Resources"
+     button was set at the same 14px as a full-width primary action, so the
+     quiet buttons read as loudly as the loud ones. */
+  .btn.control-sm {
+    font-size: 12.5px;
+    padding-inline: 14px;
+    gap: 6px;
+  }
+
+  .btn.control-md {
+    font-size: 13.5px;
+    padding-inline: 18px;
+  }
+
+  .btn.control-lg {
+    font-size: 14.5px;
+    padding-inline: 24px;
+  }
+
   .btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
