@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { getAuthCallbackUrl } from '@/lib/auth'
+import Image from 'next/image'
+import logoMark from '@/public/logo-mark.png'
 import PasswordField from '@/components/PasswordField'
 import AuthShell, { OrRule, GoogleButton, SubmitButton } from '@/components/marketing/AuthShell'
 
@@ -114,17 +116,25 @@ export default function Signup() {
 
   if (awaitingConfirmation) {
     return (
-      <main className="page px-4 py-10 md:px-6 md:py-12">
+      <main className="ground min-h-screen px-5 py-10 md:px-8 md:py-14">
         <div className="mx-auto max-w-md">
-          <div className="mb-8 flex justify-center">
-            <Link href="/">
-              <Logo width={180} height={54} priority className="h-auto w-[160px]" />
+          <div className="mb-10 flex justify-center">
+            <Link href="/" aria-label="Project Syllabus home">
+              <Image src={logoMark} alt="Project Syllabus" sizes="110px" style={{ height: 34, width: 'auto' }} priority />
             </Link>
           </div>
 
-          <div className="card p-6 md:p-8">
-            <h1 className="t-page-title mb-2">Check your email</h1>
-            <p className="t-small mb-6">
+          <div
+            className="rounded-[12px] border p-6 md:p-7"
+            style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+          >
+            <p className="mb-3 text-[10.5px] font-semibold uppercase tracking-[0.16em]" style={{ color: 'var(--text-faint)' }}>
+              Almost there
+            </p>
+            <h1 className="mb-3 text-[26px] font-semibold leading-tight tracking-[-0.028em]">
+              Check your email
+            </h1>
+            <p className="mb-6 text-[14.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
               We sent a confirmation link to{' '}
               <strong className="text-[var(--text)]">{email}</strong>. Open it and you will land
               back here to finish setting up. It can take a minute to arrive, and it is worth

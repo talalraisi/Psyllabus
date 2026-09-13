@@ -201,32 +201,40 @@ export default function Dashboard() {
               </span>
             </div>
 
-            <div className="mb-10 grid grid-cols-2 gap-3 md:grid-cols-4">
+            <div
+              className="mb-12 flex flex-wrap items-baseline gap-x-12 gap-y-6 border-t pt-6"
+              style={{ borderColor: 'var(--border)' }}
+            >
               {[
-                { label: 'Mastered', value: counts.mastered, color: 'text-[var(--status-mastered)]' },
-                { label: 'Decaying', value: counts.decaying, color: 'text-[var(--status-decaying)]' },
-                { label: 'Weak', value: counts.weak, color: 'text-[var(--status-weak)]' },
+                { label: 'mastered', value: counts.mastered, tone: 'var(--status-mastered)' },
+                { label: 'fading', value: counts.decaying, tone: 'var(--status-fading)' },
+                { label: 'weak', value: counts.weak, tone: 'var(--status-weak)' },
                 {
-                  label: 'Reviews due',
+                  label: 'reviews due',
                   value: counts.due,
-                  color: 'text-[var(--warning-text)]',
+                  tone: 'var(--text)',
                   href: '/dashboard/mistakes',
                 },
-              ].map(({ label, value, color, href }) => {
+              ].map(({ label, value, tone, href }) => {
                 const body = (
                   <>
-                    <p className={`t-stat ${color}`}>{value}</p>
-                    <p className="t-small mt-1">{label}</p>
+                    <p
+                      className="text-[30px] font-semibold leading-none tracking-[-0.028em] tabular-nums"
+                      style={{ color: tone }}
+                    >
+                      {value}
+                    </p>
+                    <p className="mt-2 text-[13px]" style={{ color: 'var(--text-muted)' }}>
+                      {label}
+                    </p>
                   </>
                 )
                 return href ? (
-                  <Link key={label} href={href} className="surface surface-interactive block p-5">
+                  <Link key={label} href={href} className="group">
                     {body}
                   </Link>
                 ) : (
-                  <div key={label} className="surface p-5">
-                    {body}
-                  </div>
+                  <div key={label}>{body}</div>
                 )
               })}
             </div>
@@ -246,22 +254,19 @@ export default function Dashboard() {
             </Link>
           }
         >
-          <ul className="surface">
+          <ul className="flex flex-col gap-0.5">
             {subjects.map((subject, i) => {
               const pct = subjectStats[subject] ?? 0
               const locked = isSubjectLocked(subject, profile)
               return (
-                <li
-                  key={subject}
-                  className={i > 0 ? 'border-t border-[var(--border)]' : undefined}
-                >
+                <li key={subject}>
                   <Link
                     href={
                       locked
                         ? '/dashboard/profile#unlock'
                         : `/dashboard/syllabus/${getSlugForSubject(subject)}`
                     }
-                    className="flex items-center gap-4 px-5 py-4 transition-colors duration-150 hover:bg-[var(--surface-sunken)]"
+                    className="flex items-center gap-4 rounded-[10px] px-3 py-3.5 transition-colors duration-150 hover:bg-[var(--surface-sunken)]"
                   >
                     <span
                       className={`min-w-0 flex-1 truncate text-sm font-medium sm:w-48 sm:flex-none sm:shrink-0 ${
@@ -315,15 +320,12 @@ export default function Dashboard() {
         {/* The DP core is separate: it is not one of the six subjects. */}
         {core.length > 0 && (
           <Section title="Diploma core">
-            <ul className="surface">
-              {core.map((subject, i) => (
-                <li
-                  key={subject}
-                  className={i > 0 ? 'border-t border-[var(--border)]' : undefined}
-                >
+            <ul className="flex flex-col gap-0.5">
+              {core.map((subject) => (
+                <li key={subject}>
                   <Link
                     href={`/dashboard/syllabus/${getSlugForSubject(subject)}`}
-                    className="flex items-center gap-4 px-5 py-4 transition-colors duration-150 hover:bg-[var(--surface-sunken)]"
+                    className="flex items-center gap-4 rounded-[10px] px-3 py-3.5 transition-colors duration-150 hover:bg-[var(--surface-sunken)]"
                   >
                     <span className="flex-1 truncate text-sm font-medium text-[var(--text)]">
                       {subject}
@@ -346,13 +348,14 @@ export default function Dashboard() {
         {/* Focus comes last so a new account is not confronted with a queue. */}
         {hasActivity && focus.length > 0 && (
           <Section title="What to work on next">
-            <ul className="surface">
-              {focus.map((item, i) => (
+            <ul className="flex flex-col">
+              {focus.map((item) => (
                 <li
                   key={item.id}
-                  className={i > 0 ? 'border-t border-[var(--border)]' : undefined}
+                  className="border-b last:border-b-0"
+                  style={{ borderColor: 'var(--border)' }}
                 >
-                  <div className="flex items-center gap-3 px-5 py-4">
+                  <div className="flex items-center gap-3 px-1 py-3.5">
                     <span
                       className={`h-2 w-2 shrink-0 rounded-full ${STATUS_COLORS[item.status]}`}
                       aria-hidden="true"

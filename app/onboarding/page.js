@@ -427,7 +427,7 @@ export default function Onboarding() {
         {step === 1 && (
           <div className="card p-5 md:p-8">
             <h1 className="text-2xl font-bold text-text mb-2">
-              Let's set up your profile
+              Let&rsquo;s set up your profile
             </h1>
             <p className="text-text-muted text-sm mb-8">
               Tell us about your curriculum so we can map your exact syllabus.

@@ -56,7 +56,7 @@ export default function NoteImport({ subject, subjects, savedNotes = [], onCards
     reader.readAsText(file)
   }
 
-  const useNote = (note) => {
+  const applyNote = (note) => {
     setText(note.body || '')
     setSubj(note.subject || subj)
     setSubtopic(note.subtopic || '')
@@ -90,7 +90,7 @@ export default function NoteImport({ subject, subjects, savedNotes = [], onCards
             {savedNotes.map((n) => (
               <button
                 key={n.id}
-                onClick={() => useNote(n)}
+                onClick={() => applyNote(n)}
                 className="rounded-full border border-[var(--border)] px-3 py-1.5 text-left text-xs text-[var(--text-body)] transition-colors duration-150 hover:border-[var(--brand)] hover:bg-[var(--brand-tint)] hover:text-[var(--brand)]"
               >
                 {n.subtopic ? displaySubtopic(n.subtopic) : n.subject}
