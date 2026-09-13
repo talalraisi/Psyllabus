@@ -15,6 +15,7 @@ import { getSlugForSubject } from '@/lib/subject-map'
 import {
   computeCompletionPercent,
   progressKey,
+  topicSortKey,
   STATUS_COLORS,
   STATUS_LABELS,
   displaySubtopic,
@@ -36,6 +37,7 @@ export default function Dashboard() {
   const [subjectStats, setSubjectStats] = useState({})
   const [breakdown, setBreakdown] = useState({})
   const [sizes, setSizes] = useState({})
+  const [topics, setTopics] = useState({})
   const [overall, setOverall] = useState(0)
   const [counts, setCounts] = useState({ mastered: 0, weak: 0, decaying: 0, due: 0, tested: 0 })
   const [session, setSession] = useState({ items: [], perItemMinutes: 0 })
@@ -86,13 +88,24 @@ export default function Dashboard() {
       const stats = {}
       const tallies = {}
       const sizeOf = {}
+      const byTopic = {}
       for (const subject of subjects) {
         const rows = merged.filter((r) => r.subject === subject)
         stats[subject] = computeCompletionPercent(rows, progressMap, subject)
         sizeOf[subject] = rows.length
         const tally = {}
-        for (const row of rows) tally[row.status] = (tally[row.status] || 0) + 1
+        const topics = new Map()
+        for (const row of rows) {
+          tally[row.status] = (tally[row.status] || 0) + 1
+          const t = topics.get(row.topic) || { topic: row.topic, total: 0, mastered: 0 }
+          t.total++
+          if (row.status === 'mastered') t.mastered++
+          topics.set(row.topic, t)
+        }
         tallies[subject] = tally
+        byTopic[subject] = [...topics.values()].sort(
+          (a, b) => topicSortKey(a.topic) - topicSortKey(b.topic)
+        )
       }
 
       const mastered = merged.filter((r) => r.status === 'mastered').length
@@ -116,6 +129,7 @@ export default function Dashboard() {
 
       setSubjectStats(stats)
       setBreakdown(tallies)
+      setTopics(byTopic)
       setSizes(sizeOf)
       setLoading(false)
     }
@@ -143,8 +157,7 @@ export default function Dashboard() {
   // One thing to start, then at most three more. The whole queue lives on the
   // study plan; a dashboard that lists nine subtopics is a to-do list, and a
   // to-do list that long is one nobody opens.
-  const [next, ...queued] = session.items
-  const rest = queued.slice(0, 3)
+  const rest = session.items.slice(0, 4)
   const firstSubject = subjects[0]
   const startHref = firstSubject
     ? `/dashboard/syllabus/${getSlugForSubject(firstSubject)}`
@@ -204,74 +217,43 @@ export default function Dashboard() {
           </>
         ) : (
           <>
-            {/* Start here. One thing, named, with the reason it is first and a
-                button that opens it. Everything else on this page is reference
-                for when you have already done it. */}
-            {next && (
-              <div className="mb-14">
-                <p
-                  className="mb-4 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
-                  style={{ color: 'var(--text-faint)' }}
-                >
-                  Start here
-                </p>
-                <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
-                  {next.subject} · {next.topic}
-                </p>
-                <h2 className="mt-1.5 text-[clamp(1.5rem,3.6vw,2.1rem)] font-semibold leading-[1.15] tracking-[-0.03em]">
-                  {displaySubtopic(next.subtopic)}
-                </h2>
+            <div className="mb-16">
+              <SubjectWheel
+                subjects={subjects}
+                core={core}
+                breakdown={breakdown}
+                counts={sizes}
+                targets={profile.target_grades || {}}
+                overall={overall}
+                lockedSubjects={subjects.filter((subject) => isSubjectLocked(subject, profile))}
+                topicsBySubject={topics}
+              />
+            </div>
 
-                <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13.5px]">
-                  <span className={`font-medium ${STATUS_TEXT_COLORS[next.status]}`}>
-                    {STATUS_LABELS[next.status]}
-                  </span>
-                  {next.reasons?.slice(0, 2).map((r) => (
-                    <span key={r.kind} style={{ color: 'var(--text-muted)' }}>
-                      {r.label}
-                    </span>
-                  ))}
-                  <span
-                    className="inline-flex items-center gap-1.5"
-                    style={{ color: 'var(--text-faint)' }}
-                  >
-                    <IconClock width={13} height={13} />
-                    about {session.perItemMinutes} min
-                  </span>
-                </p>
-
-                <div className="mt-7 flex flex-wrap items-center gap-3">
-                  <Link
-                    href={`/dashboard/quiz?subject=${encodeURIComponent(next.subject)}&topic=${encodeURIComponent(next.topic)}&subtopic=${encodeURIComponent(next.subtopic)}&back=/dashboard`}
-                    className="btn btn-solid control-lg"
-                  >
-                    Start this quiz
-                    <IconArrowRight width={17} height={17} />
-                  </Link>
-                  {counts.due > 0 && (
-                    <Link
-                      href="/dashboard/quiz?mode=mistakes&back=/dashboard"
-                      className="btn btn-outline control-lg"
-                    >
-                      Or review {counts.due} mistake{counts.due === 1 ? '' : 's'}
-                    </Link>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* The rest of today, so the one thing above has a context and you
-                can see what you are working toward without leaving the page. */}
+            {/* What the planner would have you do, in the order it would have
+                you do it. Four at most: the whole queue lives on the study
+                plan, and a dashboard listing nine subtopics is a to-do list
+                long enough that nobody opens it. */}
             {rest.length > 0 && (
               <Section
-                title="Then today"
+                title="Today"
                 action={
-                  <Link
-                    href="/dashboard/study-plan"
-                    className="text-[13px] font-medium text-[var(--brand)] hover:underline"
-                  >
-                    Full plan
-                  </Link>
+                  <div className="flex items-center gap-5">
+                    {counts.due > 0 && (
+                      <Link
+                        href="/dashboard/quiz?mode=mistakes&back=/dashboard"
+                        className="text-[13px] font-medium text-[var(--brand)] hover:underline"
+                      >
+                        Review {counts.due}
+                      </Link>
+                    )}
+                    <Link
+                      href="/dashboard/study-plan"
+                      className="text-[13px] font-medium text-[var(--brand)] hover:underline"
+                    >
+                      Full plan
+                    </Link>
+                  </div>
                 }
               >
                 <ul className="flex flex-col">
@@ -309,19 +291,6 @@ export default function Dashboard() {
                 </ul>
               </Section>
             )}
-
-            {/* Your programme as one shape. */}
-            <Section title="Your programme">
-              <SubjectWheel
-                subjects={subjects}
-                core={core}
-                breakdown={breakdown}
-                counts={sizes}
-                targets={profile.target_grades || {}}
-                overall={overall}
-                lockedSubjects={subjects.filter((subject) => isSubjectLocked(subject, profile))}
-              />
-            </Section>
 
             {/* The numbers, as reference under a rule. They are what the page
                 is measured on, not what it opens with. */}

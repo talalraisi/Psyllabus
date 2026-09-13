@@ -964,3 +964,28 @@ input[type='range'].slider:focus-visible::-moz-range-thumb {
   mask-image: radial-gradient(ellipse 70% 60% at 50% 42%, #000 0%, transparent 74%);
   opacity: 0.7;
 }
+
+/* The wheel changing level. Keyed on the open subject, so React mounts a fresh
+   group and this plays once — a step in rather than a crossfade, which is what
+   makes pressing an arc read as going into it. */
+.wheel-level {
+  animation: wheel-in 320ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  transform-origin: 50% 50%;
+}
+
+@keyframes wheel-in {
+  from {
+    opacity: 0;
+    transform: scale(0.93);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wheel-level {
+    animation: none;
+  }
+}
