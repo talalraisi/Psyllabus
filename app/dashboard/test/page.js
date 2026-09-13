@@ -307,11 +307,7 @@ export default function TestBuilderPage() {
                   onClick={() => setLevel(l.key)}
                   aria-pressed={level === l.key}
                   title={l.hint}
-                  className={`control-sm rounded-full border px-4 text-[12.5px] font-medium transition-colors duration-150 ${
-                    level === l.key
-                      ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
-                      : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
-                  }`}
+                  className={`${level === l.key ? 'btn btn-solid control-sm' : 'btn btn-outline control-sm'}`}
                 >
                   {l.label}
                 </button>
@@ -431,11 +427,7 @@ export default function TestBuilderPage() {
                   onClick={() => setDifficulty(d.key)}
                   aria-pressed={difficulty === d.key}
                   disabled={n === 0}
-                  className={`control-sm rounded-full border px-4 text-[12.5px] font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40 ${
-                    difficulty === d.key
-                      ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
-                      : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
-                  }`}
+                  className={`${difficulty === d.key ? 'btn btn-solid control-sm' : 'btn btn-outline control-sm'}`}
                 >
                   {d.label}
                   <span className="ml-2 opacity-60">{n}</span>
@@ -462,11 +454,7 @@ export default function TestBuilderPage() {
                   aria-pressed={qtype === t.key}
                   title={t.hint}
                   disabled={n === 0}
-                  className={`control-sm rounded-full border px-4 text-[12.5px] font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40 ${
-                    qtype === t.key
-                      ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
-                      : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
-                  }`}
+                  className={`${qtype === t.key ? 'btn btn-solid control-sm' : 'btn btn-outline control-sm'}`}
                 >
                   {t.label}
                   <span className="ml-2 opacity-60">{n}</span>
@@ -484,11 +472,7 @@ export default function TestBuilderPage() {
                 onClick={() => setOrder(o.key)}
                 aria-pressed={order === o.key}
                 title={o.hint}
-                className={`control-sm rounded-full border px-4 text-[12.5px] font-medium transition-colors duration-150 ${
-                  order === o.key
-                    ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
-                    : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
-                }`}
+                className={`${order === o.key ? 'btn btn-solid control-sm' : 'btn btn-outline control-sm'}`}
               >
                 {o.label}
               </button>
@@ -502,11 +486,7 @@ export default function TestBuilderPage() {
                 key={n}
                 onClick={() => setLength(n)}
                 aria-pressed={length === n}
-                className={`control-md rounded-full border px-4 text-[12.5px] font-medium transition-colors duration-150 ${
-                  length === n
-                    ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
-                    : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
-                }`}
+                className={`${length === n ? 'btn btn-solid control-sm' : 'btn btn-outline control-sm'}`}
               >
                 {n} questions
               </button>

@@ -40,6 +40,9 @@ const R_CORE_OUT = 168
 
 const R_CENTRE = 116
 
+/** Degrees of air between neighbouring slices, per side. */
+const GAP = 1.5
+
 const r2 = (n) => Math.round(n * 100) / 100
 
 function polar(radius, deg) {
@@ -265,8 +268,8 @@ export default function SubjectWheel({
             }}
           >
             {subjects.map((subject, i) => {
-              const a0 = i * step
-              const a1 = (i + 1) * step
+              const a0 = i * step + GAP
+              const a1 = (i + 1) * step - GAP
               const locked = lockedSubjects.includes(subject)
               const frac = locked ? 0 : fractionOf(subject)
               const aFill = a0 + (a1 - a0) * frac
@@ -341,8 +344,8 @@ export default function SubjectWheel({
             with the subjects, inside the same group, so opening one is the
             same motion. */}
           {core.map((component, i) => {
-            const a0 = i * coreStep
-            const a1 = (i + 1) * coreStep
+            const a0 = i * coreStep + GAP
+            const a1 = (i + 1) * coreStep - GAP
             const [lx, ly] = polar((R_CORE_IN + R_CORE_OUT) / 2, (a0 + a1) / 2)
             const grade = targets[component]
             const isOpen = open?.kind === 'core' && open.index === i

@@ -195,18 +195,10 @@ export default function Dashboard() {
   return (
     <DashboardLayout profile={profile}>
       <Page width="wide">
-        {/* A greeting, not a headline.
-            This was set at the same display size as a page title, which put the
-            wheel — the thing you actually came to look at — a screen and a half
-            down. It is one quiet line now, and the wheel starts near the top. */}
-        <header className="mb-8 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-          <h1 className="text-[19px] font-semibold tracking-[-0.02em]">
-            {now ? greeting(now) : 'Hello'}, {firstName}
-          </h1>
-          <p className="text-[13px]" style={{ color: 'var(--text-faint)' }}>
-            {subtitle}
-          </p>
-        </header>
+        <PageHeader
+          title={`${now ? greeting(now) : 'Hello'}, ${firstName}`}
+          subtitle={subtitle}
+        />
 
         {!hasActivity ? (
           <>

@@ -126,11 +126,7 @@ export default function MistakeBankPage() {
                 <button
                   onClick={() => setPicked([])}
                   aria-pressed={picked.length === 0}
-                  className={`control-sm rounded-full border px-4 text-[13px] font-medium transition-colors duration-150 ${
-                    picked.length === 0
-                      ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
-                      : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
-                  }`}
+                  className={`${picked.length === 0 ? 'btn btn-solid control-sm' : 'btn btn-outline control-sm'}`}
                 >
                   All subjects
                 </button>
@@ -144,11 +140,7 @@ export default function MistakeBankPage() {
                       key={subject}
                       onClick={() => toggle(subject)}
                       aria-pressed={on}
-                      className={`control-sm rounded-full border px-4 text-[13px] font-medium transition-colors duration-150 ${
-                        on
-                          ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
-                          : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
-                      }`}
+                      className={`${on ? 'btn btn-solid control-sm' : 'btn btn-outline control-sm'}`}
                     >
                       {subject}
                       <span className="ml-2 tabular-nums opacity-60">

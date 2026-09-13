@@ -555,19 +555,10 @@ function Chip({ label, count, due, active, onClick }) {
     <button
       onClick={onClick}
       aria-pressed={active}
-      className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs transition-colors duration-150 ${
-        active
-          ? 'border-[var(--brand)] bg-[var(--brand-tint)] text-[var(--brand)]'
-          : 'border-[var(--border)] text-[var(--text-body)] hover:border-[var(--border-strong)] hover:bg-[var(--surface-sunken)]'
-      }`}
+      className={active ? 'btn btn-solid control-sm' : 'btn btn-outline control-sm'}
     >
-      <span className="font-medium">{label}</span>
-      <span className="text-[var(--text-faint)]">{count}</span>
-      {due > 0 && (
-        <span className="rounded-full bg-[var(--brand)] px-1.5 py-0.5 text-[10px] font-semibold text-white">
-          {due}
-        </span>
-      )}
+      <span>{label}</span>
+      <span className="tabular-nums opacity-60">{due > 0 ? `${due} due` : count}</span>
     </button>
   )
 }
