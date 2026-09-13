@@ -16,8 +16,8 @@ import AuthShell, { OrRule, GoogleButton, SubmitButton } from '@/components/mark
  * form later cannot retroactively change what somebody actually consented to.
  */
 export const CONSENT_TEXT = {
-  en: 'I confirm that I am a student and have obtained permission from my parent or guardian to use this platform, in line with the Oman Personal Data Protection Law. I agree to the Privacy Policy.',
-  ar: 'أقر بأنني طالب وقد حصلت على موافقة صريحة من ولي أمري لاستخدام هذه المنصة وفقاً لقانون حماية البيانات الشخصية العماني. أوافق على سياسة الخصوصية.',
+  en: 'I have my parent or guardian\u2019s permission to use Project Syllabus.',
+  ar: 'لدي موافقة ولي أمري على استخدام منصة Project Syllabus.',
 }
 
 export default function Signup() {
@@ -27,7 +27,12 @@ export default function Signup() {
   const [schoolCode, setSchoolCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [consented, setConsented] = useState(false)
+  // Two separate consents: permission from a guardian, and agreement to the
+  // terms. Only the first is a PDPL consent record, and only the first is
+  // stored with its wording.
+  const [guardianOk, setGuardianOk] = useState(false)
+  const [termsOk, setTermsOk] = useState(false)
+  const consented = guardianOk && termsOk
   const [awaitingConfirmation, setAwaitingConfirmation] = useState(false)
   const [resending, setResending] = useState(false)
   const [resent, setResent] = useState(false)
@@ -94,8 +99,14 @@ export default function Signup() {
   const handleGoogleSignup = async () => {
     // The form's required attribute does nothing for a button outside it, so
     // the same consent has to be enforced here or Google becomes a way round it.
-    if (!consented) {
+    // Say which box, not that something is missing. Two checkboxes and one
+    // generic message is how people end up ticking the one they already ticked.
+    if (!guardianOk) {
       setError('Please confirm you have your parent or guardian\u2019s permission first.')
+      return
+    }
+    if (!termsOk) {
+      setError('Please agree to the Terms, Privacy Policy and Cookie Policy.')
       return
     }
     setLoading(true)
@@ -262,37 +273,50 @@ export default function Signup() {
               </p>
             </div>
 
-            {/* Unticked by default and required. Pre-ticked consent is not
-                consent, and Oman's PDPL wants it explicit for a minor. */}
-            <label className="flex cursor-pointer items-start gap-3 rounded-[var(--r-md)] border border-[var(--border-strong)] p-4">
-              <input
-                type="checkbox"
-                checked={consented}
-                onChange={(e) => setConsented(e.target.checked)}
-                required
-                className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--brand)]"
-              />
-              <span className="text-[13px] leading-relaxed text-[var(--text-body)]">
-                I confirm that I am a student and have permission from my parent or guardian to use
-                Project Syllabus, in line with the{' '}
-                <Link href="/privacy" className="text-[var(--brand)] underline">
-                  Oman Personal Data Protection Law
-                </Link>
-                . I agree to the{' '}
-                <Link href="/terms" className="text-[var(--brand)] underline">
-                  Terms
-                </Link>
-                ,{' '}
-                <Link href="/privacy" className="text-[var(--brand)] underline">
-                  Privacy Policy
-                </Link>{' '}
-                and{' '}
-                <Link href="/cookies" className="text-[var(--brand)] underline">
-                  Cookie Policy
-                </Link>
-                , and I understand I can delete my account and all of my data at any time.
-              </span>
-            </label>
+            {/* Both unticked by default and both required. Pre-ticked consent
+                is not consent, and the PDPL wants it explicit for a minor. */}
+            <div
+              className="flex flex-col gap-3 rounded-[10px] border p-4"
+              style={{ borderColor: 'var(--border-strong)' }}
+            >
+              <label className="flex cursor-pointer items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={guardianOk}
+                  onChange={(e) => setGuardianOk(e.target.checked)}
+                  required
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--brand)]"
+                />
+                <span className="text-[13px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                  I have my parent or guardian&rsquo;s permission to use Project Syllabus.
+                </span>
+              </label>
+
+              <label className="flex cursor-pointer items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={termsOk}
+                  onChange={(e) => setTermsOk(e.target.checked)}
+                  required
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--brand)]"
+                />
+                <span className="text-[13px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                  I agree to the{' '}
+                  <Link href="/terms" className="underline" style={{ color: 'var(--brand)' }}>
+                    Terms
+                  </Link>
+                  ,{' '}
+                  <Link href="/privacy" className="underline" style={{ color: 'var(--brand)' }}>
+                    Privacy Policy
+                  </Link>{' '}
+                  and{' '}
+                  <Link href="/cookies" className="underline" style={{ color: 'var(--brand)' }}>
+                    Cookie Policy
+                  </Link>
+                  .
+                </span>
+              </label>
+            </div>
 
             {error && <div className="error-box">{error}</div>}
 
