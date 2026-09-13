@@ -397,7 +397,7 @@ export default function PredictionPage() {
                               key={g}
                               onClick={() => setTarget(subject, String(g))}
                               aria-pressed={String(targets[subject]) === String(g)}
-                              className={`control-sm w-10 rounded-full border text-[13.5px] font-semibold transition-colors duration-150 ${
+                              className={`control-sm w-10 rounded-full border text-[12.5px] font-semibold transition-colors duration-150 ${
                                 String(targets[subject]) === String(g)
                                   ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
                                   : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
@@ -422,7 +422,7 @@ export default function PredictionPage() {
                             key={g}
                             onClick={() => setTarget(component, g)}
                             aria-pressed={targets[component] === g}
-                            className={`control-sm w-10 rounded-full border text-[13.5px] font-semibold transition-colors duration-150 ${
+                            className={`control-sm w-10 rounded-full border text-[12.5px] font-semibold transition-colors duration-150 ${
                               targets[component] === g
                                 ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
                                 : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'

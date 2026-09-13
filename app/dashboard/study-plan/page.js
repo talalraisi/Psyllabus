@@ -279,7 +279,7 @@ export default function StudyPlanPage() {
                   key={key}
                   onClick={() => setView(key)}
                   aria-pressed={view === key}
-                  className={`control-sm rounded-full border px-4 text-[13.5px] font-medium transition-colors duration-150 ${
+                  className={`control-sm rounded-full border px-4 text-[12.5px] font-medium transition-colors duration-150 ${
                     view === key
                       ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
                       : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'

@@ -170,7 +170,7 @@ export default function CalendarPage() {
   if (loading) {
     return (
       <DashboardLayout profile={null}>
-        <PageLoading title="Calendar" width="default" variant="calendar" />
+        <PageLoading title="Calendar" width="wide" variant="calendar" />
       </DashboardLayout>
     )
   }
@@ -182,7 +182,7 @@ export default function CalendarPage() {
   return (
     <DashboardLayout profile={profile}>
       <ReminderWatcher events={events} />
-      <Page width="default">
+      <Page width="wide">
         <PageHeader
           title="Calendar"
           subtitle="Tests, mocks, IA deadlines and orals, with a reminder before each one."

@@ -108,8 +108,10 @@ export default function SubjectWheel({
   // part of the programme, and a slice you cannot press reads as broken rather
   // than as deliberate.
   const [open, setOpen] = useState(null)
-  const [at, setAt] = useState(null) // subject index under the pointer
-  const [coreAt, setCoreAt] = useState(null) // core index under the pointer
+  // One pointer, one slice. The two rings used to track their own hover
+  // independently, so a subject and a core component could both be outlined at
+  // the same time — two highlights, which is no highlight at all.
+  const [hover, setHover] = useState(null) // {kind: 'subject'|'core', index}
 
   if (!subjects.length) return null
 
@@ -122,12 +124,14 @@ export default function SubjectWheel({
   const openSubject = open?.kind === 'subject' ? subjects[open.index] : null
   const openCore = open?.kind === 'core' ? core[open.index] : null
   const openTopics = openSubject ? topicsBySubject[openSubject] || [] : []
+  const at = hover?.kind === 'subject' ? hover.index : null
+  const coreAt = hover?.kind === 'core' ? hover.index : null
   const hoveredSubject = at === null ? null : subjects[at]
   const hoveredCore = coreAt === null ? null : core[coreAt]
   // One hover model across both rings. Pointing at a subject used to leave the
   // core at full strength, so the thing you were looking at was the only part
   // of the wheel that did not stand out.
-  const anyHover = at !== null || coreAt !== null
+  const anyHover = hover !== null
 
   /**
    * Where the wheel has to get to.
@@ -160,15 +164,14 @@ export default function SubjectWheel({
 
   const close = () => {
     setOpen(null)
-    setAt(null)
-    setCoreAt(null)
+    setHover(null)
   }
 
   return (
     <div className="flex flex-col items-center">
       {/* What the wheel is showing, written above it. Fixed height, so opening
           a slice does not shunt the wheel up and down the page. */}
-      <div className="flex min-h-[150px] w-full max-w-2xl flex-col items-center justify-end pb-6 text-center">
+      <div className="flex min-h-[118px] w-full max-w-2xl flex-col items-center justify-end pb-5 text-center">
         {openSubject || openCore ? (
           <>
             <button
@@ -247,10 +250,7 @@ export default function SubjectWheel({
               ? `${openSubject}, ${masteredIn(openSubject)} of ${sizeOf(openSubject)} subtopics mastered`
               : `Your ${subjects.length} subjects, ${overall}% of the syllabus mastered`
           }
-          onMouseLeave={() => {
-          setAt(null)
-          setCoreAt(null)
-        }}
+          onMouseLeave={() => setHover(null)}
         >
           {/* The slices. The whole group turns, which is what carries the one you
               pressed down to the bottom. */}
@@ -321,8 +321,8 @@ export default function SubjectWheel({
                     role="button"
                     aria-label={`${subject}, ${masteredIn(subject)} of ${sizeOf(subject)} subtopics mastered`}
                     style={{ cursor: 'pointer', outline: 'none' }}
-                    onMouseEnter={() => setAt(i)}
-                    onFocus={() => setAt(i)}
+                    onMouseEnter={() => setHover({ kind: 'subject', index: i })}
+                    onFocus={() => setHover({ kind: 'subject', index: i })}
                     onClick={() => setOpen(isOpen ? null : { kind: 'subject', index: i })}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
@@ -394,8 +394,8 @@ export default function SubjectWheel({
                   role="button"
                   aria-label={`${component}${grade ? `, target ${grade}` : ', no target set'}`}
                   style={{ cursor: 'pointer', outline: 'none' }}
-                  onMouseEnter={() => setCoreAt(i)}
-                  onFocus={() => setCoreAt(i)}
+                  onMouseEnter={() => setHover({ kind: 'core', index: i })}
+                  onFocus={() => setHover({ kind: 'core', index: i })}
                   onClick={() => setOpen(isOpen ? null : { kind: 'core', index: i })}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {

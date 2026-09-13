@@ -213,7 +213,7 @@ export default function DashboardLayout({ children, profile }) {
                   href={href}
                   aria-current={active ? 'page' : undefined}
                   title={compact ? label : undefined}
-                  className={`relative flex items-center gap-3 rounded-[8px] py-2.5 text-[13.5px] transition-colors duration-150 ${
+                  className={`relative flex items-center gap-3 rounded-[8px] py-2.5 text-[12.5px] transition-colors duration-150 ${
                     compact ? 'justify-center px-0' : 'px-3'
                   }`}
                   style={{
@@ -273,7 +273,7 @@ export default function DashboardLayout({ children, profile }) {
         <Link
           href="/dashboard/profile"
           title={compact ? 'Profile' : undefined}
-          className={`control-md flex items-center gap-3 rounded-[8px] text-[13.5px] font-medium text-[var(--text-body)] transition-colors duration-150 hover:bg-[var(--surface-sunken)] ${
+          className={`control-md flex items-center gap-3 rounded-[8px] text-[12.5px] font-medium text-[var(--text-body)] transition-colors duration-150 hover:bg-[var(--surface-sunken)] ${
             compact ? 'justify-center px-0' : 'px-3'
           }`}
         >
@@ -285,7 +285,7 @@ export default function DashboardLayout({ children, profile }) {
           onClick={handleLogout}
           disabled={signingOut}
           title={compact ? 'Sign out' : undefined}
-          className={`control-md flex w-full items-center gap-3 rounded-[8px] text-[13.5px] font-medium text-[var(--text-body)] transition-colors duration-150 hover:bg-[var(--surface-sunken)] disabled:opacity-50 ${
+          className={`control-md flex w-full items-center gap-3 rounded-[8px] text-[12.5px] font-medium text-[var(--text-body)] transition-colors duration-150 hover:bg-[var(--surface-sunken)] disabled:opacity-50 ${
             compact ? 'justify-center px-0' : 'px-3'
           }`}
         >

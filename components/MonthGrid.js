@@ -67,7 +67,7 @@ export default function MonthGrid({
           {WEEKDAYS.map((d) => (
             <div
               key={d}
-              className="border-b px-2 py-2 text-center text-[10px] font-semibold uppercase tracking-[0.14em]"
+              className="border-b px-2 py-2.5 text-center text-[10.5px] font-semibold uppercase tracking-[0.14em]"
               style={{ color: 'var(--text-faint)', borderColor: 'var(--border)' }}
             >
               {d}
@@ -84,7 +84,7 @@ export default function MonthGrid({
             const dayEvents = eventsByDay.get(key) || []
             const lastRow = i >= 35
             const lastCol = i % 7 === 6
-            const shown = dayEvents.slice(0, 2)
+            const shown = dayEvents.slice(0, 3)
             const hidden = dayEvents.length - shown.length
 
             return (
@@ -93,7 +93,7 @@ export default function MonthGrid({
                 onClick={() => onSelect(key)}
                 aria-pressed={isSelected}
                 aria-label={`${day.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })}${dayEvents.length ? `, ${dayEvents.length} event${dayEvents.length === 1 ? '' : 's'}` : ''}`}
-                className={`relative flex min-h-[86px] flex-col gap-1 p-1.5 text-left transition-colors duration-150 ${
+                className={`relative flex min-h-[118px] flex-col gap-1 p-1.5 text-left transition-colors duration-150 ${
                   lastRow ? '' : 'border-b'
                 } ${lastCol ? '' : 'border-r'} ${isSelected ? '' : 'hover:bg-[var(--surface-sunken)]'}`}
                 style={{
@@ -109,7 +109,7 @@ export default function MonthGrid({
                     look like the day you had picked, which it usually is not. */}
                 <span className="flex items-baseline gap-1.5">
                   <span
-                    className="text-[12px] tabular-nums"
+                    className="text-[13px] tabular-nums"
                     style={{
                       color: isToday
                         ? 'var(--brand)'
@@ -141,7 +141,7 @@ export default function MonthGrid({
                     }}
                   >
                     <span
-                      className="min-w-0 truncate text-[10.5px] leading-[1.35]"
+                      className="min-w-0 truncate text-[11.5px] leading-[1.4]"
                       style={{
                         color: 'var(--text-body)',
                         textDecoration: e.completed ? 'line-through' : undefined,

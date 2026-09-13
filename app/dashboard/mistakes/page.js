@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import { displaySubtopic } from '@/lib/progress'
+import { IconChevronRight } from '@/components/Icons'
 import { Page, PageHeader, EmptyState, PageLoading } from '@/components/PageShell'
 
 function relativeDue(nextReviewAt, now = Date.now()) {
@@ -20,6 +21,9 @@ function relativeDue(nextReviewAt, now = Date.now()) {
 export default function MistakeBankPage() {
   const [profile, setProfile] = useState(null)
   const [picked, setPicked] = useState([])
+  // Folded state per subject. Absent means open, so the page still shows its
+  // contents the first time you arrive.
+  const [openSubjects, setOpenSubjects] = useState({})
   const [mistakes, setMistakes] = useState([])
   const [loading, setLoading] = useState(true)
   const router = useRouter()
@@ -75,6 +79,11 @@ export default function MistakeBankPage() {
   // the page should not make you choose before it shows you anything.
   const scope = picked.length ? picked : subjects
   const inScope = mistakes.filter((m) => scope.includes(m.questions.subject || 'Other'))
+  // Subjects that actually have something in the current scope, in the order
+  // the picker shows them.
+  const subjectsInScope = subjects.filter((subject) =>
+    inScope.some((m) => (m.questions.subject || 'Other') === subject)
+  )
   const dueInScope = inScope.filter((m) => new Date(m.next_review_at).getTime() <= now)
 
   const toggle = (subject) =>
@@ -186,46 +195,108 @@ export default function MistakeBankPage() {
               </p>
             )}
 
-            <ul className="flex flex-col">
-              {inScope.map((m) => {
-                const isDue = new Date(m.next_review_at).getTime() <= now
+            {/* Grouped by subject and foldable. A flat list of thirty-five is
+                a wall; folded, you can see which subject the damage is in and
+                open only that one. */}
+            <div className="flex flex-col">
+              {subjectsInScope.map((subject) => {
+                const items = inScope.filter((m) => m.questions.subject === subject)
+                const dueHere = items.filter(
+                  (m) => new Date(m.next_review_at).getTime() <= now
+                ).length
+                const isOpen = openSubjects[subject] !== false // open unless folded
+
                 return (
-                  <li
-                    key={m.id}
-                    className="flex items-center gap-4 border-b py-3.5"
+                  <section
+                    key={subject}
+                    className="border-t last:border-b"
                     style={{ borderColor: 'var(--border)' }}
                   >
-                    <span
-                      className="h-1.5 w-1.5 shrink-0 rounded-full"
-                      style={{
-                        background: isDue ? 'var(--status-fading)' : 'var(--border-strong)',
-                      }}
-                      aria-hidden="true"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
-                        {m.questions.subject} · {displaySubtopic(m.questions.subtopic)}
-                      </p>
-                      <p className="mt-0.5 truncate text-[14px]" style={{ color: 'var(--text-body)' }}>
-                        {m.questions.stem}
-                      </p>
-                    </div>
-                    <span
-                      className="hidden shrink-0 text-[12px] tabular-nums sm:block"
-                      style={{ color: 'var(--text-faint)' }}
+                    <button
+                      onClick={() =>
+                        setOpenSubjects((prev) => ({ ...prev, [subject]: !isOpen }))
+                      }
+                      aria-expanded={isOpen}
+                      className="flex w-full items-center gap-3 py-3.5 text-left"
                     >
-                      {m.review_count > 0 ? `${m.review_count}/3 recovered` : 'not yet'}
-                    </span>
-                    <span
-                      className="w-[74px] shrink-0 text-right text-[12.5px] font-medium tabular-nums"
-                      style={{ color: isDue ? 'var(--status-fading)' : 'var(--text-muted)' }}
-                    >
-                      {relativeDue(m.next_review_at, now)}
-                    </span>
-                  </li>
+                      <IconChevronRight
+                        width={13}
+                        height={13}
+                        className={`shrink-0 transition-transform duration-150 ${isOpen ? 'rotate-90' : ''}`}
+                        style={{ color: 'var(--text-faint)' }}
+                      />
+                      <span className="min-w-0 flex-1 truncate text-[13.5px] font-medium">
+                        {subject}
+                      </span>
+                      <span
+                        className="shrink-0 text-[12px] tabular-nums"
+                        style={{ color: 'var(--text-faint)' }}
+                      >
+                        {dueHere > 0 && (
+                          <span style={{ color: 'var(--status-fading)' }}>{dueHere} due · </span>
+                        )}
+                        {items.length} logged
+                      </span>
+                    </button>
+
+                    {isOpen && (
+                      <ul className="flex flex-col pb-2 pl-6">
+                        {items.map((m) => {
+                          const isDue = new Date(m.next_review_at).getTime() <= now
+                          return (
+                            <li
+                              key={m.id}
+                              className="flex items-center gap-4 border-t py-3"
+                              style={{ borderColor: 'var(--border)' }}
+                            >
+                              <span
+                                className="h-1.5 w-1.5 shrink-0 rounded-full"
+                                style={{
+                                  background: isDue
+                                    ? 'var(--status-fading)'
+                                    : 'var(--border-strong)',
+                                }}
+                                aria-hidden="true"
+                              />
+                              <div className="min-w-0 flex-1">
+                                <p
+                                  className="truncate text-[11.5px]"
+                                  style={{ color: 'var(--text-faint)' }}
+                                >
+                                  {displaySubtopic(m.questions.subtopic)}
+                                </p>
+                                <p
+                                  className="mt-0.5 truncate text-[13.5px]"
+                                  style={{ color: 'var(--text-body)' }}
+                                >
+                                  {m.questions.stem}
+                                </p>
+                              </div>
+                              <span
+                                className="hidden shrink-0 text-[12px] tabular-nums sm:block"
+                                style={{ color: 'var(--text-faint)' }}
+                              >
+                                {m.review_count > 0
+                                  ? `${m.review_count}/3 recovered`
+                                  : 'not yet'}
+                              </span>
+                              <span
+                                className="w-[74px] shrink-0 text-right text-[12.5px] font-medium tabular-nums"
+                                style={{
+                                  color: isDue ? 'var(--status-fading)' : 'var(--text-muted)',
+                                }}
+                              >
+                                {relativeDue(m.next_review_at, now)}
+                              </span>
+                            </li>
+                          )
+                        })}
+                      </ul>
+                    )}
+                  </section>
                 )
               })}
-            </ul>
+            </div>
           </>
         )}
       </Page>

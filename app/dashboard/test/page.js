@@ -209,8 +209,13 @@ export default function TestBuilderPage() {
   const usable = accessibleSubjects(profile).filter((s) => !IB_CORE_SUBJECTS.includes(s))
   const isHLSubject = profile?.curriculum === 'IB' && / HL$/.test(subject)
   const hlCount = Object.values(hlBySubtopic).filter(Boolean).length
-  // A typed length wins over the presets, clamped to something sittable.
-  const typedLength = Math.min(100, Math.max(1, parseInt(customLength, 10) || 0))
+  // A typed length wins over the presets, clamped to something sittable. Blank
+  // has to stay blank: clamping an empty box up to 1 is how "85 questions
+  // match" turned into a one-question paper.
+  const parsedLength = parseInt(customLength, 10)
+  const typedLength = Number.isFinite(parsedLength) && parsedLength > 0
+    ? Math.min(100, parsedLength)
+    : 0
   const wantedLength = typedLength || length
   const actualLength = Math.min(wantedLength, eligible.length)
   const canStart = actualLength > 0
@@ -220,7 +225,10 @@ export default function TestBuilderPage() {
   const totalMarks = sample.reduce((s, q) => s + (q.marks || 1), 0)
   const totalSeconds = sample.reduce((s, q) => s + (q.time_budget_seconds || 90), 0)
   const budgetMinutes = Math.max(1, Math.round(totalSeconds / 60))
-  const typedMinutes = Math.min(240, Math.max(1, parseInt(customMinutes, 10) || 0))
+  const parsedMinutes = parseInt(customMinutes, 10)
+  const typedMinutes = Number.isFinite(parsedMinutes) && parsedMinutes > 0
+    ? Math.min(240, parsedMinutes)
+    : 0
   const estMinutes = timed && typedMinutes ? typedMinutes : budgetMinutes
 
   const toggleTopic = (topic) =>
@@ -299,7 +307,7 @@ export default function TestBuilderPage() {
                   onClick={() => setLevel(l.key)}
                   aria-pressed={level === l.key}
                   title={l.hint}
-                  className={`control-sm rounded-full border px-4 text-[13.5px] font-medium transition-colors duration-150 ${
+                  className={`control-sm rounded-full border px-4 text-[12.5px] font-medium transition-colors duration-150 ${
                     level === l.key
                       ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
                       : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
@@ -423,7 +431,7 @@ export default function TestBuilderPage() {
                   onClick={() => setDifficulty(d.key)}
                   aria-pressed={difficulty === d.key}
                   disabled={n === 0}
-                  className={`control-sm rounded-full border px-4 text-[13.5px] font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40 ${
+                  className={`control-sm rounded-full border px-4 text-[12.5px] font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40 ${
                     difficulty === d.key
                       ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
                       : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
@@ -454,7 +462,7 @@ export default function TestBuilderPage() {
                   aria-pressed={qtype === t.key}
                   title={t.hint}
                   disabled={n === 0}
-                  className={`control-sm rounded-full border px-4 text-[13.5px] font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40 ${
+                  className={`control-sm rounded-full border px-4 text-[12.5px] font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40 ${
                     qtype === t.key
                       ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
                       : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
@@ -476,7 +484,7 @@ export default function TestBuilderPage() {
                 onClick={() => setOrder(o.key)}
                 aria-pressed={order === o.key}
                 title={o.hint}
-                className={`control-sm rounded-full border px-4 text-[13.5px] font-medium transition-colors duration-150 ${
+                className={`control-sm rounded-full border px-4 text-[12.5px] font-medium transition-colors duration-150 ${
                   order === o.key
                     ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
                     : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
@@ -494,7 +502,7 @@ export default function TestBuilderPage() {
                 key={n}
                 onClick={() => setLength(n)}
                 aria-pressed={length === n}
-                className={`control-md rounded-full border px-4 text-[13.5px] font-medium transition-colors duration-150 ${
+                className={`control-md rounded-full border px-4 text-[12.5px] font-medium transition-colors duration-150 ${
                   length === n
                     ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
                     : 'border-[var(--border-strong)] text-[var(--text-body)] hover:border-[var(--border-hover)]'
