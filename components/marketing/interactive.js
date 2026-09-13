@@ -111,7 +111,7 @@ export function Heatmap({ cols = 12, rows = 8, subject = 'Physics SL' }) {
               </p>
             </div>
             <div className="shrink-0 text-right">
-              <p className="text-[12px] font-semibold" style={{ color: `var(--${active.status})` }}>
+              <p className="text-[12px] font-semibold" style={{ color: `var(--status-${active.status})` }}>
                 {STATUS_LABEL[active.status]}
               </p>
               <p className="text-[11px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
@@ -431,8 +431,7 @@ export function DecayDemo() {
         max={9}
         value={weeks}
         onChange={(e) => setWeeks(Number(e.target.value))}
-        className="mt-2.5 w-full"
-        style={{ accentColor: 'var(--brand)' }}
+        className="slider mt-2.5"
       />
 
       <p className="mt-4 text-[12.5px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
@@ -508,8 +507,7 @@ export function PlanDemo() {
         step={15}
         value={minutes}
         onChange={(e) => setMinutes(Number(e.target.value))}
-        className="mt-3 w-full"
-        style={{ accentColor: 'var(--brand)' }}
+        className="slider mt-3"
       />
 
       <ul className="mt-6 flex flex-col">

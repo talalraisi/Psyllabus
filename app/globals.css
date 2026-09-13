@@ -289,8 +289,7 @@ body {
   .surface {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--r-lg);
-    box-shadow: var(--shadow-card);
+    border-radius: 12px;
   }
 
   /* Cards that navigate somewhere lift on hover. Static cards never move. */
@@ -312,15 +311,18 @@ body {
      The extra space sits below the baseline where no glyph reaches, so the
      label reads as sitting low in the button. Tightening the box to the text
      puts the letters where the eye expects them. */
+  /* Pill-shaped, to match the homepage. Changing it here rather than per page
+     is what makes the rest of the app follow without being rewritten. */
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding-inline: 16px;
-    border-radius: var(--r-md);
+    padding-inline: 20px;
+    border-radius: 999px;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
+    letter-spacing: -0.005em;
     line-height: 1;
     transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
       color var(--dur) var(--ease);
@@ -446,8 +448,7 @@ body {
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--r-lg);
-    box-shadow: var(--shadow-card);
+    border-radius: 12px;
   }
 
   .card-pad { padding: 32px; }
@@ -458,10 +459,10 @@ body {
      padding, otherwise a select sits 2px short of the text field beside it. */
   .input {
     width: 100%;
-    height: 48px;
+    height: 46px;
     padding: 0 16px;
     border: 1px solid var(--border-strong);
-    border-radius: var(--r-md);
+    border-radius: 10px;
     background: var(--surface);
     color: var(--text-body);
     font-size: 16px;
@@ -832,4 +833,115 @@ body {
       animation-range: entry 0% cover 34%;
     }
   }
+}
+
+/* --- Range inputs. --------------------------------------------------------
+   The browser's own slider carries the operating system's look, which is the
+   one element on a page that will not match anything else you have designed.
+   accent-color only tints it; the track height, the thumb size and the shadow
+   all stay whatever the platform decided. So it is drawn here instead: a thin
+   rule, a small solid handle, and a focus ring that matches every other
+   control. -------------------------------------------------------------- */
+
+input[type='range'].slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 20px;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type='range'].slider::-webkit-slider-runnable-track {
+  height: 3px;
+  border-radius: 999px;
+  background: var(--border-strong);
+}
+
+input[type='range'].slider::-moz-range-track {
+  height: 3px;
+  border-radius: 999px;
+  background: var(--border-strong);
+}
+
+/* Firefox can fill the track up to the handle; WebKit cannot, so the filled
+   portion is drawn as a separate element behind it in the markup. */
+input[type='range'].slider::-moz-range-progress {
+  height: 3px;
+  border-radius: 999px;
+  background: var(--brand);
+}
+
+input[type='range'].slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  margin-top: -6px;
+  border-radius: 999px;
+  background: var(--brand);
+  border: 2px solid var(--surface);
+  box-shadow: 0 0 0 1px var(--border-strong);
+  transition: transform 140ms var(--ease);
+}
+
+input[type='range'].slider::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  border-radius: 999px;
+  background: var(--brand);
+  border: 2px solid var(--surface);
+  box-shadow: 0 0 0 1px var(--border-strong);
+  transition: transform 140ms var(--ease);
+}
+
+input[type='range'].slider:hover::-webkit-slider-thumb,
+input[type='range'].slider:active::-webkit-slider-thumb {
+  transform: scale(1.15);
+}
+input[type='range'].slider:hover::-moz-range-thumb,
+input[type='range'].slider:active::-moz-range-thumb {
+  transform: scale(1.15);
+}
+
+input[type='range'].slider:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+input[type='range'].slider:focus-visible::-moz-range-thumb {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  input[type='range'].slider::-webkit-slider-thumb,
+  input[type='range'].slider::-moz-range-thumb {
+    transition: none;
+  }
+}
+
+/* --- Auth screens. -------------------------------------------------------
+   Signing in should look like the rest of the product, not like a form on a
+   blank slab, so these sit on the same ruled ground the homepage hero uses,
+   masked so it fades out behind the card rather than ending at an edge.
+   ------------------------------------------------------------------------- */
+
+.page-center {
+  position: relative;
+  isolation: isolate;
+}
+
+.page-center::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--border) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--border) 1px, transparent 1px);
+  background-size: 72px 72px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 42%, #000 0%, transparent 74%);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 42%, #000 0%, transparent 74%);
+  opacity: 0.7;
 }

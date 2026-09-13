@@ -280,11 +280,11 @@ export default async function Home() {
                 style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
               >
                 <div className="flex gap-3">
-                  <IconClose width={16} height={16} className="mt-0.5 shrink-0" style={{ color: 'var(--weak)' }} />
+                  <IconClose width={16} height={16} className="mt-0.5 shrink-0" style={{ color: 'var(--status-weak)' }} />
                   <p className="text-[14.5px] leading-snug" style={{ color: 'var(--text-muted)' }}>{a.them}</p>
                 </div>
                 <div className="flex gap-3">
-                  <IconCheck width={16} height={16} className="mt-0.5 shrink-0" style={{ color: 'var(--proficient)' }} />
+                  <IconCheck width={16} height={16} className="mt-0.5 shrink-0" style={{ color: 'var(--status-proficient)' }} />
                   <p className="text-[14.5px] leading-snug">{a.us}</p>
                 </div>
               </Reveal>
@@ -302,7 +302,7 @@ export default async function Home() {
                 <div key={key} className="flex-1">
                   <div
                     className="cell rounded-t-lg"
-                    style={{ height: `${h * 1.5}px`, background: `var(--${key})`, animationDelay: `${i * 90}ms` }}
+                    style={{ height: `${h * 1.5}px`, background: `var(--status-${key})`, animationDelay: `${i * 90}ms` }}
                   />
                   <p className="mt-3 text-[12.5px] font-medium">{label}</p>
                 </div>
@@ -311,9 +311,9 @@ export default async function Home() {
             <div className="flex-1">
               <div
                 className="cell rounded-lg border border-dashed"
-                style={{ height: '50px', borderColor: 'var(--fading)', animationDelay: '400ms' }}
+                style={{ height: '50px', borderColor: 'var(--status-fading)', animationDelay: '400ms' }}
               />
-              <p className="mt-3 text-[12.5px] font-medium" style={{ color: 'var(--fading)' }}>Fading</p>
+              <p className="mt-3 text-[12.5px] font-medium" style={{ color: 'var(--status-fading)' }}>Fading</p>
             </div>
           </div>
 
