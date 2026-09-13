@@ -72,6 +72,16 @@ function labelArc(radius, a0, a1) {
   return `M ${x0} ${y0} A ${radius} ${radius} 0 0 ${sweep} ${x1} ${y1}`
 }
 
+/** What each core component actually is, for the student who has not met it yet. */
+const CORE_BLURB = {
+  'Theory of Knowledge':
+    'A course about how you know things, assessed by an exhibition and a 1,600-word essay.',
+  'Extended Essay':
+    'A 4,000-word independent research paper in a subject you choose, supervised by a teacher.',
+  'Creativity Activity Service':
+    'Eighteen months of creativity, activity and service outside the classroom, assessed by reflection rather than by grade.',
+}
+
 const CORE_SHORT = {
   'Theory of Knowledge': 'TOK',
   'Extended Essay': 'EE',
@@ -93,8 +103,12 @@ export default function SubjectWheel({
   lockedSubjects = [],
   topicsBySubject = {},
 }) {
-  const [open, setOpen] = useState(null) // index of the slice on the desk
-  const [at, setAt] = useState(null) // index under the pointer
+  // What has been taken out of the wheel: {kind: 'subject'|'core', index}.
+  // The core is three components you are not quizzed on, but they are still
+  // part of the programme, and a slice you cannot press reads as broken rather
+  // than as deliberate.
+  const [open, setOpen] = useState(null)
+  const [at, setAt] = useState(null) // subject index under the pointer
 
   if (!subjects.length) return null
 
@@ -103,12 +117,36 @@ export default function SubjectWheel({
   const sizeOf = (s) => counts[s] || 0
   const fractionOf = (s) => (sizeOf(s) ? masteredIn(s) / sizeOf(s) : 0)
 
-  const openSubject = open === null ? null : subjects[open]
+  const coreStep = core.length ? 360 / core.length : 0
+  const openSubject = open?.kind === 'subject' ? subjects[open.index] : null
+  const openCore = open?.kind === 'core' ? core[open.index] : null
   const openTopics = openSubject ? topicsBySubject[openSubject] || [] : []
   const hoveredSubject = at === null ? null : subjects[at]
 
-  // How far the wheel has to turn to bring the open slice to the bottom.
-  const spin = open === null ? 0 : r2(180 - (open * step + step / 2))
+  /**
+   * Where the wheel has to get to.
+   *
+   * Closed, it sits still. Open, the slice you pressed turns to the top of the
+   * circle and the whole thing swells and drops, until all that is left on
+   * screen is the crown of one enormous arc rising through the bottom of the
+   * page. It is the same slice, close enough that the curve has almost gone
+   * out of it.
+   */
+  // Chosen so the crown lands about four fifths of the way down the box and
+  // the chord is wider than any content column, which is what makes the curve
+  // run off both sides instead of tapering to points inside the page. The drop
+  // is measured from whichever ring was opened: the core sits closer in, so the
+  // same drop would carry it clean off the bottom.
+  const OPEN_SCALE = 4.6
+  const OPEN_CROWN = 480
+  const openOuter = open?.kind === 'core' ? R_CORE_OUT : R_SUBJ_OUT
+  const OPEN_DROP = r2(OPEN_CROWN - C + openOuter * OPEN_SCALE)
+  const spin = !open
+    ? 0
+    : r2(-((open.kind === 'core' ? open.index * coreStep + coreStep / 2 : open.index * step + step / 2)))
+  const wheelTransform = open
+    ? `translate(0px, ${OPEN_DROP}px) rotate(${spin}deg) scale(${OPEN_SCALE})`
+    : 'rotate(0deg)'
 
   // Room for the label ring, which sits outside the slices.
   const PAD = 40
@@ -124,7 +162,7 @@ export default function SubjectWheel({
       {/* What the wheel is showing, written above it. Fixed height, so opening
           a slice does not shunt the wheel up and down the page. */}
       <div className="flex min-h-[150px] w-full max-w-2xl flex-col items-center justify-end pb-6 text-center">
-        {openSubject ? (
+        {openSubject || openCore ? (
           <>
             <button
               onClick={close}
@@ -138,14 +176,23 @@ export default function SubjectWheel({
               className="text-[10.5px] font-semibold uppercase tracking-[0.16em]"
               style={{ color: 'var(--text-faint)' }}
             >
-              {lockedSubjects.includes(openSubject) ? 'Locked on the free plan' : 'Subject'}
+              {openCore
+                ? 'Diploma core'
+                : lockedSubjects.includes(openSubject)
+                  ? 'Locked on the free plan'
+                  : 'Subject'}
             </p>
             <h3 className="mt-2.5 text-[clamp(1.5rem,3.4vw,2.1rem)] font-semibold leading-tight tracking-[-0.03em]">
-              {openSubject}
+              {openSubject || openCore}
             </h3>
             <p className="mt-2.5 text-[14px] tabular-nums" style={{ color: 'var(--text-muted)' }}>
-              {masteredIn(openSubject)} of {sizeOf(openSubject)} subtopics mastered
-              {targets[openSubject] ? ` · target ${targets[openSubject]}` : ''}
+              {openCore
+                ? targets[openCore]
+                  ? `Target ${targets[openCore]}`
+                  : 'No target set'
+                : `${masteredIn(openSubject)} of ${sizeOf(openSubject)} subtopics mastered${
+                    targets[openSubject] ? ` · target ${targets[openSubject]}` : ''
+                  }`}
             </p>
           </>
         ) : (
@@ -175,10 +222,11 @@ export default function SubjectWheel({
         )}
       </div>
 
-      <div className="relative w-full max-w-[min(100%,620px)]">
+      <div className="relative w-full overflow-hidden">
+        <div className="relative mx-auto w-full max-w-[min(100%,620px)]">
         <svg
           viewBox={viewBox}
-          className="block w-full"
+          className="block w-full overflow-visible"
           role="img"
           aria-label={
             openSubject
@@ -194,9 +242,9 @@ export default function SubjectWheel({
               // Turning brings the pressed slice to the bottom; the scale is
             // what makes it read as coming toward you rather than as the wheel
             // merely rotating.
-            transform: `rotate(${spin}deg)${open === null ? '' : ' scale(1.12)'}`,
+            transform: wheelTransform,
               transformOrigin: `${C}px ${C}px`,
-              transition: 'transform 620ms cubic-bezier(0.22, 0.68, 0.24, 1)',
+              transition: 'transform 720ms cubic-bezier(0.22, 0.68, 0.24, 1)',
             }}
           >
             {subjects.map((subject, i) => {
@@ -204,18 +252,18 @@ export default function SubjectWheel({
               const a1 = (i + 1) * step
               const locked = lockedSubjects.includes(subject)
               const frac = locked ? 0 : fractionOf(subject)
-              const rFill = R_SUBJ_IN + (R_SUBJ_OUT - R_SUBJ_IN) * frac
-              const isOpen = open === i
+              const aFill = a0 + (a1 - a0) * frac
+              const isOpen = open?.kind === 'subject' && open.index === i
               const on = at === i || isOpen
               // Everything that is not the slice you pressed gets out of the way.
-              const faded = open !== null && !isOpen
+              const faded = !!open && !isOpen
               const labelId = `wheel-label-${i}`
 
               return (
                 <g
                   key={subject}
                   style={{
-                    opacity: faded ? 0 : open === null && at !== null && !on ? 0.32 : 1,
+                    opacity: faded ? 0 : !open && at !== null && !on ? 0.32 : 1,
                     pointerEvents: faded ? 'none' : 'auto',
                     transition: 'opacity 380ms ease',
                   }}
@@ -223,12 +271,16 @@ export default function SubjectWheel({
                   <path
                     d={wedge(R_SUBJ_IN, R_SUBJ_OUT, a0, a1)}
                     fill="var(--surface-sunken)"
-                    stroke={on ? 'var(--text)' : 'var(--border-strong)'}
-                    strokeWidth={on ? 2 : 1}
+                    stroke={isOpen ? 'var(--border-strong)' : on ? 'var(--text)' : 'var(--border-strong)'}
+                    strokeWidth={isOpen ? 1 / OPEN_SCALE : on ? 2 : 1}
                     style={{ transition: 'stroke 180ms ease, stroke-width 180ms ease' }}
                   />
                   {frac > 0 && (
-                    <path d={wedge(R_SUBJ_IN, rFill, a0, a1)} fill="var(--brand)" opacity={on ? 1 : 0.92} />
+                    <path
+                      d={wedge(R_SUBJ_IN, R_SUBJ_OUT, a0, aFill)}
+                      fill="var(--brand)"
+                      opacity={on ? 1 : 0.92}
+                    />
                   )}
 
                   {/* The name, curved along the outside of its own slice. */}
@@ -238,7 +290,7 @@ export default function SubjectWheel({
                     fontWeight="600"
                     letterSpacing="-0.01em"
                     fill={on ? 'var(--text)' : 'var(--text-muted)'}
-                    style={{ opacity: open === null ? 1 : 0, transition: 'opacity 240ms ease' }}
+                    style={{ opacity: open ? 0 : 1, transition: 'opacity 240ms ease' }}
                   >
                     <textPath href={`#${labelId}`} startOffset="50%" textAnchor="middle">
                       {fit(subject, 26)}
@@ -254,42 +306,46 @@ export default function SubjectWheel({
                     style={{ cursor: 'pointer', outline: 'none' }}
                     onMouseEnter={() => setAt(i)}
                     onFocus={() => setAt(i)}
-                    onClick={() => setOpen(open === i ? null : i)}
+                    onClick={() => setOpen(isOpen ? null : { kind: 'subject', index: i })}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault()
-                        setOpen(open === i ? null : i)
+                        setOpen(isOpen ? null : { kind: 'subject', index: i })
                       }
                     }}
                   />
                 </g>
               )
             })}
-          </g>
 
-          {/* The core. Thinner, unlabelled by mastery, and it steps aside when a
-              subject is open because it does not belong to any one of them. */}
-          <g
-            style={{
-              opacity: open === null ? 1 : 0,
-              pointerEvents: open === null ? 'auto' : 'none',
-              transition: 'opacity 380ms ease',
-            }}
-          >
-            {core.map((component, i) => {
-              const coreStep = 360 / core.length
-              const a0 = i * coreStep
-              const a1 = (i + 1) * coreStep
-              const [lx, ly] = polar((R_CORE_IN + R_CORE_OUT) / 2, (a0 + a1) / 2)
-              const grade = targets[component]
-              return (
-                <g key={component}>
-                  <path
-                    d={wedge(R_CORE_IN, R_CORE_OUT, a0, a1)}
-                    fill="var(--surface)"
-                    stroke="var(--border-strong)"
-                    strokeWidth={1}
-                  />
+          {/* The core. Thinner, and now pressable: TOK, the EE and CAS are three
+            components of the same Diploma, and a slice that does nothing when
+            you press it reads as broken rather than as deliberate. They turn
+            with the subjects, inside the same group, so opening one is the
+            same motion. */}
+          {core.map((component, i) => {
+            const a0 = i * coreStep
+            const a1 = (i + 1) * coreStep
+            const [lx, ly] = polar((R_CORE_IN + R_CORE_OUT) / 2, (a0 + a1) / 2)
+            const grade = targets[component]
+            const isOpen = open?.kind === 'core' && open.index === i
+            const faded = !!open && !isOpen
+            return (
+              <g
+                key={component}
+                style={{
+                  opacity: faded ? 0 : 1,
+                  pointerEvents: faded ? 'none' : 'auto',
+                  transition: 'opacity 380ms ease',
+                }}
+              >
+                <path
+                  d={wedge(R_CORE_IN, R_CORE_OUT, a0, a1)}
+                  fill="var(--surface)"
+                  stroke={isOpen ? 'var(--text)' : 'var(--border-strong)'}
+                  strokeWidth={isOpen ? 2 : 1}
+                />
+                <g style={{ opacity: open ? 0 : 1, transition: 'opacity 240ms ease' }}>
                   <text
                     x={lx}
                     y={ly - 2}
@@ -312,14 +368,30 @@ export default function SubjectWheel({
                     {grade || '—'}
                   </text>
                 </g>
-              )
-            })}
-          </g>
+                <path
+                  d={wedge(R_CORE_IN, R_CORE_OUT, a0, a1)}
+                  fill="transparent"
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`${component}${grade ? `, target ${grade}` : ', no target set'}`}
+                  style={{ cursor: 'pointer', outline: 'none' }}
+                  onClick={() => setOpen(isOpen ? null : { kind: 'core', index: i })}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      setOpen(isOpen ? null : { kind: 'core', index: i })
+                    }
+                  }}
+                />
+              </g>
+            )
+          })}
+        </g>
 
-          {/* The middle never turns. */}
+        {/* The middle never turns. */}
           <g
             style={{
-              opacity: open === null ? 1 : 0,
+              opacity: open ? 0 : 1,
               transition: 'opacity 300ms ease',
             }}
           >
@@ -344,9 +416,21 @@ export default function SubjectWheel({
         {/* What the slice contains, in the space the rest of the wheel has
             just left. The slice itself stays visible underneath, at the
             bottom, so it is clear what you are looking inside. */}
-        {openSubject && (
-          <div className="wheel-topics absolute inset-x-[6%] top-[9%] max-h-[64%] overflow-y-auto">
-            {openTopics.length > 0 ? (
+        {(openSubject || openCore) && (
+          <div className="wheel-topics absolute inset-x-[6%] top-[8%] max-h-[58%] overflow-y-auto">
+            {openCore ? (
+              <div className="text-center">
+                <p className="text-[13.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                  {CORE_BLURB[openCore] ||
+                    'Part of the Diploma core, assessed by coursework rather than by examination.'}
+                </p>
+                <p className="mt-4 text-[13px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
+                  There is nothing to quiz here, so Project Syllabus does not give it a level. It
+                  carries the grade you are aiming for, and that grade is the one thing about it the
+                  app can hold you to.
+                </p>
+              </div>
+            ) : openTopics.length > 0 ? (
               <ul>
                 {openTopics.map((t) => (
                   <li
@@ -389,10 +473,16 @@ export default function SubjectWheel({
             )}
           </div>
         )}
+        </div>
       </div>
 
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-        {openSubject ? (
+        {openCore ? (
+          <Link href="/dashboard/prediction" className="btn btn-solid control-md">
+            {targets[openCore] ? 'Change the target' : 'Set a target'}
+            <IconArrowRight width={16} height={16} />
+          </Link>
+        ) : openSubject ? (
           <Link
             href={
               lockedSubjects.includes(openSubject)
