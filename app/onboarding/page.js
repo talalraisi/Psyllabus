@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { CONSENT_TEXT } from '@/lib/consent'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -271,6 +272,11 @@ export default function Onboarding() {
   // Who this is about to be saved against, and whether that account is already
   // set up. Both are read once on arrival.
   const [account, setAccount] = useState(null)
+  // Consent, for anyone who did not give it on the sign-up form — which is
+  // everybody who came in through Google.
+  const [needsConsent, setNeedsConsent] = useState(false)
+  const [guardianOk, setGuardianOk] = useState(false)
+  const [termsOk, setTermsOk] = useState(false)
   const [alreadySetUp, setAlreadySetUp] = useState(false)
   const [checking, setChecking] = useState(true)
   const router = useRouter()
@@ -306,6 +312,8 @@ export default function Onboarding() {
   // IB needs a grade for each chosen subject plus TOK and EE; other curricula
   // only need one per chosen subject.
   const ibTotal = predictedTotal(targetGrades, selectedSubjects)
+  const consentComplete = !needsConsent || (guardianOk && termsOk)
+
   const gradesComplete = isIB
     ? selectedSubjects.every((s) => targetGrades[s]) &&
       !!targetGrades['Theory of Knowledge'] &&
@@ -339,6 +347,9 @@ export default function Onboarding() {
         .maybeSingle()
       if (cancelled) return
       const subjects = Array.isArray(profile?.subjects) ? profile.subjects : []
+      // Google never showed the boxes, so ask here. The metadata is only set by
+      // the e-mail form, which records the wording as it goes.
+      setNeedsConsent(!user.user_metadata?.guardian_consent_text)
       setAccount({ email: user.email, id: user.id })
       setAlreadySetUp(subjects.length > 0)
       setChecking(false)
@@ -381,8 +392,14 @@ export default function Onboarding() {
         full_name: user.user_metadata?.full_name || user.user_metadata?.name || null,
         // Carried from the sign-up form so the record sits on the profile, with
         // the wording that was actually agreed to rather than a bare boolean.
-        guardian_consent_at: user.user_metadata?.guardian_consent_at || new Date().toISOString(),
-        guardian_consent_text: user.user_metadata?.guardian_consent_text || null,
+        // Recorded with the wording that was actually agreed to, on whichever
+        // screen agreed to it. Stamping a timestamp with no text — which is
+        // what this did for every Google account — records a consent nobody
+        // was ever shown.
+        guardian_consent_at:
+          user.user_metadata?.guardian_consent_at || new Date().toISOString(),
+        guardian_consent_text:
+          user.user_metadata?.guardian_consent_text || (needsConsent ? CONSENT_TEXT.en : null),
         curriculum,
         grad_year: gradYear,
         subjects: allSubjects,
@@ -799,13 +816,58 @@ export default function Onboarding() {
               </div>
             )}
 
+            {/* The consent that the sign-up form asks for, for the people who
+                never saw that form. It is the last thing before the account
+                starts being used, and it is recorded with its wording. */}
+            {needsConsent && (
+              <div
+                className="mb-7 border-t pt-6"
+                style={{ borderColor: 'var(--border)' }}
+              >
+                <label className="flex cursor-pointer items-start gap-3">
+                  <input
+                    type="checkbox"
+                    checked={guardianOk}
+                    onChange={(e) => setGuardianOk(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--brand)]"
+                  />
+                  <span className="text-[13.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                    {CONSENT_TEXT.en}
+                  </span>
+                </label>
+                <label className="mt-3 flex cursor-pointer items-start gap-3">
+                  <input
+                    type="checkbox"
+                    checked={termsOk}
+                    onChange={(e) => setTermsOk(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--brand)]"
+                  />
+                  <span className="text-[13.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                    I agree to the{' '}
+                    <Link href="/terms" className="underline" style={{ color: 'var(--brand)' }}>
+                      Terms
+                    </Link>
+                    ,{' '}
+                    <Link href="/privacy" className="underline" style={{ color: 'var(--brand)' }}>
+                      Privacy Policy
+                    </Link>{' '}
+                    and{' '}
+                    <Link href="/cookies" className="underline" style={{ color: 'var(--brand)' }}>
+                      Cookie Policy
+                    </Link>
+                    .
+                  </span>
+                </label>
+              </div>
+            )}
+
             <div className="flex gap-3">
               <button onClick={() => setStep(2)} className="btn btn-quiet control-md px-6">
                 Back
               </button>
               <button
                 onClick={handleFinish}
-                disabled={loading || !gradesComplete}
+                disabled={loading || !gradesComplete || !consentComplete}
                 className="btn btn-solid control-lg flex-1 text-base">
                 {loading ? 'Setting up…' : 'Continue'}
               </button>

@@ -8,17 +8,7 @@ import Image from 'next/image'
 import logoMark from '@/public/logo-mark.png'
 import PasswordField from '@/components/PasswordField'
 import AuthShell, { OrRule, GoogleButton, SubmitButton } from '@/components/marketing/AuthShell'
-
-/**
- * The exact wording a student agrees to.
- *
- * Stored alongside the timestamp rather than just a boolean, so changing this
- * form later cannot retroactively change what somebody actually consented to.
- */
-export const CONSENT_TEXT = {
-  en: 'I have my parent or guardian\u2019s permission to use Project Syllabus.',
-  ar: 'لدي موافقة ولي أمري على استخدام منصة Project Syllabus.',
-}
+import { CONSENT_TEXT } from '@/lib/consent'
 
 export default function Signup() {
   const [email, setEmail] = useState('')
@@ -106,20 +96,21 @@ export default function Signup() {
   }
 
   const handleGoogleSignup = async () => {
-    // The form's required attribute does nothing for a button outside it, so
-    // the same consent has to be enforced here or Google becomes a way round it.
-    // Say which box, not that something is missing. Two checkboxes and one
-    // generic message is how people end up ticking the one they already ticked.
-    if (!guardianOk) {
-      setError('Please confirm you have your parent or guardian\u2019s permission first.')
-      return
-    }
-    if (!termsOk) {
-      setError('Please agree to the Terms, Privacy Policy and Cookie Policy.')
-      return
-    }
+    // Google does not ask for the boxes first.
+    //
+    // Making somebody read and tick two consents before they can press a
+    // one-press sign-in is friction in front of the cheapest path in, and it
+    // put the legal text in the worst possible place: ahead of any reason to
+    // care. It is asked for in onboarding instead, before the account can be
+    // used for anything, and recorded there with its wording. Nothing is
+    // skipped — it moves.
     setLoading(true)
     setError('')
+
+    // Whoever is signed in on this device is signed out first. See the note on
+    // the email path: a stale session is how one account's answers end up on
+    // another's profile.
+    await supabase.auth.signOut()
     
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',

@@ -12,6 +12,7 @@ import { IconChevronRight, IconArrowRight, IconCheck, IconClock } from '@/compon
 import { buildQueue, buildSession } from '@/lib/planner'
 import { relativeDay } from '@/lib/calendar'
 import SubjectWheel from '@/components/SubjectWheel'
+import TodoList from '@/components/TodoList'
 import { getSlugForSubject } from '@/lib/subject-map'
 import {
   computeCompletionPercent,
@@ -347,6 +348,10 @@ export default function Dashboard() {
                 </ul>
               </Section>
             )}
+
+        {/* What is outstanding, short. The full list, where things can be
+            added and deleted, lives on the calendar and the study plan. */}
+        <TodoList className="mb-12" title="To-do" compact limit={5} />
 
         {/* Subjects */}
         <Section

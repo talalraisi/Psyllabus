@@ -10,6 +10,7 @@ import { Page, PageHeader, Section, EmptyState, PageLoading } from '@/components
 import { IconCheck, IconClose } from '@/components/Icons'
 import ReminderWatcher from '@/components/ReminderWatcher'
 import MonthGrid from '@/components/MonthGrid'
+import TodoList from '@/components/TodoList'
 import { accessibleSubjects } from '@/lib/access'
 import {
   EVENT_KINDS,
@@ -372,6 +373,7 @@ export default function CalendarPage() {
           />
         </Section>
 
+        <div className="grid gap-x-14 lg:grid-cols-2">
         {/* Selected day */}
         <Section
           title={fromDateKey(selected).toLocaleDateString(undefined, {
@@ -410,6 +412,18 @@ export default function CalendarPage() {
             </ul>
           )}
         </Section>
+
+        {/* Everything that is not a test.
+            A mock on the 11th moves a subject up the planner; "print the lab
+            sheet" does not, and it still has to live somewhere. Adding here
+            dates the task to whichever day is selected above. */}
+        <TodoList
+          className="mb-12"
+          title="To-do"
+          defaultDue={selected}
+          key={selected}
+        />
+        </div>
 
         {/* What is coming */}
         <Section title="Coming up">

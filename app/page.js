@@ -46,10 +46,11 @@ async function bankCounts() {
   }
 }
 
-function Section({ children, label, tint = false, className = '' }) {
+function Section({ children, label, tint = false, className = '', id }) {
   return (
     <section
-      className={`border-t px-5 py-20 md:px-8 md:py-28 ${className}`}
+      id={id}
+      className={`scroll-mt-16 border-t px-5 py-20 md:px-8 md:py-28 ${className}`}
       style={{
         borderColor: 'var(--border)',
         background: tint ? 'var(--surface-sunken)' : 'transparent',
@@ -117,15 +118,13 @@ export default async function Home() {
           <div className="flex items-center gap-2">
             <Link
               href="/login"
-              className="hidden rounded-full px-3.5 py-2 text-[13px] font-medium sm:block"
-              style={{ color: 'var(--text-body)' }}
+              className="btn btn-quiet control-sm hidden sm:inline-flex"
             >
               Log in
             </Link>
             <Link
               href="/signup"
-              className="rounded-full px-4 py-2 text-[13px] font-semibold text-white"
-              style={{ background: 'var(--brand-solid)' }}
+              className="btn btn-solid control-sm"
             >
               Get started
             </Link>
@@ -152,19 +151,13 @@ export default async function Home() {
             </p>
 
             <div className="mt-10 flex flex-wrap items-center gap-3">
-              <button
-                className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-[14.5px] font-semibold text-white transition-transform duration-150 hover:-translate-y-px"
-                style={{ background: 'var(--brand-solid)' }}
-              >
+              <Link href="/signup" className="btn btn-solid control-lg">
                 Start free with one subject
-                <IconArrowRight width={17} height={17} />
-              </button>
-              <button
-                className="rounded-full border px-5 py-3.5 text-[14.5px] font-medium"
-                style={{ borderColor: 'var(--border-strong)', color: 'var(--text-body)' }}
-              >
+                <IconArrowRight width={16} height={16} />
+              </Link>
+              <Link href="#how-it-works" className="btn btn-outline control-lg">
                 See how it works
-              </button>
+              </Link>
             </div>
 
             {/* The three things a student needs answered in the first ten
@@ -219,7 +212,7 @@ export default async function Home() {
         </Section>
 
         {/* --------------------------------------------------- how it works */}
-        <Section label="How it works">
+        <Section label="How it works" id="how-it-works">
           <Heading className="max-w-xl">Three steps, and the second one is the point</Heading>
 
           <div className="mt-14 grid gap-px md:grid-cols-3" style={{ background: 'var(--border)' }}>
@@ -430,11 +423,10 @@ export default async function Home() {
             </p>
             <Link
               href="/signup"
-              className="mt-9 inline-flex items-center gap-2 rounded-full px-7 py-4 text-[15px] font-semibold text-white transition-transform duration-150 hover:-translate-y-px"
-              style={{ background: 'var(--brand-solid)' }}
+              className="btn btn-solid control-lg mt-9"
             >
               Create a free account
-              <IconArrowRight width={18} height={18} />
+              <IconArrowRight width={16} height={16} />
             </Link>
           </div>
         </Section>

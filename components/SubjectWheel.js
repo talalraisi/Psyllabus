@@ -43,6 +43,30 @@ const R_CENTRE = 92
 /** Degrees of air between neighbouring slices, per side. */
 const GAP = 1.5
 
+/**
+ * What colour a slice is.
+ *
+ * Every slice was brand green, which made the wheel one colour at six
+ * lengths — you could compare them, but only by measuring. The status palette
+ * is already the language the rest of the product uses for how well something
+ * is held, so a subject takes the colour of the level it is at. Red is not
+ * decoration: it means that subject is weak, the same as it does on the
+ * heatmap and in the mistake bank.
+ *
+ * The thresholds are the share of a subject's subtopics that are mastered,
+ * which is the same number the arc length shows. Colour and length say the
+ * same thing twice, deliberately: length is precise, colour is legible across
+ * the room.
+ */
+function toneFor(fraction, locked) {
+  if (locked) return 'var(--status-untested)'
+  if (fraction <= 0) return 'var(--status-untested)'
+  if (fraction < 0.25) return 'var(--status-weak)'
+  if (fraction < 0.5) return 'var(--status-developing)'
+  if (fraction < 0.8) return 'var(--status-proficient)'
+  return 'var(--status-mastered)'
+}
+
 const r2 = (n) => Math.round(n * 100) / 100
 
 function polar(radius, deg) {
@@ -236,7 +260,7 @@ export default function SubjectWheel({
                   ? `${masteredIn(hoveredSubject)} of ${sizeOf(hoveredSubject)} subtopics mastered${
                       targets[hoveredSubject] ? ` · target ${targets[hoveredSubject]}` : ''
                     }`
-                  : 'Each slice fills as you prove a subtopic. Press one to take it out.'}
+                  : 'Each slice fills and changes colour as you prove subtopics. Press one to take it out.'}
             </p>
           </>
         )}
@@ -273,6 +297,7 @@ export default function SubjectWheel({
               const locked = lockedSubjects.includes(subject)
               const frac = locked ? 0 : fractionOf(subject)
               const aFill = a0 + (a1 - a0) * frac
+              const tone = toneFor(frac, locked)
               const isOpen = open?.kind === 'subject' && open.index === i
               const on = at === i || isOpen
               // Everything that is not the slice you pressed gets out of the way.
@@ -298,8 +323,9 @@ export default function SubjectWheel({
                   {frac > 0 && (
                     <path
                       d={wedge(R_SUBJ_IN, R_SUBJ_OUT, a0, aFill)}
-                      fill="var(--brand)"
+                      fill={tone}
                       opacity={on ? 1 : 0.92}
+                      style={{ transition: 'fill 200ms ease' }}
                     />
                   )}
 

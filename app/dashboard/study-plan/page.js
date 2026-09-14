@@ -10,6 +10,7 @@ import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader, EmptyState, PageLoading } from '@/components/PageShell'
 import { IconArrowRight, IconClock, IconCheck, IconCalendar } from '@/components/Icons'
 import SessionTimer from '@/components/SessionTimer'
+import TodoList from '@/components/TodoList'
 import ResourceHubDrawer from '@/components/ResourceHubDrawer'
 import ReminderWatcher from '@/components/ReminderWatcher'
 import { getSlugForSubject } from '@/lib/subject-map'
@@ -417,6 +418,10 @@ export default function StudyPlanPage() {
                     </ol>
                   )}
                 </div>
+
+                {/* The evening's other half. Subtopics above, everything else
+                    that has to happen tonight here. */}
+                <TodoList className="mt-12 mb-12" title="Also tonight" />
 
                 {dueReviews > 0 && (
                   <Link
