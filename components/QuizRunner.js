@@ -137,6 +137,10 @@ export default function QuizRunner({
   qtype = null,
   order = null,
   minutes = null,
+  subtopics = null,
+  /** 'exam' marks at the end; 'practice' marks each question as you go. */
+  review = 'exam',
+  hintsAllowed = true,
   level = null,
   paper = null,
   backHref = '/dashboard',
@@ -152,6 +156,8 @@ export default function QuizRunner({
   const [userId, setUserId] = useState(null)
   const [secondsLeft, setSecondsLeft] = useState(null)
   const [hintsShown, setHintsShown] = useState({})
+  // Practice mode only: questionId → grading result, once marked.
+  const [revealed, setRevealed] = useState({})
   const router = useRouter()
   const supabase = createClient()
 
@@ -222,6 +228,7 @@ export default function QuizRunner({
 
       if (mode === 'subtopic') query = query.eq('subtopic', subtopic)
       else if (mode === 'topic') query = query.eq('topic', topic)
+      else if (mode === 'custom' && subtopics?.length) query = query.in('subtopic', subtopics)
       else if (mode === 'custom' && topics?.length) query = query.in('topic', topics)
 
       const { data: questionRows } = await query
@@ -355,7 +362,7 @@ export default function QuizRunner({
     }
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subject, topic, subtopic, mode, count, topics?.join('|'), subjects?.join('|'), focus, difficulty, level, paper, qtype, order])
+  }, [subject, topic, subtopic, mode, count, topics?.join('|'), subtopics?.join('|'), subjects?.join('|'), focus, difficulty, level, paper, qtype, order])
 
   const startQuiz = () => {
     questionTimesRef.current = {}
@@ -405,11 +412,30 @@ export default function QuizRunner({
   }
 
   const selectAnswer = (questionId, optionId) => {
+    // In practice mode an answer is final once given: marking it and then
+    // letting you change it is not practice, it is a guess with a retry.
+    if (review === 'practice' && revealed[questionId]) return
     setAnswers((prev) => {
       const next = { ...prev, [questionId]: optionId }
       answersRef.current = next
       return next
     })
+  }
+
+  /**
+   * Mark this one now.
+   *
+   * Exam mode holds everything back until the end, which is what sitting a
+   * paper is like. Practice mode marks each question as you answer it, which
+   * is what learning is like — the gap between getting it wrong and finding
+   * out why is where the learning actually happens, and in exam mode that gap
+   * is the whole paper long.
+   */
+  const revealOne = (question) => {
+    const given = answersRef.current[question.id]
+    if (given == null || String(given).trim() === '') return
+    const graded = gradeAnswer(question, given)
+    setRevealed((prev) => ({ ...prev, [question.id]: graded }))
   }
 
   const finishQuiz = useCallback(async () => {
@@ -840,14 +866,27 @@ export default function QuizRunner({
           <div className="mt-6 flex flex-col gap-2">
             {options.map((opt) => {
               const isPicked = selected === opt.id
+              const mark = revealed[q.id]
+              const isAnswer = mark && opt.id === q.correct_answer
+              const isWrongPick = mark && isPicked && !mark.correct
+              const tone = isAnswer
+                ? 'var(--status-proficient)'
+                : isWrongPick
+                  ? 'var(--status-weak)'
+                  : null
               return (
                 <button
                   key={opt.id}
                   onClick={() => selectAnswer(q.id, opt.id)}
-                  className="flex items-center gap-3 rounded-xl border px-4 py-3.5 text-left text-[14.5px] leading-relaxed transition-colors duration-150"
+                  disabled={!!mark}
+                  className="flex items-center gap-3 rounded-xl border px-4 py-3.5 text-left text-[14.5px] leading-relaxed transition-colors duration-150 disabled:cursor-default"
                   style={{
-                    borderColor: isPicked ? 'var(--brand)' : 'var(--border-strong)',
-                    background: isPicked ? 'var(--brand-tint)' : 'transparent',
+                    borderColor: tone || (isPicked ? 'var(--brand)' : 'var(--border-strong)'),
+                    background: tone
+                      ? `color-mix(in oklab, ${tone} 12%, transparent)`
+                      : isPicked
+                        ? 'var(--brand-tint)'
+                        : 'transparent',
                     // Set rather than inherited: an author-less button falls
                     // back to the system `buttontext`, which follows
                     // color-scheme instead of the palette.
@@ -857,11 +896,17 @@ export default function QuizRunner({
                   <span
                     className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[11px] font-semibold"
                     style={{
-                      borderColor: isPicked ? 'var(--brand)' : 'var(--border-strong)',
-                      color: isPicked ? 'var(--brand)' : 'var(--text-muted)',
+                      borderColor: tone || (isPicked ? 'var(--brand)' : 'var(--border-strong)'),
+                      color: tone || (isPicked ? 'var(--brand)' : 'var(--text-muted)'),
                     }}
                   >
-                    {opt.id}
+                    {isAnswer ? (
+                      <IconCheck width={11} height={11} />
+                    ) : isWrongPick ? (
+                      <IconClose width={11} height={11} />
+                    ) : (
+                      opt.id
+                    )}
                   </span>
                   <span className="flex-1">{opt.text}</span>
                 </button>
@@ -873,7 +918,7 @@ export default function QuizRunner({
         {/* A hint is offered rather than shown. Reading it before trying is the
             fastest way to feel like you understood something you could not
             have done, so it costs a click and says so on the results. */}
-        {q.hint && (
+        {q.hint && hintsAllowed && (
           <div className="mt-5">
             {hintsShown[q.id] ? (
               <p className="text-[13.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
@@ -892,6 +937,39 @@ export default function QuizRunner({
           </div>
         )}
 
+        {/* What you got, and why, right here rather than at the end. */}
+        {review === 'practice' && revealed[q.id] && (
+          <div
+            className="mt-6 border-l-2 pl-4"
+            style={{
+              borderColor: revealed[q.id].correct
+                ? 'var(--status-proficient)'
+                : 'var(--status-weak)',
+            }}
+          >
+            <p
+              className="text-[13.5px] font-semibold"
+              style={{
+                color: revealed[q.id].correct
+                  ? 'var(--status-proficient)'
+                  : 'var(--status-weak)',
+              }}
+            >
+              {revealed[q.id].correct ? 'Correct' : 'Not right'}
+            </p>
+            {!revealed[q.id].correct && q.option_feedback?.[selected] && (
+              <p className="mt-1.5 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                {q.option_feedback[selected]}
+              </p>
+            )}
+            {q.explanation && (
+              <p className="mt-1.5 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                {q.explanation}
+              </p>
+            )}
+          </div>
+        )}
+
         <div
           className="mt-10 flex items-center gap-3 border-t pt-6"
           style={{ borderColor: 'var(--border)' }}
@@ -904,6 +982,15 @@ export default function QuizRunner({
             Back
           </button>
           <div className="flex-1" />
+          {review === 'practice' && !revealed[q.id] && (
+            <button
+              onClick={() => revealOne(q)}
+              disabled={selected == null || String(selected).trim() === ''}
+              className="btn btn-outline control-md disabled:opacity-40"
+            >
+              Check
+            </button>
+          )}
           {currentIndex < questions.length - 1 ? (
             <button
               onClick={() => goTo(currentIndex + 1)}

@@ -9,13 +9,21 @@ import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader, PageLoading, SkeletonLine } from '@/components/PageShell'
 import { startLoading, stopLoading } from '@/components/LoadingBar'
-import { IconClock, IconCheck } from '@/components/Icons'
-import { sortTopics, progressKey, HEAT_LEVELS, HEAT_RANGES } from '@/lib/progress'
+import { IconClock, IconCheck, IconChevronRight } from '@/components/Icons'
+import { sortTopics, progressKey, displaySubtopic, HEAT_LEVELS, HEAT_RANGES } from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 import { accessibleSubjects, isPremium } from '@/lib/access'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
 
 const LENGTHS = [10, 20, 30, 45]
+
+/** The same paper, counted out the way you happen to be thinking about it. */
+const LENGTH_PRESETS = {
+  questions: LENGTHS,
+  marks: [20, 40, 60, 80],
+  minutes: [15, 30, 45, 60],
+}
+const LENGTH_UNIT = { questions: 'questions', marks: 'marks', minutes: 'min' }
 
 const QUESTION_TYPES = [
   { key: 'all', label: 'Any kind', hint: 'Multiple choice and written answers mixed.' },
@@ -112,6 +120,14 @@ export default function TestBuilderPage() {
   const [pool, setPool] = useState([])
   const [statusBySubtopic, setStatusBySubtopic] = useState({})
   const [selected, setSelected] = useState([])
+  // Subtopics picked inside an opened topic. Empty for a topic means "all of
+  // it", so ticking a topic and never opening it behaves as it always did.
+  const [pickedSubtopics, setPickedSubtopics] = useState({})
+  const [openTopic, setOpenTopic] = useState(null)
+  // 'questions' | 'marks' | 'minutes' — how the length is counted out.
+  const [lengthMetric, setLengthMetric] = useState('questions')
+  const [review, setReview] = useState('exam')
+  const [hintsAllowed, setHintsAllowed] = useState(true)
   const [length, setLength] = useState(20)
   const [timed, setTimed] = useState(true)
   const [qtype, setQtype] = useState('all')
@@ -212,6 +228,9 @@ export default function TestBuilderPage() {
 
     return pool.filter((q) => {
       if (!selected.includes(q.topic)) return false
+      // A topic with nothing ticked inside it means the whole topic.
+      const within = pickedSubtopics[q.topic]
+      if (within?.length && !within.includes(q.subtopic)) return false
 
       if (mode?.statuses) {
         const status = statusBySubtopic[q.subtopic] || 'not_started'
@@ -233,7 +252,24 @@ export default function TestBuilderPage() {
 
       return true
     })
-  }, [pool, selected, focusMode, difficulty, statusBySubtopic, level, hlBySubtopic, qtype])
+  }, [pool, selected, pickedSubtopics, focusMode, difficulty, statusBySubtopic, level, hlBySubtopic, qtype])
+
+  /** Subtopic → how many questions exist, grouped under its topic. */
+  const subtopicsByTopic = useMemo(() => {
+    const out = {}
+    for (const q of pool) {
+      ;(out[q.topic] ||= {})
+      out[q.topic][q.subtopic] = (out[q.topic][q.subtopic] || 0) + 1
+    }
+    return out
+  }, [pool])
+
+  /** Every subtopic actually being drawn from, or null for "whole topics". */
+  const effectiveSubtopics = useMemo(() => {
+    const picked = selected.flatMap((t) => pickedSubtopics[t] || [])
+    return picked.length ? picked : null
+  }, [selected, pickedSubtopics])
+
 
   const perTopicCounts = useMemo(() => {
     const counts = {}
@@ -260,7 +296,25 @@ export default function TestBuilderPage() {
     ? Math.min(100, parsedLength)
     : 0
   const wantedLength = typedLength || length
-  const actualLength = Math.min(wantedLength, eligible.length)
+  /**
+   * How many questions that length actually is.
+   *
+   * A paper is as long as it takes, and students think about that in three
+   * different units depending on why they are sitting it: fifteen questions
+   * before bed, forty marks to match a real Paper 1, or twenty minutes on the
+   * bus. Same draw, counted out differently.
+   */
+  const lengthFromMetric = () => {
+    if (lengthMetric === 'questions') return Math.min(wantedLength, eligible.length)
+    let total = 0
+    for (let i = 0; i < eligible.length; i++) {
+      total +=
+        lengthMetric === 'marks' ? eligible[i].marks || 1 : (eligible[i].time_budget_seconds || 90) / 60
+      if (total >= wantedLength) return i + 1
+    }
+    return eligible.length
+  }
+  const actualLength = lengthFromMetric()
   const canStart = actualLength > 0
 
   // Real paper metrics, taken from the questions that would actually be drawn.
@@ -288,6 +342,9 @@ export default function TestBuilderPage() {
       back: '/dashboard/test',
     })
     if (timed) params.set('timed', '1')
+    if (effectiveSubtopics) params.set('subtopics', effectiveSubtopics.join('~~'))
+    if (review !== 'exam') params.set('review', review)
+    if (!hintsAllowed) params.set('hints', '0')
     if (qtype !== 'all') params.set('qtype', qtype)
     if (order !== 'mixed') params.set('order', order)
     if (timed && typedMinutes) params.set('minutes', String(typedMinutes))
@@ -418,33 +475,118 @@ export default function TestBuilderPage() {
               {topics.map((topic) => {
                 const n = perTopicCounts[topic] || 0
                 const isSelected = selected.includes(topic)
+                const within = subtopicsByTopic[topic] || {}
+                const names = Object.keys(within).sort()
+                const picked = pickedSubtopics[topic] || []
+                const isOpen = openTopic === topic
+
                 return (
-                  <button
+                  <div
                     key={topic}
-                    onClick={() => toggleTopic(topic)}
-                    aria-pressed={isSelected}
-                    className={`flex items-center gap-3 rounded-xl border px-4 py-2.5 text-left transition-colors duration-150 ${
-                      isSelected
-                        ? 'border-[var(--brand)] bg-[var(--brand-tint)]'
-                        : 'border-[var(--border-strong)] hover:border-[var(--border-hover)]'
-                    }`}
+                    className="rounded-xl border transition-colors duration-150"
+                    style={{
+                      borderColor: isSelected ? 'var(--brand)' : 'var(--border-strong)',
+                      background: isSelected ? 'var(--brand-tint)' : 'transparent',
+                    }}
                   >
-                    <span
-                      className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-[var(--r-sm)] border ${
-                        isSelected
-                          ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
-                          : 'border-[var(--border-hover)]'
-                      }`}
-                    >
-                      {isSelected && <IconCheck width={11} height={11} />}
-                    </span>
-                    <span className="min-w-0 flex-1 truncate text-sm text-[var(--text-body)]">
-                      {topic}
-                    </span>
-                    <span className="t-caption shrink-0">
-                      {n > 0 ? `${n} available` : 'none yet'}
-                    </span>
-                  </button>
+                    <div className="flex items-center gap-3 px-4 py-2.5">
+                      <button
+                        onClick={() => toggleTopic(topic)}
+                        aria-pressed={isSelected}
+                        className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                      >
+                        <span
+                          className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-[var(--r-sm)] border ${
+                            isSelected
+                              ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
+                              : 'border-[var(--border-hover)]'
+                          }`}
+                        >
+                          {isSelected && <IconCheck width={11} height={11} />}
+                        </span>
+                        <span className="min-w-0 flex-1 truncate text-[13.5px] text-[var(--text-body)]">
+                          {topic}
+                        </span>
+                      </button>
+
+                      <span className="shrink-0 text-[12px]" style={{ color: 'var(--text-faint)' }}>
+                        {picked.length
+                          ? `${picked.length} of ${names.length} picked`
+                          : n > 0
+                            ? `${n} available`
+                            : 'none yet'}
+                      </span>
+
+                      {/* Down to the subtopic, for when a whole topic is more
+                          than you meant. A topic with nothing ticked inside it
+                          still means the whole topic. */}
+                      {names.length > 0 && (
+                        <button
+                          onClick={() => setOpenTopic(isOpen ? null : topic)}
+                          aria-expanded={isOpen}
+                          aria-label={`${isOpen ? 'Hide' : 'Show'} subtopics in ${topic}`}
+                          className="shrink-0"
+                          style={{ color: 'var(--text-faint)' }}
+                        >
+                          <IconChevronRight
+                            width={13}
+                            height={13}
+                            className={`transition-transform duration-150 ${isOpen ? 'rotate-90' : ''}`}
+                          />
+                        </button>
+                      )}
+                    </div>
+
+                    {isOpen && (
+                      <ul
+                        className="flex flex-col border-t px-4 py-1"
+                        style={{ borderColor: 'var(--border)' }}
+                      >
+                        {names.map((name) => {
+                          const on = picked.includes(name)
+                          return (
+                            <li key={name}>
+                              <button
+                                onClick={() =>
+                                  setPickedSubtopics((prev) => {
+                                    const cur = prev[topic] || []
+                                    const next = cur.includes(name)
+                                      ? cur.filter((x) => x !== name)
+                                      : [...cur, name]
+                                    return { ...prev, [topic]: next }
+                                  })
+                                }
+                                aria-pressed={on}
+                                className="flex w-full items-center gap-3 py-2 text-left"
+                              >
+                                <span
+                                  className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-[3px] border ${
+                                    on
+                                      ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
+                                      : 'border-[var(--border-hover)]'
+                                  }`}
+                                >
+                                  {on && <IconCheck width={9} height={9} />}
+                                </span>
+                                <span
+                                  className="min-w-0 flex-1 truncate text-[12.5px]"
+                                  style={{ color: 'var(--text-muted)' }}
+                                >
+                                  {displaySubtopic(name)}
+                                </span>
+                                <span
+                                  className="shrink-0 text-[11.5px] tabular-nums"
+                                  style={{ color: 'var(--text-faint)' }}
+                                >
+                                  {within[name]}
+                                </span>
+                              </button>
+                            </li>
+                          )
+                        })}
+                      </ul>
+                    )}
+                  </div>
                 )
               })}
             </div>
@@ -526,16 +668,35 @@ export default function TestBuilderPage() {
             ))}
           </div>
 
-          <p className="mb-3 text-[13.5px] font-medium">Length</p>
+          <p className="text-[13.5px] font-medium">Length</p>
+          <p className="t-caption mb-3">
+            Counted however you are thinking about it. Same draw either way.
+          </p>
+          <div className="mb-3 flex flex-wrap gap-2">
+            {[
+              ['questions', 'By questions'],
+              ['marks', 'By marks'],
+              ['minutes', 'By minutes'],
+            ].map(([key, label]) => (
+              <button
+                key={key}
+                onClick={() => setLengthMetric(key)}
+                aria-pressed={lengthMetric === key}
+                className={lengthMetric === key ? 'btn btn-solid control-sm' : 'btn btn-outline control-sm'}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
           <div className="mb-6 flex flex-wrap gap-2">
-            {LENGTHS.map((n) => (
+            {LENGTH_PRESETS[lengthMetric].map((n) => (
               <button
                 key={n}
                 onClick={() => setLength(n)}
                 aria-pressed={length === n}
                 className={`${length === n ? 'btn btn-solid control-sm' : 'btn btn-outline control-sm'}`}
               >
-                {n} questions
+                {n} {LENGTH_UNIT[lengthMetric]}
               </button>
             ))}
             <label className="flex items-center gap-2">
@@ -543,7 +704,7 @@ export default function TestBuilderPage() {
                 type="text"
                 inputMode="numeric"
                 value={customLength}
-                aria-label="Or type how many questions"
+                aria-label={`Or type a number of ${lengthMetric}`}
                 placeholder="or type"
                 onChange={(e) => setCustomLength(e.target.value.replace(/[^0-9]/g, ''))}
                 className="input control-md w-[104px] text-center tabular-nums"

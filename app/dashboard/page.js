@@ -33,6 +33,18 @@ function greeting(now) {
   return 'Good evening'
 }
 
+/** Why the planner put something first, coloured by what kind of reason it is. */
+const REASON_STYLE = {
+  weak: 'text-[var(--status-weak)]',
+  decaying: 'text-[var(--status-fading)]',
+  shaky: 'text-[var(--status-developing)]',
+  proficient: 'text-[var(--status-proficient)]',
+  untested: 'text-[var(--text-faint)]',
+  foundation: 'text-[var(--brand)]',
+  exam: 'text-[var(--status-weak)]',
+  event: 'text-[var(--status-weak)] font-medium',
+}
+
 export default function Dashboard() {
   const [profile, setProfile] = useState(null)
   const [subjectStats, setSubjectStats] = useState({})
@@ -176,7 +188,10 @@ export default function Dashboard() {
   // One thing to start, then at most three more. The whole queue lives on the
   // study plan; a dashboard that lists nine subtopics is a to-do list, and a
   // to-do list that long is one nobody opens.
-  const rest = session.items.slice(0, 4)
+  // The one thing to do, and the two after it. The planner already ranks the
+  // whole queue; a dashboard's job is to name the top of it, not reprint it.
+  const [nextUp, ...afterThat] = session.items
+  const queued = afterThat.slice(0, 3)
 
   /**
    * The second line of the header.
@@ -208,271 +223,232 @@ export default function Dashboard() {
           subtitle={subtitle}
         />
 
-        {!hasActivity ? (
-          <>
-            {/* The first screen of a new account.
-                It was a heading, three sentences and a button on an otherwise
-                empty page — which is what a product looks like when it has
-                nothing to show yet, and it read as nothing to show. It has
-                plenty to show: the student's own subjects, how much of each is
-                waiting, and the one press that starts it. */}
-            <div className="mb-12 border-t pt-8" style={{ borderColor: 'var(--border)' }}>
-              <h2 className="text-[clamp(1.3rem,2.6vw,1.7rem)] font-semibold tracking-[-0.025em]">
-                Nothing here is filled in by guessing
-              </h2>
-              <p
-                className="mt-3 max-w-xl text-[14.5px] leading-relaxed"
-                style={{ color: 'var(--text-muted)' }}
-              >
-                Every level in Project Syllabus is set by questions you either got right or did
-                not. Take one quiz and this page starts filling itself in — the heatmap, the
-                study plan, the predicted grade, all of it from that.
-              </p>
-
-              <div className="mt-8">
-                <Link href={startHref} className="btn btn-solid control-lg max-w-full px-6">
-                  <span className="min-w-0 truncate">
-                    {firstSubject ? `Start with ${firstSubject}` : 'Choose a subject'}
-                  </span>
-                  <IconArrowRight width={16} height={16} className="shrink-0" />
-                </Link>
-              </div>
-            </div>
-
-            {/* What is actually waiting, per subject. A new account is not
-                empty — it has a mapped syllabus behind it, and showing the size
-                of each subject is both the first real information the page can
-                give and the reason to press one. */}
-            {subjects.length > 0 && (
-              <Section title="Your subjects" className="mb-14">
-                <ul className="flex flex-col">
-                  {subjects.map((subject) => {
-                    const locked = isSubjectLocked(subject, profile)
-                    const size = subjectSizes[subject] || 0
-                    return (
-                      <li
-                        key={subject}
-                        className="border-b last:border-b-0"
-                        style={{ borderColor: 'var(--border)' }}
-                      >
-                        <Link
-                          href={
-                            locked
-                              ? '/dashboard/profile#unlock'
-                              : `/dashboard/syllabus/${getSlugForSubject(subject)}`
-                          }
-                          className="flex items-center gap-4 rounded-[10px] px-3 py-4 transition-colors duration-150 hover:bg-[var(--surface-sunken)]"
-                        >
-                          <span
-                            className="min-w-0 flex-1 truncate text-[14.5px] font-medium"
-                            style={{ color: locked ? 'var(--text-faint)' : 'var(--text)' }}
-                          >
-                            {subject}
-                          </span>
-                          <span
-                            className="shrink-0 text-[12.5px] tabular-nums"
-                            style={{ color: 'var(--text-faint)' }}
-                          >
-                            {locked ? 'locked on the free plan' : `${size} subtopics waiting`}
-                          </span>
-                          <IconArrowRight
-                            width={15}
-                            height={15}
-                            className="shrink-0"
-                            style={{ color: 'var(--text-faint)' }}
-                          />
-                        </Link>
-                      </li>
-                    )
-                  })}
-                </ul>
-              </Section>
-            )}
-
-            {/* The three steps, as a caption under the thing they describe
-                rather than as the page's main content. */}
-            <ol className="mb-8 grid gap-7 sm:grid-cols-3">
-              {[
-                'Open a subject and pick a subtopic that looks shaky.',
-                'Answer ten questions. It takes a few minutes.',
-                'Your heatmap and study plan build themselves from the result.',
-              ].map((step, i) => (
-                <li key={step} className="border-t pt-4" style={{ borderColor: 'var(--border)' }}>
-                  <span
-                    className="text-[11px] font-semibold tabular-nums tracking-[0.16em]"
-                    style={{ color: 'var(--text-faint)' }}
-                  >
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                    {step}
-                  </p>
-                </li>
-              ))}
-            </ol>
-          </>
-        ) : (
-          <>
-            {/* The numbers, as reference under a rule. They are what the page
-                is measured on, not what it opens with. */}
-            <div className="mb-14">
-              <StatRow
-                stats={[
-                  { label: 'mastered', value: counts.mastered, tone: 'var(--status-mastered)' },
-                  { label: 'fading', value: counts.decaying, tone: 'var(--status-fading)' },
-                  { label: 'weak', value: counts.weak, tone: 'var(--status-weak)' },
-                  { label: 'reviews due', value: counts.due },
-                  { label: 'of the syllabus mastered', value: `${overall}%`, tone: 'var(--brand)' },
-                ]}
-              />
-            </div>
-
-            <div className="grid gap-x-14 gap-y-0 lg:grid-cols-2">
-            {/* What the planner would have you do, in the order it would have
-                you do it. Four at most: the whole queue lives on the study
-                plan, and a dashboard listing nine subtopics is a to-do list
-                long enough that nobody opens it. */}
-            {rest.length > 0 && (
-              <Section
-                title="Today"
-                action={
-                  <div className="flex items-center gap-5">
-                    {counts.due > 0 && (
-                      <Link
-                        href="/dashboard/quiz?mode=mistakes&back=/dashboard"
-                        className="text-[13px] font-medium text-[var(--brand)] hover:underline"
-                      >
-                        Review {counts.due}
-                      </Link>
-                    )}
-                    <Link
-                      href="/dashboard/study-plan"
-                      className="text-[13px] font-medium text-[var(--brand)] hover:underline"
-                    >
-                      Full plan
-                    </Link>
-                  </div>
-                }
-              >
-                <ul className="flex flex-col">
-                  {rest.map((item) => (
-                    <li
-                      key={item.id}
-                      className="flex items-center gap-3 border-b py-3.5 last:border-b-0"
-                      style={{ borderColor: 'var(--border)' }}
-                    >
-                      <span
-                        className={`h-2 w-2 shrink-0 rounded-full ${STATUS_COLORS[item.status]}`}
-                        aria-hidden="true"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
-                          {item.subject} · {item.topic}
-                        </p>
-                        <p className="mt-0.5 truncate text-[14px]" style={{ color: 'var(--text-body)' }}>
-                          {displaySubtopic(item.subtopic)}
-                        </p>
-                      </div>
-                      <span
-                        className={`hidden shrink-0 text-[12.5px] font-medium sm:block ${STATUS_TEXT_COLORS[item.status]}`}
-                      >
-                        {STATUS_LABELS[item.status]}
-                      </span>
-                      <Link
-                        href={`/dashboard/quiz?subject=${encodeURIComponent(item.subject)}&topic=${encodeURIComponent(item.topic)}&subtopic=${encodeURIComponent(item.subtopic)}&back=/dashboard`}
-                        className="btn btn-outline control-sm shrink-0"
-                      >
-                        Quiz
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </Section>
-            )}
-
-        {/* What is outstanding, short. The full list, where things can be
-            added and deleted, lives on the calendar and the study plan. */}
-        <TodoList className="mb-12" title="To-do" compact limit={5} />
-
-        {/* Subjects */}
-        <Section
-          title="Your subjects"
-          action={
-            <Link
-              href="/dashboard/subjects"
-              className="inline-flex items-center gap-2 text-sm font-medium text-[var(--brand)] hover:underline"
+        {/* One thing first, then reference.
+            This page had two problems with one cause: on a used account it
+            opened with five sections at once, and on a new one it opened with
+            almost nothing. Both are what happens when a page has no single
+            first thing. It has one now — the next subtopic to sit, or the
+            first one if nothing has been sat yet — and everything else is
+            reference underneath it. */}
+        {nextUp ? (
+          <section
+            className="mb-12 border-t pt-7"
+            style={{ borderColor: 'var(--border)' }}
+          >
+            <p
+              className="text-[10.5px] font-semibold uppercase tracking-[0.16em]"
+              style={{ color: 'var(--text-faint)' }}
             >
-              View all
+              {hasActivity ? 'Next up' : 'Start here'}
+            </p>
+
+            <h2 className="mt-3 text-[clamp(1.35rem,2.8vw,1.8rem)] font-semibold leading-tight tracking-[-0.028em]">
+              {displaySubtopic(nextUp.subtopic)}
+            </h2>
+            <p className="mt-2 text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
+              {nextUp.subject} · {nextUp.topic}
+            </p>
+
+            {nextUp.reasons?.length > 0 && (
+              <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+                {nextUp.reasons.slice(0, 2).map((r) => (
+                  <span
+                    key={r.kind}
+                    className={`text-[12.5px] ${REASON_STYLE[r.kind] || 'text-[var(--text-faint)]'}`}
+                  >
+                    {r.label}
+                  </span>
+                ))}
+              </p>
+            )}
+
+            <div className="mt-7 flex flex-wrap items-center gap-3">
+              <Link
+                href={`/dashboard/quiz?subject=${encodeURIComponent(nextUp.subject)}&topic=${encodeURIComponent(nextUp.topic)}&subtopic=${encodeURIComponent(nextUp.subtopic)}&back=/dashboard`}
+                className="btn btn-solid control-lg"
+              >
+                {hasActivity ? 'Sit this one' : 'Take your first quiz'}
+                <IconArrowRight width={16} height={16} />
+              </Link>
+              {counts.due > 0 && (
+                <Link
+                  href="/dashboard/quiz?mode=mistakes&back=/dashboard"
+                  className="btn btn-outline control-md"
+                >
+                  Or review {counts.due} mistake{counts.due === 1 ? '' : 's'}
+                </Link>
+              )}
+            </div>
+          </section>
+        ) : (
+          <section className="mb-12 border-t pt-7" style={{ borderColor: 'var(--border)' }}>
+            <h2 className="text-[clamp(1.35rem,2.8vw,1.8rem)] font-semibold tracking-[-0.028em]">
+              Everything is secure
+            </h2>
+            <p
+              className="mt-3 max-w-xl text-[14.5px] leading-relaxed"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              Nothing is weak or fading right now. Keep testing to hold it there, or build a paper
+              across the topics you want.
+            </p>
+            <Link href="/dashboard/test" className="btn btn-solid control-lg mt-7">
+              Build a test
               <IconArrowRight width={16} height={16} />
             </Link>
-          }
-        >
-          <ul className="flex flex-col gap-0.5">
-            {subjects.map((subject, i) => {
-              const pct = subjectStats[subject] ?? 0
-              const locked = isSubjectLocked(subject, profile)
-              return (
-                <li key={subject}>
-                  <Link
-                    href={
-                      locked
-                        ? '/dashboard/profile#unlock'
-                        : `/dashboard/syllabus/${getSlugForSubject(subject)}`
-                    }
-                    className="flex items-center gap-4 rounded-[10px] px-3 py-3.5 transition-colors duration-150 hover:bg-[var(--surface-sunken)]"
+          </section>
+        )}
+
+        {/* The numbers, once there are any. On a new account these are all
+            zero, which says nothing and looks like a broken page. */}
+        {hasActivity && (
+          <div className="mb-12">
+            <StatRow
+              stats={[
+                { label: 'mastered', value: counts.mastered, tone: 'var(--status-mastered)' },
+                { label: 'fading', value: counts.decaying, tone: 'var(--status-fading)' },
+                { label: 'weak', value: counts.weak, tone: 'var(--status-weak)' },
+                { label: 'reviews due', value: counts.due },
+                { label: 'of the syllabus mastered', value: `${overall}%`, tone: 'var(--brand)' },
+              ]}
+            />
+          </div>
+        )}
+
+        <div className="grid gap-x-14 lg:grid-cols-2">
+          {/* Three, not nine. The queue lives on the study plan. */}
+          {queued.length > 0 && (
+            <Section
+              title="After that"
+              action={
+                <Link
+                  href="/dashboard/study-plan"
+                  className="text-[13px] font-medium text-[var(--brand)] hover:underline"
+                >
+                  Full plan
+                </Link>
+              }
+            >
+              <ul className="flex flex-col">
+                {queued.map((item) => (
+                  <li
+                    key={item.id}
+                    className="flex items-center gap-3 border-b py-3 last:border-b-0"
+                    style={{ borderColor: 'var(--border)' }}
                   >
                     <span
-                      className={`min-w-0 flex-1 truncate text-[14.5px] font-medium sm:w-48 sm:flex-none sm:shrink-0 ${
-                        locked ? 'text-[var(--text-faint)]' : 'text-[var(--text)]'
-                      }`}
-                    >
-                      {subject}
-                    </span>
-                    {locked ? (
-                      <span className="ml-auto shrink-0 rounded-full border border-[var(--border-strong)] px-2.5 py-1 text-xs font-medium text-[var(--text-muted)]">
-                        <span className="sm:hidden">Locked</span>
-                        <span className="hidden sm:inline">Locked on free plan</span>
-                      </span>
-                    ) : (
-                      <>
-                        <span className="hidden h-1 flex-1 overflow-hidden rounded-full bg-[var(--border-strong)] sm:block">
-                          <span
-                            className="block h-full rounded-full bg-[var(--brand)]"
-                            style={{ width: `${pct}%` }}
-                          />
-                        </span>
-                        <span className="ml-auto w-11 shrink-0 text-right text-[13.5px] font-semibold tabular-nums text-[var(--brand)] sm:ml-0">
-                          {pct}%
-                        </span>
-                      </>
-                    )}
-                    <IconChevronRight
-                      width={16}
-                      height={16}
-                      className="shrink-0 text-[var(--text-faint)]"
+                      className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_COLORS[item.status]}`}
+                      aria-hidden="true"
                     />
-                  </Link>
-                </li>
-              )
-            })}
-          </ul>
-
-          {!premium && subjects.length > 1 && (
-            <Link
-              href="/dashboard/profile#unlock"
-              className="mt-5 flex items-center gap-3 border-l-2 pl-4"
-              style={{ borderColor: 'var(--brand)' }}
-            >
-              <IconCheck width={15} height={15} className="shrink-0 text-[var(--brand)]" />
-              <span className="text-[14px]" style={{ color: 'var(--text-body)' }}>
-                Have a school code? Unlock every subject free.
-              </span>
-            </Link>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
+                        {item.subject}
+                      </p>
+                      <p className="mt-0.5 truncate text-[13.5px]" style={{ color: 'var(--text-body)' }}>
+                        {displaySubtopic(item.subtopic)}
+                      </p>
+                    </div>
+                    <Link
+                      href={`/dashboard/quiz?subject=${encodeURIComponent(item.subject)}&topic=${encodeURIComponent(item.topic)}&subtopic=${encodeURIComponent(item.subtopic)}&back=/dashboard`}
+                      className="btn btn-quiet control-sm shrink-0"
+                    >
+                      Quiz
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </Section>
           )}
-        </Section>
-            </div>
-          </>
-        )}
+
+          <Section
+            title="Your subjects"
+            action={
+              <Link
+                href="/dashboard/subjects"
+                className="text-[13px] font-medium text-[var(--brand)] hover:underline"
+              >
+                View all
+              </Link>
+            }
+          >
+            <ul className="flex flex-col">
+              {subjects.map((subject) => {
+                const locked = isSubjectLocked(subject, profile)
+                const pct = subjectStats[subject] ?? 0
+                const size = subjectSizes[subject] || 0
+                return (
+                  <li
+                    key={subject}
+                    className="border-b last:border-b-0"
+                    style={{ borderColor: 'var(--border)' }}
+                  >
+                    <Link
+                      href={
+                        locked
+                          ? '/dashboard/profile#unlock'
+                          : `/dashboard/syllabus/${getSlugForSubject(subject)}`
+                      }
+                      className="flex items-center gap-4 rounded-[10px] px-2 py-3 transition-colors duration-150 hover:bg-[var(--surface-sunken)]"
+                    >
+                      <span
+                        className="min-w-0 flex-1 truncate text-[13.5px] font-medium"
+                        style={{ color: locked ? 'var(--text-faint)' : 'var(--text)' }}
+                      >
+                        {subject}
+                      </span>
+                      {locked ? (
+                        <span className="shrink-0 text-[12px]" style={{ color: 'var(--text-faint)' }}>
+                          locked
+                        </span>
+                      ) : hasActivity ? (
+                        <>
+                          <span
+                            className="hidden h-1 w-20 shrink-0 overflow-hidden rounded-full sm:block"
+                            style={{ background: 'var(--border-strong)' }}
+                          >
+                            <span
+                              className="block h-full rounded-full"
+                              style={{ width: `${pct}%`, background: 'var(--brand)' }}
+                            />
+                          </span>
+                          <span
+                            className="w-10 shrink-0 text-right text-[12.5px] font-semibold tabular-nums"
+                            style={{ color: 'var(--brand)' }}
+                          >
+                            {pct}%
+                          </span>
+                        </>
+                      ) : (
+                        <span
+                          className="shrink-0 text-[12px] tabular-nums"
+                          style={{ color: 'var(--text-faint)' }}
+                        >
+                          {size} subtopics
+                        </span>
+                      )}
+                    </Link>
+                  </li>
+                )
+              })}
+            </ul>
+
+            {!premium && subjects.length > 1 && (
+              <Link
+                href="/dashboard/profile#unlock"
+                className="mt-5 flex items-center gap-3 border-l-2 pl-4"
+                style={{ borderColor: 'var(--brand)' }}
+              >
+                <IconCheck width={15} height={15} className="shrink-0 text-[var(--brand)]" />
+                <span className="text-[13.5px]" style={{ color: 'var(--text-body)' }}>
+                  Have a school code? Unlock every subject free.
+                </span>
+              </Link>
+            )}
+          </Section>
+        </div>
+
+        <TodoList className="mb-12" title="To-do" compact limit={5} />
+
       </Page>
     </DashboardLayout>
   )

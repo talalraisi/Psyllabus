@@ -107,6 +107,20 @@ export default function DashboardLayout({ children, profile }) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
+  // Which account this actually is. It lives on the auth user rather than the
+  // profile row, and it is the only thing that distinguishes two accounts with
+  // the same name on the same device.
+  const [email, setEmail] = useState('')
+
+  useEffect(() => {
+    let cancelled = false
+    supabase.auth.getUser().then(({ data }) => {
+      if (!cancelled) setEmail(data?.user?.email || '')
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [supabase])
   const [mobileOpen, setMobileOpen] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
@@ -252,8 +266,13 @@ export default function DashboardLayout({ children, profile }) {
               <p className="truncate text-[13px] font-semibold text-[var(--text)]">
                 {profile.full_name || 'Student'}
               </p>
-              <p className="t-caption truncate">
-                {profile.curriculum} · Class of {profile.grad_year}
+              {/* The e-mail, not the programme.
+                  Two accounts on one device can easily carry the same name —
+                  they did here — and "IB · Class of 2028" is true of both. The
+                  address is the only line that tells them apart, which is the
+                  whole question you are asking when you look at this block. */}
+              <p className="t-caption truncate" title={email || undefined}>
+                {email || `${profile.curriculum} · Class of ${profile.grad_year}`}
               </p>
             </div>
           </div>
