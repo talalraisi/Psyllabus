@@ -8,12 +8,14 @@
  * Components that take all their data as props can be rendered here with made
  * up data instead, and looked at properly first.
  *
- * It never exists in production. The check is a build-time constant, so the
- * whole page is dropped rather than hidden behind a redirect somebody could
- * get past.
+ * It does not exist in production: the route answers 404 there, the same as any
+ * address that was never defined. Returning null was not enough — that still
+ * served a 200 with an empty page, which is a route that exists and happens to
+ * be blank.
  */
 
 import { useState } from 'react'
+import { notFound } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader } from '@/components/PageShell'
 import TestBuilder from '@/components/TestBuilder'
@@ -105,9 +107,9 @@ export default function DevPreview() {
   const [review, setReview] = useState('exam')
   const [hintsAllowed, setHintsAllowed] = useState(true)
 
-  // After the hooks, never before: an early return above them would make this
-  // a component whose hook order changes between environments.
-  if (!ENABLED) return null
+  // After the hooks, never before: a return above them would make this a
+  // component whose hook order changes between environments.
+  if (!ENABLED) notFound()
 
   return (
     <DashboardLayout profile={PROFILE}>
