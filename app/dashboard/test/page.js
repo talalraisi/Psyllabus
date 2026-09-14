@@ -7,6 +7,7 @@ import { getSyllabus, getProfile } from '@/lib/cache'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
+import TestBuilder from '@/components/TestBuilder'
 import { Page, PageHeader, PageLoading, SkeletonLine } from '@/components/PageShell'
 import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { IconClock, IconCheck, IconChevronRight } from '@/components/Icons'
@@ -79,39 +80,6 @@ const DIFFICULTIES = [
   { key: 'mixed', label: 'Any heat', range: null },
   ...HEAT_LEVELS.map((h) => ({ key: h.key, label: h.label, range: HEAT_RANGES[h.key] })),
 ]
-
-/**
- * One decision per block, numbered.
- *
- * This page was nine sections in a column, each with its own rule and heading,
- * which is a wall of controls rather than a thing you are building. They fall
- * into three questions — what goes in it, how hard and how long, and how you
- * sit it — so those are the three blocks now, and the settings inside them are
- * no longer separated from each other as though they were unrelated.
- */
-function Step({ n, title, hint, children }) {
-  return (
-    <section className="mb-10 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
-      <div className="mb-6 flex items-baseline gap-3">
-        <span
-          className="text-[11px] font-semibold tabular-nums tracking-[0.16em]"
-          style={{ color: 'var(--text-faint)' }}
-        >
-          {String(n).padStart(2, '0')}
-        </span>
-        <div className="min-w-0">
-          <h2 className="text-[16px] font-semibold tracking-[-0.018em]">{title}</h2>
-          {hint && (
-            <p className="mt-1 text-[13px]" style={{ color: 'var(--text-muted)' }}>
-              {hint}
-            </p>
-          )}
-        </div>
-      </div>
-      {children}
-    </section>
-  )
-}
 
 export default function TestBuilderPage() {
   const [profile, setProfile] = useState(null)
@@ -277,6 +245,33 @@ export default function TestBuilderPage() {
     return counts
   }, [pool])
 
+  /**
+   * The spread of heat across the questions that would actually be drawn.
+   *
+   * A count tells you how big the paper is. This tells you what sitting it
+   * will feel like, which is the thing you are really choosing when you set a
+   * heat filter — and it is drawn from the questions themselves rather than
+   * from the filter, so a "Burning" paper that only has four burning questions
+   * in it says so.
+   */
+  const composition = useMemo(() => {
+    const drawn = eligible
+    if (!drawn.length) return []
+    const counts = {}
+    for (const q of drawn) {
+      const v = typeof q.difficulty === 'number' ? q.difficulty : 0.5
+      const level = HEAT_LEVELS.find((h) => v <= h.max) || HEAT_LEVELS[HEAT_LEVELS.length - 1]
+      counts[level.key] = (counts[level.key] || 0) + 1
+    }
+    return HEAT_LEVELS.filter((h) => counts[h.key]).map((h) => ({
+      key: h.key,
+      label: h.label,
+      count: counts[h.key],
+      share: counts[h.key] / drawn.length,
+      color: `var(--heat-${h.key}, var(--brand))`,
+    }))
+  }, [eligible])
+
   if (loading) {
     return (
       <DashboardLayout profile={null}>
@@ -315,6 +310,19 @@ export default function TestBuilderPage() {
     return eligible.length
   }
   const actualLength = lengthFromMetric()
+
+  /** What this paper is drawn from, in one line. */
+  const scopeLabel = [
+    selected.length === topics.length
+      ? 'All topics'
+      : `${selected.length} of ${topics.length} topic${topics.length === 1 ? '' : 's'}`,
+    effectiveSubtopics ? `${effectiveSubtopics.length} subtopics` : null,
+    level !== 'all' ? LEVELS.find((l) => l.key === level)?.label : null,
+    focusMode !== 'all' ? FOCUS_MODES.find((f) => f.key === focusMode)?.label : null,
+  ]
+    .filter(Boolean)
+    .join(' · ')
+
   const canStart = actualLength > 0
 
   // Real paper metrics, taken from the questions that would actually be drawn.
@@ -363,476 +371,96 @@ export default function TestBuilderPage() {
           subtitle="Set the paper on the left. It takes shape on the right as you go."
         />
 
-        <div className="grid gap-10 lg:grid-cols-[1fr_20rem] lg:gap-14">
-          <div>
-
-        <Step n={1} title="What goes in it" hint="The subject, the half of the course, and which topics it draws from.">
-        {/* Subject */}
-        <div className="mb-7">
-          <label htmlFor="subject" className="mb-2 block text-[13.5px] font-medium">
-            Subject
-          </label>
-          <select
-            id="subject"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            className="field"
-          >
-            {usable.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
-          {!isPremium(profile) && (profile.subjects || []).length > usable.length && (
-            <p className="t-caption mt-2">
-              Free plan covers one subject.{' '}
-              <Link href="/dashboard/profile#unlock" className="text-[var(--brand)] hover:underline">
-                Unlock the rest
-              </Link>
-            </p>
-          )}
-        </div>
-
-        {/* Level. Only an IB HL subject has two halves to choose between. */}
-        {isHLSubject && hlCount > 0 && (
-          <div className="mb-7">
-            <p className="text-[13.5px] font-medium">Level</p>
-            <p className="t-caption mb-3">
-              {hlCount} of your subtopics in this subject are HL extension.
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {LEVELS.map((l) => (
-                <button
-                  key={l.key}
-                  onClick={() => setLevel(l.key)}
-                  aria-pressed={level === l.key}
-                  title={l.hint}
-                  className={`${level === l.key ? 'btn btn-solid control-sm' : 'btn btn-outline control-sm'}`}
-                >
-                  {l.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* What to draw from */}
-        <div className="mb-7">
-          <p className="mb-3 text-[13.5px] font-medium">What should this test cover?</p>
-          <div className="flex flex-col gap-2">
-            {FOCUS_MODES.map((mode) => (
-              <button
-                key={mode.key}
-                onClick={() => setFocusMode(mode.key)}
-                aria-pressed={focusMode === mode.key}
-                className={`flex items-start gap-3 rounded-xl border px-4 py-3 text-left transition-colors duration-150 ${
-                  focusMode === mode.key
-                    ? 'border-[var(--brand)] bg-[var(--brand-tint)]'
-                    : 'border-[var(--border-strong)] hover:border-[var(--border-hover)]'
-                }`}
-              >
-                <span
-                  className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
-                    focusMode === mode.key
-                      ? 'border-[var(--brand)] bg-[var(--brand)]'
-                      : 'border-[var(--border-hover)]'
-                  }`}
-                >
-                  {focusMode === mode.key && <span className="h-1.5 w-1.5 rounded-full bg-white" />}
-                </span>
-                <span className="min-w-0">
-                  <span className="block text-sm font-medium text-[var(--text)]">{mode.label}</span>
-                  <span className="t-caption">{mode.hint}</span>
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Topics */}
-        <div className="mb-7">
-          <div className="mb-3 flex items-center justify-between">
-            <p className="text-[13.5px] font-medium">Topics</p>
-            <button
-              onClick={() => setSelected(selected.length === topics.length ? [] : topics)}
-              className="text-xs font-medium text-[var(--brand)] hover:underline"
-            >
-              {selected.length === topics.length ? 'Clear all' : 'Select all'}
-            </button>
-          </div>
-
-          {loadingPool ? (
-            <div className="flex flex-col gap-2">
-              {[0, 1, 2].map((i) => (
-                <SkeletonLine key={i} height={36} />
-              ))}
-            </div>
-          ) : topics.length === 0 ? (
-            <p className="t-small">No syllabus loaded for this subject yet.</p>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {topics.map((topic) => {
-                const n = perTopicCounts[topic] || 0
-                const isSelected = selected.includes(topic)
-                const within = subtopicsByTopic[topic] || {}
-                const names = Object.keys(within).sort()
-                const picked = pickedSubtopics[topic] || []
-                const isOpen = openTopic === topic
-
-                return (
-                  <div
-                    key={topic}
-                    className="rounded-xl border transition-colors duration-150"
-                    style={{
-                      borderColor: isSelected ? 'var(--brand)' : 'var(--border-strong)',
-                      background: isSelected ? 'var(--brand-tint)' : 'transparent',
-                    }}
-                  >
-                    <div className="flex items-center gap-3 px-4 py-2.5">
-                      <button
-                        onClick={() => toggleTopic(topic)}
-                        aria-pressed={isSelected}
-                        className="flex min-w-0 flex-1 items-center gap-3 text-left"
-                      >
-                        <span
-                          className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-[var(--r-sm)] border ${
-                            isSelected
-                              ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
-                              : 'border-[var(--border-hover)]'
-                          }`}
-                        >
-                          {isSelected && <IconCheck width={11} height={11} />}
-                        </span>
-                        <span className="min-w-0 flex-1 truncate text-[13.5px] text-[var(--text-body)]">
-                          {topic}
-                        </span>
-                      </button>
-
-                      <span className="shrink-0 text-[12px]" style={{ color: 'var(--text-faint)' }}>
-                        {picked.length
-                          ? `${picked.length} of ${names.length} picked`
-                          : n > 0
-                            ? `${n} available`
-                            : 'none yet'}
-                      </span>
-
-                      {/* Down to the subtopic, for when a whole topic is more
-                          than you meant. A topic with nothing ticked inside it
-                          still means the whole topic. */}
-                      {names.length > 0 && (
-                        <button
-                          onClick={() => setOpenTopic(isOpen ? null : topic)}
-                          aria-expanded={isOpen}
-                          aria-label={`${isOpen ? 'Hide' : 'Show'} subtopics in ${topic}`}
-                          className="shrink-0"
-                          style={{ color: 'var(--text-faint)' }}
-                        >
-                          <IconChevronRight
-                            width={13}
-                            height={13}
-                            className={`transition-transform duration-150 ${isOpen ? 'rotate-90' : ''}`}
-                          />
-                        </button>
-                      )}
-                    </div>
-
-                    {isOpen && (
-                      <ul
-                        className="flex flex-col border-t px-4 py-1"
-                        style={{ borderColor: 'var(--border)' }}
-                      >
-                        {names.map((name) => {
-                          const on = picked.includes(name)
-                          return (
-                            <li key={name}>
-                              <button
-                                onClick={() =>
-                                  setPickedSubtopics((prev) => {
-                                    const cur = prev[topic] || []
-                                    const next = cur.includes(name)
-                                      ? cur.filter((x) => x !== name)
-                                      : [...cur, name]
-                                    return { ...prev, [topic]: next }
-                                  })
-                                }
-                                aria-pressed={on}
-                                className="flex w-full items-center gap-3 py-2 text-left"
-                              >
-                                <span
-                                  className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-[3px] border ${
-                                    on
-                                      ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
-                                      : 'border-[var(--border-hover)]'
-                                  }`}
-                                >
-                                  {on && <IconCheck width={9} height={9} />}
-                                </span>
-                                <span
-                                  className="min-w-0 flex-1 truncate text-[12.5px]"
-                                  style={{ color: 'var(--text-muted)' }}
-                                >
-                                  {displaySubtopic(name)}
-                                </span>
-                                <span
-                                  className="shrink-0 text-[11.5px] tabular-nums"
-                                  style={{ color: 'var(--text-faint)' }}
-                                >
-                                  {within[name]}
-                                </span>
-                              </button>
-                            </li>
-                          )
-                        })}
-                      </ul>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          )}
-        </div>
-
-        </Step>
-
-        <Step n={2} title="How hard, and how long" hint="Heat sets the difficulty; the rest sets the shape of the paper.">
-        {/* Difficulty and length */}
-        <div className="mb-7">
-          <p className="text-[13.5px] font-medium">Heat</p>
-          <p className="t-caption mb-3">
-            How hard the questions are. Burning is the hardest end of the paper.
-          </p>
-          <div className="mb-6 flex flex-wrap gap-2">
-            {DIFFICULTIES.map((d) => {
-              const n = d.range
-                ? pool.filter((q) => {
-                    const v = typeof q.difficulty === 'number' ? q.difficulty : 0.5
-                    return v > d.range[0] && v <= d.range[1]
-                  }).length
-                : pool.length
-              return (
-                <button
-                  key={d.key}
-                  onClick={() => setDifficulty(d.key)}
-                  aria-pressed={difficulty === d.key}
-                  disabled={n === 0}
-                  className={`${difficulty === d.key ? 'btn btn-solid control-sm' : 'btn btn-outline control-sm'}`}
-                >
-                  {d.label}
-                  <span className="ml-2 opacity-60">{n}</span>
-                </button>
-              )
-            })}
-          </div>
-
-          <p className="text-[13.5px] font-medium">Question type</p>
-          <p className="t-caption mb-3">
-            What the paper is made of. A type your subject has none of is ignored rather than
-            handed back empty.
-          </p>
-          <div className="mb-6 flex flex-wrap gap-2">
-            {QUESTION_TYPES.map((t) => {
-              const n =
-                t.key === 'all'
-                  ? pool.length
-                  : pool.filter((q) => (q.question_type || 'mcq') === t.key).length
-              return (
-                <button
-                  key={t.key}
-                  onClick={() => setQtype(t.key)}
-                  aria-pressed={qtype === t.key}
-                  title={t.hint}
-                  disabled={n === 0}
-                  className={`${qtype === t.key ? 'btn btn-solid control-sm' : 'btn btn-outline control-sm'}`}
-                >
-                  {t.label}
-                  <span className="ml-2 opacity-60">{n}</span>
-                </button>
-              )
-            })}
-          </div>
-
-          <p className="text-[13.5px] font-medium">Order</p>
-          <p className="t-caption mb-3">The order you sit them in, once they have been chosen.</p>
-          <div className="mb-6 flex flex-wrap gap-2">
-            {ORDERS.map((o) => (
-              <button
-                key={o.key}
-                onClick={() => setOrder(o.key)}
-                aria-pressed={order === o.key}
-                title={o.hint}
-                className={`${order === o.key ? 'btn btn-solid control-sm' : 'btn btn-outline control-sm'}`}
-              >
-                {o.label}
-              </button>
-            ))}
-          </div>
-
-          <p className="text-[13.5px] font-medium">Length</p>
-          <p className="t-caption mb-3">
-            Counted however you are thinking about it. Same draw either way.
-          </p>
-          <div className="mb-3 flex flex-wrap gap-2">
-            {[
-              ['questions', 'By questions'],
-              ['marks', 'By marks'],
-              ['minutes', 'By minutes'],
-            ].map(([key, label]) => (
-              <button
-                key={key}
-                onClick={() => setLengthMetric(key)}
-                aria-pressed={lengthMetric === key}
-                className={lengthMetric === key ? 'btn btn-solid control-sm' : 'btn btn-outline control-sm'}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-          <div className="mb-6 flex flex-wrap gap-2">
-            {LENGTH_PRESETS[lengthMetric].map((n) => (
-              <button
-                key={n}
-                onClick={() => setLength(n)}
-                aria-pressed={length === n}
-                className={`${length === n ? 'btn btn-solid control-sm' : 'btn btn-outline control-sm'}`}
-              >
-                {n} {LENGTH_UNIT[lengthMetric]}
-              </button>
-            ))}
-            <label className="flex items-center gap-2">
-              <input
-                type="text"
-                inputMode="numeric"
-                value={customLength}
-                aria-label={`Or type a number of ${lengthMetric}`}
-                placeholder="or type"
-                onChange={(e) => setCustomLength(e.target.value.replace(/[^0-9]/g, ''))}
-                className="input control-md w-[104px] text-center tabular-nums"
-              />
-            </label>
-          </div>
-        </div>
-        </Step>
-
-        <Step n={3} title="How you sit it" hint="Untimed to learn, timed to rehearse the real thing.">
-          <button
-            onClick={() => setTimed(!timed)}
-            role="switch"
-            aria-checked={timed}
-            className="flex items-center gap-3"
-          >
-            <span
-              className={`relative h-6 w-10 shrink-0 rounded-full transition-colors duration-150 ${
-                timed ? 'bg-[var(--brand)]' : 'bg-[var(--border-strong)]'
-              }`}
-            >
-              <span
-                className={`absolute top-1 h-4 w-4 rounded-full bg-white transition-all duration-150 ${
-                  timed ? 'left-5' : 'left-1'
-                }`}
-              />
-            </span>
-            <span className="text-[13.5px] text-[var(--text-body)]">
-              Exam conditions: countdown and live marks-per-minute pacing
-            </span>
-          </button>
-
-          {timed && (
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              <label className="flex items-center gap-2">
-                <span className="text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
-                  Time limit
-                </span>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={customMinutes}
-                  aria-label="Time limit in minutes"
-                  placeholder={String(budgetMinutes)}
-                  onChange={(e) => setCustomMinutes(e.target.value.replace(/[^0-9]/g, ''))}
-                  className="input control-sm w-[88px] text-center tabular-nums"
-                />
-                <span className="text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
-                  minutes
-                </span>
-              </label>
-              <span className="t-caption">
-                Leave it blank for {budgetMinutes} minutes, which is what these questions are worth
-                in real exam time.
-              </span>
-            </div>
-          )}
-        </Step>
-
-          </div>
-
-          {/* The paper, as it currently stands. */}
-          <aside className="lg:sticky lg:top-10 lg:self-start">
-            <div
-              className="rounded-[12px] border p-5"
-              style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
-            >
-              <p
-                className="mb-4 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
-                style={{ color: 'var(--text-faint)' }}
-              >
-                Your paper
-              </p>
-              <p className="text-[15px] font-semibold leading-snug tracking-[-0.015em]">{subject}</p>
-              <p className="mt-1 text-[12.5px]" style={{ color: 'var(--text-muted)' }}>
-                {selected.length === topics.length
-                  ? 'All topics'
-                  : `${selected.length} of ${topics.length} topic${topics.length === 1 ? '' : 's'}`}
-                {level !== 'all' ? ` · ${LEVELS.find((l) => l.key === level)?.label}` : ''}
-                {difficulty !== 'mixed'
-                  ? ` · ${DIFFICULTIES.find((d) => d.key === difficulty)?.label}`
-                  : ''}
-              </p>
-
-              <div className="my-5 h-px" style={{ background: 'var(--border)' }} />
-
-              {canStart ? (
-                <>
-                  <dl className="mb-7 flex flex-wrap gap-x-9 gap-y-5">
-                    {[
-                      ['Questions', actualLength],
-                      ['Marks', totalMarks],
-                      [timed ? 'Time limit' : 'Est. time', `${estMinutes}m`],
-                    ].map(([label, value]) => (
-                      <div key={label}>
-                        <dt className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
-                          {label}
-                        </dt>
-                        <dd className="mt-1.5 text-[24px] font-semibold leading-none tracking-[-0.028em] tabular-nums">
-                          {value}
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
-
-                  {actualLength < length && (
-                    <p className="mb-5 text-[12.5px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
-                      Only {eligible.length} question{eligible.length === 1 ? '' : 's'} match these
-                      filters, so the paper will be {actualLength} long. Widen the topics or
-                      difficulty for more.
-                    </p>
-                  )}
-
-                  <button onClick={startTest} className="btn btn-solid control-lg w-full">
-                    {timed && <IconClock width={18} height={18} />}
-                    Start {timed ? 'timed test' : 'test'}
-                  </button>
-                </>
-              ) : (
-                <p className="text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                  {selected.length === 0
-                    ? 'Select at least one topic to build a paper.'
-                    : 'Nothing matches these settings. Try a different focus, a wider heat range, or more topics.'}
-                </p>
-              )}
-            </div>
-          </aside>
-        </div>
+        <TestBuilder
+          subject={subject}
+          subjects={usable}
+          onSubject={setSubject}
+          freeNote={
+            !isPremium(profile) && (profile.subjects || []).length > usable.length
+              ? 'The free plan covers one subject. A school code opens the rest.'
+              : null
+          }
+          levels={LEVELS}
+          level={level}
+          onLevel={setLevel}
+          showLevel={isHLSubject && hlCount > 0}
+          hlCount={hlCount}
+          focusModes={FOCUS_MODES}
+          focusMode={focusMode}
+          onFocusMode={setFocusMode}
+          topics={topics}
+          selected={selected}
+          onToggleTopic={toggleTopic}
+          onSelectAll={() => setSelected(selected.length === topics.length ? [] : topics)}
+          perTopicCounts={perTopicCounts}
+          subtopicsByTopic={subtopicsByTopic}
+          pickedSubtopics={pickedSubtopics}
+          onToggleSubtopic={(topic, name) =>
+            setPickedSubtopics((prev) => {
+              const cur = prev[topic] || []
+              return {
+                ...prev,
+                [topic]: cur.includes(name) ? cur.filter((x) => x !== name) : [...cur, name],
+              }
+            })
+          }
+          openTopic={openTopic}
+          onOpenTopic={setOpenTopic}
+          loadingPool={loadingPool}
+          difficulties={DIFFICULTIES}
+          difficulty={difficulty}
+          onDifficulty={setDifficulty}
+          difficultyCount={(d) =>
+            d.range
+              ? pool.filter((q) => {
+                  const v = typeof q.difficulty === 'number' ? q.difficulty : 0.5
+                  return v > d.range[0] && v <= d.range[1]
+                }).length
+              : pool.length
+          }
+          questionTypes={QUESTION_TYPES}
+          qtype={qtype}
+          onQtype={setQtype}
+          qtypeCount={(t) =>
+            t.key === 'all'
+              ? pool.length
+              : pool.filter((q) => (q.question_type || 'mcq') === t.key).length
+          }
+          orders={ORDERS}
+          order={order}
+          onOrder={setOrder}
+          lengthMetric={lengthMetric}
+          onLengthMetric={setLengthMetric}
+          lengthPresets={LENGTH_PRESETS}
+          lengthUnit={LENGTH_UNIT}
+          length={length}
+          onLength={(n) => {
+            setLength(n)
+            setCustomLength('')
+          }}
+          customLength={customLength}
+          onCustomLength={setCustomLength}
+          timed={timed}
+          onTimed={setTimed}
+          customMinutes={customMinutes}
+          onCustomMinutes={setCustomMinutes}
+          budgetMinutes={budgetMinutes}
+          review={review}
+          onReview={setReview}
+          hintsAllowed={hintsAllowed}
+          onHintsAllowed={setHintsAllowed}
+          paper={{
+            canStart,
+            actualLength,
+            totalMarks,
+            estMinutes,
+            eligibleCount: eligible.length,
+            short: actualLength < wantedLength,
+            scopeLabel,
+            composition,
+          }}
+          onStart={startTest}
+        />
       </Page>
     </DashboardLayout>
   )
