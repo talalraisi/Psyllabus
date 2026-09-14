@@ -1,57 +1,89 @@
 'use client'
 
-import { IconClock, IconCheck, IconChevronRight } from '@/components/Icons'
+import { useState } from 'react'
+import { IconClock, IconCheck, IconChevronRight, IconArrowLeft, IconArrowRight } from '@/components/Icons'
 import { SkeletonLine } from '@/components/PageShell'
 import { displaySubtopic } from '@/lib/progress'
 
 /**
- * Building a paper, rather than filling in a form.
+ * One decision at a time.
  *
- * The last version was a column of numbered steps with the summary parked in a
- * sidebar. Everything worked and none of it felt like assembling anything: the
- * choices were a questionnaire, and the thing being made was a box of statistics
- * off to one side.
+ * This was a long form: every control on one page, the paper summarised in a
+ * sidebar, and a scroll between you and the button. Restyling it did not help,
+ * because the shape was the problem. A page that shows you sixteen controls at
+ * once is a settings screen, and setting a paper is not what anyone came here
+ * to do — they came to sit one.
  *
- * So the paper is the subject of the screen now. It sits on the right at the
- * size of an actual front sheet, it fills in as you choose, and it shows what
- * is in it — the spread of heat across the questions that would be drawn — not
- * just how many there are. The choices are on the left in three quiet bands,
- * without numbers, because nobody needs to be told that a form has an order.
+ * So it is a flow. Five screens, one question each, nothing below the fold, and
+ * the paper itself as the last screen rather than a panel off to the side. Each
+ * step knows whether it can be left, so Next is refused rather than leading
+ * somewhere broken, and every step is reachable from the rail at the top once
+ * you have been past it.
  *
- * It is presentational on purpose. Every value and every handler comes in as a
- * prop, which is what lets the design be rendered and looked at with made-up
- * data instead of being deployed and guessed at.
+ * Nothing was dropped to get here. Every choice the long form had is still in
+ * it, just not all at once.
+ *
+ * Presentational on purpose: every value and handler is a prop, which is what
+ * lets this be rendered and looked at with made-up data rather than deployed
+ * and guessed at.
  */
 
-function Band({ title, hint, children, className = '' }) {
-  return (
-    <section className={`border-t pt-6 ${className}`} style={{ borderColor: 'var(--border)' }}>
-      <h2 className="text-[13px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'var(--text-faint)' }}>
-        {title}
-      </h2>
-      {hint && (
-        <p className="mt-1.5 text-[13px]" style={{ color: 'var(--text-muted)' }}>
-          {hint}
-        </p>
-      )}
-      <div className="mt-5">{children}</div>
-    </section>
-  )
-}
+const STEPS = [
+  { key: 'subject', label: 'Subject' },
+  { key: 'source', label: 'Source' },
+  { key: 'topics', label: 'Topics' },
+  { key: 'shape', label: 'Shape' },
+  { key: 'sit', label: 'Sit it' },
+]
 
-/** A labelled row of choices. The label sits beside them on a wide screen. */
-function Row({ label, children, className = '' }) {
+/** A full-width choice. Big enough to press without aiming. */
+function Option({ on, disabled, onClick, title, hint, meta }) {
   return (
-    <div className={`grid gap-2 sm:grid-cols-[8rem_1fr] sm:items-baseline sm:gap-5 ${className}`}>
-      <span className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
-        {label}
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      aria-pressed={on}
+      className="flex w-full items-start gap-4 rounded-[12px] border px-5 py-4 text-left transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40"
+      style={{
+        borderColor: on ? 'var(--brand)' : 'var(--border-strong)',
+        background: on ? 'var(--brand-tint)' : 'transparent',
+      }}
+    >
+      <span
+        className="mt-[3px] flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border"
+        style={{
+          borderColor: on ? 'var(--brand)' : 'var(--border-hover)',
+          background: on ? 'var(--brand)' : 'transparent',
+          color: '#fff',
+        }}
+      >
+        {on && <IconCheck width={11} height={11} />}
       </span>
-      <div className="flex flex-wrap gap-2">{children}</div>
-    </div>
+      <span className="min-w-0 flex-1">
+        <span className="flex items-baseline justify-between gap-3">
+          <span className="text-[15px] font-medium">{title}</span>
+          {meta != null && (
+            <span className="shrink-0 text-[12.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
+              {meta}
+            </span>
+          )}
+        </span>
+        {hint && (
+          <span className="mt-1 block text-[13px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+            {hint}
+          </span>
+        )}
+      </span>
+    </button>
   )
 }
 
-function Choice({ on, disabled, onClick, children, title }) {
+/** A compact row of choices, for the settings that are genuinely small. */
+function Chips({ children }) {
+  return <div className="flex flex-wrap gap-2">{children}</div>
+}
+
+function Chip({ on, disabled, onClick, children, title }) {
   return (
     <button
       onClick={onClick}
@@ -67,9 +99,15 @@ function Choice({ on, disabled, onClick, children, title }) {
 
 function Toggle({ on, onClick, label, hint }) {
   return (
-    <button onClick={onClick} role="switch" aria-checked={on} className="flex items-start gap-3 text-left">
+    <button
+      onClick={onClick}
+      role="switch"
+      aria-checked={on}
+      className="flex w-full items-start gap-4 rounded-[12px] border px-5 py-4 text-left transition-colors duration-150"
+      style={{ borderColor: on ? 'var(--brand)' : 'var(--border-strong)' }}
+    >
       <span
-        className="relative mt-0.5 h-5 w-9 shrink-0 rounded-full transition-colors duration-150"
+        className="relative mt-[2px] h-5 w-9 shrink-0 rounded-full transition-colors duration-150"
         style={{ background: on ? 'var(--brand)' : 'var(--border-strong)' }}
       >
         <span
@@ -77,10 +115,10 @@ function Toggle({ on, onClick, label, hint }) {
           style={{ left: on ? 18 : 3 }}
         />
       </span>
-      <span className="min-w-0">
-        <span className="block text-[13.5px] font-medium">{label}</span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[15px] font-medium">{label}</span>
         {hint && (
-          <span className="mt-0.5 block text-[12.5px]" style={{ color: 'var(--text-muted)' }}>
+          <span className="mt-1 block text-[13px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
             {hint}
           </span>
         )}
@@ -89,140 +127,164 @@ function Toggle({ on, onClick, label, hint }) {
   )
 }
 
+function Question({ title, hint, children }) {
+  return (
+    <div>
+      <h2 className="text-[clamp(1.35rem,3vw,1.75rem)] font-semibold leading-tight tracking-[-0.03em]">
+        {title}
+      </h2>
+      {hint && (
+        <p className="mt-2.5 max-w-lg text-[14px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+          {hint}
+        </p>
+      )}
+      <div className="mt-8">{children}</div>
+    </div>
+  )
+}
+
 export default function TestBuilder({
-  // what goes in it
-  subject,
-  subjects,
-  onSubject,
-  freeNote,
-  levels,
-  level,
-  onLevel,
-  showLevel,
-  hlCount,
-  focusModes,
-  focusMode,
-  onFocusMode,
-  // topics and subtopics
-  topics,
-  selected,
-  onToggleTopic,
-  onSelectAll,
-  perTopicCounts,
-  subtopicsByTopic,
-  pickedSubtopics,
-  onToggleSubtopic,
-  openTopic,
-  onOpenTopic,
-  loadingPool,
-  // shape
-  difficulties,
-  difficulty,
-  onDifficulty,
-  difficultyCount,
-  questionTypes,
-  qtype,
-  onQtype,
-  qtypeCount,
-  orders,
-  order,
-  onOrder,
-  lengthMetric,
-  onLengthMetric,
-  lengthPresets,
-  lengthUnit,
-  length,
-  onLength,
-  customLength,
-  onCustomLength,
-  // conditions
-  timed,
-  onTimed,
-  customMinutes,
-  onCustomMinutes,
-  budgetMinutes,
-  review,
-  onReview,
-  hintsAllowed,
-  onHintsAllowed,
-  // the paper itself
-  paper,
-  onStart,
+  subject, subjects, onSubject, freeNote,
+  levels, level, onLevel, showLevel, hlCount,
+  focusModes, focusMode, onFocusMode,
+  topics, selected, onToggleTopic, onSelectAll, perTopicCounts,
+  subtopicsByTopic, pickedSubtopics, onToggleSubtopic, openTopic, onOpenTopic, loadingPool,
+  difficulties, difficulty, onDifficulty, difficultyCount,
+  questionTypes, qtype, onQtype, qtypeCount,
+  orders, order, onOrder,
+  lengthMetric, onLengthMetric, lengthPresets, lengthUnit,
+  length, onLength, customLength, onCustomLength,
+  timed, onTimed, customMinutes, onCustomMinutes, budgetMinutes,
+  review, onReview, hintsAllowed, onHintsAllowed,
+  paper, onStart,
 }) {
-  const allSelected = topics.length > 0 && selected.length === topics.length
+  const [step, setStep] = useState(0)
+  const [furthest, setFurthest] = useState(0)
+
+  const canLeave = {
+    subject: !!subject,
+    source: !!focusMode,
+    topics: selected.length > 0,
+    shape: true,
+    sit: paper.canStart,
+  }[STEPS[step].key]
+
+  const go = (n) => {
+    const next = Math.max(0, Math.min(STEPS.length - 1, n))
+    setStep(next)
+    setFurthest((f) => Math.max(f, next))
+    // A step change is a new screen, so it starts at the top of one.
+    if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[1fr_21rem] lg:gap-14">
-      <div className="flex flex-col gap-10">
-        <Band title="What goes in it" hint="The subject, which half of the course, and where the questions come from.">
-          <div className="flex flex-col gap-5">
-            <Row label="Subject">
-              <select
-                value={subject}
-                onChange={(e) => onSubject(e.target.value)}
-                aria-label="Subject"
-                className="field max-w-sm"
+    <div className="mx-auto max-w-2xl">
+      {/* Where you are. Steps you have been past are reachable; ones you have
+          not are not, because they would be asking about a paper that does not
+          exist yet. */}
+      <nav className="mb-10 flex items-center gap-1.5" aria-label="Progress">
+        {STEPS.map((s, i) => {
+          const done = i < step
+          const here = i === step
+          const reachable = i <= furthest
+          return (
+            <button
+              key={s.key}
+              onClick={() => reachable && go(i)}
+              disabled={!reachable}
+              aria-current={here ? 'step' : undefined}
+              className="group flex flex-1 flex-col gap-2 disabled:cursor-default"
+              title={s.label}
+            >
+              <span
+                className="h-[3px] w-full rounded-full transition-colors duration-200"
+                style={{
+                  background: here
+                    ? 'var(--brand)'
+                    : done
+                      ? 'color-mix(in oklab, var(--brand) 45%, transparent)'
+                      : 'var(--border-strong)',
+                }}
+              />
+              <span
+                className="text-left text-[11px] font-medium uppercase tracking-[0.1em]"
+                style={{ color: here ? 'var(--text)' : 'var(--text-faint)' }}
               >
-                {subjects.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-            </Row>
-            {freeNote && (
-              <p className="text-[12.5px] sm:pl-[8.6rem]" style={{ color: 'var(--text-faint)' }}>
-                {freeNote}
-              </p>
-            )}
+                {s.label}
+              </span>
+            </button>
+          )
+        })}
+      </nav>
 
-            {showLevel && (
-              <Row label="Level">
-                {levels.map((l) => (
-                  <Choice key={l.key} on={level === l.key} onClick={() => onLevel(l.key)} title={l.hint}>
-                    {l.label}
-                  </Choice>
-                ))}
-                <span className="self-center text-[12px]" style={{ color: 'var(--text-faint)' }}>
-                  {hlCount} HL subtopics
-                </span>
-              </Row>
-            )}
-
-            <Row label="Draw from">
-              {focusModes.map((m) => (
-                <Choice key={m.key} on={focusMode === m.key} onClick={() => onFocusMode(m.key)} title={m.hint}>
-                  {m.label}
-                </Choice>
-              ))}
-            </Row>
+      {STEPS[step].key === 'subject' && (
+        <Question title="Which subject?" hint="One paper, one subject. Everything after this is about that subject.">
+          <div className="flex flex-col gap-2">
+            {subjects.map((s) => (
+              <Option key={s} on={subject === s} onClick={() => onSubject(s)} title={s} />
+            ))}
           </div>
-        </Band>
+          {freeNote && (
+            <p className="mt-4 text-[13px]" style={{ color: 'var(--text-faint)' }}>
+              {freeNote}
+            </p>
+          )}
 
-        <Band
-          title="Topics"
-          hint="Open one to pick individual subtopics. A topic with nothing ticked inside it means all of it."
-        >
-          <div className="mb-3 flex items-center justify-between">
+          {showLevel && (
+            <div className="mt-9 border-t pt-7" style={{ borderColor: 'var(--border)' }}>
+              <p className="text-[14px] font-medium">Which half of the course?</p>
+              <p className="mt-1 text-[13px]" style={{ color: 'var(--text-muted)' }}>
+                {`${hlCount} of this subject\u2019s subtopics are the higher level extension.`}
+              </p>
+              <div className="mt-4">
+                <Chips>
+                  {levels.map((l) => (
+                    <Chip key={l.key} on={level === l.key} onClick={() => onLevel(l.key)} title={l.hint}>
+                      {l.label}
+                    </Chip>
+                  ))}
+                </Chips>
+              </div>
+            </div>
+          )}
+        </Question>
+      )}
+
+      {STEPS[step].key === 'source' && (
+        <Question title="What should it draw from?" hint="The questions can come from anywhere in the subject, or only from the parts that need work.">
+          <div className="flex flex-col gap-2">
+            {focusModes.map((m) => (
+              <Option
+                key={m.key}
+                on={focusMode === m.key}
+                onClick={() => onFocusMode(m.key)}
+                title={m.label}
+                hint={m.hint}
+              />
+            ))}
+          </div>
+        </Question>
+      )}
+
+      {STEPS[step].key === 'topics' && (
+        <Question title="Which topics?" hint="Open one to pick individual subtopics. A topic with nothing ticked inside it means all of it.">
+          <div className="mb-4 flex items-center justify-between">
             <span className="text-[13px] tabular-nums" style={{ color: 'var(--text-muted)' }}>
               {selected.length} of {topics.length} selected
             </span>
-            <button
-              onClick={onSelectAll}
-              className="text-[12.5px] font-medium text-[var(--brand)] hover:underline"
-            >
-              {allSelected ? 'Clear all' : 'Select all'}
+            <button onClick={onSelectAll} className="text-[12.5px] font-medium text-[var(--brand)] hover:underline">
+              {topics.length > 0 && selected.length === topics.length ? 'Clear all' : 'Select all'}
             </button>
           </div>
 
           {loadingPool ? (
             <div className="flex flex-col gap-2">
               {[0, 1, 2, 3].map((i) => (
-                <SkeletonLine key={i} height={44} />
+                <SkeletonLine key={i} height={56} />
               ))}
             </div>
           ) : topics.length === 0 ? (
-            <p className="text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-[14px]" style={{ color: 'var(--text-muted)' }}>
               No syllabus loaded for this subject yet.
             </p>
           ) : (
@@ -238,20 +300,20 @@ export default function TestBuilder({
                 return (
                   <div
                     key={topic}
-                    className="rounded-[10px] border transition-colors duration-150"
+                    className="rounded-[12px] border transition-colors duration-150"
                     style={{
                       borderColor: isSelected ? 'var(--brand)' : 'var(--border-strong)',
                       background: isSelected ? 'var(--brand-tint)' : 'transparent',
                     }}
                   >
-                    <div className="flex items-center gap-3 px-4 py-3">
+                    <div className="flex items-center gap-4 px-5 py-4">
                       <button
                         onClick={() => onToggleTopic(topic)}
                         aria-pressed={isSelected}
-                        className="flex min-w-0 flex-1 items-center gap-3 text-left"
+                        className="flex min-w-0 flex-1 items-center gap-4 text-left"
                       >
                         <span
-                          className="flex h-[17px] w-[17px] shrink-0 items-center justify-center rounded-[5px] border"
+                          className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] border"
                           style={{
                             borderColor: isSelected ? 'var(--brand)' : 'var(--border-hover)',
                             background: isSelected ? 'var(--brand)' : 'transparent',
@@ -260,13 +322,11 @@ export default function TestBuilder({
                         >
                           {isSelected && <IconCheck width={11} height={11} />}
                         </span>
-                        <span className="min-w-0 flex-1 truncate text-[13.5px]">{topic}</span>
+                        <span className="min-w-0 flex-1 truncate text-[14.5px]">{topic}</span>
                       </button>
-
-                      <span className="shrink-0 text-[12px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
+                      <span className="shrink-0 text-[12.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
                         {picked.length ? `${picked.length}/${names.length}` : n > 0 ? n : '—'}
                       </span>
-
                       {names.length > 0 && (
                         <button
                           onClick={() => onOpenTopic(isOpen ? null : topic)}
@@ -276,8 +336,8 @@ export default function TestBuilder({
                           style={{ color: 'var(--text-faint)' }}
                         >
                           <IconChevronRight
-                            width={13}
-                            height={13}
+                            width={14}
+                            height={14}
                             className={`transition-transform duration-150 ${isOpen ? 'rotate-90' : ''}`}
                           />
                         </button>
@@ -285,7 +345,7 @@ export default function TestBuilder({
                     </div>
 
                     {isOpen && (
-                      <ul className="flex flex-col border-t px-4" style={{ borderColor: 'var(--border)' }}>
+                      <ul className="flex flex-col border-t px-5" style={{ borderColor: 'var(--border)' }}>
                         {names.map((name) => {
                           const on = picked.includes(name)
                           return (
@@ -293,10 +353,10 @@ export default function TestBuilder({
                               <button
                                 onClick={() => onToggleSubtopic(topic, name)}
                                 aria-pressed={on}
-                                className="flex w-full items-center gap-3 py-2 text-left"
+                                className="flex w-full items-center gap-4 py-2.5 text-left"
                               >
                                 <span
-                                  className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-[4px] border"
+                                  className="flex h-4 w-4 shrink-0 items-center justify-center rounded-[4px] border"
                                   style={{
                                     borderColor: on ? 'var(--brand)' : 'var(--border-hover)',
                                     background: on ? 'var(--brand)' : 'transparent',
@@ -305,16 +365,10 @@ export default function TestBuilder({
                                 >
                                   {on && <IconCheck width={9} height={9} />}
                                 </span>
-                                <span
-                                  className="min-w-0 flex-1 truncate text-[12.5px]"
-                                  style={{ color: 'var(--text-muted)' }}
-                                >
+                                <span className="min-w-0 flex-1 truncate text-[13px]" style={{ color: 'var(--text-muted)' }}>
                                   {displaySubtopic(name)}
                                 </span>
-                                <span
-                                  className="shrink-0 text-[11.5px] tabular-nums"
-                                  style={{ color: 'var(--text-faint)' }}
-                                >
+                                <span className="shrink-0 text-[12px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
                                   {within[name]}
                                 </span>
                               </button>
@@ -328,90 +382,103 @@ export default function TestBuilder({
               })}
             </div>
           )}
-        </Band>
+        </Question>
+      )}
 
-        <Band title="Shape of the paper" hint="How hard, what kind, what order, and how long.">
-          <div className="flex flex-col gap-5">
-            <Row label="Heat">
-              {difficulties.map((d) => {
-                const n = difficultyCount(d)
-                return (
-                  <Choice
-                    key={d.key}
-                    on={difficulty === d.key}
-                    disabled={n === 0}
-                    onClick={() => onDifficulty(d.key)}
-                  >
-                    {d.label}
-                    <span className="ml-1.5 tabular-nums opacity-60">{n}</span>
-                  </Choice>
-                )
-              })}
-            </Row>
+      {STEPS[step].key === 'shape' && (
+        <Question title="What shape is the paper?" hint="How hard, what kind of question, what order, and how long.">
+          <div className="flex flex-col gap-8">
+            <div>
+              <p className="mb-3 text-[14px] font-medium">Heat</p>
+              <Chips>
+                {difficulties.map((d) => {
+                  const n = difficultyCount(d)
+                  return (
+                    <Chip key={d.key} on={difficulty === d.key} disabled={n === 0} onClick={() => onDifficulty(d.key)}>
+                      {d.label}
+                      <span className="ml-1.5 tabular-nums opacity-60">{n}</span>
+                    </Chip>
+                  )
+                })}
+              </Chips>
+            </div>
 
-            <Row label="Question type">
-              {questionTypes.map((t) => {
-                const n = qtypeCount(t)
-                return (
-                  <Choice key={t.key} on={qtype === t.key} disabled={n === 0} onClick={() => onQtype(t.key)} title={t.hint}>
-                    {t.label}
-                    <span className="ml-1.5 tabular-nums opacity-60">{n}</span>
-                  </Choice>
-                )
-              })}
-            </Row>
+            <div>
+              <p className="mb-3 text-[14px] font-medium">Question type</p>
+              <Chips>
+                {questionTypes.map((t) => {
+                  const n = qtypeCount(t)
+                  return (
+                    <Chip key={t.key} on={qtype === t.key} disabled={n === 0} onClick={() => onQtype(t.key)} title={t.hint}>
+                      {t.label}
+                      <span className="ml-1.5 tabular-nums opacity-60">{n}</span>
+                    </Chip>
+                  )
+                })}
+              </Chips>
+            </div>
 
-            <Row label="Order">
-              {orders.map((o) => (
-                <Choice key={o.key} on={order === o.key} onClick={() => onOrder(o.key)} title={o.hint}>
-                  {o.label}
-                </Choice>
-              ))}
-            </Row>
+            <div>
+              <p className="mb-3 text-[14px] font-medium">Order</p>
+              <Chips>
+                {orders.map((o) => (
+                  <Chip key={o.key} on={order === o.key} onClick={() => onOrder(o.key)} title={o.hint}>
+                    {o.label}
+                  </Chip>
+                ))}
+              </Chips>
+            </div>
 
-            <Row label="Length">
-              <span className="flex w-full flex-wrap gap-2">
+            <div>
+              <p className="mb-1 text-[14px] font-medium">Length</p>
+              <p className="mb-3 text-[13px]" style={{ color: 'var(--text-muted)' }}>
+                Counted however you are thinking about it. Same draw either way.
+              </p>
+              <Chips>
                 {[
                   ['questions', 'questions'],
                   ['marks', 'marks'],
                   ['minutes', 'minutes'],
                 ].map(([key, label]) => (
-                  <Choice key={key} on={lengthMetric === key} onClick={() => onLengthMetric(key)}>
+                  <Chip key={key} on={lengthMetric === key} onClick={() => onLengthMetric(key)}>
                     by {label}
-                  </Choice>
+                  </Chip>
                 ))}
-              </span>
-              <span className="flex w-full flex-wrap gap-2">
-                {lengthPresets[lengthMetric].map((n) => (
-                  <Choice key={n} on={!customLength && length === n} onClick={() => onLength(n)}>
-                    {n} {lengthUnit[lengthMetric]}
-                  </Choice>
-                ))}
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={customLength}
-                  aria-label={`Or type a number of ${lengthMetric}`}
-                  placeholder="or type"
-                  onChange={(e) => onCustomLength(e.target.value.replace(/[^0-9]/g, ''))}
-                  className="input control-sm w-[92px] text-center tabular-nums"
-                />
-              </span>
-            </Row>
+              </Chips>
+              <div className="mt-2.5">
+                <Chips>
+                  {lengthPresets[lengthMetric].map((n) => (
+                    <Chip key={n} on={!customLength && length === n} onClick={() => onLength(n)}>
+                      {n} {lengthUnit[lengthMetric]}
+                    </Chip>
+                  ))}
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={customLength}
+                    aria-label={`Or type a number of ${lengthMetric}`}
+                    placeholder="or type"
+                    onChange={(e) => onCustomLength(e.target.value.replace(/[^0-9]/g, ''))}
+                    className="input control-sm w-[92px] text-center tabular-nums"
+                  />
+                </Chips>
+              </div>
+            </div>
           </div>
-        </Band>
+        </Question>
+      )}
 
-        <Band title="How you sit it" hint="Untimed to learn, timed to rehearse the real thing.">
-          <div className="flex flex-col gap-5">
+      {STEPS[step].key === 'sit' && (
+        <Question title="How do you want to sit it?" hint="Untimed to learn, timed to rehearse the real thing.">
+          <div className="flex flex-col gap-3">
             <Toggle
               on={timed}
               onClick={() => onTimed(!timed)}
               label="Exam conditions"
               hint="A countdown, and live marks-per-minute pacing against what the paper needs."
             />
-
             {timed && (
-              <label className="flex flex-wrap items-center gap-2 sm:pl-12">
+              <label className="flex flex-wrap items-center gap-2 pl-5">
                 <span className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
                   Time limit
                 </span>
@@ -425,19 +492,16 @@ export default function TestBuilder({
                   className="input control-sm w-[84px] text-center tabular-nums"
                 />
                 <span className="text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
-                  minutes · blank uses {budgetMinutes}, what these questions are worth in real exam
-                  time
+                  minutes · blank uses {budgetMinutes}, what these questions are worth in real exam time
                 </span>
               </label>
             )}
-
             <Toggle
               on={review === 'practice'}
               onClick={() => onReview(review === 'practice' ? 'exam' : 'practice')}
               label="Mark each question as I answer it"
               hint="Off is exam mode: everything is held back until the end."
             />
-
             <Toggle
               on={!hintsAllowed}
               onClick={() => onHintsAllowed(!hintsAllowed)}
@@ -445,101 +509,102 @@ export default function TestBuilder({
               hint="Hides the hint button, the way the real paper does."
             />
           </div>
-        </Band>
-      </div>
 
-      {/* The paper. Front sheet rather than a box of statistics. */}
-      <aside className="lg:sticky lg:top-8 lg:self-start">
-        <div
-          className="rounded-[14px] border p-6"
-          style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
-        >
-          <p
-            className="text-[10px] font-semibold uppercase tracking-[0.2em]"
-            style={{ color: 'var(--text-faint)' }}
-          >
-            Your paper
-          </p>
-
-          <h2 className="mt-4 text-[19px] font-semibold leading-snug tracking-[-0.02em]">{subject}</h2>
-          <p className="mt-1.5 text-[12.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-            {paper.scopeLabel}
-          </p>
-
-          <div className="my-6 border-t" style={{ borderColor: 'var(--border)' }} />
-
-          {paper.canStart ? (
-            <>
-              <dl className="flex flex-wrap gap-x-8 gap-y-5">
-                {[
-                  ['Questions', paper.actualLength],
-                  ['Marks', paper.totalMarks],
-                  [timed ? 'Time limit' : 'Est. time', `${paper.estMinutes}m`],
-                ].map(([label, value]) => (
-                  <div key={label}>
-                    <dt className="text-[12px]" style={{ color: 'var(--text-muted)' }}>
-                      {label}
-                    </dt>
-                    <dd className="mt-1 text-[26px] font-semibold leading-none tracking-[-0.03em] tabular-nums">
-                      {value}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-
-              {/* What is actually in it. A count says how big the paper is;
-                  this says what sitting it will feel like. */}
-              {paper.composition?.length > 0 && (
-                <div className="mt-7">
-                  <p className="text-[12px]" style={{ color: 'var(--text-muted)' }}>
-                    Spread of heat
-                  </p>
-                  <div className="mt-2.5 flex h-1.5 w-full overflow-hidden rounded-full">
-                    {paper.composition.map((c) => (
-                      <span
-                        key={c.key}
-                        title={`${c.label}: ${c.count}`}
-                        style={{ width: `${c.share * 100}%`, background: c.color }}
-                      />
-                    ))}
-                  </div>
-                  <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
-                    {paper.composition.map((c) => (
-                      <li
-                        key={c.key}
-                        className="flex items-center gap-1.5 text-[11.5px] tabular-nums"
-                        style={{ color: 'var(--text-faint)' }}
-                      >
-                        <span className="h-[7px] w-[7px] rounded-full" style={{ background: c.color }} />
-                        {c.label} {c.count}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {paper.short && (
-                <p className="mt-6 text-[12px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
-                  Only {paper.eligibleCount} question{paper.eligibleCount === 1 ? '' : 's'} match
-                  these settings, so the paper will be {paper.actualLength} long. Widen the topics
-                  or the heat for more.
-                </p>
-              )}
-
-              <button onClick={onStart} className="btn btn-solid control-lg mt-7 w-full">
-                {timed && <IconClock width={17} height={17} />}
-                Start {timed ? 'timed test' : 'test'}
-              </button>
-            </>
-          ) : (
-            <p className="text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              {selected.length === 0
-                ? 'Select at least one topic and the paper will build itself here.'
-                : 'Nothing matches these settings. Try a different source, a wider heat range, or more topics.'}
+          {/* The paper, once there is one. Last screen rather than a sidebar. */}
+          <div className="mt-10 rounded-[14px] border p-6" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em]" style={{ color: 'var(--text-faint)' }}>
+              Your paper
             </p>
-          )}
-        </div>
-      </aside>
+            <h3 className="mt-3.5 text-[18px] font-semibold tracking-[-0.02em]">{subject}</h3>
+            <p className="mt-1.5 text-[12.5px]" style={{ color: 'var(--text-muted)' }}>
+              {paper.scopeLabel}
+            </p>
+
+            {paper.canStart ? (
+              <>
+                <dl className="mt-6 flex flex-wrap gap-x-9 gap-y-5">
+                  {[
+                    ['Questions', paper.actualLength],
+                    ['Marks', paper.totalMarks],
+                    [timed ? 'Time limit' : 'Est. time', `${paper.estMinutes}m`],
+                  ].map(([label, value]) => (
+                    <div key={label}>
+                      <dt className="text-[12px]" style={{ color: 'var(--text-muted)' }}>
+                        {label}
+                      </dt>
+                      <dd className="mt-1 text-[26px] font-semibold leading-none tracking-[-0.03em] tabular-nums">
+                        {value}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+
+                {paper.composition?.length > 0 && (
+                  <div className="mt-7">
+                    <p className="text-[12px]" style={{ color: 'var(--text-muted)' }}>
+                      Spread of heat
+                    </p>
+                    <div className="mt-2.5 flex h-1.5 w-full overflow-hidden rounded-full">
+                      {paper.composition.map((c) => (
+                        <span key={c.key} title={`${c.label}: ${c.count}`} style={{ width: `${c.share * 100}%`, background: c.color }} />
+                      ))}
+                    </div>
+                    <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+                      {paper.composition.map((c) => (
+                        <li key={c.key} className="flex items-center gap-1.5 text-[11.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
+                          <span className="h-[7px] w-[7px] rounded-full" style={{ background: c.color }} />
+                          {c.label} {c.count}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {paper.short && (
+                  <p className="mt-6 text-[12px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
+                    Only {paper.eligibleCount} question{paper.eligibleCount === 1 ? '' : 's'} match these
+                    settings, so the paper will be {paper.actualLength} long. Go back and widen the
+                    topics or the heat for more.
+                  </p>
+                )}
+              </>
+            ) : (
+              <p className="mt-5 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                Nothing matches these settings. Go back and try a different source, a wider heat
+                range, or more topics.
+              </p>
+            )}
+          </div>
+        </Question>
+      )}
+
+      {/* Back, where you are, and the one way forward. */}
+      <div className="mt-10 flex items-center gap-3 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
+        <button
+          onClick={() => go(step - 1)}
+          disabled={step === 0}
+          className="btn btn-quiet control-md disabled:opacity-40"
+        >
+          <IconArrowLeft width={15} height={15} />
+          Back
+        </button>
+
+        <span className="flex-1 text-center text-[12.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
+          {step + 1} of {STEPS.length}
+        </span>
+
+        {step < STEPS.length - 1 ? (
+          <button onClick={() => go(step + 1)} disabled={!canLeave} className="btn btn-solid control-md disabled:opacity-40">
+            Next
+            <IconArrowRight width={15} height={15} />
+          </button>
+        ) : (
+          <button onClick={onStart} disabled={!paper.canStart} className="btn btn-solid control-lg disabled:opacity-40">
+            {timed && <IconClock width={16} height={16} />}
+            Start {timed ? 'timed test' : 'test'}
+          </button>
+        )}
+      </div>
     </div>
   )
 }
