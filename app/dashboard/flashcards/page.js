@@ -8,6 +8,7 @@ import { getCurrentUser } from '@/lib/auth'
 import { getProfile } from '@/lib/cache'
 import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader, PageLoading, EmptyState } from '@/components/PageShell'
+import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { IconClose, IconArrowRight, IconArrowLeft, IconCards } from '@/components/Icons'
 import { displaySubtopic } from '@/lib/progress'
 import { accessibleSubjects } from '@/lib/access'
@@ -33,6 +34,15 @@ export default function FlashcardsPage() {
   const [cards, setCards] = useState([])
   const [notes, setNotes] = useState([])
   const [loading, setLoading] = useState(true)
+
+  // The top bar runs for as long as this page is fetching, not just while the
+  // route is in flight. A page that has arrived but has no data yet is the
+  // part that feels broken.
+  useEffect(() => {
+    if (!loading) return
+    startLoading()
+    return () => stopLoading()
+  }, [loading])
   const [reviewing, setReviewing] = useState(null)
   const [error, setError] = useState('')
 

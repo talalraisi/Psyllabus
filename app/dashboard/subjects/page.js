@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader, Section, PageLoading } from '@/components/PageShell'
+import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { getSlugForSubject } from '@/lib/subject-map'
 import { progressKey, STATUS_LABELS } from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
@@ -37,6 +38,15 @@ export default function SubjectsPage() {
   const [counts, setCounts] = useState({})
   const [breakdown, setBreakdown] = useState({})
   const [loading, setLoading] = useState(true)
+
+  // The top bar runs for as long as this page is fetching, not just while the
+  // route is in flight. A page that has arrived but has no data yet is the
+  // part that feels broken.
+  useEffect(() => {
+    if (!loading) return
+    startLoading()
+    return () => stopLoading()
+  }, [loading])
   const [switching, setSwitching] = useState('')
   const router = useRouter()
   const supabase = createClient()

@@ -7,6 +7,7 @@ import { getCurrentUser } from '@/lib/auth'
 import { getProfile } from '@/lib/cache'
 import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader, Section, EmptyState, PageLoading } from '@/components/PageShell'
+import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { IconCheck, IconClose } from '@/components/Icons'
 import ReminderWatcher from '@/components/ReminderWatcher'
 import MonthGrid from '@/components/MonthGrid'
@@ -40,6 +41,15 @@ export default function CalendarPage() {
   const [profile, setProfile] = useState(null)
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
+
+  // The top bar runs for as long as this page is fetching, not just while the
+  // route is in flight. A page that has arrived but has no data yet is the
+  // part that feels broken.
+  useEffect(() => {
+    if (!loading) return
+    startLoading()
+    return () => stopLoading()
+  }, [loading])
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
 

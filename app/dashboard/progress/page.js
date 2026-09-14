@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 import Heatmap from '@/components/Heatmap'
 import { Page, PageHeader, Section, StatRow } from '@/components/PageShell'
+import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { mergeSyllabusWithProgress } from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 
@@ -34,6 +35,15 @@ export default function ProgressPage() {
     decaying: 0,
   })
   const [loading, setLoading] = useState(true)
+
+  // The top bar runs for as long as this page is fetching, not just while the
+  // route is in flight. A page that has arrived but has no data yet is the
+  // part that feels broken.
+  useEffect(() => {
+    if (!loading) return
+    startLoading()
+    return () => stopLoading()
+  }, [loading])
   const router = useRouter()
   const supabase = createClient()
 

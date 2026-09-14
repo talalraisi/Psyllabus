@@ -10,6 +10,7 @@ import DashboardLayout from '@/components/DashboardLayout'
 import { displaySubtopic } from '@/lib/progress'
 import { IconChevronRight } from '@/components/Icons'
 import { Page, PageHeader, EmptyState, PageLoading } from '@/components/PageShell'
+import { startLoading, stopLoading } from '@/components/LoadingBar'
 
 const DAY = 24 * 60 * 60 * 1000
 
@@ -47,6 +48,15 @@ export default function MistakeBankPage() {
   const [openBuckets, setOpenBuckets] = useState({})
   const [mistakes, setMistakes] = useState([])
   const [loading, setLoading] = useState(true)
+
+  // The top bar runs for as long as this page is fetching, not just while the
+  // route is in flight. A page that has arrived but has no data yet is the
+  // part that feels broken.
+  useEffect(() => {
+    if (!loading) return
+    startLoading()
+    return () => stopLoading()
+  }, [loading])
   const router = useRouter()
   const supabase = createClient()
 

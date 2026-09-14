@@ -271,31 +271,31 @@ export default function Signup() {
             {/* Both unticked by default and both required. Pre-ticked consent
                 is not consent, and the PDPL wants it explicit for a minor. */}
             <div
-              className="flex flex-col gap-3 rounded-[10px] border p-4"
+              className="flex flex-col rounded-[10px] border px-4"
               style={{ borderColor: 'var(--border-strong)' }}
             >
-              <label className="flex cursor-pointer items-start gap-3">
+              <label className="flex cursor-pointer items-start gap-2.5 py-3">
                 <input
                   type="checkbox"
                   checked={guardianOk}
                   onChange={(e) => setGuardianOk(e.target.checked)}
                   required
-                  className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--brand)]"
+                  className="mt-[1px] h-[15px] w-[15px] shrink-0 accent-[var(--brand)]"
                 />
-                <span className="text-[13px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                <span className="text-[12px] leading-[1.55]" style={{ color: 'var(--text-muted)' }}>
                   I have my parent or guardian&rsquo;s permission to use Project Syllabus.
                 </span>
               </label>
 
-              <label className="flex cursor-pointer items-start gap-3">
+              <label className="flex cursor-pointer items-start gap-2.5 py-2.5">
                 <input
                   type="checkbox"
                   checked={termsOk}
                   onChange={(e) => setTermsOk(e.target.checked)}
                   required
-                  className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--brand)]"
+                  className="mt-[1px] h-[15px] w-[15px] shrink-0 accent-[var(--brand)]"
                 />
-                <span className="text-[13px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                <span className="text-[12px] leading-[1.55]" style={{ color: 'var(--text-muted)' }}>
                   I agree to the{' '}
                   <Link href="/terms" className="underline" style={{ color: 'var(--brand)' }}>
                     Terms

@@ -638,7 +638,19 @@ export default function Onboarding() {
               {curriculum === 'AP' && 'Select the AP courses you are taking.'}
               {curriculum === 'A-Level' && 'Most students take 3-4 A-Level subjects.'}
             </p>
-            <p className="mb-8 mt-2 text-[12.5px] font-semibold tabular-nums" style={{ color: 'var(--brand)' }}>
+            {/* Said before the choice, not after it. Everything earned is
+                filed under a subject, so changing the list later would hide
+                that work rather than move it — which is why it cannot be
+                changed, and why that has to be clear now. */}
+            <p
+              className="mt-6 border-l-2 pl-4 text-[13.5px] leading-relaxed"
+              style={{ borderColor: 'var(--brand)', color: 'var(--text-body)' }}
+            >
+              <strong className="font-semibold">Choose carefully.</strong> Your subjects are set
+              once and cannot be changed afterwards. Everything you go on to prove — your levels,
+              your mistake bank, your predicted grade — is filed under the subjects you pick here.
+            </p>
+            <p className="mb-8 mt-6 text-[12.5px] font-semibold tabular-nums" style={{ color: 'var(--brand)' }}>
               {selectedSubjects.length}/{currentCurriculum.maxSubjects} selected
             </p>
 
@@ -824,25 +836,25 @@ export default function Onboarding() {
                 className="mb-7 border-t pt-6"
                 style={{ borderColor: 'var(--border)' }}
               >
-                <label className="flex cursor-pointer items-start gap-3">
+                <label className="flex cursor-pointer items-start gap-2.5 py-2.5">
                   <input
                     type="checkbox"
                     checked={guardianOk}
                     onChange={(e) => setGuardianOk(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--brand)]"
+                    className="mt-[1px] h-[15px] w-[15px] shrink-0 accent-[var(--brand)]"
                   />
-                  <span className="text-[13.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                  <span className="text-[12px] leading-[1.55]" style={{ color: 'var(--text-muted)' }}>
                     {CONSENT_TEXT.en}
                   </span>
                 </label>
-                <label className="mt-3 flex cursor-pointer items-start gap-3">
+                <label className="flex cursor-pointer items-start gap-2.5 border-t py-2.5" style={{ borderColor: 'var(--border)' }}>
                   <input
                     type="checkbox"
                     checked={termsOk}
                     onChange={(e) => setTermsOk(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--brand)]"
+                    className="mt-[1px] h-[15px] w-[15px] shrink-0 accent-[var(--brand)]"
                   />
-                  <span className="text-[13.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                  <span className="text-[12px] leading-[1.55]" style={{ color: 'var(--text-muted)' }}>
                     I agree to the{' '}
                     <Link href="/terms" className="underline" style={{ color: 'var(--brand)' }}>
                       Terms

@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader, EmptyState, PageLoading } from '@/components/PageShell'
+import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { IconArrowRight, IconClock, IconCheck, IconCalendar } from '@/components/Icons'
 import SessionTimer from '@/components/SessionTimer'
 import TodoList from '@/components/TodoList'
@@ -65,6 +66,15 @@ export default function StudyPlanPage() {
   const [drawerItem, setDrawerItem] = useState(null)
   const [permission, setPermission] = useState('default')
   const [loading, setLoading] = useState(true)
+
+  // The top bar runs for as long as this page is fetching, not just while the
+  // route is in flight. A page that has arrived but has no data yet is the
+  // part that feels broken.
+  useEffect(() => {
+    if (!loading) return
+    startLoading()
+    return () => stopLoading()
+  }, [loading])
   const router = useRouter()
   const supabase = createClient()
 

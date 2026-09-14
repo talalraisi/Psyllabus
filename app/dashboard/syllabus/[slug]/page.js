@@ -10,6 +10,7 @@ import DashboardLayout from '@/components/DashboardLayout'
 import ResourceHubDrawer from '@/components/ResourceHubDrawer'
 import PaperPicker from '@/components/PaperPicker'
 import { Page, PageHeader, EmptyState } from '@/components/PageShell'
+import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { IconArrowLeft, IconChevronRight } from '@/components/Icons'
 import { resolveSubjectFromSlug } from '@/lib/subject-map'
 import { isSubjectLocked, isPremium } from '@/lib/access'
@@ -35,6 +36,15 @@ export default function SyllabusPage() {
   const [syllabusData, setSyllabusData] = useState([])
   const [progress, setProgress] = useState({})
   const [loading, setLoading] = useState(true)
+
+  // The top bar runs for as long as this page is fetching, not just while the
+  // route is in flight. A page that has arrived but has no data yet is the
+  // part that feels broken.
+  useEffect(() => {
+    if (!loading) return
+    startLoading()
+    return () => stopLoading()
+  }, [loading])
   const [expandedTopics, setExpandedTopics] = useState({})
   const [progressDetail, setProgressDetail] = useState({})
   const [hasQuestions, setHasQuestions] = useState(false)

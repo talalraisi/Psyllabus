@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader, Section, EmptyState, PageLoading, Spinner } from '@/components/PageShell'
+import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { getSlugForSubject } from '@/lib/subject-map'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 import { predictDiploma, CONFIDENCE_COPY } from '@/lib/prediction'
@@ -26,6 +27,15 @@ export default function PredictionPage() {
   const [saved, setSaved] = useState(false)
   const [editing, setEditing] = useState(false)
   const [loading, setLoading] = useState(true)
+
+  // The top bar runs for as long as this page is fetching, not just while the
+  // route is in flight. A page that has arrived but has no data yet is the
+  // part that feels broken.
+  useEffect(() => {
+    if (!loading) return
+    startLoading()
+    return () => stopLoading()
+  }, [loading])
   const router = useRouter()
   const supabase = createClient()
 

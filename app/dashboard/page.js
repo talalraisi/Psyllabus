@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader, Section, StatRow, PageLoading } from '@/components/PageShell'
+import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { IconChevronRight, IconArrowRight, IconCheck, IconClock } from '@/components/Icons'
 import { buildQueue, buildSession } from '@/lib/planner'
 import { relativeDay } from '@/lib/calendar'
@@ -35,6 +36,9 @@ function greeting(now) {
 export default function Dashboard() {
   const [profile, setProfile] = useState(null)
   const [subjectStats, setSubjectStats] = useState({})
+  // How big each subject is. On a brand-new account this is the only real
+  // information the dashboard has, and it is the reason to open one.
+  const [subjectSizes, setSubjectSizes] = useState({})
   // The greeting and the date are read once, on the client, when the data
   // lands. Reading the clock while rendering makes the component impure, and
   // the answer would be the server's time zone rather than the student's.
@@ -44,6 +48,15 @@ export default function Dashboard() {
   const [counts, setCounts] = useState({ mastered: 0, weak: 0, decaying: 0, due: 0, tested: 0 })
   const [session, setSession] = useState({ items: [], perItemMinutes: 0 })
   const [loading, setLoading] = useState(true)
+
+  // The top bar runs for as long as this page is fetching, not just while the
+  // route is in flight. A page that has arrived but has no data yet is the
+  // part that feels broken.
+  useEffect(() => {
+    if (!loading) return
+    startLoading()
+    return () => stopLoading()
+  }, [loading])
   const router = useRouter()
   const supabase = createClient()
 
@@ -104,10 +117,13 @@ export default function Dashboard() {
       }))
 
       const stats = {}
+      const sizes = {}
       for (const subject of subjects) {
         const rows = merged.filter((r) => r.subject === subject)
         stats[subject] = computeCompletionPercent(rows, progressMap, subject)
+        sizes[subject] = rows.length
       }
+      setSubjectSizes(sizes)
 
       const mastered = merged.filter((r) => r.status === 'mastered').length
       setCounts({
@@ -194,43 +210,106 @@ export default function Dashboard() {
 
         {!hasActivity ? (
           <>
+            {/* The first screen of a new account.
+                It was a heading, three sentences and a button on an otherwise
+                empty page — which is what a product looks like when it has
+                nothing to show yet, and it read as nothing to show. It has
+                plenty to show: the student's own subjects, how much of each is
+                waiting, and the one press that starts it. */}
             <div className="mb-12 border-t pt-8" style={{ borderColor: 'var(--border)' }}>
-              <h2 className="text-[19px] font-semibold tracking-[-0.02em]">Start with one quiz</h2>
-              <p className="mt-3 max-w-xl text-[14.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                Nothing here is filled in by guessing. Take a short quiz on any subtopic and
-                Project Syllabus marks it from your answers, then works out what you should study next.
+              <h2 className="text-[clamp(1.3rem,2.6vw,1.7rem)] font-semibold tracking-[-0.025em]">
+                Nothing here is filled in by guessing
+              </h2>
+              <p
+                className="mt-3 max-w-xl text-[14.5px] leading-relaxed"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                Every level in Project Syllabus is set by questions you either got right or did
+                not. Take one quiz and this page starts filling itself in — the heatmap, the
+                study plan, the predicted grade, all of it from that.
               </p>
 
-              {/* Numbered the way the landing page numbers its steps: the
-                  figure is reference, set small and faint, and the sentence is
-                  the thing you read. */}
-              <ol className="mt-8 grid gap-7 sm:grid-cols-3">
-                {[
-                  'Open a subject and pick a subtopic that looks shaky.',
-                  'Answer ten questions. It takes a few minutes.',
-                  'Your heatmap and study plan build themselves from the result.',
-                ].map((step, i) => (
-                  <li key={step} className="border-t pt-4" style={{ borderColor: 'var(--border)' }}>
-                    <span
-                      className="text-[11px] font-semibold tabular-nums tracking-[0.16em]"
-                      style={{ color: 'var(--text-faint)' }}
-                    >
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <p className="mt-2 text-[14px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-                      {step}
-                    </p>
-                  </li>
-                ))}
-              </ol>
-
-              <Link href={startHref} className="btn btn-solid control-lg mt-9 max-w-full px-6">
-                <span className="min-w-0 truncate">
-                  {firstSubject ? `Open ${firstSubject}` : 'Choose a subject'}
-                </span>
-                <IconArrowRight width={18} height={18} className="shrink-0" />
-              </Link>
+              <div className="mt-8">
+                <Link href={startHref} className="btn btn-solid control-lg max-w-full px-6">
+                  <span className="min-w-0 truncate">
+                    {firstSubject ? `Start with ${firstSubject}` : 'Choose a subject'}
+                  </span>
+                  <IconArrowRight width={16} height={16} className="shrink-0" />
+                </Link>
+              </div>
             </div>
+
+            {/* What is actually waiting, per subject. A new account is not
+                empty — it has a mapped syllabus behind it, and showing the size
+                of each subject is both the first real information the page can
+                give and the reason to press one. */}
+            {subjects.length > 0 && (
+              <Section title="Your subjects" className="mb-14">
+                <ul className="flex flex-col">
+                  {subjects.map((subject) => {
+                    const locked = isSubjectLocked(subject, profile)
+                    const size = subjectSizes[subject] || 0
+                    return (
+                      <li
+                        key={subject}
+                        className="border-b last:border-b-0"
+                        style={{ borderColor: 'var(--border)' }}
+                      >
+                        <Link
+                          href={
+                            locked
+                              ? '/dashboard/profile#unlock'
+                              : `/dashboard/syllabus/${getSlugForSubject(subject)}`
+                          }
+                          className="flex items-center gap-4 rounded-[10px] px-3 py-4 transition-colors duration-150 hover:bg-[var(--surface-sunken)]"
+                        >
+                          <span
+                            className="min-w-0 flex-1 truncate text-[14.5px] font-medium"
+                            style={{ color: locked ? 'var(--text-faint)' : 'var(--text)' }}
+                          >
+                            {subject}
+                          </span>
+                          <span
+                            className="shrink-0 text-[12.5px] tabular-nums"
+                            style={{ color: 'var(--text-faint)' }}
+                          >
+                            {locked ? 'locked on the free plan' : `${size} subtopics waiting`}
+                          </span>
+                          <IconArrowRight
+                            width={15}
+                            height={15}
+                            className="shrink-0"
+                            style={{ color: 'var(--text-faint)' }}
+                          />
+                        </Link>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </Section>
+            )}
+
+            {/* The three steps, as a caption under the thing they describe
+                rather than as the page's main content. */}
+            <ol className="mb-8 grid gap-7 sm:grid-cols-3">
+              {[
+                'Open a subject and pick a subtopic that looks shaky.',
+                'Answer ten questions. It takes a few minutes.',
+                'Your heatmap and study plan build themselves from the result.',
+              ].map((step, i) => (
+                <li key={step} className="border-t pt-4" style={{ borderColor: 'var(--border)' }}>
+                  <span
+                    className="text-[11px] font-semibold tabular-nums tracking-[0.16em]"
+                    style={{ color: 'var(--text-faint)' }}
+                  >
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                    {step}
+                  </p>
+                </li>
+              ))}
+            </ol>
           </>
         ) : (
           <>

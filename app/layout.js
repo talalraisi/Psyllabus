@@ -1,5 +1,6 @@
 import { Inter } from 'next/font/google'
 import './globals.css'
+import LoadingBar from '@/components/LoadingBar'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -106,6 +107,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className="min-h-full flex flex-col bg-[var(--bg,#FAFAF8)] text-[var(--text,#1C1917)] font-sans antialiased">
+        <LoadingBar />
         {children}
       </body>
     </html>
