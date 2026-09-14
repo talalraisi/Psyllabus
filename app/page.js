@@ -160,20 +160,26 @@ export default async function Home() {
               </Link>
             </div>
 
-            {/* The three things a student needs answered in the first ten
-                seconds, not a row of labels. */}
+            {/* The three programmes, with what is actually mapped for each.
+                This was three promises about pricing and privacy, which are
+                true and are also on the pricing page, the terms and the footer.
+                What somebody landing here needs to know first is whether their
+                own course is in it. */}
             <dl
               className="mt-20 grid gap-px border-t sm:grid-cols-3"
               style={{ borderColor: 'var(--border)', background: 'var(--border)' }}
             >
               {[
-                ['One subject, free', 'No trial that expires. Keep it as long as you want.'],
-                ['No card, ever, to start', 'A school code opens the rest for nothing.'],
-                ['Your notes stay on your device', 'Nothing you paste or upload is sent anywhere or used to train anything.'],
-              ].map(([term, def]) => (
-                <div key={term} className="px-0 py-6 sm:px-6 sm:first:pl-0" style={{ background: 'var(--bg)' }}>
-                  <dt className="text-[13.5px] font-semibold">{term}</dt>
-                  <dd className="mt-1.5 text-[12.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                ['IB Diploma', '91 subjects mapped', 'Every group, HL and SL, with the core alongside them.'],
+                ['A-Level', '44 subjects mapped', 'AS and A2 content, split the way the specifications split it.'],
+                ['AP', '38 subjects mapped', 'Course and exam description units, unit by unit.'],
+              ].map(([term, count, def]) => (
+                <div key={term} className="px-0 pt-7 sm:px-6 sm:pt-8" style={{ background: 'var(--bg)' }}>
+                  <dt className="text-[15px] font-semibold tracking-[-0.015em]">{term}</dt>
+                  <dd className="mt-1 text-[13px] tabular-nums" style={{ color: 'var(--brand)' }}>
+                    {count}
+                  </dd>
+                  <dd className="mt-2 pb-7 text-[13.5px] leading-relaxed sm:pb-8" style={{ color: 'var(--text-muted)' }}>
                     {def}
                   </dd>
                 </div>

@@ -334,6 +334,8 @@ export function DecayDemo() {
   // Ebbinghaus in the shape that matters here: steep early, flattening late.
   const retention = Math.exp(-0.34 * weeks)
   const pct = Math.round(retention * 100)
+  // The slider moves continuously; the sentence under it counts in weeks.
+  const shownWeeks = Math.round(weeks)
 
   // Three states on the way down, not two. Fading means slipping and still
   // recoverable with a retest; below about a third retained it is not slipping
@@ -392,7 +394,7 @@ export function DecayDemo() {
       </div>
 
       {/* The curve, with a marker that tracks the slider. */}
-      <svg viewBox={`0 0 ${W} ${H}`} className="mt-5 w-full" role="img" aria-label={`Retention after ${weeks} weeks: about ${pct}%`}>
+      <svg viewBox={`0 0 ${W} ${H}`} className="mt-5 w-full" role="img" aria-label={`Retention after ${shownWeeks} weeks: about ${pct}%`}>
         <line x1="8" x2={W - 8} y1={y(0)} y2={y(0)} stroke="var(--border)" />
         <line x1="8" x2={W - 8} y1={y(1)} y2={y(1)} stroke="var(--border)" strokeDasharray="2 4" />
         <path d={path} fill="none" stroke="var(--border-strong)" strokeWidth="1.5" />
@@ -421,7 +423,7 @@ export function DecayDemo() {
       <label htmlFor={id} className="mt-4 block text-[12.5px] font-medium" style={{ color: 'var(--text-body)' }}>
         Untouched for{' '}
         <span className="font-semibold tabular-nums" style={{ color: 'var(--text)' }}>
-          {weeks} {weeks === 1 ? 'week' : 'weeks'}
+          {shownWeeks} {shownWeeks === 1 ? 'week' : 'weeks'}
         </span>
       </label>
       <input
@@ -429,6 +431,7 @@ export function DecayDemo() {
         type="range"
         min={0}
         max={9}
+        step={0.05}
         value={weeks}
         onChange={(e) => setWeeks(Number(e.target.value))}
         className="slider mt-2.5"
@@ -504,7 +507,7 @@ export function PlanDemo() {
         type="range"
         min={15}
         max={240}
-        step={15}
+        step={5}
         value={minutes}
         onChange={(e) => setMinutes(Number(e.target.value))}
         className="slider mt-3"
