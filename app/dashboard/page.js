@@ -11,13 +11,11 @@ import { Page, PageHeader, Section, StatRow, PageLoading } from '@/components/Pa
 import { IconChevronRight, IconArrowRight, IconCheck, IconClock } from '@/components/Icons'
 import { buildQueue, buildSession } from '@/lib/planner'
 import { relativeDay } from '@/lib/calendar'
-import SubjectWheel from '@/components/SubjectWheel'
 import TodoList from '@/components/TodoList'
 import { getSlugForSubject } from '@/lib/subject-map'
 import {
   computeCompletionPercent,
   progressKey,
-  topicSortKey,
   STATUS_COLORS,
   STATUS_LABELS,
   displaySubtopic,
@@ -37,9 +35,6 @@ function greeting(now) {
 export default function Dashboard() {
   const [profile, setProfile] = useState(null)
   const [subjectStats, setSubjectStats] = useState({})
-  const [breakdown, setBreakdown] = useState({})
-  const [sizes, setSizes] = useState({})
-  const [topics, setTopics] = useState({})
   // The greeting and the date are read once, on the client, when the data
   // lands. Reading the clock while rendering makes the component impure, and
   // the answer would be the server's time zone rather than the student's.
@@ -109,26 +104,9 @@ export default function Dashboard() {
       }))
 
       const stats = {}
-      const tallies = {}
-      const sizeOf = {}
-      const byTopic = {}
       for (const subject of subjects) {
         const rows = merged.filter((r) => r.subject === subject)
         stats[subject] = computeCompletionPercent(rows, progressMap, subject)
-        sizeOf[subject] = rows.length
-        const tally = {}
-        const topics = new Map()
-        for (const row of rows) {
-          tally[row.status] = (tally[row.status] || 0) + 1
-          const t = topics.get(row.topic) || { topic: row.topic, total: 0, mastered: 0 }
-          t.total++
-          if (row.status === 'mastered') t.mastered++
-          topics.set(row.topic, t)
-        }
-        tallies[subject] = tally
-        byTopic[subject] = [...topics.values()].sort(
-          (a, b) => topicSortKey(a.topic) - topicSortKey(b.topic)
-        )
       }
 
       const mastered = merged.filter((r) => r.status === 'mastered').length
@@ -156,9 +134,6 @@ export default function Dashboard() {
       setNextEvent(pending[0] || null)
       setNow(new Date())
       setSubjectStats(stats)
-      setBreakdown(tallies)
-      setTopics(byTopic)
-      setSizes(sizeOf)
       setLoading(false)
     }
     loadData()
@@ -259,19 +234,6 @@ export default function Dashboard() {
           </>
         ) : (
           <>
-            <div className="mb-10">
-              <SubjectWheel
-                subjects={subjects}
-                core={core}
-                breakdown={breakdown}
-                counts={sizes}
-                targets={profile.target_grades || {}}
-                overall={overall}
-                lockedSubjects={subjects.filter((subject) => isSubjectLocked(subject, profile))}
-                topicsBySubject={topics}
-              />
-            </div>
-
             {/* The numbers, as reference under a rule. They are what the page
                 is measured on, not what it opens with. */}
             <div className="mb-14">
