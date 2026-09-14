@@ -325,6 +325,43 @@ export default function TestBuilderPage() {
 
   const canStart = actualLength > 0
 
+  /**
+   * Why nothing matched, when nothing matched.
+   *
+   * "Nothing matches these settings" is true and useless: four filters can each
+   * be reasonable and still intersect to nothing, and the one actually
+   * responsible is usually the source. Picking subtopics you have never been
+   * tested on while the source is set to your weak spots is the common way in,
+   * and the page used to just disable the button and say nothing.
+   *
+   * So each filter is relaxed in turn to see which one is doing it.
+   */
+  const emptyReason = (() => {
+    if (canStart || !selected.length) return null
+    const inTopics = pool.filter((q) => selected.includes(q.topic))
+    if (!inTopics.length) return 'There are no questions in these topics yet.'
+
+    const picked = inTopics.filter((q) => {
+      const within = pickedSubtopics[q.topic]
+      return !(within?.length && !within.includes(q.subtopic))
+    })
+    if (!picked.length) return 'No questions have been written for the subtopics you ticked yet.'
+
+    const mode = FOCUS_MODES.find((m) => m.key === focusMode)
+    if (mode?.statuses) {
+      const surviving = picked.filter((q) =>
+        mode.statuses.includes(statusBySubtopic[q.subtopic] || 'not_started')
+      )
+      if (!surviving.length) {
+        return `Nothing here matches “${mode.label}”. These subtopics have not been tested yet, so none of them count as weak. Go back and draw from everything.`
+      }
+    }
+    if (level !== 'all') return 'Nothing at this level. Try “Everything” on the first step.'
+    if (difficulty !== 'mixed') return 'No questions at this heat. Try “Any heat”.'
+    if (qtype !== 'all') return 'No questions of this type. Try “Any kind”.'
+    return 'Nothing matches these settings.'
+  })()
+
   // Real paper metrics, taken from the questions that would actually be drawn.
   const sample = eligible.slice(0, actualLength)
   const totalMarks = sample.reduce((s, q) => s + (q.marks || 1), 0)
@@ -456,6 +493,7 @@ export default function TestBuilderPage() {
             estMinutes,
             eligibleCount: eligible.length,
             short: actualLength < wantedLength,
+            emptyReason,
             scopeLabel,
             composition,
           }}

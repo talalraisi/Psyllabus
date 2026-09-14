@@ -34,6 +34,13 @@ function QuizPageInner() {
   const paper = searchParams.get('paper') || null
   const qtype = searchParams.get('qtype') || null
   const order = searchParams.get('order') || null
+  // The builder sets these; nothing was reading them, so picking subtopics,
+  // asking to be marked as you go, turning hints off and setting your own time
+  // limit all silently did nothing.
+  const subtopicsParam = searchParams.get('subtopics')
+  const subtopics = subtopicsParam ? subtopicsParam.split('~~') : undefined
+  const review = searchParams.get('review') || 'exam'
+  const hintsAllowed = searchParams.get('hints') !== '0'
   const minutes = parseInt(searchParams.get('minutes') || '0', 10) || null
 
   useEffect(() => {
@@ -96,6 +103,9 @@ function QuizPageInner() {
           paper={paper}
           qtype={qtype}
           order={order}
+          subtopics={subtopics}
+          review={review}
+          hintsAllowed={hintsAllowed}
           minutes={minutes}
           backHref={backHref}
         />

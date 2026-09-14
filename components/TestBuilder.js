@@ -452,15 +452,27 @@ export default function TestBuilder({
                       {n} {lengthUnit[lengthMetric]}
                     </Chip>
                   ))}
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={customLength}
-                    aria-label={`Or type a number of ${lengthMetric}`}
-                    placeholder="or type"
-                    onChange={(e) => onCustomLength(e.target.value.replace(/[^0-9]/g, ''))}
-                    className="input control-sm w-[92px] text-center tabular-nums"
-                  />
+                  {/* Not another pill. A number you type is a different kind
+                      of thing from a preset you press, and dressing it as one
+                      made it read as a button that had lost its label. */}
+                  <label
+                    className="flex h-8 items-center gap-1.5 rounded-[7px] border px-2.5"
+                    style={{ borderColor: 'var(--border-strong)' }}
+                  >
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={customLength}
+                      aria-label={`Or type a number of ${lengthMetric}`}
+                      placeholder="—"
+                      onChange={(e) => onCustomLength(e.target.value.replace(/[^0-9]/g, ''))}
+                      className="w-9 border-0 bg-transparent p-0 text-center text-[12.5px] tabular-nums outline-none"
+                      style={{ color: 'var(--text)' }}
+                    />
+                    <span className="text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
+                      {lengthUnit[lengthMetric]}
+                    </span>
+                  </label>
                 </Chips>
               </div>
             </div>
@@ -570,8 +582,8 @@ export default function TestBuilder({
               </>
             ) : (
               <p className="mt-5 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                Nothing matches these settings. Go back and try a different source, a wider heat
-                range, or more topics.
+                {paper.emptyReason ||
+                  'Nothing matches these settings. Go back and try a different source, a wider heat range, or more topics.'}
               </p>
             )}
           </div>
