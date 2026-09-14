@@ -38,7 +38,7 @@ const R_LABEL = 284
 const R_CORE_IN = 128
 const R_CORE_OUT = 168
 
-const R_CENTRE = 116
+const R_CENTRE = 92
 
 /** Degrees of air between neighbouring slices, per side. */
 const GAP = 1.5
@@ -162,7 +162,7 @@ export default function SubjectWheel({
     : 'rotate(0deg)'
 
   // Room for the label ring, which sits outside the slices.
-  const PAD = 40
+  const PAD = 24
   const viewBox = `${-PAD} ${-PAD} ${SIZE + PAD * 2} ${SIZE + PAD * 2}`
 
   const close = () => {
@@ -242,8 +242,8 @@ export default function SubjectWheel({
         )}
       </div>
 
-      <div className="relative w-full overflow-hidden">
-        <div className="relative mx-auto w-full max-w-[min(100%,520px)]">
+      <div className="wheel-arrive relative w-full overflow-hidden">
+        <div className="relative mx-auto w-full max-w-[min(100%,620px)]">
         <svg
           viewBox={viewBox}
           className="block w-full overflow-visible"
