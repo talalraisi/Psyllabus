@@ -1,0 +1,22 @@
+# Where each subject's syllabus comes from. One line per subject:
+#
+#   Subject Name = https://…/guide.pdf
+#
+# The subject name must match the one the app uses (syllabus_content.subject),
+# because that is what the file gets named after and what the remap looks up.
+#
+# Then:
+#   node scripts/fetch-guides.mjs --list guides/sources.txt
+#   node scripts/ingest-guides.mjs --from guides/pdf
+#   node scripts/remap-syllabus.mjs --subject "Physics SL" --source guides/physics-sl.txt
+#
+# Where to find them, officially and free:
+#
+#   AP        apcentral.collegeboard.org — "Course and Exam Description" per subject
+#   A-Level   aqa.org.uk · pearson.com · ocr.org.uk · wjec.co.uk — full specifications
+#   IB        your school's copy, or the subject briefs on ibo.org
+#
+# A guide behind a login will come back as a web page rather than a PDF, and
+# the fetcher says so rather than writing the login page to disk. Download
+# those by hand into guides/pdf/ and the ingester picks them up the same way.
+
