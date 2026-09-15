@@ -25,6 +25,7 @@ import {
 import { planLabel, isPremium } from '@/lib/access'
 import { clearCache } from '@/lib/cache'
 import TimerPill from '@/components/TimerPill'
+import FeedbackButton from '@/components/FeedbackButton'
 import ThemeToggle from '@/components/ThemeToggle'
 
 const NAV_ITEMS = [
@@ -377,6 +378,10 @@ export default function DashboardLayout({ children, profile }) {
 
       {/* Follows you out of the study plan so a running session stays visible. */}
       <TimerPill />
+
+      {/* On every signed-in page, because the page somebody is looking at when
+          something goes wrong is the page they should be able to say so from. */}
+      <FeedbackButton />
     </div>
   )
 }
