@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { CONSENT_TEXT } from '@/lib/consent'
+import { getCoverage, coverageLabel, COVERAGE_TONE } from '@/lib/coverage'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -279,6 +280,9 @@ export default function Onboarding() {
   const [termsOk, setTermsOk] = useState(false)
   const [alreadySetUp, setAlreadySetUp] = useState(false)
   const [checking, setChecking] = useState(true)
+  // How much of each subject has questions in it, so nobody picks four empty
+  // ones without being told.
+  const [coverage, setCoverage] = useState({})
   const router = useRouter()
   const supabase = createClient()
 
@@ -342,16 +346,41 @@ export default function Onboarding() {
       }
       const { data: profile } = await supabase
         .from('profiles')
-        .select('subjects')
+        .select('subjects, curriculum, grad_year, target_grades')
         .eq('id', user.id)
         .maybeSingle()
       if (cancelled) return
       const subjects = Array.isArray(profile?.subjects) ? profile.subjects : []
+
+      // Set up is not the same as used. A student who picked wrong two minutes
+      // ago has nothing filed under those subjects, and the database will let
+      // them change the list; refusing here would be the app being stricter
+      // than the rule it is enforcing.
+      const [{ count: progressCount }, { count: attemptCount }] = await Promise.all([
+        supabase
+          .from('progress')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id),
+        supabase
+          .from('quiz_attempts')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id),
+      ])
+      const hasWork = (progressCount || 0) > 0 || (attemptCount || 0) > 0
       // Google never showed the boxes, so ask here. The metadata is only set by
       // the e-mail form, which records the wording as it goes.
       setNeedsConsent(!user.user_metadata?.guardian_consent_text)
       setAccount({ email: user.email, id: user.id })
-      setAlreadySetUp(subjects.length > 0)
+      setAlreadySetUp(subjects.length > 0 && hasWork)
+      // Coming back to change a list that is still changeable: start on the
+      // subjects rather than on the curriculum, with the old choices in place.
+      if (subjects.length > 0 && !hasWork) {
+        setCurriculum(profile.curriculum || '')
+        setGradYear(profile.grad_year ? String(profile.grad_year) : '')
+        setSelectedSubjects(subjects.filter((s) => !IB_CORE_SUBJECTS.includes(s)))
+        setTargetGrades(profile.target_grades || {})
+        setStep(2)
+      }
       setChecking(false)
     }
     check()
@@ -359,6 +388,16 @@ export default function Onboarding() {
       cancelled = true
     }
   }, [router, supabase])
+
+  useEffect(() => {
+    let cancelled = false
+    getCoverage(supabase).then((c) => {
+      if (!cancelled) setCoverage(c)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [supabase])
 
   const startOver = async () => {
     await supabase.auth.signOut()
@@ -681,13 +720,30 @@ export default function Onboarding() {
                   
                   {expandedGroup === gi && (
                     <div className="px-4 pb-4 grid grid-cols-2 gap-2">
-                      {group.subjects.map(subject => (
-                        <button key={subject} onClick={() => toggleSubject(subject)}
-                        className={`rounded-full border px-3.5 py-2 text-left text-[12.5px] font-medium transition-colors duration-150
-                        ${selectedSubjects.includes(subject) ? 'chip-active' : 'chip hover:border-border-strong'}`}>
-                          {subject}
-                        </button>
-                      ))}
+                      {group.subjects.map((subject) => {
+                        const cov = coverageLabel(coverage[subject])
+                        return (
+                          <button
+                            key={subject}
+                            onClick={() => toggleSubject(subject)}
+                            className={`rounded-[10px] border px-3.5 py-2.5 text-left transition-colors duration-150
+                        ${selectedSubjects.includes(subject) ? 'chip-active' : 'chip hover:border-border-strong'}`}
+                          >
+                            <span className="block text-[12.5px] font-medium">{subject}</span>
+                            {/* Said before the choice, not after it. A subject
+                                with nothing in it is still the right subject to
+                                take — it just will not do anything yet, and
+                                finding that out afterwards is what makes a
+                                product look broken rather than early. */}
+                            <span
+                              className="mt-0.5 block text-[10.5px]"
+                              style={{ color: COVERAGE_TONE[cov.tone] }}
+                            >
+                              {cov.label}
+                            </span>
+                          </button>
+                        )
+                      })}
                     </div>
                   )}
                 </div>

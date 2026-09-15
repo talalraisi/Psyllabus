@@ -20,6 +20,7 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
+  const [hasWork, setHasWork] = useState(true)
 
   const [fullName, setFullName] = useState('')
   const [avatarUrl, setAvatarUrl] = useState('')
@@ -68,6 +69,22 @@ export default function ProfilePage() {
           router.push('/onboarding')
           return
         }
+
+        // Whether anything is filed under the current subjects. It decides
+        // whether the list can still be changed, and the database enforces the
+        // same rule, so this only ever decides what to say.
+        const [{ count: progressCount }, { count: attemptCount }] = await Promise.all([
+          supabase
+            .from('progress')
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', user.id),
+          supabase
+            .from('quiz_attempts')
+            .select('id', { count: 'exact', head: true })
+            .eq('user_id', user.id),
+        ])
+        if (cancelled) return
+        setHasWork((progressCount || 0) > 0 || (attemptCount || 0) > 0)
 
         setProfile({ ...data, id: data.id ?? user.id, email: user.email ?? '' })
         setFullName(data.full_name ?? '')
@@ -359,6 +376,44 @@ export default function ProfilePage() {
             {saving ? 'Saving' : 'Save changes'}
           </button>
         </form>
+
+        {/* Subjects.
+            Locked by work rather than by time: nothing earned means nothing to
+            lose, and a student who has just signed up and picked wrong should
+            not be stuck with it. One answer to one question closes it, because
+            from that point a change would hide something real rather than move
+            it. The database enforces this; the page only explains it. */}
+        <Section title="Subjects">
+          <ul className="mb-5 flex flex-col">
+            {(profile.subjects || []).map((s) => (
+              <li
+                key={s}
+                className="border-b py-2.5 text-[14px] last:border-b-0"
+                style={{ borderColor: 'var(--border)', color: 'var(--text-body)' }}
+              >
+                {s}
+              </li>
+            ))}
+          </ul>
+
+          {hasWork ? (
+            <p className="text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+              These are set now. Your levels, mistake bank and predicted grade are all filed under
+              them, so changing the list would hide that work rather than move it. Get in touch if
+              the list is wrong and it can be corrected properly.
+            </p>
+          ) : (
+            <>
+              <p className="mb-5 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                You have not answered anything yet, so there is nothing filed under these and the
+                list can still be changed. Once you sit your first quiz it is fixed.
+              </p>
+              <Link href="/onboarding" className="btn btn-outline control-md">
+                Change my subjects
+              </Link>
+            </>
+          )}
+        </Section>
 
         {/* Access */}
         <Section title="Access" className="mb-0">
