@@ -16,8 +16,12 @@ const OUTPUT = 512 // what gets uploaded, square
  * square and re-encoded as JPEG, so a 12MB photo uploads as roughly 60KB and
  * the size limit stops mattering. Nothing is sent until Save.
  */
-export default function AvatarCropper({ file, onCancel, onCropped, saving }) {
+export default function AvatarCropper({ file, onCancel, onCropped, saving, error }) {
   const [img, setImg] = useState(null)
+  // Problems opening the file, which happen before anything reaches the page
+  // that owns the upload — so they are shown here, in the dialog, where the
+  // person is actually looking.
+  const [loadError, setLoadError] = useState('')
   const [zoom, setZoom] = useState(1)
   const [offset, setOffset] = useState({ x: 0, y: 0 })
   const dragging = useRef(null)
@@ -27,13 +31,39 @@ export default function AvatarCropper({ file, onCancel, onCropped, saving }) {
     if (!file) return
     const url = URL.createObjectURL(file)
     const image = new Image()
+    // Events from an image this effect has already cleaned up are ignored.
+    //
+    // Cleanup revokes the object URL, which makes a still-loading image fail —
+    // and that failure arrives after the next run has already started. Without
+    // this guard the effect running twice (as it does in development, and on
+    // any re-render that changes the file) put "could not be opened" under a
+    // photo that had opened perfectly well.
+    let current = true
     image.onload = () => {
+      if (!current) return
+      setLoadError('')
       setImg(image)
       setZoom(1)
       setOffset({ x: 0, y: 0 })
     }
+    // Without this, a file the browser cannot decode — most often an iPhone
+    // HEIC photo, which passes the "is it an image" check by its type and then
+    // cannot be drawn — left a blank circle and a Save button that never
+    // enabled, with nothing saying why.
+    image.onerror = () => {
+      if (!current) return
+      const kind = (file.type || file.name.split('.').pop() || '').toLowerCase()
+      setLoadError(
+        /heic|heif/.test(kind)
+          ? 'This is an iPhone HEIC photo, which browsers cannot open. Export it as a JPEG or PNG and choose that instead.'
+          : 'That file could not be opened as an image. Try a JPEG or PNG.'
+      )
+    }
     image.src = url
-    return () => URL.revokeObjectURL(url)
+    return () => {
+      current = false
+      URL.revokeObjectURL(url)
+    }
   }, [file])
 
   // Scale that just fills the crop box, so there is never a transparent edge.
@@ -108,7 +138,10 @@ export default function AvatarCropper({ file, onCancel, onCropped, saving }) {
       h
     )
     ctx.restore()
-    out.toBlob((blob) => blob && onCropped(blob), 'image/jpeg', 0.9)
+    out.toBlob((blob) => {
+      if (blob) onCropped(blob)
+      else setLoadError('The photo could not be prepared for upload. Try a different image.')
+    }, 'image/jpeg', 0.9)
   }
 
   return (
@@ -150,6 +183,16 @@ export default function AvatarCropper({ file, onCancel, onCropped, saving }) {
             className="mt-2 w-full accent-[var(--brand)]"
           />
         </label>
+
+        {(loadError || error) && (
+          <p
+            role="alert"
+            className="mt-4 border-l-2 pl-3 text-[12.5px] leading-relaxed"
+            style={{ borderColor: 'var(--danger)', color: 'var(--danger)' }}
+          >
+            {loadError || error}
+          </p>
+        )}
 
         <div className="mt-5 flex gap-2">
           <button onClick={onCancel} disabled={saving} className="btn btn-quiet control-md flex-1">

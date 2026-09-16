@@ -27,6 +27,8 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [pendingPhoto, setPendingPhoto] = useState(null)
+  // Shown inside the crop dialog, which covers the page while it is open.
+  const [photoError, setPhotoError] = useState('')
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState('')
   const [deleting, setDeleting] = useState(false)
@@ -131,41 +133,84 @@ export default function ProfilePage() {
    */
   const onCropped = async (blob) => {
     if (!profile?.id) return
-    setUploading(true)
-    const path = `${profile.id}/avatar-${Date.now()}.jpg`
+    setPhotoError('')
 
-    const { error: uploadError } = await supabase.storage
-      .from('avatars')
-      .upload(path, blob, { upsert: true, contentType: 'image/jpeg' })
-
-    if (uploadError) {
-      setError(
-        uploadError.message.includes('Bucket not found')
-          ? 'Photo storage is not set up yet. Run npm run setup-db.'
-          : uploadError.message
-      )
-      setUploading(false)
+    // Offline is the commonest reason this fails, and the browser's own
+    // message for it is a TypeError nobody would read as "you have no
+    // internet". Say it plainly, before trying.
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      setPhotoError('You are offline. Reconnect and press Save again — your crop is still here.')
       return
     }
 
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from('avatars').getPublicUrl(path)
+    setUploading(true)
+    const path = `${profile.id}/avatar-${Date.now()}.jpg`
 
-    const { error: saveError } = await supabase
-      .from('profiles')
-      .update({ avatar_url: publicUrl })
-      .eq('id', profile.id)
+    /**
+     * Never hang.
+     *
+     * A request on a dropping connection can sit there for minutes, and with
+     * no try/catch a thrown network error left this on "Saving…" for good with
+     * nothing on screen. Every failure now ends in a sentence, in the dialog
+     * the person is looking at rather than on the page underneath it.
+     */
+    const withTimeout = (promise, ms) =>
+      Promise.race([
+        promise,
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('timeout')), ms)
+        ),
+      ])
 
-    if (saveError) setError(saveError.message)
-    else {
+    try {
+      const { error: uploadError } = await withTimeout(
+        supabase.storage
+          .from('avatars')
+          .upload(path, blob, { upsert: true, contentType: 'image/jpeg' }),
+        30000
+      )
+
+      if (uploadError) {
+        setPhotoError(
+          uploadError.message.includes('Bucket not found')
+            ? 'Photo storage is not set up on the server yet.'
+            : /exceeded|too large|size/i.test(uploadError.message)
+              ? 'That photo is too large. Try a smaller one.'
+              : `The upload was refused: ${uploadError.message}`
+        )
+        return
+      }
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('avatars').getPublicUrl(path)
+
+      const { error: saveError } = await withTimeout(
+        supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', profile.id),
+        15000
+      )
+
+      if (saveError) {
+        setPhotoError(`The photo uploaded but could not be saved to your profile: ${saveError.message}`)
+        return
+      }
+
       invalidateProfile(profile.id)
       setAvatarUrl(publicUrl)
       setProfile((p) => ({ ...p, avatar_url: publicUrl }))
+      setPendingPhoto(null)
       flash('Photo updated')
+    } catch (e) {
+      setPhotoError(
+        e?.message === 'timeout'
+          ? 'The upload is taking too long — your connection may have dropped. Try again.'
+          : typeof navigator !== 'undefined' && navigator.onLine === false
+            ? 'You went offline during the upload. Reconnect and press Save again.'
+            : 'The upload could not reach the server. Check your connection and try again.'
+      )
+    } finally {
+      setUploading(false)
     }
-    setUploading(false)
-    setPendingPhoto(null)
   }
 
   /**
@@ -248,7 +293,11 @@ export default function ProfilePage() {
         <AvatarCropper
           file={pendingPhoto}
           saving={uploading}
-          onCancel={() => setPendingPhoto(null)}
+          error={photoError}
+          onCancel={() => {
+            setPendingPhoto(null)
+            setPhotoError('')
+          }}
           onCropped={onCropped}
         />
       )}
