@@ -171,6 +171,26 @@ const SAME_SCHEMA = {
   },
 };
 
+/**
+ * Identical is identical.
+ *
+ * Not a semantic comparison — that is what the model is for — just the case
+ * where the checker produced the same sentence, or one that contains the
+ * other. Half the cards in a batch hit this, and asking a model whether
+ * "The slope of a position-time graph represents the velocity of the object"
+ * means the same as itself is a round trip that can only introduce error.
+ */
+function obviouslySame(a, b) {
+  const x = normalise(a);
+  const y = normalise(b);
+  if (!x || !y) return false;
+  if (x === y) return true;
+  // One stating the other plus a clause — "…, and it is a vector quantity".
+  const shorter = x.length <= y.length ? x : y;
+  const longer = x.length <= y.length ? y : x;
+  return shorter.length >= 25 && longer.includes(shorter);
+}
+
 async function agreesViaModel(pairs) {
   if (!pairs.length) return new Map();
   const listing = pairs
@@ -195,6 +215,54 @@ ${listing}`,
   const map = new Map();
   for (const v of out.verdicts || []) map.set(v.index, !!v.same);
   return map;
+}
+
+/**
+ * Judge every pair, and know the difference between "different" and "no answer".
+ *
+ * The batch call returns an empty verdicts array often enough to matter — six
+ * subtopics out of twelve produced nothing on the first real run, not because
+ * the cards were wrong but because no verdict came back and a missing verdict
+ * was being read as a rejection. Cards identical to the checker's own answer
+ * were being thrown away.
+ *
+ * So: the obvious ones never reach the model, anything the batch missed is
+ * asked again one at a time, and a card is only dropped when something
+ * actually said it was different.
+ */
+async function judge(pairs) {
+  const verdict = new Map();
+  const needModel = [];
+
+  for (const [i, p] of pairs.entries()) {
+    if (obviouslySame(p.answer, p.back)) verdict.set(i, true);
+    else needModel.push({ ...p, original: i });
+  }
+
+  if (needModel.length) {
+    let got = new Map();
+    try {
+      got = await agreesViaModel(needModel);
+    } catch {
+      /* fall through to the one-at-a-time pass */
+    }
+    for (const [j, p] of needModel.entries()) {
+      if (got.has(j)) verdict.set(p.original, got.get(j));
+    }
+
+    // Anything the batch skipped, asked on its own.
+    for (const [j, p] of needModel.entries()) {
+      if (verdict.has(p.original)) continue;
+      try {
+        const one = await agreesViaModel([p]);
+        if (one.has(0)) verdict.set(p.original, one.get(0));
+      } catch {
+        /* leave it unknown */
+      }
+    }
+  }
+
+  return verdict;
 }
 
 async function main() {
@@ -302,8 +370,10 @@ ${listing}`,
     let kept = [];
     if (survivors.length) {
       try {
-        const verdicts = await agreesViaModel(survivors);
+        const verdicts = await judge(survivors);
+        const unknown = survivors.filter((_, i) => !verdicts.has(i)).length;
         kept = survivors.filter((_, i) => verdicts.get(i) === true).map((s) => s.card);
+        if (unknown) process.stdout.write(`(${unknown} unjudged) `);
       } catch (e) {
         console.log(`comparison failed — ${e.message.slice(0, 50)}`);
         continue;
