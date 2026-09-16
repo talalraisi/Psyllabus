@@ -15,19 +15,23 @@
  *   --provider ollama   free, unlimited, runs locally (default)
  *                       install: https://ollama.com  then: ollama pull qwen2.5:14b
  *   --provider claude   highest quality, costs API credits
+ *   --provider gemini   free tier, limited by requests per day (see scripts/gemini.mjs)
  *
  * Requirements (in .env.local):
  *   DATABASE_URL       the same connection string npm run setup-db uses
  *   ANTHROPIC_API_KEY  only when using --provider claude
+ *   GEMINI_API_KEY     only when using --provider gemini
  *
  * Usage:
  *   node scripts/generate-questions.mjs --subject "Math Analysis & Approaches HL" --per-subtopic 100
  *   node scripts/generate-questions.mjs --subject "Physics SL" --per-subtopic 50 --provider claude
  *   node scripts/generate-questions.mjs --subject "Economics HL" --limit-subtopics 3 --per-subtopic 10
+ *   node scripts/generate-questions.mjs --subject "Physics SL" --provider gemini --gemini-rpm 8
  */
 
 import Anthropic from "@anthropic-ai/sdk";
-import { connect } from "./db.mjs";
+import { connect, loadEnv } from "./db.mjs";
+import { callGemini, geminiPreflight } from "./gemini.mjs";
 import { normaliseText, parseNumber, numbersMatch, looseNumericMatch } from "../lib/grading.js";
 import { figureIsUsable } from "../lib/figures.js";
 
@@ -57,7 +61,12 @@ const LIMIT_SUBTOPICS = parseInt(arg("limit-subtopics", "0"), 10); // 0 = all
  * OpenAI API, so this is the same code path any hosted open-weights provider
  * would use too.
  */
-const PROVIDER = arg("provider", "ollama"); // ollama | vllm | claude
+const PROVIDER = arg("provider", "ollama"); // ollama | vllm | claude | gemini
+const GEMINI_MODEL = arg("gemini-model", "gemini-2.5-flash");
+// Requests per minute. Set it from aistudio.google.com/rate-limit; the default
+// is deliberately under what free tiers have allowed, so a first run is paced
+// rather than refused.
+const GEMINI_RPM = parseFloat(arg("gemini-rpm", "8"));
 const OLLAMA_MODEL = arg("ollama-model", "qwen2.5:14b");
 /**
  * One or more Ollama endpoints, comma separated.
@@ -117,7 +126,9 @@ const AVOID_STEMS = parseInt(arg("avoid-stems", NUM_CTX <= 4096 ? "12" : "40"), 
  */
 const CONCURRENCY = Math.max(
   1,
-  parseInt(arg("concurrency", PROVIDER === "ollama" ? "1" : "16"), 10)
+  // Gemini is paced by requests per minute whatever this says, so more than one
+  // at a time only interleaves the log.
+  parseInt(arg("concurrency", PROVIDER === "ollama" || PROVIDER === "gemini" ? "1" : "16"), 10)
 );
 
 // Stop after this many, for pilots. 0 = no limit.
@@ -650,10 +661,25 @@ async function callOllama(prompt, schema, temperature) {
 async function callModel(prompt, schema, maxTokens, temperature, provider = PROVIDER) {
   if (provider === "claude") return callClaude(prompt, schema, maxTokens, temperature);
   if (provider === "vllm") return callOpenAICompatible(prompt, schema, temperature);
+  if (provider === "gemini") {
+    return callGemini(prompt, schema, {
+      model: GEMINI_MODEL,
+      temperature: temperature ?? 0.8,
+      maxTokens,
+      rpm: GEMINI_RPM,
+      usage: spend,
+    });
+  }
   return callOllama(prompt, schema, temperature);
 }
 
 async function preflight() {
+  if (PROVIDER === "gemini" || VERIFY_PROVIDER === "gemini") {
+    loadEnv();
+    geminiPreflight(GEMINI_MODEL);
+    if (PROVIDER === "gemini" && VERIFY_PROVIDER === "gemini") return;
+  }
+
   if (PROVIDER === "claude" || VERIFY_PROVIDER === "claude") {
     // Failing here, before anything is generated, beats failing on the first
     // call at 2am with a stack trace and a night already lost.
@@ -699,6 +725,8 @@ async function preflight() {
     }
     if (PROVIDER === "vllm") return;
   }
+
+  if (PROVIDER !== "ollama" && VERIFY_PROVIDER !== "ollama") return;
 
   // Every endpoint is checked, because one machine quietly missing the model
   // means half the night's requests fail and the other half carry the load.
@@ -1303,7 +1331,9 @@ async function main() {
       ? MODEL
       : PROVIDER === "vllm"
         ? `${VLLM_MODEL} (served)`
-        : `${OLLAMA_MODEL} (local, free)`;
+        : PROVIDER === "gemini"
+          ? `${GEMINI_MODEL} (free tier, ${GEMINI_RPM}/min)`
+          : `${OLLAMA_MODEL} (local, free)`;
   console.log(`Subject: ${SUBJECT} | target ${PER_SUBTOPIC}/subtopic | ${modelLabel}`);
   await preflight();
 
@@ -1463,6 +1493,7 @@ async function main() {
           consecutiveNoProgress++;
         }
       } catch (err) {
+        if (err.stopRun) throw err;
         console.error(`  batch failed: ${err.message}; waiting 20s`);
         await new Promise((r) => setTimeout(r, 20000));
       }
@@ -1486,6 +1517,13 @@ async function main() {
       try {
         await fillSubtopic(next);
       } catch (err) {
+        // Out of quota for the day: every subtopic after this would fail the
+        // same way, so stop rather than walk the whole list failing.
+        if (err.stopRun) {
+          if (!stopped) console.log(`\n${err.message}`);
+          stopped = true;
+          return;
+        }
         // One bad subtopic must not take the whole run down. It stays
         // unfinished and the next run picks it up, because progress is counted
         // from what is already in the database rather than from memory.

@@ -15,11 +15,19 @@
  *   node scripts/generate-flashcards.mjs --subject "Physics SL"
  *   node scripts/generate-flashcards.mjs --subject "Physics SL" --per-subtopic 8
  *   node scripts/generate-flashcards.mjs --subject "Physics SL" --provider claude
+ *   node scripts/generate-flashcards.mjs --subject "Physics SL" --provider gemini --gemini-rpm 8
+ *
+ * The check can run on a different model from the writing, and on the free
+ * tier it should: a model checking its own card tends to make the same mistake
+ * twice and call that agreement.
+ *
+ *   --provider gemini --verify-provider ollama
  */
 
 import crypto from "node:crypto";
 import Anthropic from "@anthropic-ai/sdk";
-import { connect } from "./db.mjs";
+import { connect, loadEnv } from "./db.mjs";
+import { callGemini, geminiPreflight } from "./gemini.mjs";
 
 const args = process.argv.slice(2);
 const arg = (name, fallback) => {
@@ -33,13 +41,18 @@ const PROVIDER = arg("provider", "ollama");
 const MODEL = arg("ollama-model", "qwen2.5:14b");
 const OLLAMA = arg("ollama-url", "http://localhost:11434");
 const CLAUDE_MODEL = arg("claude-model", "claude-opus-5");
+const GEMINI_MODEL = arg("gemini-model", "gemini-2.5-flash");
+const GEMINI_RPM = parseFloat(arg("gemini-rpm", "8"));
+const VERIFY_PROVIDER = arg("verify-provider", PROVIDER);
 
 if (!SUBJECT) {
   console.error('Pass --subject "Physics SL".');
   process.exit(1);
 }
 
-const anthropic = PROVIDER === "claude" ? new Anthropic() : null;
+loadEnv();
+if (PROVIDER === "gemini" || VERIFY_PROVIDER === "gemini") geminiPreflight(GEMINI_MODEL);
+const anthropic = PROVIDER === "claude" || VERIFY_PROVIDER === "claude" ? new Anthropic() : null;
 
 const CARDS_SCHEMA = {
   type: "object",
@@ -109,8 +122,17 @@ async function callClaude(prompt, schema) {
   return JSON.parse(response.content.find((b) => b.type === "text").text);
 }
 
-const ask = (prompt, schema, temperature) =>
-  PROVIDER === "claude" ? callClaude(prompt, schema) : callOllama(prompt, schema, temperature);
+const callWith = (provider, prompt, schema, temperature) =>
+  provider === "claude"
+    ? callClaude(prompt, schema)
+    : provider === "gemini"
+      ? callGemini(prompt, schema, { model: GEMINI_MODEL, temperature, maxTokens: 8000, rpm: GEMINI_RPM })
+      : callOllama(prompt, schema, temperature);
+
+/** Writing the cards. */
+const ask = (prompt, schema, temperature) => callWith(PROVIDER, prompt, schema, temperature);
+/** Everything that decides whether a card is right. */
+const check = (prompt, schema, temperature) => callWith(VERIFY_PROVIDER, prompt, schema, temperature);
 
 const normalise = (s) =>
   String(s || "")
@@ -200,7 +222,7 @@ async function agreesViaModel(pairs) {
     )
     .join("\n\n");
 
-  const out = await ask(
+  const out = await check(
     `For each numbered item below, two answers to the same question are given. Decide whether they say the same thing.
 
 Different wording is not a difference. "The rate of change of velocity" and "how quickly velocity changes" are the same answer. One being longer, or adding an example, is not a difference either.
@@ -243,7 +265,8 @@ async function judge(pairs) {
     let got = new Map();
     try {
       got = await agreesViaModel(needModel);
-    } catch {
+    } catch (e) {
+      if (e.stopRun) throw e;
       /* fall through to the one-at-a-time pass */
     }
     for (const [j, p] of needModel.entries()) {
@@ -256,7 +279,8 @@ async function judge(pairs) {
       try {
         const one = await agreesViaModel([p]);
         if (one.has(0)) verdict.set(p.original, one.get(0));
-      } catch {
+      } catch (e) {
+        if (e.stopRun) throw e;
         /* leave it unknown */
       }
     }
@@ -290,12 +314,26 @@ async function main() {
   );
   const existing = new Map(have.map((r) => [r.subtopic, r.n]));
 
+  const labelOf = (provider) =>
+    provider === "claude"
+      ? CLAUDE_MODEL
+      : provider === "gemini"
+        ? `${GEMINI_MODEL} (free tier, ${GEMINI_RPM}/min)`
+        : `${MODEL} (local, free)`;
   const label =
-    PROVIDER === "claude" ? CLAUDE_MODEL : `${MODEL} (local, free)`;
+    VERIFY_PROVIDER === PROVIDER
+      ? labelOf(PROVIDER)
+      : `written by ${labelOf(PROVIDER)}, checked by ${labelOf(VERIFY_PROVIDER)}`;
   console.log(`${SUBJECT} (${curriculum}) · ${subtopics.length} subtopics · target ${PER} each · ${label}\n`);
 
   let written = 0;
   let rejected = 0;
+
+  // Out of quota: every subtopic after this one would fail the same way.
+  const stopForToday = (e) => {
+    console.log(`stopped\n\n${e.message}\n\n${written} written this run.`);
+    process.exit(0);
+  };
 
   for (const { topic, subtopic } of subtopics) {
     const already = existing.get(subtopic) || 0;
@@ -327,6 +365,7 @@ Rules:
       );
       cards = (made.cards || []).filter((c) => c.front?.trim() && c.back?.trim()).slice(0, want);
     } catch (e) {
+      if (e.stopRun) return stopForToday(e);
       console.log(`generation failed — ${e.message.slice(0, 60)}`);
       continue;
     }
@@ -340,7 +379,7 @@ Rules:
     let answers = [];
     try {
       const listing = cards.map((c, i) => `${i}. ${c.front}`).join("\n");
-      const checked = await ask(
+      const checked = await check(
         `Answer each of these ${curriculum} ${SUBJECT} questions from your own knowledge.
 
 Give the answer only, in one or two sentences. If a question cannot be answered as written — because it is ambiguous, or does not say what it is about — set answerable to false.
@@ -351,6 +390,7 @@ ${listing}`,
       );
       answers = checked.answers || [];
     } catch (e) {
+      if (e.stopRun) return stopForToday(e);
       console.log(`verification failed — ${e.message.slice(0, 60)}`);
       continue;
     }
@@ -375,6 +415,7 @@ ${listing}`,
         kept = survivors.filter((_, i) => verdicts.get(i) === true).map((s) => s.card);
         if (unknown) process.stdout.write(`(${unknown} unjudged) `);
       } catch (e) {
+        if (e.stopRun) return stopForToday(e);
         console.log(`comparison failed — ${e.message.slice(0, 50)}`);
         continue;
       }
