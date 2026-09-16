@@ -55,6 +55,10 @@ export default function FlashcardsPage() {
   const [saving, setSaving] = useState(false)
   const [proposed, setProposed] = useState(null)
   const [sessionStats, setSessionStats] = useState({ right: 0, wrong: 0 })
+  // Ready-made decks available for the subjects this student takes, and which
+  // of them they have already taken a copy of.
+  const [presets, setPresets] = useState([])
+  const [startingDeck, setStartingDeck] = useState('')
 
   const router = useRouter()
   const supabase = createClient()
@@ -73,7 +77,9 @@ export default function FlashcardsPage() {
     setProfile(profileData)
     setDraft((d) => ({ ...d, subject: d.subject || accessibleSubjects(profileData)[0] || '' }))
 
-    const [{ data: cardRows }, { data: noteRows }] = await Promise.all([
+    const usable = accessibleSubjects(profileData)
+
+    const [{ data: cardRows }, { data: noteRows }, { data: presetRows }] = await Promise.all([
       supabase
         .from('flashcards')
         .select('*')
@@ -84,8 +90,17 @@ export default function FlashcardsPage() {
         .select('id, subject, subtopic, body')
         .eq('user_id', user.id)
         .order('updated_at', { ascending: false }),
+      // Only the verified ones are readable at all, so this needs no filter of
+      // its own beyond the subjects they actually take.
+      usable.length
+        ? supabase
+            .from('flashcard_presets')
+            .select('subject, topic, subtopic')
+            .in('subject', usable)
+        : Promise.resolve({ data: [] }),
     ])
 
+    setPresets(presetRows || [])
     setCards(cardRows || [])
     setNotes((noteRows || []).filter((n) => (n.body || '').trim().length > 20))
     setLoading(false)
@@ -133,6 +148,56 @@ export default function FlashcardsPage() {
   )
 
   const dueInScope = useMemo(() => inScope.filter(isDue), [inScope])
+
+  /**
+   * Ready-made decks the student has not taken yet.
+   *
+   * "Not taken" is by front text rather than by a flag, because that is what
+   * start_preset_deck() skips on. A deck that has gained cards since you
+   * started it shows the number still missing rather than disappearing, so a
+   * top-up is one press and never a duplicate.
+   */
+  const availablePresets = useMemo(() => {
+    const mine = new Set(cards.map((c) => `${c.subject}||${c.front}`))
+    const bySubtopic = new Map()
+    for (const p of presets) {
+      const key = `${p.subject}||${p.subtopic}`
+      const entry = bySubtopic.get(key) || { subject: p.subject, topic: p.topic, subtopic: p.subtopic, total: 0 }
+      entry.total++
+      bySubtopic.set(key, entry)
+    }
+    // How many of each deck are already in their own cards.
+    const held = new Map()
+    for (const c of cards) {
+      const key = `${c.subject}||${c.subtopic}`
+      held.set(key, (held.get(key) || 0) + 1)
+    }
+    return [...bySubtopic.values()]
+      .map((d) => ({ ...d, have: held.get(`${d.subject}||${d.subtopic}`) || 0 }))
+      .filter((d) => d.have < d.total)
+      .filter((d) => !openDeck || d.subject === openDeck)
+      .sort((a, b) => a.subject.localeCompare(b.subject) || a.subtopic.localeCompare(b.subtopic))
+  }, [presets, cards, openDeck])
+
+  /** Copy a ready-made deck into this student's own cards. */
+  const startPreset = useCallback(
+    async (deck) => {
+      const key = `${deck.subject}||${deck.subtopic}`
+      setStartingDeck(key)
+      setError('')
+      const { data, error: rpcError } = await supabase.rpc('start_preset_deck', {
+        p_subject: deck.subject,
+        p_subtopic: deck.subtopic,
+      })
+      setStartingDeck('')
+      if (rpcError) {
+        setError(rpcError.message)
+        return
+      }
+      if (data > 0) await load()
+    },
+    [supabase, load]
+  )
   const totalDue = useMemo(() => cards.filter(isDue).length, [cards])
 
   /* ----------------------------------------------------------------- review */
@@ -411,6 +476,63 @@ export default function FlashcardsPage() {
                     </div>
                   </button>
                 ))}
+              </div>
+            )}
+
+            {/* Decks somebody already wrote.
+                Writing your own cards is the better way to learn and also the
+                one nobody does at eleven at night. A ready-made deck per
+                subtopic is the version that actually gets used, and taking one
+                copies it into your own cards so the scheduling is yours. */}
+            {availablePresets.length > 0 && (
+              <div className="mb-10 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
+                <div className="mb-1 flex flex-wrap items-baseline justify-between gap-3">
+                  <h2 className="text-[15px] font-semibold tracking-[-0.012em]">Ready-made decks</h2>
+                  <span className="text-[12.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
+                    {availablePresets.length} available
+                  </span>
+                </div>
+                <p className="mb-4 text-[13px]" style={{ color: 'var(--text-muted)' }}>
+                  Written for one subtopic and checked before anybody sees them. Taking a deck
+                  copies it into your cards, so the schedule and anything you delete are yours.
+                </p>
+
+                <ul className="flex flex-col">
+                  {availablePresets.map((deck) => {
+                    const key = `${deck.subject}||${deck.subtopic}`
+                    const missing = deck.total - deck.have
+                    const partial = deck.have > 0
+                    return (
+                      <li
+                        key={key}
+                        className="flex items-center gap-4 border-b py-3 last:border-b-0"
+                        style={{ borderColor: 'var(--border)' }}
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
+                            {deck.subject}
+                          </p>
+                          <p className="mt-0.5 truncate text-[14px]" style={{ color: 'var(--text-body)' }}>
+                            {displaySubtopic(deck.subtopic)}
+                          </p>
+                        </div>
+                        <span
+                          className="shrink-0 text-[12.5px] tabular-nums"
+                          style={{ color: 'var(--text-faint)' }}
+                        >
+                          {partial ? `${missing} new` : `${deck.total} cards`}
+                        </span>
+                        <button
+                          onClick={() => startPreset(deck)}
+                          disabled={startingDeck === key}
+                          className="btn btn-outline control-sm shrink-0 disabled:opacity-40"
+                        >
+                          {startingDeck === key ? 'Adding' : partial ? 'Top up' : 'Add'}
+                        </button>
+                      </li>
+                    )
+                  })}
+                </ul>
               </div>
             )}
 
