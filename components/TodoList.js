@@ -59,6 +59,8 @@ export default function TodoList({
   const [draft, setDraft] = useState('')
   const [error, setError] = useState('')
   const [showDone, setShowDone] = useState(false)
+  // Which row is open for editing. One at a time: this is a list, not a form.
+  const [openId, setOpenId] = useState(null)
   const [userId, setUserId] = useState(null)
   const supabase = createClient()
   const inputRef = useRef(null)
@@ -152,6 +154,19 @@ export default function TodoList({
     [supabase]
   )
 
+  const patch = useCallback(
+    async (todo, changes) => {
+      const before = todo
+      setTodos((prev) => prev.map((t) => (t.id === todo.id ? { ...t, ...changes } : t)))
+      const { error: updateError } = await supabase.from('todos').update(changes).eq('id', todo.id)
+      if (updateError) {
+        setTodos((prev) => prev.map((t) => (t.id === todo.id ? before : t)))
+        setError(updateError.message)
+      }
+    },
+    [supabase]
+  )
+
   const remove = useCallback(
     async (todo) => {
       const before = todos
@@ -213,15 +228,22 @@ export default function TodoList({
                   {todo.done && <IconCheck width={11} height={11} />}
                 </button>
 
-                <span
-                  className="min-w-0 flex-1 text-[14px] leading-snug"
+                <button
+                  onClick={() => setOpenId(openId === todo.id ? null : todo.id)}
+                  className="min-w-0 flex-1 text-left text-[14px] leading-snug"
                   style={{
                     color: todo.done ? 'var(--text-faint)' : 'var(--text-body)',
                     textDecoration: todo.done ? 'line-through' : undefined,
                   }}
+                  title="Open for a date, a subject and notes"
                 >
                   {todo.title}
-                </span>
+                  {todo.note && (
+                    <span className="ml-2 text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
+                      ·
+                    </span>
+                  )}
+                </button>
 
                 {todo.subject && (
                   <span
@@ -254,6 +276,76 @@ export default function TodoList({
               </li>
             )
   }
+
+  /**
+   * The detail, under the row that opened it.
+   *
+   * A date, a subject and a note — the three things that were either being
+   * crammed into the title or lost. Written on change rather than behind a
+   * Save button, because a panel with a Save button is a form again.
+   */
+  const renderDetail = (todo) => (
+    <li
+      key={`${todo.id}-detail`}
+      className="pop-enter border-b px-1 pb-4 pt-1"
+      style={{ borderColor: 'var(--border)' }}
+    >
+      <div className="flex flex-wrap items-center gap-2">
+        <input
+          type="date"
+          value={todo.due_on || ''}
+          onChange={(e) => patch(todo, { due_on: e.target.value || null })}
+          aria-label="Due date"
+          className="input control-sm"
+          style={{ width: 150 }}
+        />
+        {subjects.length > 0 && (
+          <select
+            value={todo.subject || ''}
+            onChange={(e) => patch(todo, { subject: e.target.value || null })}
+            aria-label="Subject"
+            className="input control-sm"
+            style={{ width: 190 }}
+          >
+            <option value="">No subject</option>
+            {subjects.map((subject) => (
+              <option key={subject} value={subject}>
+                {subject}
+              </option>
+            ))}
+          </select>
+        )}
+        <button
+          onClick={() => patch(todo, { due_on: dayKey() })}
+          className="btn btn-quiet control-sm"
+        >
+          Today
+        </button>
+        <button
+          onClick={() => {
+            const d = new Date()
+            d.setDate(d.getDate() + 1)
+            patch(todo, { due_on: dayKey(d) })
+          }}
+          className="btn btn-quiet control-sm"
+        >
+          Tomorrow
+        </button>
+      </div>
+
+      <textarea
+        rows={2}
+        defaultValue={todo.note || ''}
+        onBlur={(e) => {
+          const value = e.target.value.trim()
+          if (value !== (todo.note || '')) patch(todo, { note: value || null })
+        }}
+        placeholder="Notes — what it needs, where it is, who asked for it"
+        className="input mt-2 w-full resize-y text-[13px]"
+        style={{ height: 'auto', padding: '8px 12px' }}
+      />
+    </li>
+  )
 
   if (loading) {
     return (
@@ -348,7 +440,13 @@ export default function TodoList({
                   {bucket === 'done' ? 'Done' : BUCKET_LABELS[bucket]}
                 </p>
               )}
-              <ul className="flex flex-col">{items.map(renderRow)}</ul>
+              <ul className="flex flex-col">
+                {items.flatMap((todo) =>
+                  openId === todo.id && !compact
+                    ? [renderRow(todo), renderDetail(todo)]
+                    : [renderRow(todo)]
+                )}
+              </ul>
             </section>
           ))}
         </div>
