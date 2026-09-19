@@ -34,6 +34,7 @@ import { connect, loadEnv } from "./db.mjs";
 import { callGemini, geminiPreflight } from "./gemini.mjs";
 import { normaliseText, parseNumber, numbersMatch, looseNumericMatch } from "../lib/grading.js";
 import { figureIsUsable } from "../lib/figures.js";
+import { markschemeProfile } from "../lib/markscheme.js";
 
 // ---------------------------------------------------------------------------
 // Config
@@ -330,6 +331,45 @@ const STIMULUS_SCHEMA = {
   },
 };
 
+/**
+ * What earns the marks.
+ *
+ * Optional, and deliberately so: a one-mark recall question has nothing to put
+ * here, and a scheme invented for one would be the explanation written twice.
+ * Where it matters — history, economics, geography, anything marked on points
+ * rather than on a single value — it is the difference between feedback and a
+ * right answer.
+ */
+const MARKSCHEME_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  required: ["command_term", "points"],
+  properties: {
+    command_term: {
+      type: "string",
+      description: "The IB command term the question uses: State, Explain, Calculate, Compare, Evaluate.",
+    },
+    points: {
+      type: "array",
+      description:
+        "What an examiner gives marks for, in the order an answer would make them. Each is one specific thing a student either wrote or did not.",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["point", "marks"],
+        properties: {
+          point: { type: "string" },
+          marks: { type: "integer", enum: [1, 2] },
+        },
+      },
+    },
+    guidance: {
+      type: "string",
+      description: "What else examiners accept, or a common answer that earns nothing. Optional.",
+    },
+  },
+};
+
 const HINT_DESCRIPTION_TEXT =
   "One sentence pointing at where in the extract to look. Never the answer.";
 
@@ -363,6 +403,7 @@ const TEXT_MCQ_SCHEMA = {
           correct_answer: { type: "string", enum: ["a", "b", "c", "d"] },
           explanation: { type: "string" },
           hint: { type: "string", description: HINT_DESCRIPTION_TEXT },
+          markscheme: MARKSCHEME_SCHEMA,
           marks: { type: "integer", enum: [1, 2, 3] },
           time_budget_seconds: { type: "integer", enum: [30, 45, 60, 75, 90, 120, 150, 180] },
           difficulty: { type: "number" },
@@ -389,6 +430,7 @@ const TEXT_SHORT_SCHEMA = {
           accepted_answers: { type: "array", items: { type: "string" }, minItems: 1 },
           explanation: { type: "string" },
           hint: { type: "string", description: HINT_DESCRIPTION_TEXT },
+          markscheme: MARKSCHEME_SCHEMA,
           marks: { type: "integer", enum: [1, 2, 3] },
           time_budget_seconds: { type: "integer", enum: [30, 45, 60, 75, 90, 120, 150, 180] },
           difficulty: { type: "number" },
@@ -445,6 +487,7 @@ const SHORT_ANSWER_SCHEMA = {
           },
           explanation: { type: "string", description: "One or two sentences of working." },
           hint: { type: "string", description: HINT_DESCRIPTION },
+          markscheme: MARKSCHEME_SCHEMA,
           figure: FIGURE_SCHEMA,
           marks: { type: "integer", enum: [1, 2, 3] },
           time_budget_seconds: { type: "integer", enum: [30, 45, 60, 75, 90, 120, 150, 180] },
@@ -1121,6 +1164,17 @@ For every question:
 - Put any required rounding or unit in answer_hint, e.g. "to 3 significant figures".
 - For text, list the spellings that should pass: ["mitochondrion", "mitochondria"].
 
+${
+      markschemeProfile(SUBJECT).style === "points"
+        ? `Every question worth 2 or 3 marks must carry a markscheme: the command term, and
+what an examiner gives each mark for, in the order an answer would make them. One
+specific thing per point — "identifies that demand is price inelastic", not "good
+understanding". A student marks their own answer against it, so a point they cannot
+check themselves is a wasted line. A 1-mark question does not need one.`
+        : `Do not write a markscheme. This subject is marked on criteria bands rather than
+on points, and a list of marking points would misrepresent how the paper works.`
+    }
+
 Good: "A car travels at 20 m/s around a track of radius 50 m. Calculate its
 centripetal acceleration." -> accepted_answers ["8", "8.0"], numeric, hint "in m/s^2".
 
@@ -1420,6 +1474,7 @@ async function main() {
             answer_hint: q.answer_hint || null,
             explanation: q.explanation,
             hint: q.hint || null,
+            markscheme: q.markscheme?.points?.length ? q.markscheme : null,
             // Only the wrong options carry feedback. Storing an empty string
             // for the correct one would make the UI think there is something
             // to say about picking the right answer.
@@ -1450,10 +1505,10 @@ async function main() {
                    (curriculum, subject, topic, subtopic, question_type, stem, options,
                     correct_answer, accepted_answers, answer_kind, answer_hint,
                     explanation, hint, option_feedback, figure,
-                    stimulus, stimulus_kind,
+                    stimulus, stimulus_kind, markscheme,
                     marks, time_budget_seconds, difficulty, source, verified)
                  VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,$9::jsonb,$10,$11,$12,$13,
-                         $14::jsonb,$15::jsonb,$16,$17,$18,$19,$20,$21,$22)
+                         $14::jsonb,$15::jsonb,$16,$17,$18::jsonb,$19,$20,$21,$22,$23)
                  ON CONFLICT DO NOTHING`,
                 [
                   row.curriculum, row.subject, row.topic, row.subtopic, row.question_type,
@@ -1468,6 +1523,7 @@ async function main() {
                     : null,
                   row.figure ? JSON.stringify(row.figure) : null,
                   row.stimulus, row.stimulus_kind,
+                  row.markscheme ? JSON.stringify(row.markscheme) : null,
                   row.marks, row.time_budget_seconds, row.difficulty, row.source, row.verified,
                 ]
               );

@@ -6,6 +6,7 @@ import Link from 'next/link'
 import CopyButton from '@/components/CopyButton'
 import QuestionMenu from '@/components/QuestionMenu'
 import Calculator from '@/components/Calculator'
+import MarkScheme from '@/components/MarkScheme'
 import HeatBadge from '@/components/HeatBadge'
 import QuestionFigure from '@/components/QuestionFigure'
 import QuestionStimulus from '@/components/QuestionStimulus'
@@ -1058,6 +1059,7 @@ export default function QuizRunner({
                 {q.explanation}
               </p>
             )}
+            <MarkScheme question={q} />
           </div>
         )}
 
@@ -1271,6 +1273,10 @@ export default function QuizRunner({
                         {g.question.explanation}
                       </p>
                     )}
+                    {/* For a written answer, what the marks were actually for.
+                        "The answer is X" is not much use after a six-marker. */}
+                    <MarkScheme question={g.question} />
+
                     <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
                       <HeatBadge difficulty={g.question.difficulty} showPoints />
                       <span
@@ -1292,7 +1298,7 @@ export default function QuizRunner({
 
         <div className="mt-10 flex flex-wrap items-center gap-3">
           <Link href="/dashboard/mistakes" className="btn btn-solid control-md">
-            Open Mistake Bank
+            Open Redemption
           </Link>
           <Link href={backHref} className="btn btn-quiet control-md">
             Done
