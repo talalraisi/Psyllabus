@@ -105,8 +105,11 @@ export default function TestBuilderPage() {
   const [unitBySubtopic, setUnitBySubtopic] = useState({})
   // 'questions' | 'marks' | 'minutes' — how the length is counted out.
   const [lengthMetric, setLengthMetric] = useState('questions')
-  const [review, setReview] = useState('exam')
-  const [hintsAllowed, setHintsAllowed] = useState(true)
+  const [review, setReview] = useState('practice')
+  // Hints follow exam mode rather than having a switch of their own: a real
+  // paper has no hint button, and two toggles for one idea is how a builder
+  // becomes a settings page.
+  const hintsAllowed = review !== 'exam'
   const [length, setLength] = useState(20)
   const [timed, setTimed] = useState(true)
   const [qtype, setQtype] = useState('all')
@@ -503,8 +506,6 @@ export default function TestBuilderPage() {
           budgetMinutes={budgetMinutes}
           review={review}
           onReview={setReview}
-          hintsAllowed={hintsAllowed}
-          onHintsAllowed={setHintsAllowed}
           paper={{
             canStart,
             actualLength,

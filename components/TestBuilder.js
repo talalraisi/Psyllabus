@@ -156,7 +156,7 @@ export default function TestBuilder({
   lengthMetric, onLengthMetric, lengthPresets, lengthUnit,
   length, onLength, customLength, onCustomLength,
   timed, onTimed, customMinutes, onCustomMinutes, budgetMinutes,
-  review, onReview, hintsAllowed, onHintsAllowed,
+  review, onReview,
   paper, onStart,
 }) {
   const [step, setStep] = useState(0)
@@ -555,12 +555,7 @@ export default function TestBuilder({
               label="Exam mode"
               hint="Nothing is marked until you finish, the way a real paper works."
             />
-            <Toggle
-              on={!hintsAllowed}
-              onClick={() => onHintsAllowed(!hintsAllowed)}
-              label="No hints"
-              hint="Hides the hint button, the way the real paper does."
-            />
+
           </div>
 
           {/* The paper, once there is one. Last screen rather than a sidebar. */}

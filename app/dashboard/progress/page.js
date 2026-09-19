@@ -11,6 +11,7 @@ import { Page, PageHeader, Section, StatRow } from '@/components/PageShell'
 import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { mergeSyllabusWithProgress } from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
+import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
 
 // Read left to right this is the ladder itself: everything tracked, then the
 // same subtopics sorted by how well they are actually held.
@@ -63,7 +64,10 @@ export default function ProgressPage() {
       }
 
       setProfile(profileData)
-      const subjects = profileData.subjects || []
+      // The core is not quizzed, so it cannot be measured here: every one of
+      // its rows would sit at 0% for ever and drag the overall figure down
+      // with it. It has its own page, where ticking things off is the point.
+      const subjects = (profileData.subjects || []).filter((s) => !IB_CORE_SUBJECTS.includes(s))
 
       const [syllabusRows, { data: progressRows }] = await Promise.all([
         getSyllabus(supabase, subjects),
@@ -97,7 +101,7 @@ export default function ProgressPage() {
     )
   }
 
-  const subjects = profile.subjects || []
+  const subjects = (profile.subjects || []).filter((s) => !IB_CORE_SUBJECTS.includes(s))
   const overallPercent = summary.total
     ? Math.round((summary.mastered / summary.total) * 100)
     : 0

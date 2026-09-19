@@ -134,6 +134,7 @@ export default function SubjectsPage() {
   const core = all.filter((s) => IB_CORE_SUBJECTS.includes(s))
 
   const canSwitch = canSwitchFreeSubject(profile)
+  const freeSubjectName = freeSubject(profile)
 
   const SubjectCard = ({ subject, locked }) => {
     const count = counts[subject] ?? 0
@@ -224,24 +225,28 @@ export default function SubjectsPage() {
 
         {locked ? (
           <div className="mt-auto flex flex-col gap-2">
+            {/* What the lock actually is: a free account studies one subject,
+                and the hold stops it being swapped daily to read the whole
+                syllabus a subject at a time. "Locked for 30d" explained none
+                of that and read like the subject itself was expiring. */}
+            <p className="text-[12.5px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
+              {canSwitch.allowed
+                ? `Your free account studies one subject. Right now that is ${freeSubjectName || 'another subject'}.`
+                : `Your free subject is ${freeSubjectName || 'set'} until ${canSwitch.daysLeft} day${canSwitch.daysLeft === 1 ? '' : 's'} from now.`}
+            </p>
             <button
               onClick={() => chooseFreeSubject(subject)}
               disabled={!!switching || !canSwitch.allowed}
-              title={
-                canSwitch.allowed
-                  ? undefined
-                  : `You can change subject again in ${canSwitch.daysLeft} day${canSwitch.daysLeft === 1 ? '' : 's'}`
-              }
-              className="btn btn-outline control-md w-full"
+              className="btn btn-outline control-md w-full disabled:opacity-40"
             >
               {switching === subject
                 ? 'Switching'
                 : canSwitch.allowed
-                  ? 'Study this one instead'
-                  : `Locked for ${canSwitch.daysLeft}d`}
+                  ? 'Make this my free subject'
+                  : 'Cannot switch yet'}
             </button>
             <Link href="/dashboard/profile#unlock" className="btn btn-quiet control-md w-full">
-              Unlock everything
+              Unlock every subject
             </Link>
           </div>
         ) : (
