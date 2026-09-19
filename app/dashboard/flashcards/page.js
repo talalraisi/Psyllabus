@@ -58,8 +58,6 @@ export default function FlashcardsPage() {
   // Ready-made decks available for the subjects this student takes, and which
   // of them they have already taken a copy of.
   const [presets, setPresets] = useState([])
-  const [startingDeck, setStartingDeck] = useState('')
-  const [startingSubject, setStartingSubject] = useState('')
   const [openPresetSubject, setOpenPresetSubject] = useState(null)
 
   const router = useRouter()
@@ -97,7 +95,8 @@ export default function FlashcardsPage() {
       usable.length
         ? supabase
             .from('flashcard_presets')
-            .select('subject, topic, subtopic')
+            .select('id, subject, topic, subtopic, front, back')
+            .eq('verified', true)
             .in('subject', usable)
         : Promise.resolve({ data: [] }),
     ])
@@ -164,8 +163,13 @@ export default function FlashcardsPage() {
     const bySubtopic = new Map()
     for (const p of presets) {
       const key = `${p.subject}||${p.subtopic}`
-      const entry = bySubtopic.get(key) || { subject: p.subject, topic: p.topic, subtopic: p.subtopic, total: 0 }
+      const entry =
+        bySubtopic.get(key) ||
+        { subject: p.subject, topic: p.topic, subtopic: p.subtopic, total: 0, cards: [] }
       entry.total++
+      // Marked so the reviewer knows this card is not the student's yet.
+      entry.cards.push({ ...p, preset: true, box: 1, reviews: 0 })
+      if (mine.has(`${p.subject}||${p.front}`)) entry.cards.pop()
       bySubtopic.set(key, entry)
     }
     // How many of each deck are already in their own cards.
@@ -199,56 +203,6 @@ export default function FlashcardsPage() {
     return [...map.values()].sort((a, b) => b.cards - a.cards)
   }, [availablePresets])
 
-  /** Copy a ready-made deck into this student's own cards. */
-  const startPreset = useCallback(
-    async (deck) => {
-      const key = `${deck.subject}||${deck.subtopic}`
-      setStartingDeck(key)
-      setError('')
-      const { data, error: rpcError } = await supabase.rpc('start_preset_deck', {
-        p_subject: deck.subject,
-        p_subtopic: deck.subtopic,
-      })
-      setStartingDeck('')
-      if (rpcError) {
-        setError(rpcError.message)
-        return
-      }
-      if (data > 0) await load()
-    },
-    [supabase, load]
-  )
-
-  /**
-   * Take every ready-made deck for a subject at once.
-   *
-   * One request per subtopic, run in series rather than in parallel: this is
-   * the same RPC the single button calls, and thirty of them at once is a
-   * thundering herd for a button somebody pressed out of curiosity. Reloading
-   * happens once, at the end.
-   */
-  const startSubjectPresets = useCallback(
-    async (group) => {
-      setStartingSubject(group.subject)
-      setError('')
-      let added = 0
-      for (const deck of group.decks) {
-        const { data, error: rpcError } = await supabase.rpc('start_preset_deck', {
-          p_subject: deck.subject,
-          p_subtopic: deck.subtopic,
-        })
-        if (rpcError) {
-          setError(rpcError.message)
-          break
-        }
-        added += data || 0
-      }
-      setStartingSubject('')
-      if (added > 0) await load()
-    },
-    [supabase, load]
-  )
-
   const totalDue = useMemo(() => cards.filter(isDue).length, [cards])
 
   /* ----------------------------------------------------------------- review */
@@ -264,6 +218,37 @@ export default function FlashcardsPage() {
       ...s,
       [correct ? 'right' : 'wrong']: s[correct ? 'right' : 'wrong'] + 1,
     }))
+
+    /**
+     * A ready-made card becomes yours the moment you answer it.
+     *
+     * Asking somebody to "add" a deck before studying it is a decision about
+     * a deck they have not seen. So the decks are simply offered, and the
+     * first time a card is reviewed it is copied into their own — which is
+     * what makes the schedule theirs to keep.
+     */
+    if (card.preset) {
+      const user = await getCurrentUser(supabase)
+      if (!user) return
+      const patch = scheduleAfter({ box: 1, reviews: 0 }, correct)
+      const { data } = await supabase
+        .from('flashcards')
+        .insert({
+          user_id: user.id,
+          subject: card.subject,
+          topic: card.topic || null,
+          subtopic: card.subtopic || null,
+          front: card.front,
+          back: card.back,
+          source: 'preset',
+          ...patch,
+        })
+        .select()
+        .single()
+      if (data) setCards((prev) => [data, ...prev])
+      return
+    }
+
     // Cramming a card that is not due should not drag its real schedule
     // around: the night before a test is not new evidence about next month.
     if (reviewing?.cramming && !isDue(card)) return
@@ -551,20 +536,19 @@ export default function FlashcardsPage() {
             {availablePresets.length > 0 && (
               <div className="mb-10 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
                 <div className="mb-1 flex flex-wrap items-baseline justify-between gap-3">
-                  <h2 className="text-[15px] font-semibold tracking-[-0.012em]">Ready-made decks</h2>
+                  <h2 className="text-[15px] font-semibold tracking-[-0.012em]">Decks on offer</h2>
                   <span className="text-[12.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
                     {availablePresets.length} available
                   </span>
                 </div>
                 <p className="mb-4 text-[13px]" style={{ color: 'var(--text-muted)' }}>
-                  Written for one subtopic and checked before anybody sees them. Taking a deck
-                  copies it into your cards, so the schedule and anything you delete are yours.
+                  Checked before anybody sees them. Study one now — a card becomes yours, with its
+                  own schedule, the first time you answer it.
                 </p>
 
                 <ul className="stagger flex flex-col">
                   {presetsBySubject.map((group) => {
                     const expanded = openPresetSubject === group.subject
-                    const busy = startingSubject === group.subject
                     return (
                       <li
                         key={group.subject}
@@ -588,11 +572,15 @@ export default function FlashcardsPage() {
                             </p>
                           </button>
                           <button
-                            onClick={() => startSubjectPresets(group)}
-                            disabled={busy}
-                            className="btn btn-outline control-sm shrink-0 disabled:opacity-40"
+                            onClick={() =>
+                              review(
+                                group.decks.flatMap((d) => d.cards).slice(0, 20),
+                                false
+                              )
+                            }
+                            className="btn btn-outline control-sm shrink-0"
                           >
-                            {busy ? 'Adding' : 'Add all'}
+                            Study
                           </button>
                         </div>
 
@@ -617,12 +605,12 @@ export default function FlashcardsPage() {
                                     {partial ? `${missing} new` : deck.total}
                                   </span>
                                   <button
-                                    onClick={() => startPreset(deck)}
-                                    disabled={startingDeck === key || busy}
+                                    onClick={() => review(deck.cards, false)}
+                                    disabled={!deck.cards.length}
                                     className="shrink-0 text-[12.5px] font-medium underline-offset-2 hover:underline disabled:opacity-40"
                                     style={{ color: 'var(--brand)' }}
                                   >
-                                    {startingDeck === key ? 'Adding' : partial ? 'Top up' : 'Add'}
+                                    Study
                                   </button>
                                 </li>
                               )
