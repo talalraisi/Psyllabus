@@ -45,6 +45,49 @@ const REASON_STYLE = {
   event: 'text-[var(--status-weak)] font-medium',
 }
 
+/**
+ * A percentage you can see at a glance.
+ *
+ * The only decorative thing on the page, and it earns its place: "38%" read as
+ * a number takes a moment to place, read as part of a circle takes none.
+ */
+function Ring({ percent }) {
+  const size = 46
+  const stroke = 4
+  const radius = (size - stroke) / 2
+  const circumference = 2 * Math.PI * radius
+  const filled = Math.max(0, Math.min(100, percent)) / 100
+
+  return (
+    <div className="relative shrink-0" style={{ width: size, height: size }}>
+      <svg width={size} height={size} aria-hidden="true">
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="var(--border-strong)"
+          strokeWidth={stroke}
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="var(--brand)"
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          strokeDasharray={`${circumference * filled} ${circumference}`}
+          transform={`rotate(-90 ${size / 2} ${size / 2})`}
+        />
+      </svg>
+      <span className="absolute inset-0 flex items-center justify-center text-[12.5px] font-semibold tabular-nums">
+        {percent}
+      </span>
+    </div>
+  )
+}
+
 export default function Dashboard() {
   const [profile, setProfile] = useState(null)
   const [subjectStats, setSubjectStats] = useState({})
@@ -232,8 +275,8 @@ export default function Dashboard() {
             reference underneath it. */}
         {nextUp ? (
           <section
-            className="mb-12 border-t pt-7"
-            style={{ borderColor: 'var(--border)' }}
+            className="mb-8 rounded-[16px] border p-6 sm:p-7"
+            style={{ borderColor: 'var(--brand)', background: 'var(--brand-tint)' }}
           >
             <p
               className="text-[10.5px] font-semibold uppercase tracking-[0.16em]"
@@ -281,7 +324,10 @@ export default function Dashboard() {
             </div>
           </section>
         ) : (
-          <section className="mb-12 border-t pt-7" style={{ borderColor: 'var(--border)' }}>
+          <section
+            className="mb-8 rounded-[16px] border p-6 sm:p-7"
+            style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+          >
             <h2 className="text-[clamp(1.35rem,2.8vw,1.8rem)] font-semibold tracking-[-0.028em]">
               Everything is secure
             </h2>
@@ -301,17 +347,55 @@ export default function Dashboard() {
 
         {/* The numbers, once there are any. On a new account these are all
             zero, which says nothing and looks like a broken page. */}
+        {/* Three cards, each of which is a thing you might act on, rather
+            than five numbers in a row that a student has to rank themselves.
+            The ring is the only decoration: a percentage is easier to feel
+            than to read. */}
         {hasActivity && (
-          <div className="mb-12">
-            <StatRow
-              stats={[
-                { label: 'mastered', value: counts.mastered, tone: 'var(--status-mastered)' },
-                { label: 'fading', value: counts.decaying, tone: 'var(--status-fading)' },
-                { label: 'weak', value: counts.weak, tone: 'var(--status-weak)' },
-                { label: 'reviews due', value: counts.due },
-                { label: 'of the syllabus mastered', value: `${overall}%`, tone: 'var(--brand)' },
-              ]}
-            />
+          <div className="stagger mb-10 grid gap-3 sm:grid-cols-3">
+            <div
+              className="flex items-center gap-4 rounded-[14px] border p-5"
+              style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+            >
+              <Ring percent={overall} />
+              <div className="min-w-0">
+                <p className="text-[13px] font-medium">Syllabus mastered</p>
+                <p className="mt-1 text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
+                  {counts.mastered} subtopic{counts.mastered === 1 ? '' : 's'} proved
+                </p>
+              </div>
+            </div>
+
+            <Link
+              href="/dashboard/study-plan"
+              className="rounded-[14px] border p-5 transition-colors hover:border-[var(--border-hover)]"
+              style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+            >
+              <p className="text-[26px] font-semibold leading-none tabular-nums">
+                {counts.weak + counts.decaying}
+              </p>
+              <p className="mt-2 text-[13px] font-medium">Needs attention</p>
+              <p className="mt-1 text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
+                {counts.weak} weak · {counts.decaying} fading
+              </p>
+            </Link>
+
+            <Link
+              href="/dashboard/mistakes"
+              className="rounded-[14px] border p-5 transition-colors hover:border-[var(--border-hover)]"
+              style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+            >
+              <p
+                className="text-[26px] font-semibold leading-none tabular-nums"
+                style={{ color: counts.due > 0 ? 'var(--brand)' : undefined }}
+              >
+                {counts.due}
+              </p>
+              <p className="mt-2 text-[13px] font-medium">Redemption due</p>
+              <p className="mt-1 text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
+                {counts.due > 0 ? 'Questions waiting to be cleared' : 'Nothing waiting'}
+              </p>
+            </Link>
           </div>
         )}
 
