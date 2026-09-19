@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import CopyButton from '@/components/CopyButton'
 import QuestionMenu from '@/components/QuestionMenu'
+import Calculator from '@/components/Calculator'
 import HeatBadge from '@/components/HeatBadge'
 import QuestionFigure from '@/components/QuestionFigure'
 import QuestionStimulus from '@/components/QuestionStimulus'
@@ -152,6 +153,7 @@ export default function QuizRunner({
   const [mistakeRowsById, setMistakeRowsById] = useState({})
   // Which of this quiz's questions are here because you got them wrong before.
   const [redemptionIds, setRedemptionIds] = useState(() => new Set())
+  const [calcOpen, setCalcOpen] = useState(false)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState({})
   const [results, setResults] = useState(null)
@@ -885,6 +887,16 @@ export default function QuizRunner({
               Question {currentIndex + 1} of {questions.length} · {answeredCount} answered
             </p>
             <div className="flex items-center gap-4">
+              {/* A calculator on the same screen as the question. Closed until
+                  asked for, so a language paper never sees it. */}
+              <button
+                onClick={() => setCalcOpen((v) => !v)}
+                aria-pressed={calcOpen}
+                className="text-[12.5px] font-medium underline-offset-2 hover:underline"
+                style={{ color: calcOpen ? 'var(--brand)' : 'var(--text-faint)' }}
+              >
+                Calculator
+              </button>
               {redemptionIds.has(q.id) && (
                 <span
                   className="text-[11px] font-semibold uppercase tracking-[0.08em]"
@@ -1080,6 +1092,8 @@ export default function QuizRunner({
             </button>
           )}
         </div>
+
+        <Calculator open={calcOpen} onClose={() => setCalcOpen(false)} />
       </div>
     )
   }
