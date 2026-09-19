@@ -300,54 +300,73 @@ export default function StudyPlanPage() {
             {view === 'today' ? (
               <>
                 <div className="mb-10">
-                  <div className="mb-6 border-b pb-3" style={{ borderColor: 'var(--border)' }}>
-                    <p className="text-[15px] font-semibold tracking-[-0.012em]">
-                      {sessionComplete ? 'Session complete' : "Today's session"}
-                    </p>
-                    <p
-                      className="mt-1.5 inline-flex items-center gap-2 text-[13px]"
-                      style={{ color: 'var(--text-muted)' }}
-                    >
-                      <IconClock width={14} height={14} />
-                      {session.items.length} subtopic{session.items.length === 1 ? '' : 's'} ·
-                      about {session.perItemMinutes} minutes each
-                      {completedCount > 0 && ` · ${completedCount} done`}
-                    </p>
-                  </div>
-
-                  {/* How long you actually have */}
-                  <div className="mb-6 flex flex-wrap items-end gap-5">
-                    <label className="shrink-0">
-                      <span className="t-overline">I have</span>
-                      <div className="mt-1 flex items-center gap-2">
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          value={minutesInput}
-                          aria-label="Minutes available"
-                          onChange={(e) => setMinutesInput(e.target.value.replace(/[^0-9]/g, ''))}
-                          onBlur={() => {
-                            const parsed = parseInt(minutesInput, 10)
-                            commitMinutes(Number.isNaN(parsed) ? minutes : parsed)
-                          }}
-                          onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
-                          className="input w-24 text-center tabular-nums"
-                        />
-                        <span className="text-sm text-[var(--text-muted)]">minutes</span>
+                  {/* The plan for tonight, as a card: what it is, how long it
+                      takes, how far through you are. The controls sit inside
+                      it, because "how long have I got" is part of the plan
+                      rather than a setting about it. */}
+                  <div
+                    className="mb-8 rounded-[16px] border p-6"
+                    style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+                  >
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                      <div className="min-w-0">
+                        <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em]" style={{ color: 'var(--text-faint)' }}>
+                          {sessionComplete ? 'Session complete' : 'Tonight'}
+                        </p>
+                        <h2 className="mt-2 text-[clamp(1.25rem,2.4vw,1.6rem)] font-semibold leading-tight tracking-[-0.025em]">
+                          {sessionComplete
+                            ? 'Everything planned is done'
+                            : `${session.items.length} subtopic${session.items.length === 1 ? '' : 's'}, about ${minutes} minutes`}
+                        </h2>
+                        <p className="mt-1.5 text-[13px]" style={{ color: 'var(--text-muted)' }}>
+                          {completedCount > 0
+                            ? `${completedCount} of ${session.items.length} done · about ${session.perItemMinutes} minutes each`
+                            : `About ${session.perItemMinutes} minutes each: read it, sit the quiz, go back over what you missed.`}
+                        </p>
                       </div>
-                    </label>
-                    <p
-                      className="min-w-[12rem] flex-1 text-[13px] leading-relaxed"
-                      style={{ color: 'var(--text-faint)' }}
-                    >
-                      A subtopic takes about {session.perItemMinutes} minutes to recover: read
-                      it, sit the quiz, then go back over what you got wrong. The plan below is
-                      cut to fit the time you have.
-                    </p>
-                  </div>
 
-                  <div className="mb-6">
-                    <SessionTimer minutes={minutes} />
+                      <label className="shrink-0">
+                        <span className="t-overline">I have</span>
+                        <div className="mt-1 flex items-center gap-2">
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            value={minutesInput}
+                            aria-label="Minutes available"
+                            onChange={(e) => setMinutesInput(e.target.value.replace(/[^0-9]/g, ''))}
+                            onBlur={() => {
+                              const parsed = parseInt(minutesInput, 10)
+                              commitMinutes(Number.isNaN(parsed) ? minutes : parsed)
+                            }}
+                            onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
+                            className="input w-20 text-center tabular-nums"
+                          />
+                          <span className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
+                            min
+                          </span>
+                        </div>
+                      </label>
+                    </div>
+
+                    {/* How far through the evening you are, at a glance. */}
+                    {session.items.length > 0 && !sessionComplete && (
+                      <div
+                        className="mt-5 h-1.5 overflow-hidden rounded-full"
+                        style={{ background: 'var(--border-strong)' }}
+                      >
+                        <div
+                          className="h-full rounded-full transition-[width] duration-500"
+                          style={{
+                            width: `${(completedCount / session.items.length) * 100}%`,
+                            background: 'var(--brand)',
+                          }}
+                        />
+                      </div>
+                    )}
+
+                    <div className="mt-5">
+                      <SessionTimer minutes={minutes} />
+                    </div>
                   </div>
 
                   {sessionComplete ? (
@@ -361,14 +380,19 @@ export default function StudyPlanPage() {
                       </p>
                     </div>
                   ) : (
-                    <ol className="flex flex-col">
+                    <ol className="stagger flex flex-col">
                       {session.items.map((item) => {
                         const isDone = done.has(item.id)
                         return (
                           <li
                             key={item.id}
-                            className="flex flex-wrap items-center gap-3 border-b py-3.5 last:border-b-0"
-                            style={{ borderColor: 'var(--border)' }}
+                            className="flex flex-wrap items-center gap-3 rounded-[12px] border px-4 py-3.5"
+                            style={{
+                              borderColor: isDone ? 'var(--border)' : 'var(--border-strong)',
+                              background: isDone ? 'transparent' : 'var(--surface)',
+                              marginBottom: 8,
+                              opacity: isDone ? 0.6 : 1,
+                            }}
                           >
                             <button
                               onClick={() => toggleDone(item.id)}
