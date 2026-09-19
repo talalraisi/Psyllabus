@@ -16,6 +16,7 @@ import {
   IconTarget,
   IconCalendar,
   IconCards,
+  IconSchool,
   IconUser,
   IconLogout,
   IconMenu,
@@ -53,6 +54,12 @@ const NAV_ITEMS = [
     label: 'Build a Test',
     Icon: IconTest,
     match: (p) => p === '/dashboard/test' || p.startsWith('/dashboard/quiz'),
+  },
+  {
+    href: '/dashboard/core',
+    label: 'Diploma Core',
+    Icon: IconSchool,
+    match: (p) => p === '/dashboard/core',
   },
   {
     href: '/dashboard/calendar',
