@@ -38,6 +38,12 @@ const NAV_ITEMS = [
     match: (p) => p.startsWith('/dashboard/syllabus') || p === '/dashboard/subjects',
   },
   {
+    href: '/dashboard/core',
+    label: 'Diploma Core',
+    Icon: IconSchool,
+    match: (p) => p === '/dashboard/core',
+  },
+  {
     href: '/dashboard/flashcards',
     label: 'Flashcards',
     Icon: IconCards,
@@ -54,12 +60,6 @@ const NAV_ITEMS = [
     label: 'Build a Test',
     Icon: IconTest,
     match: (p) => p === '/dashboard/test' || p.startsWith('/dashboard/quiz'),
-  },
-  {
-    href: '/dashboard/core',
-    label: 'Diploma Core',
-    Icon: IconSchool,
-    match: (p) => p === '/dashboard/core',
   },
   {
     href: '/dashboard/calendar',

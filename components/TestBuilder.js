@@ -546,11 +546,14 @@ export default function TestBuilder({
                 </span>
               </label>
             )}
+            {/* One switch, stated the way round people think about it.
+                Marking as you go is what practice is; exam mode is the thing
+                you deliberately turn on. */}
             <Toggle
-              on={review === 'practice'}
-              onClick={() => onReview(review === 'practice' ? 'exam' : 'practice')}
-              label="Mark each question as I answer it"
-              hint="Off is exam mode: everything is held back until the end."
+              on={review === 'exam'}
+              onClick={() => onReview(review === 'exam' ? 'practice' : 'exam')}
+              label="Exam mode"
+              hint="Nothing is marked until you finish, the way a real paper works."
             />
             <Toggle
               on={!hintsAllowed}

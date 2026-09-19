@@ -15,13 +15,63 @@ import { evaluate, formatResult, CalcError } from '@/lib/calc'
  * asked every time is its own kind of wrong.
  */
 
+/**
+ * The keypad.
+ *
+ * Laid out the way a calculator is: functions on top, digits in a block,
+ * operators down the right. `tone` decides how a key reads — function keys
+ * recede, the equals key is the only filled one on the pad.
+ */
 const KEYS = [
-  ['sin(', 'cos(', 'tan(', '^', '('],
-  ['ln(', 'log(', 'sqrt(', '!', ')'],
-  ['7', '8', '9', '÷', 'C'],
-  ['4', '5', '6', '×', '←'],
-  ['1', '2', '3', '-', 'pi'],
-  ['0', '.', 'ans', '+', '='],
+  [
+    { label: 'sin', insert: 'sin(', tone: 'fn' },
+    { label: 'cos', insert: 'cos(', tone: 'fn' },
+    { label: 'tan', insert: 'tan(', tone: 'fn' },
+    { label: 'π', insert: 'pi', tone: 'fn' },
+    { label: 'AC', action: 'clear', tone: 'fn' },
+  ],
+  [
+    { label: 'ln', insert: 'ln(', tone: 'fn' },
+    { label: 'log', insert: 'log(', tone: 'fn' },
+    { label: '√', insert: 'sqrt(', tone: 'fn' },
+    { label: 'x²', insert: '^2', tone: 'fn' },
+    { label: '⌫', action: 'back', tone: 'fn' },
+  ],
+  [
+    { label: '(', insert: '(' },
+    { label: ')', insert: ')' },
+    { label: 'x^y', insert: '^', tone: 'fn' },
+    { label: 'ans', insert: 'ans', tone: 'fn' },
+    { label: '÷', insert: '/', tone: 'op' },
+  ],
+  [
+    { label: '7', insert: '7' },
+    { label: '8', insert: '8' },
+    { label: '9', insert: '9' },
+    { label: 'x', insert: 'x', tone: 'fn' },
+    { label: '×', insert: '*', tone: 'op' },
+  ],
+  [
+    { label: '4', insert: '4' },
+    { label: '5', insert: '5' },
+    { label: '6', insert: '6' },
+    { label: '!', insert: '!', tone: 'fn' },
+    { label: '−', insert: '-', tone: 'op' },
+  ],
+  [
+    { label: '1', insert: '1' },
+    { label: '2', insert: '2' },
+    { label: '3', insert: '3' },
+    { label: 'e', insert: 'e', tone: 'fn' },
+    { label: '+', insert: '+', tone: 'op' },
+  ],
+  [
+    { label: '0', insert: '0' },
+    { label: '.', insert: '.' },
+    { label: '%', insert: '%', tone: 'op' },
+    { label: ',', insert: ' ' },
+    { label: '=', action: 'equals', tone: 'equals' },
+  ],
 ]
 
 function Plot({ expression, degrees }) {
@@ -213,22 +263,24 @@ export default function Calculator({ open, onClose }) {
   if (!open) return null
 
   const press = (key) => {
-    if (key === '=') return commit()
-    if (key === 'C') {
+    if (key.action === 'equals') return commit()
+    if (key.action === 'clear') {
       setInput('')
+      inputRef.current?.focus()
       return
     }
-    if (key === '←') {
+    if (key.action === 'back') {
       setInput((v) => v.slice(0, -1))
+      inputRef.current?.focus()
       return
     }
-    setInput((v) => v + key)
+    setInput((v) => v + key.insert)
     inputRef.current?.focus()
   }
 
   return (
     <div
-      className="pop-enter fixed bottom-4 right-4 z-40 w-[330px] max-w-[calc(100vw-2rem)] rounded-[14px] border shadow-xl"
+      className="pop-enter fixed bottom-4 right-4 z-40 w-[360px] max-w-[calc(100vw-2rem)] rounded-[16px] border shadow-xl"
       style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
       role="dialog"
       aria-label="Calculator"
@@ -270,8 +322,8 @@ export default function Calculator({ open, onClose }) {
           onKeyDown={(e) => {
             if (e.key === 'Enter') commit()
           }}
-          placeholder={mode === 'graph' ? 'y = x^2 - 3' : '2 + 3 × 4'}
-          className="input w-full text-[15px]"
+          placeholder={mode === 'graph' ? 'x^2 - 3' : '2 + 3 * 4'}
+          className="input w-full text-[16px]"
           spellCheck={false}
           autoComplete="off"
         />
@@ -302,17 +354,23 @@ export default function Calculator({ open, onClose }) {
             <div className="mt-3 grid grid-cols-5 gap-1.5">
               {KEYS.flat().map((key) => (
                 <button
-                  key={key}
+                  key={key.label}
                   onClick={() => press(key)}
-                  className="rounded-[var(--r-md)] border py-2 text-[13px] transition-colors hover:bg-[var(--surface-sunken)]"
+                  className="press rounded-[10px] border py-2.5 text-[14px] font-medium transition-colors hover:bg-[var(--surface-sunken)]"
                   style={{
-                    borderColor: key === '=' ? 'var(--brand)' : 'var(--border)',
-                    background: key === '=' ? 'var(--brand)' : 'transparent',
-                    color: key === '=' ? '#fff' : 'var(--text)',
+                    borderColor: key.tone === 'equals' ? 'var(--brand)' : 'var(--border)',
+                    background: key.tone === 'equals' ? 'var(--brand)' : 'transparent',
+                    color:
+                      key.tone === 'equals'
+                        ? '#fff'
+                        : key.tone === 'fn'
+                          ? 'var(--text-muted)'
+                          : key.tone === 'op'
+                            ? 'var(--brand)'
+                            : 'var(--text)',
                   }}
                 >
-                  {/* sin( shows as sin; a bracket key shows as a bracket. */}
-                  {key.length > 1 ? key.replace('(', '') : key}
+                  {key.label}
                 </button>
               ))}
             </div>

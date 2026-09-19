@@ -292,15 +292,22 @@ export default function SubjectsPage() {
           )}
         </Section>
 
-        {/* The core sits apart: it is compulsory, not one of the six choices. */}
+        {/* The core is not a subject you revise, it is work with deadlines,
+            so it lives on its own page rather than among the six. */}
         {core.length > 0 && (
-          <Section title="Diploma core">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {core.map((subject) => (
-                <SubjectCard key={subject} subject={subject} locked={false} />
-              ))}
-            </div>
-          </Section>
+          <div className="mt-12 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
+            <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
+              TOK, the extended essay and CAS are tracked in{' '}
+              <Link
+                href="/dashboard/core"
+                className="font-medium underline underline-offset-2"
+                style={{ color: 'var(--text)' }}
+              >
+                Diploma Core
+              </Link>
+              .
+            </p>
+          </div>
         )}
       </Page>
     </DashboardLayout>

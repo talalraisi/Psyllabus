@@ -24,6 +24,7 @@ import {
   STATUS_LABELS,
   STATUS_COLORS,
   STATUS_TEXT_COLORS,
+  displaySubtopic,
 } from '@/lib/progress'
 import { getCurrentUser } from '@/lib/auth'
 import { getSyllabus, getProfile } from '@/lib/cache'
@@ -155,6 +156,8 @@ export default function QuizRunner({
   // Which of this quiz's questions are here because you got them wrong before.
   const [redemptionIds, setRedemptionIds] = useState(() => new Set())
   const [calcOpen, setCalcOpen] = useState(false)
+  // The ones you got right, folded away until asked for.
+  const [showRight, setShowRight] = useState(false)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState({})
   const [results, setResults] = useState(null)
@@ -705,10 +708,26 @@ export default function QuizRunner({
       }
     }
 
+    // How each subtopic did in this paper alone. Used for the one-line
+    // verdict at the top: naming the subtopic is more use than the percentage.
+    const bySubtopicMap = new Map()
+    for (const g of graded) {
+      const key = g.question.subtopic
+      if (!bySubtopicMap.has(key)) bySubtopicMap.set(key, { subtopic: key, right: 0, total: 0 })
+      const entry = bySubtopicMap.get(key)
+      entry.total++
+      if (g.correct) entry.right++
+    }
+    const bySubtopic = [...bySubtopicMap.values()].map((e) => ({
+      ...e,
+      accuracy: e.total ? e.right / e.total : 0,
+    }))
+
     setResults({
       score,
       total,
       accuracy,
+      bySubtopic,
       prediction,
       graded,
       totalMarks,
@@ -719,6 +738,27 @@ export default function QuizRunner({
     setPhase(PHASE.results)
     setSubmitting(false)
   }, [userId, submitting, questions, currentIndex, secondsLeft, mode, subject, topic, subtopic, timed, mistakeRowsById, commitTime, supabase])
+
+  /**
+   * Sit the ones you got wrong again, now.
+   *
+   * The old results page ended in two links out. The thing a student actually
+   * wants at that moment is another go at the nine they missed, and making
+   * them rebuild that paper by hand is why nobody did it.
+   */
+  const retryWrong = useCallback(() => {
+    const missed = (results?.graded || []).filter((g) => !g.correct).map((g) => g.question)
+    if (!missed.length) return
+    setQuestions(shuffle(missed))
+    setAnswers({})
+    setRevealed({})
+    setResults(null)
+    setShowRight(false)
+    questionTimesRef.current = {}
+    lastSwitchRef.current = Date.now()
+    setCurrentIndex(0)
+    setPhase(PHASE.quiz)
+  }, [results])
 
   finishRef.current = finishQuiz
 
@@ -883,42 +923,30 @@ export default function QuizRunner({
               />
             ))}
           </div>
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          <div className="mt-3 flex items-center justify-between gap-4">
             <p className="text-[12.5px] tabular-nums" style={{ color: 'var(--text-muted)' }}>
-              Question {currentIndex + 1} of {questions.length} · {answeredCount} answered
+              Question {currentIndex + 1} of {questions.length}
             </p>
-            <div className="flex items-center gap-4">
-              {/* A calculator on the same screen as the question. Closed until
-                  asked for, so a language paper never sees it. */}
-              <button
-                onClick={() => setCalcOpen((v) => !v)}
-                aria-pressed={calcOpen}
-                className="text-[12.5px] font-medium underline-offset-2 hover:underline"
-                style={{ color: calcOpen ? 'var(--brand)' : 'var(--text-faint)' }}
-              >
-                Calculator
-              </button>
-              {redemptionIds.has(q.id) && (
-                <span
-                  className="text-[11px] font-semibold uppercase tracking-[0.08em]"
-                  style={{ color: 'var(--brand)' }}
-                  title="You got this one wrong before. Get it right to clear it."
-                >
-                  Redemption
-                </span>
-              )}
-              <HeatBadge difficulty={q.difficulty} />
-              <span className="text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
-                {q.marks || 1} mark{(q.marks || 1) !== 1 ? 's' : ''}
-              </span>
-            </div>
+            <span className="text-[12.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
+              {q.marks || 1} mark{(q.marks || 1) !== 1 ? 's' : ''}
+            </span>
           </div>
         </div>
 
         <QuestionStimulus text={q.stimulus} kind={q.stimulus_kind} />
 
         <div className="flex items-start justify-between gap-4">
-          <p className="text-[17px] font-medium leading-relaxed">{q.stem}</p>
+          <div className="min-w-0">
+            {redemptionIds.has(q.id) && (
+              <p
+                className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.08em]"
+                style={{ color: 'var(--brand)' }}
+              >
+                Redemption · you got this one wrong before
+              </p>
+            )}
+            <p className="text-[17px] font-medium leading-relaxed">{q.stem}</p>
+          </div>
           <QuestionMenu question={q} />
         </div>
 
@@ -1095,15 +1123,127 @@ export default function QuizRunner({
           )}
         </div>
 
+        {/* A button that looks like a button. It was a grey word in the
+            header and nobody pressed it. */}
+        {!calcOpen && (
+          <button
+            onClick={() => setCalcOpen(true)}
+            className="press fixed bottom-5 right-5 z-30 flex h-12 w-12 items-center justify-center rounded-full border shadow-lg"
+            style={{
+              borderColor: 'var(--border-strong)',
+              background: 'var(--surface)',
+              color: 'var(--text-body)',
+            }}
+            aria-label="Open calculator"
+            title="Calculator"
+          >
+            <svg width="19" height="19" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <rect x="3" y="2" width="14" height="16" rx="2.5" stroke="currentColor" strokeWidth="1.4" />
+              <rect x="5.8" y="4.6" width="8.4" height="3" rx="1" fill="currentColor" opacity="0.25" />
+              <circle cx="7" cy="11" r="1.05" fill="currentColor" />
+              <circle cx="10" cy="11" r="1.05" fill="currentColor" />
+              <circle cx="13" cy="11" r="1.05" fill="currentColor" />
+              <circle cx="7" cy="14.5" r="1.05" fill="currentColor" />
+              <circle cx="10" cy="14.5" r="1.05" fill="currentColor" />
+              <circle cx="13" cy="14.5" r="1.05" fill="currentColor" />
+            </svg>
+          </button>
+        )}
+
         <Calculator open={calcOpen} onClose={() => setCalcOpen(false)} />
       </div>
     )
   }
-
   if (phase === PHASE.results && results) {
     const pct = Math.round(results.accuracy * 100)
     const overBudget = results.graded.filter(
       (g) => g.timeSpent > (g.question.time_budget_seconds || 90)
+    )
+    const wrong = results.graded.filter((g) => !g.correct)
+    const right = results.graded.filter((g) => g.correct)
+    const pointsEarned = (results.earned || []).reduce((sum, e) => sum + (e.gained || 0), 0)
+
+    /**
+     * One sentence, before any numbers are read.
+     *
+     * A results page that opens with a score and a table of twenty rows makes
+     * a student work out what just happened. The app already knows: which
+     * subtopic went worst, whether it was speed or knowledge, whether anything
+     * was cleared. Say it, then show the evidence.
+     */
+    const worst = [...(results.bySubtopic || [])].sort((a, b) => a.accuracy - b.accuracy)[0]
+    const verdict =
+      pct >= 85
+        ? 'Strong paper. Push the difficulty up next time.'
+        : wrong.length === 0
+          ? 'Everything right.'
+          : worst && worst.total >= 2 && worst.accuracy < 0.5
+            ? `Most of the damage was ${displaySubtopic(worst.subtopic)}.`
+            : pct >= 60
+              ? 'Solid, with gaps worth a second look.'
+              : 'Worth redoing this one after reading the answers below.'
+
+    const tiles = [
+      ['Score', `${results.score}/${results.total}`],
+      ['Accuracy', `${pct}%`],
+      ['Points', pointsEarned ? `+${pointsEarned.toFixed(2)}` : '0'],
+      timed ? ['Time', formatClock(results.elapsed)] : null,
+    ].filter(Boolean)
+
+    const QuestionRow = ({ g, expanded }) => (
+      <li
+        className="border-b py-4 last:border-b-0"
+        style={{ borderColor: 'var(--border)' }}
+      >
+        <div className="flex items-start gap-3">
+          <span
+            className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border"
+            style={{
+              borderColor: g.correct ? 'var(--status-proficient)' : 'var(--status-weak)',
+              color: g.correct ? 'var(--status-proficient)' : 'var(--status-weak)',
+            }}
+            aria-label={g.correct ? 'Correct' : 'Incorrect'}
+          >
+            {g.correct ? <IconCheck width={11} height={11} /> : <IconClose width={11} height={11} />}
+          </span>
+
+          <div className="min-w-0 flex-1">
+            <p
+              className={`text-[14.5px] leading-relaxed ${expanded ? '' : 'truncate'}`}
+              style={{ color: expanded ? 'var(--text)' : 'var(--text-muted)' }}
+            >
+              {g.question.stem}
+            </p>
+
+            {expanded && (
+              <>
+                {g.question.option_feedback?.[g.selected] && (
+                  <p
+                    className="mt-2 text-[13.5px] leading-relaxed"
+                    style={{ color: 'var(--status-weak)' }}
+                  >
+                    <span className="font-semibold">
+                      You picked {String(g.selected).toUpperCase()}.
+                    </span>{' '}
+                    {g.question.option_feedback[g.selected]}
+                  </p>
+                )}
+                {g.question.explanation && (
+                  <p
+                    className="mt-2 text-[13.5px] leading-relaxed"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    {g.question.explanation}
+                  </p>
+                )}
+                <MarkScheme question={g.question} />
+              </>
+            )}
+          </div>
+
+          <QuestionMenu question={g.question} />
+        </div>
+      </li>
     )
 
     return (
@@ -1114,53 +1254,81 @@ export default function QuizRunner({
         >
           Result
         </p>
-        <h1 className="text-[clamp(2.4rem,6vw,3.4rem)] font-semibold leading-[1] tracking-[-0.035em] tabular-nums">
-          {results.score}
-          <span style={{ color: 'var(--text-faint)' }}>/{results.total}</span>
+        <h1 className="text-[clamp(1.9rem,4.4vw,2.6rem)] font-semibold leading-[1.1] tracking-[-0.03em]">
+          {verdict}
         </h1>
-        <p className="mt-3 text-[14.5px]" style={{ color: 'var(--text-muted)' }}>
-          {pct}% accuracy
-        </p>
+
+        {/* The numbers, once, in a row. Not a column of sentences about them. */}
+        <dl
+          className="mt-7 flex flex-wrap gap-x-10 gap-y-4 border-y py-5"
+          style={{ borderColor: 'var(--border)' }}
+        >
+          {tiles.map(([label, value]) => (
+            <div key={label}>
+              <dt className="text-[12px]" style={{ color: 'var(--text-faint)' }}>
+                {label}
+              </dt>
+              <dd className="mt-1 text-[24px] font-semibold leading-none tracking-[-0.03em] tabular-nums">
+                {value}
+              </dd>
+            </div>
+          ))}
+        </dl>
 
         {results.clearedFromBank > 0 && (
-          <p
-            className="mt-6 border-l-2 pl-4 text-[14px] leading-relaxed"
-            style={{ borderColor: 'var(--status-proficient)', color: 'var(--text-body)' }}
-          >
-            {results.clearedFromBank} question{results.clearedFromBank === 1 ? '' : 's'} left your
-            mistake bank. Three correct reviews and it is considered fixed.
+          <p className="mt-5 text-[14px]" style={{ color: 'var(--status-proficient)' }}>
+            {results.clearedFromBank} redeemed. Three correct reviews and it is gone for good.
           </p>
         )}
 
-        {/* Where each subtopic now stands, and how much further it has to go.
-            Without this the level looks arbitrary: a perfect score that leaves
-            you on Weak needs explaining, and the explanation is the point. */}
+        {/* What to do about it, while it is still in front of you. */}
+        <div className="mt-8 flex flex-wrap items-center gap-3">
+          {wrong.length > 0 && (
+            <button onClick={retryWrong} className="btn btn-solid control-md">
+              Redo the {wrong.length} you missed
+            </button>
+          )}
+          <Link href={backHref} className="btn btn-quiet control-md">
+            Done
+          </Link>
+          <Link
+            href="/dashboard/mistakes"
+            className="text-[13px] font-medium underline-offset-2 hover:underline"
+            style={{ color: 'var(--text-muted)' }}
+          >
+            Redemption
+          </Link>
+        </div>
+
+        {/* Where each subtopic now stands. The bar is the point; the arithmetic
+            behind it is available to anyone who wants it and hidden from
+            everyone who does not. */}
         {results.earned?.length > 0 && (
-          <section className="mt-10">
-            <div
-              className="mb-5 flex items-baseline justify-between gap-4 border-b pb-3"
-              style={{ borderColor: 'var(--border)' }}
-            >
-              <h2 className="text-[15px] font-semibold tracking-[-0.012em]">Mastery</h2>
-              <span className="text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
-                {MASTERY_TARGET} points to Mastered
-              </span>
-            </div>
-            <ul className="flex flex-col gap-5">
+          <section className="mt-12">
+            <h2 className="mb-4 text-[15px] font-semibold tracking-[-0.012em]">Mastery</h2>
+            <ul className="stagger flex flex-col gap-4">
               {results.earned.map((e) => {
                 const next = pointsToNextLevel(e.points)
                 return (
                   <li key={e.subtopic}>
                     <div className="flex items-baseline justify-between gap-3">
-                      <span className="min-w-0 truncate text-[14.5px]">{e.subtopic}</span>
+                      <span className="min-w-0 truncate text-[14px]">
+                        {displaySubtopic(e.subtopic)}
+                      </span>
                       <span
-                        className={`shrink-0 text-[12.5px] font-semibold ${STATUS_TEXT_COLORS[e.status]}`}
+                        className={`shrink-0 text-[12px] font-semibold ${STATUS_TEXT_COLORS[e.status]}`}
                       >
                         {STATUS_LABELS[e.status]}
+                        {next ? (
+                          <span className="font-normal" style={{ color: 'var(--text-faint)' }}>
+                            {' '}
+                            · {next.points} to {STATUS_LABELS[next.status]}
+                          </span>
+                        ) : null}
                       </span>
                     </div>
                     <div
-                      className="mt-2 h-1 w-full overflow-hidden rounded-full"
+                      className="mt-1.5 h-1 w-full overflow-hidden rounded-full"
                       style={{ background: 'var(--border-strong)' }}
                     >
                       <div
@@ -1168,142 +1336,75 @@ export default function QuizRunner({
                         style={{ width: `${masteryFraction(e.points) * 100}%` }}
                       />
                     </div>
-                    <p className="mt-2 text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
-                      {e.points} of {MASTERY_TARGET} points
-                      {next ? ` · ${next.points} more for ${STATUS_LABELS[next.status]}` : ''}
-                    </p>
                   </li>
                 )
               })}
             </ul>
-            <p className="mt-6 text-[13px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
-              A question is worth points by heat: Low 0.5, Medium 0.75, Hot 1, Extremely hot 1.25,
-              Burning 1.5. Only correct answers pay, and each question pays once, so the same easy
-              question cannot be farmed.
-            </p>
+
+            <details className="mt-5">
+              <summary
+                className="cursor-pointer text-[12.5px]"
+                style={{ color: 'var(--text-faint)' }}
+              >
+                How points work
+              </summary>
+              <p
+                className="mt-2 text-[12.5px] leading-relaxed"
+                style={{ color: 'var(--text-faint)' }}
+              >
+                A question pays by heat — Low 0.5 up to Burning 1.5 — and only when you get it
+                right. Each question pays once, so the same easy one cannot be farmed.
+                {MASTERY_TARGET} points is Mastered.
+              </p>
+            </details>
           </section>
         )}
 
         {timed && (
-          <section className="mt-10">
-            <div
-              className="mb-5 flex items-baseline justify-between gap-4 border-b pb-3"
-              style={{ borderColor: 'var(--border)' }}
-            >
-              <h2 className="text-[15px] font-semibold tracking-[-0.012em]">Pacing</h2>
-            </div>
+          <section className="mt-12">
+            <h2 className="mb-2 text-[15px] font-semibold tracking-[-0.012em]">Pacing</h2>
             <p className="text-[14px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              Finished in {formatClock(results.elapsed)} of {formatClock(timeLimitRef.current)} ·{' '}
-              {(results.totalMarks / (timeLimitRef.current / 60)).toFixed(1)} marks/min required
-            </p>
-            <p
-              className="mt-2 text-[14px]"
-              style={{
-                color: overBudget.length
-                  ? 'var(--status-fading)'
-                  : 'var(--status-proficient)',
-              }}
-            >
+              {formatClock(results.elapsed)} of {formatClock(timeLimitRef.current)}.{' '}
               {overBudget.length > 0
-                ? `${overBudget.length} question${overBudget.length !== 1 ? 's' : ''} went over the exam time budget.`
-                : 'All questions inside the exam time budget.'}
+                ? `${overBudget.length} question${overBudget.length !== 1 ? 's' : ''} ran over its exam time.`
+                : 'Every question inside its exam time.'}
             </p>
           </section>
         )}
 
-        <section className="mt-10">
-          <div
-            className="mb-1 flex items-baseline justify-between gap-4 border-b pb-3"
-            style={{ borderColor: 'var(--border)' }}
-          >
-            <h2 className="text-[15px] font-semibold tracking-[-0.012em]">Every question</h2>
-            <CopyButton text={paperAsText(results.graded)} label="Copy all" />
-          </div>
+        {/* The wrong ones open, the right ones folded away. Nobody reads
+            twenty explanations; everybody reads the ones they got wrong. */}
+        {wrong.length > 0 && (
+          <section className="mt-12">
+            <h2 className="mb-1 text-[15px] font-semibold tracking-[-0.012em]">
+              What went wrong ({wrong.length})
+            </h2>
+            <ul className="flex flex-col">
+              {wrong.map((g) => (
+                <QuestionRow key={g.question.id} g={g} expanded />
+              ))}
+            </ul>
+          </section>
+        )}
 
-          <ul className="flex flex-col">
-            {results.graded.map((g) => {
-              const budget = g.question.time_budget_seconds || 90
-              const slow = g.timeSpent > budget
-              const tone = g.correct ? 'var(--status-proficient)' : 'var(--status-weak)'
-              return (
-                <li
-                  key={g.question.id}
-                  className="flex items-start gap-4 border-b py-5 last:border-b-0"
-                  style={{ borderColor: 'var(--border)' }}
-                >
-                  <span
-                    className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border"
-                    style={{ borderColor: tone, color: tone }}
-                    aria-label={g.correct ? 'Correct' : 'Incorrect'}
-                  >
-                    {g.correct ? (
-                      <IconCheck width={11} height={11} />
-                    ) : (
-                      <IconClose width={11} height={11} />
-                    )}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-start justify-between gap-3">
-                      <p className="text-[14.5px] leading-relaxed">{g.question.stem}</p>
-                      <CopyButton
-                        text={questionAsText(g.question, { includeAnswer: true })}
-                        label=""
-                      />
-                    </div>
-                    {/* Why the option you chose is wrong beats why the right
-                        one is right: the second closes the loop, the first
-                        names the mistake you actually made. Both are shown,
-                        the specific one first. */}
-                    {!g.correct && g.question.option_feedback?.[g.selected] && (
-                      <p
-                        className="mt-2 text-[13.5px] leading-relaxed"
-                        style={{ color: 'var(--status-weak)' }}
-                      >
-                        <span className="font-semibold">
-                          You picked {String(g.selected).toUpperCase()}.
-                        </span>{' '}
-                        {g.question.option_feedback[g.selected]}
-                      </p>
-                    )}
-                    {!g.correct && g.question.explanation && (
-                      <p
-                        className="mt-2 text-[13.5px] leading-relaxed"
-                        style={{ color: 'var(--text-muted)' }}
-                      >
-                        {g.question.explanation}
-                      </p>
-                    )}
-                    {/* For a written answer, what the marks were actually for.
-                        "The answer is X" is not much use after a six-marker. */}
-                    <MarkScheme question={g.question} />
-
-                    <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2">
-                      <HeatBadge difficulty={g.question.difficulty} showPoints />
-                      <span
-                        className="text-[12.5px] tabular-nums"
-                        style={{
-                          color: slow && timed ? 'var(--status-fading)' : 'var(--text-faint)',
-                        }}
-                      >
-                        {g.timeSpent}s of {budget}s{slow && timed ? ' · over budget' : ''}
-                      </span>
-                    </div>
-                    <ReportQuestion questionId={g.question.id} />
-                  </div>
-                </li>
-              )
-            })}
-          </ul>
-        </section>
-
-        <div className="mt-10 flex flex-wrap items-center gap-3">
-          <Link href="/dashboard/mistakes" className="btn btn-solid control-md">
-            Open Redemption
-          </Link>
-          <Link href={backHref} className="btn btn-quiet control-md">
-            Done
-          </Link>
-        </div>
+        {right.length > 0 && (
+          <section className="mt-10">
+            <button
+              onClick={() => setShowRight((v) => !v)}
+              aria-expanded={showRight}
+              className="text-[15px] font-semibold tracking-[-0.012em]"
+            >
+              {showRight ? 'Hide' : 'Show'} the {right.length} you got right
+            </button>
+            {showRight && (
+              <ul className="mt-3 flex flex-col">
+                {right.map((g) => (
+                  <QuestionRow key={g.question.id} g={g} expanded={false} />
+                ))}
+              </ul>
+            )}
+          </section>
+        )}
       </div>
     )
   }
