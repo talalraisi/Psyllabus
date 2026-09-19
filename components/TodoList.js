@@ -239,7 +239,7 @@ export default function TodoList({
               : 'Nothing yet. Type above and press enter.'}
         </p>
       ) : (
-        <ul className="flex flex-col">
+        <ul className="stagger flex flex-col">
           {shown.map((todo) => {
             const due = relativeDay(todo.due_on, todayKey)
             const late = todo.due_on && todo.due_on < todayKey && !todo.done

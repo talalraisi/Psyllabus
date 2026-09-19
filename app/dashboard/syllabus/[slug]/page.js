@@ -213,7 +213,7 @@ export default function SyllabusPage() {
             description="We are still preparing the content for this subject. Check back soon."
           />
         ) : (
-          <div className="flex flex-col">
+          <div className="stagger flex flex-col">
             {sortTopics(Object.entries(groupedByTopic)).map(([topic, subtopics]) => {
               const topicMastered = subtopics.filter(
                 (s) => progress[progressKey(subjectName, s.subtopic)] === 'mastered'

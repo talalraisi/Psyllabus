@@ -135,7 +135,7 @@ export default function QuestionMenu({ question, align = 'right' }) {
       {open && (
         <div
           role="menu"
-          className={`absolute ${align === 'right' ? 'right-0' : 'left-0'} top-8 z-30 w-52 overflow-hidden rounded-[var(--r-md)] border py-1 shadow-lg`}
+          className={`pop-enter absolute ${align === 'right' ? 'right-0' : 'left-0'} top-8 z-30 w-52 overflow-hidden rounded-[var(--r-md)] border py-1 shadow-lg`}
           style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
         >
           <button role="menuitem" onClick={toggleSave} className={item}>
@@ -166,7 +166,7 @@ export default function QuestionMenu({ question, align = 'right' }) {
 
       {reporting && (
         <div
-          className="absolute right-0 top-8 z-30 w-[300px] rounded-[var(--r-md)] border p-1 shadow-lg"
+          className="pop-enter absolute right-0 top-8 z-30 w-[300px] rounded-[var(--r-md)] border p-1 shadow-lg"
           style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
         >
           <ReportQuestion questionId={question.id} startOpen onDone={() => setReporting(false)} />

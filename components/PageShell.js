@@ -19,7 +19,7 @@ const WIDTHS = {
 
 export function Page({ children, width = 'default' }) {
   return (
-    <div className={`mx-auto px-5 py-8 md:px-12 md:py-10 ${WIDTHS[width]}`}>{children}</div>
+    <div className={`app-enter mx-auto px-5 py-8 md:px-12 md:py-10 ${WIDTHS[width]}`}>{children}</div>
   )
 }
 
