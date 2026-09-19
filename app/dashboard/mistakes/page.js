@@ -140,7 +140,7 @@ export default function MistakeBankPage() {
         {mistakes.length === 0 ? (
           <EmptyState
             title="Nothing to redeem yet"
-            description="Get a question wrong and it comes back here, then again a week later, until you have it three times running."
+            description="Questions you get wrong come back here until you have them three times running."
           />
         ) : (
           <>

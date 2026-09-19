@@ -431,7 +431,7 @@ export default function StudyPlanPage() {
 
                 {/* The evening's other half. Subtopics above, everything else
                     that has to happen tonight here. */}
-                <TodoList className="mt-12 mb-12" title="Also tonight" />
+                <TodoList className="mt-12 mb-12" title="Also tonight" subjects={accessibleSubjects(profile)} />
 
                 {dueReviews > 0 && (
                   <Link

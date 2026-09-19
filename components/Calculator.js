@@ -311,7 +311,8 @@ export default function Calculator({ open, onClose }) {
                     color: key === '=' ? '#fff' : 'var(--text)',
                   }}
                 >
-                  {key.replace('(', '')}
+                  {/* sin( shows as sin; a bracket key shows as a bracket. */}
+                  {key.length > 1 ? key.replace('(', '') : key}
                 </button>
               ))}
             </div>

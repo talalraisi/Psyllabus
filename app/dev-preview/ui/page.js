@@ -14,6 +14,7 @@ import { useState } from 'react'
 import { notFound } from 'next/navigation'
 import Calculator from '@/components/Calculator'
 import QuestionMenu from '@/components/QuestionMenu'
+import TodoList from '@/components/TodoList'
 
 const ENABLED = process.env.NODE_ENV !== 'production'
 
@@ -45,6 +46,9 @@ export default function UiPreview() {
       <button onClick={() => setCalcOpen((v) => !v)} className="btn btn-outline control-md mt-3">
         {calcOpen ? 'Hide' : 'Show'} calculator
       </button>
+
+      <h1 className="mt-10 text-[22px] font-semibold">To-do list</h1>
+      <TodoList className="mt-4" subjects={['Physics SL', 'Economics HL']} />
 
       <Calculator open={calcOpen} onClose={() => setCalcOpen(false)} />
     </div>

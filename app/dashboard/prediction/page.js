@@ -129,7 +129,7 @@ export default function PredictionPage() {
         {!hasData ? (
           <EmptyState
             title="No prediction yet"
-            description="Predictions are calculated from quiz results only, never from self-rating. Take a quiz on any subtopic and a figure will appear here."
+            description="Take a quiz and a predicted grade appears here. Quiz results only — never self-rating."
             action={
               <Link href="/dashboard/subjects" className="btn btn-solid control-md">
                 Open a subject

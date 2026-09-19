@@ -104,7 +104,7 @@ export default function Heatmap({ items, subjects }) {
     return (
       <EmptyState
         title="Nothing to map yet"
-        description="Open a subject syllabus and take a quiz. Each square here is one subtopic, coloured by what your answers have proved."
+        description="One square per subtopic, coloured by your quiz answers. Take a quiz to start it."
       />
     )
   }

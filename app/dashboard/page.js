@@ -447,7 +447,7 @@ export default function Dashboard() {
           </Section>
         </div>
 
-        <TodoList className="mb-12" title="To-do" compact limit={5} />
+        <TodoList className="mb-12" title="To-do" compact limit={5} subjects={allSubjects} />
 
       </Page>
     </DashboardLayout>

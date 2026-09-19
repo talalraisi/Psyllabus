@@ -456,7 +456,7 @@ export default function FlashcardsPage() {
           <>
             <PageHeader
               title="Flashcards"
-              subtitle="Write your own or make them from your notes. Nothing here needs the question bank."
+              subtitle="Take a ready-made deck, write your own, or make them from your notes."
               action={
                 totalDue > 0 ? (
                   <button

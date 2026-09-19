@@ -123,7 +123,7 @@ export default function FeedbackPage() {
         {items.length === 0 ? (
           <EmptyState
             title="Nothing yet"
-            description="Every signed-in page has a Feedback button in the corner. Whatever anybody sends lands here, with the page they were on."
+            description="Feedback sent from any page lands here, with the page it came from."
           />
         ) : (
           <>

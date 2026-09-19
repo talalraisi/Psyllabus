@@ -196,7 +196,7 @@ export default function CalendarPage() {
       <Page width="wide">
         <PageHeader
           title="Calendar"
-          subtitle="Tests, mocks, IA deadlines and orals, with a reminder before each one."
+          subtitle="Tests, deadlines and orals, with a reminder before each."
           action={
             <button
               onClick={() => setDraft(emptyDraft(selected))}
@@ -431,6 +431,7 @@ export default function CalendarPage() {
           className="mb-12"
           title="To-do"
           defaultDue={selected}
+          subjects={subjects}
           key={selected}
         />
         </div>
@@ -440,7 +441,7 @@ export default function CalendarPage() {
           {next.length === 0 ? (
             <EmptyState
               title="Nothing on the calendar yet"
-              description="Add your next test or IA deadline and the planner will start prioritising the topics it covers."
+              description="Add a test or deadline and the planner works towards it."
               action={
                 <button
                   onClick={() => setDraft(emptyDraft(localDateKey(today)))}
