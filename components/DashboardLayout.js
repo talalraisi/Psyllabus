@@ -74,7 +74,7 @@ const NAV_ITEMS = [
   },
   {
     href: '/dashboard/mistakes',
-    label: 'Mistake Bank',
+    label: 'Redemption',
     Icon: IconReview,
     match: (p) => p === '/dashboard/mistakes',
   },

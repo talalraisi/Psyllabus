@@ -348,11 +348,14 @@ export default function SyllabusPage() {
                               >
                                 Resources
                               </button>
+                              {/* Five questions, marked as you go. The long
+                                  version is a click further on, in the test
+                                  builder; this is the one that gets done. */}
                               <Link
-                                href={`/dashboard/quiz?subject=${encodeURIComponent(subjectName)}&topic=${encodeURIComponent(item.topic)}&subtopic=${encodeURIComponent(item.subtopic)}&back=${encodeURIComponent(slugPath)}`}
+                                href={`/dashboard/quiz?subject=${encodeURIComponent(subjectName)}&topic=${encodeURIComponent(item.topic)}&subtopic=${encodeURIComponent(item.subtopic)}&count=5&review=practice&back=${encodeURIComponent(slugPath)}`}
                                 className="btn btn-outline control-sm"
                               >
-                                Practice
+                                Quick 5
                               </Link>
                             </div>
                           </li>

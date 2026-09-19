@@ -28,8 +28,8 @@ const REASONS = [
   { key: 'other', label: 'Something else' },
 ]
 
-export default function ReportQuestion({ questionId }) {
-  const [open, setOpen] = useState(false)
+export default function ReportQuestion({ questionId, startOpen = false, onDone }) {
+  const [open, setOpen] = useState(startOpen)
   const [reason, setReason] = useState('')
   const [note, setNote] = useState('')
   const [state, setState] = useState('idle') // idle | saving | done | error
@@ -53,7 +53,7 @@ export default function ReportQuestion({ questionId }) {
 
   if (state === 'done') {
     return (
-      <p className="t-caption mt-2 text-[var(--success-text)]">
+      <p className="t-caption m-2 text-[var(--success-text)]">
         Thanks. We will look at this one.
       </p>
     )
@@ -102,7 +102,13 @@ export default function ReportQuestion({ questionId }) {
       )}
 
       <div className="mt-3 flex gap-2">
-        <button onClick={() => setOpen(false)} className="btn btn-quiet control-sm">
+        <button
+          onClick={() => {
+            setOpen(false)
+            onDone?.()
+          }}
+          className="btn btn-quiet control-sm"
+        >
           Cancel
         </button>
         <button

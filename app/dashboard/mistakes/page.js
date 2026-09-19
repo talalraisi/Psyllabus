@@ -91,7 +91,7 @@ export default function MistakeBankPage() {
   if (loading || !profile) {
     return (
       <DashboardLayout profile={null}>
-        <PageLoading title="Mistake Bank" width="default" rows={4} variant="mistakes" />
+        <PageLoading title="Redemption" width="default" rows={4} variant="mistakes" />
       </DashboardLayout>
     )
   }
@@ -126,12 +126,12 @@ export default function MistakeBankPage() {
     <DashboardLayout profile={profile}>
       <Page width="default">
         <PageHeader
-          title="Mistake Bank"
-          subtitle="Every wrong answer comes back on a schedule until you have it three times running"
+          title="Redemption"
+          subtitle="Questions you got wrong come back until you have them three times running"
           action={
             dueInScope.length > 0 ? (
               <Link href={reviewHref} className="btn btn-solid control-md">
-                Review {dueInScope.length}
+                Redeem {dueInScope.length}
               </Link>
             ) : null
           }
@@ -139,8 +139,8 @@ export default function MistakeBankPage() {
 
         {mistakes.length === 0 ? (
           <EmptyState
-            title="No mistakes logged yet"
-            description="Take a quiz from any syllabus subtopic and wrong answers land here automatically, on a schedule that brings each one back until you have it three times running."
+            title="Nothing to redeem yet"
+            description="Get a question wrong and it comes back here, then again a week later, until you have it three times running."
           />
         ) : (
           <>

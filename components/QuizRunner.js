@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import CopyButton from '@/components/CopyButton'
+import QuestionMenu from '@/components/QuestionMenu'
 import HeatBadge from '@/components/HeatBadge'
 import QuestionFigure from '@/components/QuestionFigure'
 import QuestionStimulus from '@/components/QuestionStimulus'
@@ -149,6 +150,8 @@ export default function QuizRunner({
   const [emptyMessage, setEmptyMessage] = useState('')
   const [questions, setQuestions] = useState([])
   const [mistakeRowsById, setMistakeRowsById] = useState({})
+  // Which of this quiz's questions are here because you got them wrong before.
+  const [redemptionIds, setRedemptionIds] = useState(() => new Set())
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState({})
   const [results, setResults] = useState(null)
@@ -357,7 +360,58 @@ export default function QuizRunner({
         drawn.sort((a, b) => (b.difficulty ?? 0.5) - (a.difficulty ?? 0.5))
       }
 
-      setQuestions(drawn)
+      /**
+       * A couple of questions you got wrong, folded into the quiz you asked for.
+       *
+       * The mistake bank worked, and almost nobody opened it: a page you have
+       * to remember to visit is a page that competes with revision rather than
+       * being revision. So redemption comes to you — up to two due questions
+       * from this subject, mixed in, marked the same as everything else.
+       *
+       * Two, not ten: a quiz that is mostly old wrong answers feels like being
+       * told off, and this is supposed to be the part that clears your record.
+       */
+      let redeemed = []
+      if (mode !== 'mistakes' && mode !== 'paper' && drawn.length >= 4) {
+        const { data: dueRows } = await supabase
+          .from('mistakes')
+          .select('question_id, next_review_at, review_count, questions(*)')
+          .eq('user_id', user.id)
+          .eq('subject', subject)
+          .lte('next_review_at', new Date().toISOString())
+          .order('next_review_at', { ascending: true })
+          .limit(4)
+
+        const alreadyDrawn = new Set(drawn.map((q) => q.id))
+        redeemed = (dueRows || [])
+          .filter((r) => r.questions && !alreadyDrawn.has(r.question_id))
+          .slice(0, Math.min(2, Math.floor(drawn.length / 4)))
+
+        if (redeemed.length) {
+          setMistakeRowsById((prev) => ({
+            ...prev,
+            ...Object.fromEntries(redeemed.map((r) => [r.question_id, r])),
+          }))
+        }
+      }
+
+      let withRedemption = drawn
+      if (redeemed.length) {
+        withRedemption = shuffle([
+          ...drawn.slice(0, target - redeemed.length),
+          ...redeemed.map((r) => r.questions),
+        ])
+        // A paper asked for rising or falling difficulty keeps that shape;
+        // the redemption questions take their place within it.
+        if (order === 'rising') {
+          withRedemption.sort((a, b) => (a.difficulty ?? 0.5) - (b.difficulty ?? 0.5))
+        } else if (order === 'falling') {
+          withRedemption.sort((a, b) => (b.difficulty ?? 0.5) - (a.difficulty ?? 0.5))
+        }
+      }
+
+      setRedemptionIds(new Set(redeemed.map((r) => r.question_id)))
+      setQuestions(withRedemption)
       setPhase(PHASE.predict)
     }
     load()
@@ -411,7 +465,7 @@ export default function QuizRunner({
     setCurrentIndex(nextIndex)
   }
 
-  const selectAnswer = (questionId, optionId) => {
+  const selectAnswer = (questionId, optionId, { mark = false } = {}) => {
     // In practice mode an answer is final once given: marking it and then
     // letting you change it is not practice, it is a guess with a retry.
     if (review === 'practice' && revealed[questionId]) return
@@ -420,6 +474,15 @@ export default function QuizRunner({
       answersRef.current = next
       return next
     })
+    // Practice marks itself. A button that says "Check" is a step between
+    // answering and finding out, and nobody wants that step: you have already
+    // decided, and the only thing left is to be told.
+    if (mark && review === 'practice') {
+      const question = questions.find((x) => x.id === questionId)
+      if (question) {
+        setRevealed((prev) => ({ ...prev, [questionId]: gradeAnswer(question, optionId) }))
+      }
+    }
   }
 
   /**
@@ -822,6 +885,15 @@ export default function QuizRunner({
               Question {currentIndex + 1} of {questions.length} · {answeredCount} answered
             </p>
             <div className="flex items-center gap-4">
+              {redemptionIds.has(q.id) && (
+                <span
+                  className="text-[11px] font-semibold uppercase tracking-[0.08em]"
+                  style={{ color: 'var(--brand)' }}
+                  title="You got this one wrong before. Get it right to clear it."
+                >
+                  Redemption
+                </span>
+              )}
               <HeatBadge difficulty={q.difficulty} />
               <span className="text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
                 {q.marks || 1} mark{(q.marks || 1) !== 1 ? 's' : ''}
@@ -834,7 +906,7 @@ export default function QuizRunner({
 
         <div className="flex items-start justify-between gap-4">
           <p className="text-[17px] font-medium leading-relaxed">{q.stem}</p>
-          <CopyButton text={questionAsText(q)} label="" />
+          <QuestionMenu question={q} />
         </div>
 
         <QuestionFigure figure={q.figure} />
@@ -852,6 +924,13 @@ export default function QuizRunner({
               autoComplete="off"
               value={selected ?? ''}
               onChange={(e) => selectAnswer(q.id, e.target.value)}
+              // Typed answers cannot mark on every keystroke, so they mark on
+              // Enter or on leaving the box — still no button to press.
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') revealOne(q)
+              }}
+              onBlur={() => revealOne(q)}
+              disabled={review === 'practice' && !!revealed[q.id]}
               placeholder={q.answer_kind === 'numeric' ? 'e.g. 9.81' : 'Type your answer'}
               className="input mt-2"
             />
@@ -877,7 +956,7 @@ export default function QuizRunner({
               return (
                 <button
                   key={opt.id}
-                  onClick={() => selectAnswer(q.id, opt.id)}
+                  onClick={() => selectAnswer(q.id, opt.id, { mark: true })}
                   disabled={!!mark}
                   className="flex items-center gap-3 rounded-xl border px-4 py-3.5 text-left text-[14.5px] leading-relaxed transition-colors duration-150 disabled:cursor-default"
                   style={{
@@ -982,15 +1061,6 @@ export default function QuizRunner({
             Back
           </button>
           <div className="flex-1" />
-          {review === 'practice' && !revealed[q.id] && (
-            <button
-              onClick={() => revealOne(q)}
-              disabled={selected == null || String(selected).trim() === ''}
-              className="btn btn-outline control-md disabled:opacity-40"
-            >
-              Check
-            </button>
-          )}
           {currentIndex < questions.length - 1 ? (
             <button
               onClick={() => goTo(currentIndex + 1)}

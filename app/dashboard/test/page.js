@@ -23,13 +23,16 @@ import { buildEffectiveProgressMap } from '@/lib/decay'
 import { accessibleSubjects, isPremium } from '@/lib/access'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
 
-const LENGTHS = [10, 20, 30, 45]
+// Five is there because most revision is not an hour of it. Five questions is
+// a bus stop, a gap between lessons, the thing you actually do rather than the
+// thing you plan to do on Sunday.
+const LENGTHS = [5, 10, 20, 45]
 
 /** The same paper, counted out the way you happen to be thinking about it. */
 const LENGTH_PRESETS = {
   questions: LENGTHS,
-  marks: [20, 40, 60, 80],
-  minutes: [15, 30, 45, 60],
+  marks: [10, 20, 40, 80],
+  minutes: [5, 15, 30, 60],
 }
 const LENGTH_UNIT = { questions: 'questions', marks: 'marks', minutes: 'min' }
 
