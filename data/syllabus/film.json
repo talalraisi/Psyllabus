@@ -1,0 +1,125 @@
+{
+  "course": "Film",
+  "curriculum": "IB",
+  "guide": "first assessment 2024",
+  "confidence": "medium — three core areas (reading film, contextualising film, exploring film production roles) with the HL collaborative film project follow the guide",
+  "subjects": { "sl": "Film SL", "hl": "Film HL" },
+  "note": "Three levels: area of the course, unit, then one assessable point. Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "topics": [
+    {
+      "topic": "Reading film",
+      "units": [
+        {
+          "code": "1.1",
+          "unit": "Film language",
+          "subtopics": [
+            ["Cinematography: shot size, angle, movement and lens", "sl"],
+            ["Mise-en-scene: setting, props, costume and blocking", "sl"],
+            ["Lighting and colour", "sl"],
+            ["Editing: continuity, montage, rhythm and transitions", "sl"],
+            ["Sound: diegetic, non-diegetic, score and silence", "sl"]
+          ]
+        },
+        {
+          "code": "1.2",
+          "unit": "Structure and genre",
+          "subtopics": [
+            ["Narrative and non-narrative structures", "sl"],
+            ["Genre codes and conventions", "sl"],
+            ["Motifs, symbols and themes", "sl"],
+            ["Point of view and narration", "sl"]
+          ]
+        },
+        {
+          "code": "1.3",
+          "unit": "Meaning and response",
+          "subtopics": [
+            ["How technique constructs meaning", "sl"],
+            ["Filmmaker intention and artistic choices", "sl"],
+            ["Audience response and interpretation", "sl"],
+            ["Writing a close textual analysis of an extract", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Contextualising film",
+      "units": [
+        {
+          "code": "2.1",
+          "unit": "Film across time and place",
+          "subtopics": [
+            ["Historical development of film technology and form", "sl"],
+            ["National and regional cinemas", "sl"],
+            ["Film movements: neorealism, new waves, expressionism", "sl"],
+            ["Institutional, economic and technological contexts", "sl"]
+          ]
+        },
+        {
+          "code": "2.2",
+          "unit": "The comparative study",
+          "subtopics": [
+            ["Choosing an area of film focus and two films", "sl"],
+            ["Framing a comparative research question", "sl"],
+            ["Using film theory and critical frameworks", "sl"],
+            ["Constructing the recorded multimedia study", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Exploring film production roles",
+      "units": [
+        {
+          "code": "3.1",
+          "unit": "The production process",
+          "subtopics": [
+            ["Pre-production: research, scripting and storyboarding", "sl"],
+            ["Production: shooting, directing and recording", "sl"],
+            ["Post-production: editing, sound design and grading", "sl"],
+            ["Reflecting on intentions against the finished work", "sl"]
+          ]
+        },
+        {
+          "code": "3.2",
+          "unit": "Roles in filmmaking",
+          "subtopics": [
+            ["Director: vision and realisation", "sl"],
+            ["Writer: screenplay development and revision", "sl"],
+            ["Cinematographer: framing, lighting and camera", "sl"],
+            ["Editor: selection, assembly and rhythm", "sl"],
+            ["Sound: recording, design and mixing", "sl"],
+            ["Production design and other defined roles", "sl"]
+          ]
+        },
+        {
+          "code": "3.3",
+          "unit": "The film portfolio",
+          "subtopics": [
+            ["Documenting work in three production roles", "sl"],
+            ["Justifying creative decisions with evidence", "sl"],
+            ["Assembling and presenting the reel", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Collaboratively producing film",
+      "units": [
+        {
+          "code": "4.1",
+          "unit": "The collaborative film project",
+          "subtopics": [
+            ["Core production team roles and responsibilities", "hl"],
+            ["Shared artistic intention and planning", "hl"],
+            ["Contributing across all phases of production", "hl"],
+            ["Creating an original completed film", "hl"],
+            ["Evaluating collaboration and individual contribution", "hl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

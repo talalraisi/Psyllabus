@@ -1,0 +1,114 @@
+{
+  "course": "Music",
+  "curriculum": "IB",
+  "guide": "first assessment 2022",
+  "confidence": "medium — the four areas of inquiry and the three processes (exploring, experimenting, presenting) with the HL contemporary music-maker project follow the guide",
+  "subjects": { "sl": "Music SL", "hl": "Music HL" },
+  "note": "Three levels: area of the course, unit, then one assessable point. Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "topics": [
+    {
+      "topic": "Exploring music in context",
+      "units": [
+        {
+          "code": "1.1",
+          "unit": "Areas of inquiry",
+          "subtopics": [
+            ["Music for socio-cultural and political expression", "sl"],
+            ["Music for listening and performance", "sl"],
+            ["Music for dramatic impact, movement and entertainment", "sl"],
+            ["Music technology in the electronic and digital age", "sl"]
+          ]
+        },
+        {
+          "code": "1.2",
+          "unit": "Musical elements and analysis",
+          "subtopics": [
+            ["Melody, motif and thematic development", "sl"],
+            ["Harmony, tonality and cadences", "sl"],
+            ["Rhythm, metre and tempo", "sl"],
+            ["Texture, timbre and instrumentation", "sl"],
+            ["Form and structure", "sl"],
+            ["Notation, score reading and terminology", "sl"]
+          ]
+        },
+        {
+          "code": "1.3",
+          "unit": "Music in its context",
+          "subtopics": [
+            ["Western art music traditions and periods", "sl"],
+            ["Music of the world's cultures and traditions", "sl"],
+            ["Popular music, jazz and contemporary styles", "sl"],
+            ["Relating musical material to its cultural context", "sl"],
+            ["Comparing works from different times and places", "ext"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Experimenting with music",
+      "units": [
+        {
+          "code": "2.1",
+          "unit": "Creating",
+          "subtopics": [
+            ["Experimenting with style, genre and tradition", "sl"],
+            ["Developing musical ideas through composition", "sl"],
+            ["Arranging and reworking existing material", "sl"],
+            ["Using music technology and digital tools", "sl"]
+          ]
+        },
+        {
+          "code": "2.2",
+          "unit": "Performing",
+          "subtopics": [
+            ["Exploring performance techniques and interpretation", "sl"],
+            ["Adapting music for different ensembles and contexts", "sl"],
+            ["Improvisation and real-time decision-making", "sl"],
+            ["Evaluating performance decisions", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Presenting music",
+      "units": [
+        {
+          "code": "3.1",
+          "unit": "Performance and composition",
+          "subtopics": [
+            ["Solo and ensemble performance", "sl"],
+            ["Composition and arrangement for a chosen medium", "sl"],
+            ["Integrating technology in live and recorded work", "sl"],
+            ["Articulating artistic intention", "sl"]
+          ]
+        },
+        {
+          "code": "3.2",
+          "unit": "Documentation and reflection",
+          "subtopics": [
+            ["Curating a programme or portfolio", "sl"],
+            ["Documenting process, rationale and sources", "sl"],
+            ["Reflecting on strengths, limitations and development", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "The contemporary music-maker",
+      "units": [
+        {
+          "code": "4.1",
+          "unit": "The HL project",
+          "subtopics": [
+            ["Planning a real-world music project", "hl"],
+            ["Collaboration, roles and audience", "hl"],
+            ["Executing and documenting the project", "hl"],
+            ["Evaluating impact and learning", "hl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

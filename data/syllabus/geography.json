@@ -1,0 +1,448 @@
+{
+  "course": "Geography",
+  "curriculum": "IB",
+  "guide": "first assessment 2019",
+  "confidence": "medium-high — the core, the seven optional themes and the HL extension are the guide's; note the option letters (E is leisure, tourism and sport; G is urban environments), which the pasted list had swapped",
+  "subjects": { "sl": "Geography SL", "hl": "Geography HL" },
+  "note": "Three levels: part of the course, unit, then one assessable point. Schools choose options: SL takes two, HL takes three. Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "topics": [
+    {
+      "topic": "Core - Geographic perspectives: global change",
+      "units": [
+        {
+          "code": "1.1",
+          "unit": "Population distribution and megacities",
+          "subtopics": [
+            ["Global population distribution and density", "sl"],
+            ["Physical and human factors affecting distribution", "sl"],
+            ["Megacities: growth, definition and distribution", "sl"],
+            ["Forced migration and internal displacement", "sl"]
+          ]
+        },
+        {
+          "code": "1.2",
+          "unit": "Changing populations and places",
+          "subtopics": [
+            ["Population momentum and demographic transition", "sl"],
+            ["Population pyramids and dependency ratios", "sl"],
+            ["Ageing populations and their consequences", "sl"],
+            ["Pro-natalist and anti-natalist policies", "sl"],
+            ["Gender equality and its effect on population change", "sl"]
+          ]
+        },
+        {
+          "code": "1.3",
+          "unit": "Population, resources and development",
+          "subtopics": [
+            ["Malthusian and Boserupian views of resources", "sl"],
+            ["Measuring development: single and composite indicators", "sl"],
+            ["Progress in health, education and gender equality", "sl"],
+            ["The demographic dividend", "sl"]
+          ]
+        },
+        {
+          "code": "2.1",
+          "unit": "The causes of global climate change",
+          "subtopics": [
+            ["The atmospheric system and energy balance", "sl"],
+            ["Natural and human causes of climate change", "sl"],
+            ["Evidence and measurement of climate change", "sl"],
+            ["Feedback loops in the climate system", "sl"]
+          ]
+        },
+        {
+          "code": "2.2",
+          "unit": "The consequences of global climate change",
+          "subtopics": [
+            ["Impacts on ecosystems and biodiversity", "sl"],
+            ["Impacts on water, agriculture and health", "sl"],
+            ["Sea-level rise and vulnerable coastal populations", "sl"],
+            ["Differential vulnerability of places and groups", "sl"]
+          ]
+        },
+        {
+          "code": "2.3",
+          "unit": "Responding to global climate change",
+          "subtopics": [
+            ["Mitigation: carbon reduction, geoengineering, carbon trading", "sl"],
+            ["Adaptation strategies and resilience", "sl"],
+            ["Role of civil society, corporations and governments", "sl"],
+            ["International agreements and their effectiveness", "sl"]
+          ]
+        },
+        {
+          "code": "3.1",
+          "unit": "Global resource consumption and security",
+          "subtopics": [
+            ["The new global middle class and consumption trends", "sl"],
+            ["Ecological footprints and resource stress", "sl"],
+            ["Water, food and energy security and the nexus between them", "sl"],
+            ["Recycling, waste and the circular economy", "sl"],
+            ["Resource stewardship and possible futures", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Option A - Freshwater",
+      "units": [
+        {
+          "code": "A.1",
+          "unit": "Drainage basin hydrology and geomorphology",
+          "subtopics": [
+            ["Drainage basins as open systems: inputs, stores, flows, outputs", "sl"],
+            ["Hydrographs and factors affecting them", "sl"],
+            ["River processes: erosion, transport and deposition", "sl"],
+            ["Fluvial landforms and their formation", "sl"]
+          ]
+        },
+        {
+          "code": "A.2",
+          "unit": "Flooding and flood mitigation",
+          "subtopics": [
+            ["Natural and human causes of flooding", "sl"],
+            ["Flood prediction, forecasting and risk", "sl"],
+            ["Hard engineering approaches to flood management", "sl"],
+            ["Soft engineering and floodplain zoning", "sl"]
+          ]
+        },
+        {
+          "code": "A.3",
+          "unit": "Water scarcity and water quality",
+          "subtopics": [
+            ["Physical and economic water scarcity", "sl"],
+            ["Water pollution sources and effects", "sl"],
+            ["Agricultural, industrial and domestic water demand", "sl"],
+            ["Irrigation, aquifer depletion and salinisation", "sl"]
+          ]
+        },
+        {
+          "code": "A.4",
+          "unit": "Water management futures",
+          "subtopics": [
+            ["Dams, reservoirs and their consequences", "sl"],
+            ["Integrated drainage basin management", "sl"],
+            ["Transboundary water conflicts and cooperation", "sl"],
+            ["Water conservation and sustainable use", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Option B - Oceans and coastal margins",
+      "units": [
+        {
+          "code": "B.1",
+          "unit": "Ocean-atmosphere interactions",
+          "subtopics": [
+            ["Ocean currents, gyres and thermohaline circulation", "sl"],
+            ["El Nino and La Nina and their consequences", "sl"],
+            ["Oceans as carbon sinks and climate regulators", "sl"]
+          ]
+        },
+        {
+          "code": "B.2",
+          "unit": "Interactions between oceans and coastal places",
+          "subtopics": [
+            ["Waves, tides and coastal processes", "sl"],
+            ["Erosional and depositional coastal landforms", "sl"],
+            ["Coral reefs, mangroves and coastal ecosystems", "sl"],
+            ["Coastal hazards and vulnerability", "sl"]
+          ]
+        },
+        {
+          "code": "B.3",
+          "unit": "Managing coastal margins",
+          "subtopics": [
+            ["Hard and soft coastal engineering", "sl"],
+            ["Managed retreat and integrated coastal management", "sl"],
+            ["Coastal conflicts between stakeholders", "sl"]
+          ]
+        },
+        {
+          "code": "B.4",
+          "unit": "Ocean management futures",
+          "subtopics": [
+            ["Overfishing and fisheries management", "sl"],
+            ["Ocean pollution including plastics and oil", "sl"],
+            ["Marine protected areas and international governance", "sl"],
+            ["Geopolitics of ocean resources and shipping", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Option C - Extreme environments",
+      "units": [
+        {
+          "code": "C.1",
+          "unit": "The characteristics of extreme environments",
+          "subtopics": [
+            ["Distribution of cold and high-altitude environments", "sl"],
+            ["Distribution of hot arid and semi-arid environments", "sl"],
+            ["Climate, soils and vegetation of extreme environments", "sl"],
+            ["Population density and human occupation", "sl"]
+          ]
+        },
+        {
+          "code": "C.2",
+          "unit": "Physical processes and landscapes",
+          "subtopics": [
+            ["Glacial processes and landforms", "sl"],
+            ["Periglacial processes and permafrost", "sl"],
+            ["Desert weathering, aeolian and fluvial processes", "sl"],
+            ["Landforms of hot arid environments", "sl"]
+          ]
+        },
+        {
+          "code": "C.3",
+          "unit": "Managing extreme environments",
+          "subtopics": [
+            ["Opportunities: mineral extraction, tourism, energy", "sl"],
+            ["Challenges: accessibility, hazards, fragile ecosystems", "sl"],
+            ["Indigenous and traditional land use", "sl"]
+          ]
+        },
+        {
+          "code": "C.4",
+          "unit": "Extreme environments and global change",
+          "subtopics": [
+            ["Cryosphere change and global consequences", "sl"],
+            ["Desertification and land degradation", "sl"],
+            ["Sustainable management and conservation", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Option D - Geophysical hazards",
+      "units": [
+        {
+          "code": "D.1",
+          "unit": "Geophysical systems",
+          "subtopics": [
+            ["Plate tectonics and plate boundaries", "sl"],
+            ["Earthquakes: causes, magnitude and distribution", "sl"],
+            ["Volcanoes: types, eruptions and distribution", "sl"],
+            ["Mass movement processes and landslides", "sl"]
+          ]
+        },
+        {
+          "code": "D.2",
+          "unit": "Geophysical hazard risks",
+          "subtopics": [
+            ["Hazard, risk, vulnerability and resilience", "sl"],
+            ["Factors affecting the impact of a hazard event", "sl"],
+            ["Social, economic and environmental impacts", "sl"],
+            ["Comparing hazard events in contrasting places", "sl"]
+          ]
+        },
+        {
+          "code": "D.3",
+          "unit": "Hazard risk and vulnerability",
+          "subtopics": [
+            ["Prediction, monitoring and early warning", "sl"],
+            ["Preparedness, education and emergency planning", "sl"],
+            ["Building design, land-use planning and mitigation", "sl"]
+          ]
+        },
+        {
+          "code": "D.4",
+          "unit": "Future resilience and adaptation",
+          "subtopics": [
+            ["Post-event responses and recovery", "sl"],
+            ["Community-based disaster risk reduction", "sl"],
+            ["Role of technology, aid and governance", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Option E - Leisure, tourism and sport",
+      "units": [
+        {
+          "code": "E.1",
+          "unit": "Changing leisure patterns",
+          "subtopics": [
+            ["Growth and diversity of leisure, tourism and sport", "sl"],
+            ["Factors affecting participation: affluence, culture, technology", "sl"],
+            ["Global distribution of tourist destinations", "sl"]
+          ]
+        },
+        {
+          "code": "E.2",
+          "unit": "Tourism and sport at the local and national scale",
+          "subtopics": [
+            ["Detailed study of a tourist destination", "sl"],
+            ["Factors affecting the growth of national sport leagues", "sl"],
+            ["Butler's tourist area life cycle model", "sl"]
+          ]
+        },
+        {
+          "code": "E.3",
+          "unit": "International tourism and sport",
+          "subtopics": [
+            ["Global sporting events and their costs and benefits", "sl"],
+            ["Tourism as a national development strategy", "sl"],
+            ["Political and cultural influences on tourism", "sl"]
+          ]
+        },
+        {
+          "code": "E.4",
+          "unit": "Managing tourism and sport for the future",
+          "subtopics": [
+            ["Consequences of unsustainable tourism", "sl"],
+            ["Ecotourism and sustainable tourism management", "sl"],
+            ["Future international tourism and sport participation", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Option F - Food and health",
+      "units": [
+        {
+          "code": "F.1",
+          "unit": "Measuring food and health",
+          "subtopics": [
+            ["Global patterns of calorie intake and undernourishment", "sl"],
+            ["Indicators of health: life expectancy, infant mortality, HALE", "sl"],
+            ["Global patterns of disease and epidemiological transition", "sl"]
+          ]
+        },
+        {
+          "code": "F.2",
+          "unit": "Food systems and spread of diseases",
+          "subtopics": [
+            ["Areal differentiation of food production systems", "sl"],
+            ["Factors affecting agricultural yield and food security", "sl"],
+            ["Diffusion of disease: vectors, transmission and barriers", "sl"]
+          ]
+        },
+        {
+          "code": "F.3",
+          "unit": "Stakeholders in food and health",
+          "subtopics": [
+            ["Role of governments, TNCs and NGOs in food supply", "sl"],
+            ["Health interventions, vaccination and primary care", "sl"],
+            ["Sustainable and alternative food production", "sl"]
+          ]
+        },
+        {
+          "code": "F.4",
+          "unit": "Future health and food security",
+          "subtopics": [
+            ["Malnutrition, obesity and the nutrition transition", "sl"],
+            ["Prospects for food security and technological change", "sl"],
+            ["Emerging and re-emerging diseases and pandemic risk", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Option G - Urban environments",
+      "units": [
+        {
+          "code": "G.1",
+          "unit": "The variety of urban environments",
+          "subtopics": [
+            ["Urbanisation, suburbanisation and counter-urbanisation", "sl"],
+            ["Urban land use patterns and models", "sl"],
+            ["Factors affecting the pattern of urban economic activity", "sl"],
+            ["Urban deprivation and residential segregation", "sl"]
+          ]
+        },
+        {
+          "code": "G.2",
+          "unit": "Urban and peri-urban systems",
+          "subtopics": [
+            ["Urban microclimate and the heat island effect", "sl"],
+            ["Urban air and water pollution", "sl"],
+            ["Urban waste generation and management", "sl"],
+            ["The peri-urban fringe and its pressures", "sl"]
+          ]
+        },
+        {
+          "code": "G.3",
+          "unit": "Urban issues and challenges",
+          "subtopics": [
+            ["Informal settlements and housing provision", "sl"],
+            ["Urban transport, congestion and accessibility", "sl"],
+            ["Crime, safety and urban social tensions", "sl"]
+          ]
+        },
+        {
+          "code": "G.4",
+          "unit": "Building sustainable urban systems",
+          "subtopics": [
+            ["Urban regeneration, renewal and gentrification", "sl"],
+            ["Eco-city design and smart city technology", "sl"],
+            ["Urban resilience to hazards and climate change", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "HL extension - Global interactions",
+      "units": [
+        {
+          "code": "HL.1",
+          "unit": "Power, places and networks",
+          "subtopics": [
+            ["Measuring globalisation and global interactions indices", "hl"],
+            ["Global superpowers, TNCs and international organisations", "hl"],
+            ["Global networks: trade, flows of capital, labour and data", "hl"],
+            ["Time-space convergence and the shrinking world", "hl"]
+          ]
+        },
+        {
+          "code": "HL.2",
+          "unit": "Human development and diversity",
+          "subtopics": [
+            ["Development opportunities and global interactions", "hl"],
+            ["Cultural diffusion, hybridity and cultural imperialism", "hl"],
+            ["Loss of sovereignty and local responses", "hl"],
+            ["Migration, diaspora and identity", "hl"]
+          ]
+        },
+        {
+          "code": "HL.3",
+          "unit": "Global risks and resilience",
+          "subtopics": [
+            ["Geopolitical and economic risks of global interactions", "hl"],
+            ["Environmental risks: pollution transfer and food miles", "hl"],
+            ["Threats to individuals and businesses: cyber, surveillance", "hl"],
+            ["Local and civil-society resistance to globalisation", "hl"],
+            ["Building resilience at local and global scale", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Fieldwork and assessment",
+      "units": [
+        {
+          "code": "S.1",
+          "unit": "The internal assessment fieldwork",
+          "subtopics": [
+            ["Formulating a geographic fieldwork question", "sl"],
+            ["Selecting methods, sampling and safety", "sl"],
+            ["Data presentation techniques and statistics", "sl"],
+            ["Analysis, conclusion and evaluation of the investigation", "sl"]
+          ]
+        },
+        {
+          "code": "S.2",
+          "unit": "Examination technique",
+          "subtopics": [
+            ["Interpreting maps, graphs, photographs and data", "sl"],
+            ["Using case studies as evidence", "sl"],
+            ["Structuring extended-response answers", "sl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

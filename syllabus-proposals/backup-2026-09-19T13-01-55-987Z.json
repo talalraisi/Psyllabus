@@ -1,0 +1,332 @@
+[
+  {
+    "subject": "Psychology SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Biological approach to understanding behaviour",
+        "subtopic": "Brain and behaviour",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Biological approach to understanding behaviour",
+        "subtopic": "Neurotransmission",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Biological approach to understanding behaviour",
+        "subtopic": "Hormones and behaviour",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Biological approach to understanding behaviour",
+        "subtopic": "Genes and behaviour",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Biological approach to understanding behaviour",
+        "subtopic": "Evolutionary explanations of behaviour",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Cognitive approach to understanding behaviour",
+        "subtopic": "Schema theory",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Cognitive approach to understanding behaviour",
+        "subtopic": "Memory processes",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Cognitive approach to understanding behaviour",
+        "subtopic": "Thinking, decision-making and biases",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Cognitive approach to understanding behaviour",
+        "subtopic": "Perception",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Cognitive approach to understanding behaviour",
+        "subtopic": "Reconstructive memory",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Sociocultural approach to understanding behaviour",
+        "subtopic": "Social cognition",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Sociocultural approach to understanding behaviour",
+        "subtopic": "Conformity and obedience",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Sociocultural approach to understanding behaviour",
+        "subtopic": "Social identity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Sociocultural approach to understanding behaviour",
+        "subtopic": "Cultural influences on behaviour",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Sociocultural approach to understanding behaviour",
+        "subtopic": "Stereotypes, prejudice and discrimination",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Abnormal psychology",
+        "subtopic": "Definitions of abnormality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Abnormal psychology",
+        "subtopic": "Causes of abnormal behaviour",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Abnormal psychology",
+        "subtopic": "Anxiety disorders",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Abnormal psychology",
+        "subtopic": "Mood disorders",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Abnormal psychology",
+        "subtopic": "Schizophrenia",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Human relationships",
+        "subtopic": "Attraction",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Human relationships",
+        "subtopic": "Relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Human relationships",
+        "subtopic": "Prosocial behaviour",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Human relationships",
+        "subtopic": "Aggression",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Human relationships",
+        "subtopic": "Social influence in relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Research methods",
+        "subtopic": "Experimental methods",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Research methods",
+        "subtopic": "Sampling techniques",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Research methods",
+        "subtopic": "Data collection methods",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Research methods",
+        "subtopic": "Ethical considerations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Research methods",
+        "subtopic": "Evaluation of psychological research",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Psychology HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Biological approach to understanding behaviour",
+        "subtopic": "Brain and behaviour",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Biological approach to understanding behaviour",
+        "subtopic": "Neurotransmission",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Biological approach to understanding behaviour",
+        "subtopic": "Hormones and behaviour",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Biological approach to understanding behaviour",
+        "subtopic": "Genes and behaviour",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Biological approach to understanding behaviour",
+        "subtopic": "Evolutionary explanations of behaviour",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Cognitive approach to understanding behaviour",
+        "subtopic": "Schema theory",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Cognitive approach to understanding behaviour",
+        "subtopic": "Memory processes",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Cognitive approach to understanding behaviour",
+        "subtopic": "Thinking, decision-making and biases",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Cognitive approach to understanding behaviour",
+        "subtopic": "Perception",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Cognitive approach to understanding behaviour",
+        "subtopic": "Reconstructive memory",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Sociocultural approach to understanding behaviour",
+        "subtopic": "Social cognition",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Sociocultural approach to understanding behaviour",
+        "subtopic": "Conformity and obedience",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Sociocultural approach to understanding behaviour",
+        "subtopic": "Social identity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Sociocultural approach to understanding behaviour",
+        "subtopic": "Cultural influences on behaviour",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Sociocultural approach to understanding behaviour",
+        "subtopic": "Stereotypes, prejudice and discrimination",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Abnormal psychology",
+        "subtopic": "Definitions of abnormality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Abnormal psychology",
+        "subtopic": "Causes of abnormal behaviour",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Abnormal psychology",
+        "subtopic": "Anxiety disorders",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Abnormal psychology",
+        "subtopic": "Mood disorders",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Abnormal psychology",
+        "subtopic": "Schizophrenia",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Human relationships",
+        "subtopic": "Attraction",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Human relationships",
+        "subtopic": "Relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Human relationships",
+        "subtopic": "Prosocial behaviour",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Human relationships",
+        "subtopic": "Aggression",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Human relationships",
+        "subtopic": "Social influence in relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Research methods",
+        "subtopic": "Experimental methods",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Research methods",
+        "subtopic": "Sampling techniques",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Research methods",
+        "subtopic": "Data collection methods",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Research methods",
+        "subtopic": "Ethical considerations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Research methods",
+        "subtopic": "Evaluation of psychological research",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - HL extension",
+        "subtopic": "More advanced research design and analysis (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 7 - HL extension",
+        "subtopic": "Deeper evaluation of psychological theories (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 7 - HL extension",
+        "subtopic": "Extended essay-style argumentation (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 7 - HL extension",
+        "subtopic": "More complex application of studies and evidence (HL only)",
+        "hl_only": true
+      }
+    ]
+  }
+]

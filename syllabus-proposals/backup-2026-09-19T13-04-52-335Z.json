@@ -1,0 +1,197 @@
+[
+  {
+    "subject": "Philosophy SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Core themes",
+        "subtopic": "What is a human being?",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Core themes",
+        "subtopic": "What counts as knowledge?",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Core themes",
+        "subtopic": "What is the basis of moral judgment?",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Core themes",
+        "subtopic": "What is it to live a good life?",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Core themes",
+        "subtopic": "What is the role of politics and society?",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Core themes",
+        "subtopic": "What is the nature of reality?",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Philosophical analysis and argument",
+        "subtopic": "Identifying philosophical issues",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Philosophical analysis and argument",
+        "subtopic": "Constructing arguments",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Philosophical analysis and argument",
+        "subtopic": "Evaluating arguments",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Philosophical analysis and argument",
+        "subtopic": "Using examples and thought experiments",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Philosophical analysis and argument",
+        "subtopic": "Considering counterarguments",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Philosophical traditions and thinkers",
+        "subtopic": "Major Western philosophical traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Philosophical traditions and thinkers",
+        "subtopic": "Non-Western philosophical traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Philosophical traditions and thinkers",
+        "subtopic": "Historical and contemporary philosophers",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Philosophical traditions and thinkers",
+        "subtopic": "Comparing philosophical perspectives",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Philosophical traditions and thinkers",
+        "subtopic": "Philosophical terminology and concepts",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Philosophy HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Core themes",
+        "subtopic": "What is a human being?",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Core themes",
+        "subtopic": "What counts as knowledge?",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Core themes",
+        "subtopic": "What is the basis of moral judgment?",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Core themes",
+        "subtopic": "What is it to live a good life?",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Core themes",
+        "subtopic": "What is the role of politics and society?",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Core themes",
+        "subtopic": "What is the nature of reality?",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Philosophical analysis and argument",
+        "subtopic": "Identifying philosophical issues",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Philosophical analysis and argument",
+        "subtopic": "Constructing arguments",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Philosophical analysis and argument",
+        "subtopic": "Evaluating arguments",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Philosophical analysis and argument",
+        "subtopic": "Using examples and thought experiments",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Philosophical analysis and argument",
+        "subtopic": "Considering counterarguments",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Philosophical traditions and thinkers",
+        "subtopic": "Major Western philosophical traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Philosophical traditions and thinkers",
+        "subtopic": "Non-Western philosophical traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Philosophical traditions and thinkers",
+        "subtopic": "Historical and contemporary philosophers",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Philosophical traditions and thinkers",
+        "subtopic": "Comparing philosophical perspectives",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Philosophical traditions and thinkers",
+        "subtopic": "Philosophical terminology and concepts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - HL extension",
+        "subtopic": "Deeper comparative analysis (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - HL extension",
+        "subtopic": "More advanced critical evaluation (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - HL extension",
+        "subtopic": "Extended philosophical writing (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - HL extension",
+        "subtopic": "More complex text interpretation (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - HL extension",
+        "subtopic": "Broader engagement with philosophical sources (HL only)",
+        "hl_only": true
+      }
+    ]
+  }
+]

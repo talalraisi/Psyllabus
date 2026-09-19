@@ -1,0 +1,124 @@
+{
+  "course": "Visual arts",
+  "curriculum": "IB",
+  "guide": "first teaching 2025, first assessment 2027",
+  "confidence": "medium — follows the new guide's three areas (create, connect, communicate) with the connections study at SL and the artist project at HL",
+  "subjects": { "sl": "Visual Arts SL", "hl": "Visual Arts HL" },
+  "note": "Three levels: area, unit, then one assessable point. Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "topics": [
+    {
+      "topic": "Create",
+      "units": [
+        {
+          "code": "1.1",
+          "unit": "Art-making inquiries",
+          "subtopics": [
+            ["Developing a line of inquiry and artistic intention", "sl"],
+            ["Experimenting with media, materials and techniques", "sl"],
+            ["Two-dimensional forms: drawing, painting, printmaking", "sl"],
+            ["Three-dimensional forms: sculpture, ceramics, installation", "sl"],
+            ["Lens-based, digital and time-based media", "sl"],
+            ["Developing a personal visual language", "sl"]
+          ]
+        },
+        {
+          "code": "1.2",
+          "unit": "Formal qualities and technique",
+          "subtopics": [
+            ["Line, shape, form and space", "sl"],
+            ["Colour theory and its use", "sl"],
+            ["Composition, balance and focal point", "sl"],
+            ["Texture, surface and materiality", "sl"],
+            ["Technical skill and control of the medium", "sl"]
+          ]
+        },
+        {
+          "code": "1.3",
+          "unit": "Process and reflection",
+          "subtopics": [
+            ["Planning, iterating and refining work", "sl"],
+            ["Documenting process and decisions", "sl"],
+            ["Evaluating strengths, limitations and next steps", "sl"],
+            ["Safe and ethical use of materials and sources", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Connect",
+      "units": [
+        {
+          "code": "2.1",
+          "unit": "Investigating artists and artworks",
+          "subtopics": [
+            ["Formal analysis of an artwork", "sl"],
+            ["Interpreting meaning, symbolism and intention", "sl"],
+            ["Cultural, historical and social context of an artwork", "sl"],
+            ["Comparing artists, movements and traditions", "sl"],
+            ["Function and purpose of art in different cultures", "sl"]
+          ]
+        },
+        {
+          "code": "2.2",
+          "unit": "Connecting to your own practice",
+          "subtopics": [
+            ["Identifying influences on your own work", "sl"],
+            ["Adapting techniques and ideas from other artists", "sl"],
+            ["Situating your work within wider art discourse", "sl"],
+            ["Acknowledging sources and avoiding appropriation", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Communicate",
+      "units": [
+        {
+          "code": "3.1",
+          "unit": "Resolved artworks",
+          "subtopics": [
+            ["Producing a coherent body of resolved work", "sl"],
+            ["Relationship between intention and outcome", "sl"],
+            ["Selecting and sequencing works for an exhibition", "sl"]
+          ]
+        },
+        {
+          "code": "3.2",
+          "unit": "Exhibition and curation",
+          "subtopics": [
+            ["Curatorial rationale and exhibition concept", "sl"],
+            ["Writing exhibition texts for artworks", "sl"],
+            ["Display, space and viewer experience", "sl"],
+            ["Responding to audience and critical feedback", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Connections study and artist project",
+      "units": [
+        {
+          "code": "4.1",
+          "unit": "Connections study",
+          "subtopics": [
+            ["Investigating links between your work and other artists", "sl"],
+            ["Analysing contexts and influences", "sl"],
+            ["Presenting findings as a structured study", "sl"]
+          ]
+        },
+        {
+          "code": "4.2",
+          "unit": "Artist project",
+          "subtopics": [
+            ["Developing a sustained, self-directed inquiry", "hl"],
+            ["Producing and refining a cohesive body of work", "hl"],
+            ["Documenting process, intentions and reflection", "hl"],
+            ["Positioning the project in a wider artistic context", "hl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

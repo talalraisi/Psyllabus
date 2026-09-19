@@ -1,0 +1,267 @@
+[
+  {
+    "subject": "Theatre SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Theatre in context",
+        "subtopic": "Theatre as a human activity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Theatre in context",
+        "subtopic": "Theatre in cultural and historical contexts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Theatre in context",
+        "subtopic": "Theatre and performance traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Theatre in context",
+        "subtopic": "Theatre and society",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Theatre in context",
+        "subtopic": "Theatre and identity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Theatre in context",
+        "subtopic": "Theatre in the making",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Theatre processes and production",
+        "subtopic": "Dramatic action",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Theatre processes and production",
+        "subtopic": "Theatre-making processes",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Theatre processes and production",
+        "subtopic": "Directing and creating",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Theatre processes and production",
+        "subtopic": "Rehearsal and performance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Theatre processes and production",
+        "subtopic": "Designing for theatre",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Theatre processes and production",
+        "subtopic": "Technical theatre",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Presenting theatre",
+        "subtopic": "Performing skills",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Presenting theatre",
+        "subtopic": "Presentation and audience impact",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Presenting theatre",
+        "subtopic": "Design and staging",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Presenting theatre",
+        "subtopic": "Collaboration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Presenting theatre",
+        "subtopic": "Reflection and evaluation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Presenting theatre",
+        "subtopic": "HL only performance and presentation extension",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Theatre analysis and evaluation",
+        "subtopic": "Dramatic literature",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Theatre analysis and evaluation",
+        "subtopic": "Theatre traditions and styles",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Theatre analysis and evaluation",
+        "subtopic": "Viewing and analysing theatre",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Theatre analysis and evaluation",
+        "subtopic": "Research and interpretation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Theatre analysis and evaluation",
+        "subtopic": "Comparative study",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Theatre analysis and evaluation",
+        "subtopic": "Critical reflection",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Theatre HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Theatre in context",
+        "subtopic": "Theatre as a human activity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Theatre in context",
+        "subtopic": "Theatre in cultural and historical contexts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Theatre in context",
+        "subtopic": "Theatre and performance traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Theatre in context",
+        "subtopic": "Theatre and society",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Theatre in context",
+        "subtopic": "Theatre and identity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Theatre in context",
+        "subtopic": "Theatre in the making",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Theatre in context",
+        "subtopic": "Deeper theatre in context (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - Theatre processes and production",
+        "subtopic": "Dramatic action",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Theatre processes and production",
+        "subtopic": "Theatre-making processes",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Theatre processes and production",
+        "subtopic": "Directing and creating",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Theatre processes and production",
+        "subtopic": "Rehearsal and performance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Theatre processes and production",
+        "subtopic": "Designing for theatre",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Theatre processes and production",
+        "subtopic": "Technical theatre",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Theatre processes and production",
+        "subtopic": "Extended theatre production study (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Presenting theatre",
+        "subtopic": "Performing skills",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Presenting theatre",
+        "subtopic": "Presentation and audience impact",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Presenting theatre",
+        "subtopic": "Design and staging",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Presenting theatre",
+        "subtopic": "Collaboration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Presenting theatre",
+        "subtopic": "Reflection and evaluation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Presenting theatre",
+        "subtopic": "HL only performance and presentation extension",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Theatre analysis and evaluation",
+        "subtopic": "Dramatic literature",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Theatre analysis and evaluation",
+        "subtopic": "Theatre traditions and styles",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Theatre analysis and evaluation",
+        "subtopic": "Viewing and analysing theatre",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Theatre analysis and evaluation",
+        "subtopic": "Research and interpretation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Theatre analysis and evaluation",
+        "subtopic": "Comparative study",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Theatre analysis and evaluation",
+        "subtopic": "Critical reflection",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Theatre analysis and evaluation",
+        "subtopic": "Advanced theatre analysis (HL only)",
+        "hl_only": true
+      }
+    ]
+  }
+]

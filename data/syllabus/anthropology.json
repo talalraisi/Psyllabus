@@ -1,0 +1,191 @@
+{
+  "course": "Social and cultural anthropology",
+  "curriculum": "IB",
+  "guide": "first assessment 2019",
+  "confidence": "medium-high — the three parts (what anthropology is, engaging with anthropological research, and the HL theoretical perspectives and fieldwork) follow the guide",
+  "subjects": { "sl": "Social and Cultural Anthropology SL", "hl": "Social and Cultural Anthropology HL" },
+  "note": "Three levels: part of the course, unit, then one assessable point. Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "topics": [
+    {
+      "topic": "What is anthropology?",
+      "units": [
+        {
+          "code": "1.1",
+          "unit": "Core anthropological ideas",
+          "subtopics": [
+            ["Defining culture and society", "sl"],
+            ["Holism as an anthropological approach", "sl"],
+            ["Cultural relativism and ethnocentrism", "sl"],
+            ["Emic and etic perspectives", "sl"],
+            ["Thick description and interpretation", "sl"]
+          ]
+        },
+        {
+          "code": "1.2",
+          "unit": "Ethnography",
+          "subtopics": [
+            ["What an ethnography is and how it is written", "sl"],
+            ["Classic ethnographies and their arguments", "sl"],
+            ["Voice, positionality and reflexivity", "sl"],
+            ["Using ethnographic accounts as evidence", "sl"]
+          ]
+        },
+        {
+          "code": "1.3",
+          "unit": "Methods and ethics",
+          "subtopics": [
+            ["Participant observation in practice", "sl"],
+            ["Field notes: descriptive, methodological and analytical", "sl"],
+            ["Interviews: structured, semi-structured and unstructured", "sl"],
+            ["Visual, digital and multi-sited methods", "sl"],
+            ["Informed consent, anonymity and harm", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Social and cultural organization",
+      "units": [
+        {
+          "code": "2.1",
+          "unit": "Individuals, groups and society",
+          "subtopics": [
+            ["Socialisation and enculturation", "sl"],
+            ["Agency, structure and social reproduction", "sl"],
+            ["Personhood and the self across cultures", "sl"],
+            ["Conformity, deviance and social control", "sl"]
+          ]
+        },
+        {
+          "code": "2.2",
+          "unit": "Identity",
+          "subtopics": [
+            ["Gender and sexuality as cultural constructs", "sl"],
+            ["Ethnicity, race and nationality", "sl"],
+            ["Class, caste and social stratification", "sl"],
+            ["Age, generation and the life course", "sl"]
+          ]
+        },
+        {
+          "code": "2.3",
+          "unit": "Societies and cultures in contact",
+          "subtopics": [
+            ["Diffusion, borrowing and syncretism", "sl"],
+            ["Colonialism and its cultural consequences", "sl"],
+            ["Globalisation, hybridity and creolisation", "sl"],
+            ["Migration, diaspora and transnational communities", "sl"]
+          ]
+        },
+        {
+          "code": "2.4",
+          "unit": "Kinship as an organising principle",
+          "subtopics": [
+            ["Descent: unilineal, bilateral and ambilineal", "sl"],
+            ["Lineages, clans and kin groups", "sl"],
+            ["Marriage: rules, types and exchange", "sl"],
+            ["Households, families and childrearing", "sl"],
+            ["New kinship: adoption, reproductive technology and chosen family", "sl"]
+          ]
+        },
+        {
+          "code": "2.5",
+          "unit": "Political organization",
+          "subtopics": [
+            ["Power, authority and legitimacy", "sl"],
+            ["Bands, tribes, chiefdoms and states", "sl"],
+            ["Everyday politics and informal power", "sl"],
+            ["Nationalism, citizenship and belonging", "sl"],
+            ["Resistance, social movements and revolution", "sl"]
+          ]
+        },
+        {
+          "code": "2.6",
+          "unit": "Economic organization and the environment",
+          "subtopics": [
+            ["Modes of production: foraging, pastoralism, agriculture, industry", "sl"],
+            ["Exchange: reciprocity, redistribution and market", "sl"],
+            ["Gift economies and moral economies", "sl"],
+            ["Work, labour and value across cultures", "sl"],
+            ["Environment, resources and livelihoods", "sl"]
+          ]
+        },
+        {
+          "code": "2.7",
+          "unit": "Systems of knowledge",
+          "subtopics": [
+            ["Local and indigenous knowledge systems", "sl"],
+            ["Science, rationality and other epistemologies", "sl"],
+            ["Classification systems and folk taxonomies", "sl"],
+            ["Language, thought and cultural models", "sl"],
+            ["Education and the transmission of knowledge", "sl"]
+          ]
+        },
+        {
+          "code": "2.8",
+          "unit": "Belief systems and practices",
+          "subtopics": [
+            ["Religion, ritual and symbolism", "sl"],
+            ["Rites of passage and liminality", "sl"],
+            ["Myth, cosmology and worldview", "sl"],
+            ["Magic, witchcraft and sorcery", "sl"],
+            ["Secularism, new religious movements and spirituality", "sl"]
+          ]
+        },
+        {
+          "code": "2.9",
+          "unit": "Moral systems",
+          "subtopics": [
+            ["Values, norms and moral orders", "sl"],
+            ["Rights, justice and human rights discourse", "sl"],
+            ["Moral change and contestation", "sl"],
+            ["Anthropology, advocacy and the ethics of intervention", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "SL - Observation and critique",
+      "units": [
+        {
+          "code": "3.1",
+          "unit": "The observation exercise",
+          "subtopics": [
+            ["Choosing an accessible social setting", "sl"],
+            ["Recording systematic field notes", "sl"],
+            ["Describing observations without interpretation", "sl"],
+            ["Critiquing the observation and its limits", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "HL - Theory and fieldwork",
+      "units": [
+        {
+          "code": "4.1",
+          "unit": "Theoretical perspectives",
+          "subtopics": [
+            ["Functionalism and structural functionalism", "hl"],
+            ["Structuralism and symbolic anthropology", "hl"],
+            ["Marxism, political economy and inequality", "hl"],
+            ["Practice theory: habitus, field and capital", "hl"],
+            ["Feminist, post-colonial and decolonial approaches", "hl"]
+          ]
+        },
+        {
+          "code": "4.2",
+          "unit": "The fieldwork project",
+          "subtopics": [
+            ["Designing a research question and reviewing literature", "hl"],
+            ["Access, gatekeepers, rapport and consent", "hl"],
+            ["Conducting participant observation and interviews", "hl"],
+            ["Coding, thematic analysis and writing up", "hl"],
+            ["Evaluating validity, reliability and ethics", "hl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

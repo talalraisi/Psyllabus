@@ -1,0 +1,204 @@
+{
+  "course": "Sports, exercise and health science",
+  "curriculum": "IB",
+  "guide": "first assessment 2026",
+  "confidence": "medium-high — three themes (exercise physiology and nutrition, biomechanics, sports psychology and motor learning) plus the practical programme follow the new guide",
+  "subjects": {
+    "sl": ["Sports, Exercise, and Health Science SL", "Sports Exercise & Health Science SL"],
+    "hl": ["Sports, Exercise, and Health Science HL", "Sports Exercise & Health Science HL"]
+  },
+  "note": "Three levels: theme, unit, then one assessable point. Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "topics": [
+    {
+      "topic": "A. Exercise physiology and nutrition",
+      "units": [
+        {
+          "code": "A.1",
+          "unit": "The skeletal system",
+          "subtopics": [
+            ["Functions of the skeleton and bone structure", "sl"],
+            ["Types of joint and their movements", "sl"],
+            ["Ligaments, tendons and cartilage", "sl"],
+            ["Injury, stability and prevention", "sl"]
+          ]
+        },
+        {
+          "code": "A.2",
+          "unit": "The muscular system",
+          "subtopics": [
+            ["Skeletal muscle structure and the sarcomere", "sl"],
+            ["Sliding filament theory of contraction", "sl"],
+            ["Muscle fibre types and recruitment", "sl"],
+            ["Agonists, antagonists and movement analysis", "sl"],
+            ["Muscular adaptations to training", "ext"]
+          ]
+        },
+        {
+          "code": "A.3",
+          "unit": "The cardiovascular system",
+          "subtopics": [
+            ["Heart structure and the cardiac cycle", "sl"],
+            ["Blood, blood vessels and circulation", "sl"],
+            ["Cardiac output, stroke volume and heart rate", "sl"],
+            ["Acute responses to exercise", "sl"],
+            ["Long-term cardiovascular adaptations", "ext"]
+          ]
+        },
+        {
+          "code": "A.4",
+          "unit": "The respiratory system",
+          "subtopics": [
+            ["Structure and mechanics of ventilation", "sl"],
+            ["Gas exchange and diffusion at the alveoli", "sl"],
+            ["Oxygen transport and the dissociation curve", "ext"],
+            ["Respiratory responses and adaptations to exercise", "sl"]
+          ]
+        },
+        {
+          "code": "A.5",
+          "unit": "Energy systems",
+          "subtopics": [
+            ["ATP and energy transfer in exercise", "sl"],
+            ["The phosphagen (ATP-PC) system", "sl"],
+            ["Anaerobic glycolysis and lactate", "sl"],
+            ["Aerobic respiration and oxidative phosphorylation", "sl"],
+            ["Interaction of energy systems during activity", "sl"],
+            ["Excess post-exercise oxygen consumption", "ext"]
+          ]
+        },
+        {
+          "code": "A.6",
+          "unit": "Nutrition for health and performance",
+          "subtopics": [
+            ["Macronutrients and energy balance", "sl"],
+            ["Micronutrients, vitamins and minerals", "sl"],
+            ["Hydration, electrolytes and thermoregulation", "sl"],
+            ["Nutrition before, during and after exercise", "sl"],
+            ["Supplements, ergogenic aids and doping", "ext"]
+          ]
+        },
+        {
+          "code": "A.7",
+          "unit": "Training and fitness",
+          "subtopics": [
+            ["Principles of training: specificity, overload, progression, reversibility", "sl"],
+            ["Components of fitness and methods of training", "sl"],
+            ["Periodisation, recovery and overtraining", "sl"],
+            ["Fitness testing, validity and reliability", "sl"],
+            ["Designing a training programme for a client", "ext"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "B. Biomechanics",
+      "units": [
+        {
+          "code": "B.1",
+          "unit": "Movement analysis",
+          "subtopics": [
+            ["Planes and axes of movement", "sl"],
+            ["Types of motion and movement terminology", "sl"],
+            ["Qualitative and quantitative analysis of technique", "sl"]
+          ]
+        },
+        {
+          "code": "B.2",
+          "unit": "Linear motion and forces",
+          "subtopics": [
+            ["Distance, displacement, speed and velocity", "sl"],
+            ["Acceleration and motion graphs", "sl"],
+            ["Newton's laws applied to sport", "sl"],
+            ["Momentum, impulse and collisions", "sl"],
+            ["Friction, drag and fluid resistance", "ext"],
+            ["Projectile motion in sport", "sl"]
+          ]
+        },
+        {
+          "code": "B.3",
+          "unit": "Work, energy and power",
+          "subtopics": [
+            ["Work done and energy transfer in movement", "sl"],
+            ["Power output and efficiency", "sl"],
+            ["Measuring mechanical work in the laboratory", "ext"]
+          ]
+        },
+        {
+          "code": "B.4",
+          "unit": "Rotational motion",
+          "subtopics": [
+            ["Angular displacement, velocity and acceleration", "sl"],
+            ["Torque, levers and mechanical advantage", "sl"],
+            ["Centre of mass, balance and stability", "sl"],
+            ["Angular momentum and moment of inertia", "ext"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "C. Sports psychology and motor learning",
+      "units": [
+        {
+          "code": "C.1",
+          "unit": "Skill acquisition",
+          "subtopics": [
+            ["Classification of skills", "sl"],
+            ["Information processing and decision-making", "sl"],
+            ["Stages of learning and performance curves", "sl"],
+            ["Practice methods and types of feedback", "sl"],
+            ["Transfer of learning", "ext"]
+          ]
+        },
+        {
+          "code": "C.2",
+          "unit": "Motivation and performance",
+          "subtopics": [
+            ["Intrinsic and extrinsic motivation", "sl"],
+            ["Goal setting and self-efficacy", "sl"],
+            ["Arousal, anxiety and performance theories", "sl"],
+            ["Attention, concentration and mental preparation", "sl"],
+            ["Psychological skills training", "ext"]
+          ]
+        },
+        {
+          "code": "C.3",
+          "unit": "Social psychology of sport",
+          "subtopics": [
+            ["Group dynamics and team cohesion", "sl"],
+            ["Leadership and communication in teams", "sl"],
+            ["Aggression and attribution in sport", "sl"],
+            ["Ethics, equity and inclusion in sport", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Practical and research skills",
+      "units": [
+        {
+          "code": "T.1",
+          "unit": "Scientific inquiry",
+          "subtopics": [
+            ["Research questions, variables and hypotheses", "sl"],
+            ["Experimental design, ethics and participant safety", "sl"],
+            ["Data collection and processing", "sl"],
+            ["Statistical analysis and interpreting results", "sl"],
+            ["Evaluating reliability, validity and limitations", "sl"]
+          ]
+        },
+        {
+          "code": "T.2",
+          "unit": "The scientific investigation",
+          "subtopics": [
+            ["Designing an investigation in sport or exercise science", "sl"],
+            ["Analysing data and drawing conclusions", "sl"],
+            ["Writing the investigation report", "sl"],
+            ["The collaborative sciences project", "sl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

@@ -1,0 +1,437 @@
+[
+  {
+    "subject": "Biology SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Cell biology",
+        "subtopic": "Cell theory",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Cell biology",
+        "subtopic": "Cell structure",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Cell biology",
+        "subtopic": "Membranes and transport",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Cell biology",
+        "subtopic": "Origin of cells",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Cell biology",
+        "subtopic": "Microscopy",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Molecular biology",
+        "subtopic": "Water",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Molecular biology",
+        "subtopic": "Nucleic acids",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Molecular biology",
+        "subtopic": "DNA structure and replication",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Molecular biology",
+        "subtopic": "Transcription and translation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Molecular biology",
+        "subtopic": "Enzymes",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Molecular biology",
+        "subtopic": "Metabolism",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Genetics",
+        "subtopic": "Genes",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Genetics",
+        "subtopic": "Chromosomes",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Genetics",
+        "subtopic": "Meiosis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Genetics",
+        "subtopic": "Inheritance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Genetics",
+        "subtopic": "Genetic engineering and biotechnology",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Ecology",
+        "subtopic": "Species, communities and ecosystems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Ecology",
+        "subtopic": "Energy flow",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Ecology",
+        "subtopic": "Carbon cycling",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Ecology",
+        "subtopic": "Climate change",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Ecology",
+        "subtopic": "Populations and communities",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Evolution and biodiversity",
+        "subtopic": "Evidence for evolution",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Evolution and biodiversity",
+        "subtopic": "Natural selection",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Evolution and biodiversity",
+        "subtopic": "Classification and cladistics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Evolution and biodiversity",
+        "subtopic": "Speciation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Evolution and biodiversity",
+        "subtopic": "Biodiversity and conservation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Human physiology",
+        "subtopic": "Digestion and absorption",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Human physiology",
+        "subtopic": "The blood system",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Human physiology",
+        "subtopic": "Defence against infectious disease",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Human physiology",
+        "subtopic": "Gas exchange",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Human physiology",
+        "subtopic": "Nerves, muscles and movement",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Human physiology",
+        "subtopic": "Hormones, homeostasis and reproduction",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Option topic",
+        "subtopic": "Neurobiology and behaviour",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Option topic",
+        "subtopic": "Biotechnology and bioinformatics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Option topic",
+        "subtopic": "Ecology and conservation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Option topic",
+        "subtopic": "Human physiology",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Biology HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Cell biology",
+        "subtopic": "Cell theory",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Cell biology",
+        "subtopic": "Cell structure",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Cell biology",
+        "subtopic": "Membranes and transport",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Cell biology",
+        "subtopic": "Origin of cells",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Cell biology",
+        "subtopic": "Microscopy",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Cell biology",
+        "subtopic": "Membrane transport proteins and active transport (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 1 - Cell biology",
+        "subtopic": "Cell specialization and stem cells (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - Molecular biology",
+        "subtopic": "Water",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Molecular biology",
+        "subtopic": "Nucleic acids",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Molecular biology",
+        "subtopic": "DNA structure and replication",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Molecular biology",
+        "subtopic": "Transcription and translation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Molecular biology",
+        "subtopic": "Enzymes",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Molecular biology",
+        "subtopic": "Metabolism",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Molecular biology",
+        "subtopic": "DNA profiling and sequencing (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - Molecular biology",
+        "subtopic": "Gene transfer and genetic modification (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Genetics",
+        "subtopic": "Genes",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Genetics",
+        "subtopic": "Chromosomes",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Genetics",
+        "subtopic": "Meiosis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Genetics",
+        "subtopic": "Inheritance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Genetics",
+        "subtopic": "Genetic engineering and biotechnology",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Genetics",
+        "subtopic": "Chi-squared analysis and pedigree interpretation (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Genetics",
+        "subtopic": "Polygenic inheritance and continuous variation (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Ecology",
+        "subtopic": "Species, communities and ecosystems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Ecology",
+        "subtopic": "Energy flow",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Ecology",
+        "subtopic": "Carbon cycling",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Ecology",
+        "subtopic": "Climate change",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Ecology",
+        "subtopic": "Populations and communities",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Ecology",
+        "subtopic": "Species diversity and conservation measures (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Ecology",
+        "subtopic": "Ecosystem change and succession analysis (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Evolution and biodiversity",
+        "subtopic": "Evidence for evolution",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Evolution and biodiversity",
+        "subtopic": "Natural selection",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Evolution and biodiversity",
+        "subtopic": "Classification and cladistics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Evolution and biodiversity",
+        "subtopic": "Speciation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Evolution and biodiversity",
+        "subtopic": "Biodiversity and conservation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Evolution and biodiversity",
+        "subtopic": "Cladogram interpretation and evolutionary theory (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Evolution and biodiversity",
+        "subtopic": "Detailed mechanisms of evolution (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 6 - Human physiology",
+        "subtopic": "Digestion and absorption",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Human physiology",
+        "subtopic": "The blood system",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Human physiology",
+        "subtopic": "Defence against infectious disease",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Human physiology",
+        "subtopic": "Gas exchange",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Human physiology",
+        "subtopic": "Nerves, muscles and movement",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Human physiology",
+        "subtopic": "Hormones, homeostasis and reproduction",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Human physiology",
+        "subtopic": "Kidney and osmoregulation (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 6 - Human physiology",
+        "subtopic": "Reproduction, development and embryo stages (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 6 - Human physiology",
+        "subtopic": "Immunity and pathogen control in greater depth (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 7 - Option topic",
+        "subtopic": "Neurobiology and behaviour",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Option topic",
+        "subtopic": "Biotechnology and bioinformatics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Option topic",
+        "subtopic": "Ecology and conservation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Option topic",
+        "subtopic": "Human physiology",
+        "hl_only": false
+      }
+    ]
+  }
+]

@@ -1,0 +1,101 @@
+{
+  "course": "Literature and performance",
+  "curriculum": "IB",
+  "guide": "first assessment 2021",
+  "confidence": "medium-high — an SL-only course combining literary study with performance; the three parts are the study of texts, the transformation of text into performance, and the realisation of performance",
+  "subjects": { "sl": "Literature and Performance SL", "hl": [] },
+  "note": "Three levels: part of the course, unit, then one assessable point.",
+  "topics": [
+    {
+      "topic": "Critical study of texts",
+      "units": [
+        {
+          "code": "1.1",
+          "unit": "Reading literary texts",
+          "subtopics": [
+            ["Close reading of poetry, prose and drama", "sl"],
+            ["Theme, motif and symbolism", "sl"],
+            ["Character, setting and narrative structure", "sl"],
+            ["Narrative voice and point of view", "sl"]
+          ]
+        },
+        {
+          "code": "1.2",
+          "unit": "Context and meaning",
+          "subtopics": [
+            ["Historical, cultural and social context", "sl"],
+            ["Authorial purpose and intended audience", "sl"],
+            ["Texts in translation and what translation changes", "sl"],
+            ["Comparing works and interpretations", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Transformation of text into performance",
+      "units": [
+        {
+          "code": "2.1",
+          "unit": "From page to stage",
+          "subtopics": [
+            ["Choosing and adapting an extract for performance", "sl"],
+            ["Dramatic structure and shaping material", "sl"],
+            ["Interpreting a text through performance choices", "sl"],
+            ["Justifying an adaptation with textual evidence", "sl"]
+          ]
+        },
+        {
+          "code": "2.2",
+          "unit": "Staging choices",
+          "subtopics": [
+            ["Use of space and the actor-audience relationship", "sl"],
+            ["Sound, music and silence", "sl"],
+            ["Visual elements: set, costume and lighting", "sl"],
+            ["Ensemble work and collaboration", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Realisation of performance",
+      "units": [
+        {
+          "code": "3.1",
+          "unit": "Performance skills",
+          "subtopics": [
+            ["Voice: clarity, pace, tone and projection", "sl"],
+            ["Movement, gesture and physical expression", "sl"],
+            ["Characterisation and sustaining a role", "sl"],
+            ["Rehearsal technique and responding to direction", "sl"]
+          ]
+        },
+        {
+          "code": "3.2",
+          "unit": "Reflection and evaluation",
+          "subtopics": [
+            ["Documenting the rehearsal process", "sl"],
+            ["Evaluating performance decisions against the text", "sl"],
+            ["Reflecting on audience response", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Assessment",
+      "units": [
+        {
+          "code": "4.1",
+          "unit": "Assessment tasks",
+          "subtopics": [
+            ["Written analysis of a literary extract", "sl"],
+            ["Written rationale for a performance adaptation", "sl"],
+            ["Performance of an adapted extract", "sl"],
+            ["Individual oral on literary analysis and performance choices", "sl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

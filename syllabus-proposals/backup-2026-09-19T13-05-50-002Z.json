@@ -1,0 +1,182 @@
+[
+  {
+    "subject": "World Religions SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Introduction to world religions",
+        "subtopic": "What is religion?",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Introduction to world religions",
+        "subtopic": "Belief, practice and community",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Introduction to world religions",
+        "subtopic": "Sacred texts and authority",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Introduction to world religions",
+        "subtopic": "Ritual and symbol",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Introduction to world religions",
+        "subtopic": "Religion in society",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Hinduism",
+        "subtopic": "Origins and development",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Hinduism",
+        "subtopic": "Core beliefs and concepts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Hinduism",
+        "subtopic": "Sacred texts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Hinduism",
+        "subtopic": "Worship and ritual practice",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Hinduism",
+        "subtopic": "Contemporary expressions of Hinduism",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Buddhism",
+        "subtopic": "Origins and development",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Buddhism",
+        "subtopic": "Core beliefs and concepts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Buddhism",
+        "subtopic": "Sacred texts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Buddhism",
+        "subtopic": "Worship and ritual practice",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Buddhism",
+        "subtopic": "Contemporary expressions of Buddhism",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Christianity",
+        "subtopic": "Origins and development",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Christianity",
+        "subtopic": "Core beliefs and concepts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Christianity",
+        "subtopic": "Sacred texts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Christianity",
+        "subtopic": "Worship and ritual practice",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Christianity",
+        "subtopic": "Contemporary expressions of Christianity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Islam",
+        "subtopic": "Origins and development",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Islam",
+        "subtopic": "Core beliefs and concepts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Islam",
+        "subtopic": "Sacred texts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Islam",
+        "subtopic": "Worship and ritual practice",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Islam",
+        "subtopic": "Contemporary expressions of Islam",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Judaism",
+        "subtopic": "Origins and development",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Judaism",
+        "subtopic": "Core beliefs and concepts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Judaism",
+        "subtopic": "Sacred texts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Judaism",
+        "subtopic": "Worship and ritual practice",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Judaism",
+        "subtopic": "Contemporary expressions of Judaism",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Religion and society",
+        "subtopic": "Religion and identity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Religion and society",
+        "subtopic": "Religion and ethics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Religion and society",
+        "subtopic": "Religion and politics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Religion and society",
+        "subtopic": "Religion and gender",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Religion and society",
+        "subtopic": "Religion and globalisation",
+        "hl_only": false
+      }
+    ]
+  }
+]

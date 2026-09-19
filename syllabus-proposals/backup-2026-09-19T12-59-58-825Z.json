@@ -1,0 +1,567 @@
+[
+  {
+    "subject": "Chemistry SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Stoichiometric relationships",
+        "subtopic": "Relative atomic mass, relative molecular mass and molar mass",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Stoichiometric relationships",
+        "subtopic": "The mole and Avogadro’s constant",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Stoichiometric relationships",
+        "subtopic": "Reacting masses and empirical formulae",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Stoichiometric relationships",
+        "subtopic": "Limiting reactants and percentage yield",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Stoichiometric relationships",
+        "subtopic": "Solution concentration and titration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Atomic structure",
+        "subtopic": "The atom and subatomic particles",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Atomic structure",
+        "subtopic": "Electron arrangement",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Atomic structure",
+        "subtopic": "Mass spectrometry",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Atomic structure",
+        "subtopic": "Electron configurations and ionisation energy",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Periodicity",
+        "subtopic": "Periodic trends",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Periodicity",
+        "subtopic": "Group 1, 2 and 17 properties",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Periodicity",
+        "subtopic": "Transition metals",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Periodicity",
+        "subtopic": "Periodic variations in physical and chemical properties",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Chemical bonding and structure",
+        "subtopic": "Ionic bonding",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Chemical bonding and structure",
+        "subtopic": "Covalent bonding",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Chemical bonding and structure",
+        "subtopic": "Metallic bonding",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Chemical bonding and structure",
+        "subtopic": "Intermolecular forces",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Chemical bonding and structure",
+        "subtopic": "Shape and polarity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Chemical bonding and structure",
+        "subtopic": "Giant covalent structures",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Energetics/thermochemistry",
+        "subtopic": "Energy changes in reactions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Energetics/thermochemistry",
+        "subtopic": "Enthalpy changes",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Energetics/thermochemistry",
+        "subtopic": "Calorimetry",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Energetics/thermochemistry",
+        "subtopic": "Bond enthalpies",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Energetics/thermochemistry",
+        "subtopic": "Hess’s law",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Chemical kinetics",
+        "subtopic": "Collision theory",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Chemical kinetics",
+        "subtopic": "Rate of reaction",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Chemical kinetics",
+        "subtopic": "Factors affecting rate",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Chemical kinetics",
+        "subtopic": "Reaction mechanisms and catalysts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Equilibrium",
+        "subtopic": "Dynamic equilibrium",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Equilibrium",
+        "subtopic": "Le Chatelier’s principle",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Equilibrium",
+        "subtopic": "Equilibrium constant",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Equilibrium",
+        "subtopic": "Homogeneous and heterogeneous equilibrium",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Acids and bases",
+        "subtopic": "Bronsted-Lowry acids and bases",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Acids and bases",
+        "subtopic": "pH and pOH",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Acids and bases",
+        "subtopic": "Strong and weak acids and bases",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Acids and bases",
+        "subtopic": "Buffer solutions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Acids and bases",
+        "subtopic": "Titration curves and indicators",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 9 - Redox processes",
+        "subtopic": "Oxidation and reduction",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 9 - Redox processes",
+        "subtopic": "Oxidation states",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 9 - Redox processes",
+        "subtopic": "Electrochemical cells",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 9 - Redox processes",
+        "subtopic": "Electrolysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 10 - Organic chemistry",
+        "subtopic": "Hydrocarbons",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 10 - Organic chemistry",
+        "subtopic": "Functional groups",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 10 - Organic chemistry",
+        "subtopic": "Isomerism",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 10 - Organic chemistry",
+        "subtopic": "Reaction pathways",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 10 - Organic chemistry",
+        "subtopic": "Mechanisms",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 11 - Measurement and analysis",
+        "subtopic": "Uncertainties and errors",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 11 - Measurement and analysis",
+        "subtopic": "Significant figures",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 11 - Measurement and analysis",
+        "subtopic": "Data processing and graphing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 11 - Measurement and analysis",
+        "subtopic": "Analytical techniques",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Chemistry HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Stoichiometric relationships",
+        "subtopic": "Relative atomic mass, relative molecular mass and molar mass",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Stoichiometric relationships",
+        "subtopic": "The mole and Avogadro’s constant",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Stoichiometric relationships",
+        "subtopic": "Reacting masses and empirical formulae",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Stoichiometric relationships",
+        "subtopic": "Limiting reactants and percentage yield",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Stoichiometric relationships",
+        "subtopic": "Solution concentration and titration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Atomic structure",
+        "subtopic": "The atom and subatomic particles",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Atomic structure",
+        "subtopic": "Electron arrangement",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Atomic structure",
+        "subtopic": "Mass spectrometry",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Atomic structure",
+        "subtopic": "Electron configurations and ionisation energy",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Atomic structure",
+        "subtopic": "Atomic spectra (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Periodicity",
+        "subtopic": "Periodic trends",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Periodicity",
+        "subtopic": "Group 1, 2 and 17 properties",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Periodicity",
+        "subtopic": "Transition metals",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Periodicity",
+        "subtopic": "Periodic variations in physical and chemical properties",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Periodicity",
+        "subtopic": "First-row d-block element reactions (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Chemical bonding and structure",
+        "subtopic": "Ionic bonding",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Chemical bonding and structure",
+        "subtopic": "Covalent bonding",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Chemical bonding and structure",
+        "subtopic": "Metallic bonding",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Chemical bonding and structure",
+        "subtopic": "Intermolecular forces",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Chemical bonding and structure",
+        "subtopic": "Shape and polarity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Chemical bonding and structure",
+        "subtopic": "Giant covalent structures",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Chemical bonding and structure",
+        "subtopic": "Hybridisation and molecular orbital theory (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Energetics/thermochemistry",
+        "subtopic": "Energy changes in reactions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Energetics/thermochemistry",
+        "subtopic": "Enthalpy changes",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Energetics/thermochemistry",
+        "subtopic": "Calorimetry",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Energetics/thermochemistry",
+        "subtopic": "Bond enthalpies",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Energetics/thermochemistry",
+        "subtopic": "Hess’s law",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Energetics/thermochemistry",
+        "subtopic": "Entropy and spontaneity (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 6 - Chemical kinetics",
+        "subtopic": "Collision theory",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Chemical kinetics",
+        "subtopic": "Rate of reaction",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Chemical kinetics",
+        "subtopic": "Factors affecting rate",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Chemical kinetics",
+        "subtopic": "Reaction mechanisms and catalysts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Chemical kinetics",
+        "subtopic": "Rate equations and order of reaction (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 6 - Chemical kinetics",
+        "subtopic": "Integrated rate laws and half-life (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 7 - Equilibrium",
+        "subtopic": "Dynamic equilibrium",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Equilibrium",
+        "subtopic": "Le Chatelier’s principle",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Equilibrium",
+        "subtopic": "Equilibrium constant",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Equilibrium",
+        "subtopic": "Homogeneous and heterogeneous equilibrium",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Equilibrium",
+        "subtopic": "Calculations involving equilibrium constants (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 8 - Acids and bases",
+        "subtopic": "Bronsted-Lowry acids and bases",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Acids and bases",
+        "subtopic": "pH and pOH",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Acids and bases",
+        "subtopic": "Strong and weak acids and bases",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Acids and bases",
+        "subtopic": "Buffer solutions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Acids and bases",
+        "subtopic": "Titration curves and indicators",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Acids and bases",
+        "subtopic": "Acid-base equilibria and pKa (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 9 - Redox processes",
+        "subtopic": "Oxidation and reduction",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 9 - Redox processes",
+        "subtopic": "Oxidation states",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 9 - Redox processes",
+        "subtopic": "Electrochemical cells",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 9 - Redox processes",
+        "subtopic": "Electrolysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 9 - Redox processes",
+        "subtopic": "Standard electrode potentials (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 10 - Organic chemistry",
+        "subtopic": "Hydrocarbons",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 10 - Organic chemistry",
+        "subtopic": "Functional groups",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 10 - Organic chemistry",
+        "subtopic": "Isomerism",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 10 - Organic chemistry",
+        "subtopic": "Reaction pathways",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 10 - Organic chemistry",
+        "subtopic": "Mechanisms",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 10 - Organic chemistry",
+        "subtopic": "Stereochemistry and spectroscopy (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 11 - Measurement and analysis",
+        "subtopic": "Uncertainties and errors",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 11 - Measurement and analysis",
+        "subtopic": "Significant figures",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 11 - Measurement and analysis",
+        "subtopic": "Data processing and graphing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 11 - Measurement and analysis",
+        "subtopic": "Analytical techniques",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 11 - Measurement and analysis",
+        "subtopic": "Chromatography and spectroscopy (HL only)",
+        "hl_only": true
+      }
+    ]
+  }
+]

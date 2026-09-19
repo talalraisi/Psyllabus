@@ -1,0 +1,216 @@
+{
+  "course": "Design technology",
+  "curriculum": "IB",
+  "guide": "first teaching 2025, first assessment 2027",
+  "confidence": "medium — follows the new guide's themes (human factors, resource management and sustainable production, modelling, raw material to final product, innovation and design thinking) with the design project. Check the unit order against your teacher's plan",
+  "subjects": { "sl": "Design Technology SL", "hl": "Design Technology HL" },
+  "note": "Three levels: theme, unit, then one assessable point. Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "topics": [
+    {
+      "topic": "A. Human factors and ergonomics",
+      "units": [
+        {
+          "code": "A.1",
+          "unit": "Users and human-centred design",
+          "subtopics": [
+            ["User needs, wants and values", "sl"],
+            ["User research, personas and user profiles", "sl"],
+            ["Accessibility, inclusion and universal design", "sl"],
+            ["Designing for diverse populations", "ext"]
+          ]
+        },
+        {
+          "code": "A.2",
+          "unit": "Ergonomics and anthropometrics",
+          "subtopics": [
+            ["Anthropometric data and percentile ranges", "sl"],
+            ["Static and dynamic anthropometric data", "sl"],
+            ["Physiological and psychological factors in design", "sl"],
+            ["Safety, comfort and human error", "ext"]
+          ]
+        },
+        {
+          "code": "A.3",
+          "unit": "Usability and interaction",
+          "subtopics": [
+            ["Usability principles and heuristics", "sl"],
+            ["Human-machine interaction and interfaces", "sl"],
+            ["User testing methods and feedback", "sl"],
+            ["Evaluating a product with real users", "ext"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "B. Resource management and sustainable production",
+      "units": [
+        {
+          "code": "B.1",
+          "unit": "Sustainability in design",
+          "subtopics": [
+            ["Sustainable design principles", "sl"],
+            ["Life-cycle analysis of a product", "sl"],
+            ["Design for disassembly, repair and recycling", "sl"],
+            ["The circular economy and cradle-to-cradle design", "ext"]
+          ]
+        },
+        {
+          "code": "B.2",
+          "unit": "Resources and energy",
+          "subtopics": [
+            ["Renewable and non-renewable resources in manufacture", "sl"],
+            ["Embodied energy and carbon footprint of products", "sl"],
+            ["Waste mitigation strategies", "sl"],
+            ["Ethical sourcing and supply chain responsibility", "ext"]
+          ]
+        },
+        {
+          "code": "B.3",
+          "unit": "Production systems",
+          "subtopics": [
+            ["Craft, mechanised, automated and mass production", "sl"],
+            ["Scale of production and unit cost", "sl"],
+            ["Lean production and quality management", "ext"],
+            ["Automation, robotics and smart manufacturing", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "C. Modelling",
+      "units": [
+        {
+          "code": "C.1",
+          "unit": "Design communication",
+          "subtopics": [
+            ["Freehand sketching and annotation", "sl"],
+            ["Orthographic, isometric and exploded drawings", "sl"],
+            ["Scale, dimensions and tolerances", "sl"],
+            ["Design specifications and their criteria", "sl"]
+          ]
+        },
+        {
+          "code": "C.2",
+          "unit": "Physical and digital models",
+          "subtopics": [
+            ["Sketch models, scale models and prototypes", "sl"],
+            ["Computer-aided design", "sl"],
+            ["Computer-aided manufacture and rapid prototyping", "sl"],
+            ["Mathematical and simulation models", "ext"],
+            ["Choosing a modelling method for a purpose", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "D. Raw material to final product",
+      "units": [
+        {
+          "code": "D.1",
+          "unit": "Properties of materials",
+          "subtopics": [
+            ["Mechanical properties: strength, hardness, toughness, elasticity", "sl"],
+            ["Physical properties: density, thermal and electrical", "sl"],
+            ["Aesthetic properties and material selection", "sl"],
+            ["Material testing and interpreting data", "ext"]
+          ]
+        },
+        {
+          "code": "D.2",
+          "unit": "Materials",
+          "subtopics": [
+            ["Metals and alloys", "sl"],
+            ["Polymers, elastomers and plastics", "sl"],
+            ["Timber, paper and natural materials", "sl"],
+            ["Textiles and composites", "sl"],
+            ["Ceramics, glass and smart materials", "ext"]
+          ]
+        },
+        {
+          "code": "D.3",
+          "unit": "Manufacturing processes",
+          "subtopics": [
+            ["Forming, shaping and joining", "sl"],
+            ["Machining, casting and moulding", "sl"],
+            ["Additive manufacturing", "sl"],
+            ["Finishing processes and surface treatment", "sl"],
+            ["Quality control and safe workshop practice", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "E. Innovation and design thinking",
+      "units": [
+        {
+          "code": "E.1",
+          "unit": "The design process",
+          "subtopics": [
+            ["Identifying problems and opportunities", "sl"],
+            ["Researching users, contexts and existing products", "sl"],
+            ["Design brief and specification", "sl"],
+            ["Generating and developing ideas", "sl"],
+            ["Selecting, justifying and iterating a solution", "sl"]
+          ]
+        },
+        {
+          "code": "E.2",
+          "unit": "Innovation and markets",
+          "subtopics": [
+            ["Invention, innovation and diffusion", "sl"],
+            ["Technology push and market pull", "sl"],
+            ["Product life cycle and obsolescence", "ext"],
+            ["Intellectual property: patents, copyright, trademarks", "hl"],
+            ["Strategies for bringing a product to market", "hl"]
+          ]
+        },
+        {
+          "code": "E.3",
+          "unit": "Classic design and influence",
+          "subtopics": [
+            ["Characteristics of classic design", "sl"],
+            ["Design movements and their influence", "ext"],
+            ["Cultural, ethical and environmental influence on design", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "The design project",
+      "units": [
+        {
+          "code": "P.1",
+          "unit": "Analysis and brief",
+          "subtopics": [
+            ["Identifying an existing product and its user", "sl"],
+            ["Analysing strengths, limitations and opportunities", "sl"],
+            ["Researching user needs and context", "sl"],
+            ["Writing a focused design brief", "sl"]
+          ]
+        },
+        {
+          "code": "P.2",
+          "unit": "Development",
+          "subtopics": [
+            ["Measurable design specifications", "sl"],
+            ["Generating a range of feasible ideas", "sl"],
+            ["Developing and modelling the chosen solution", "sl"],
+            ["Testing prototypes with users", "sl"]
+          ]
+        },
+        {
+          "code": "P.3",
+          "unit": "Presentation and evaluation",
+          "subtopics": [
+            ["Presenting the final design solution", "sl"],
+            ["Evaluating against the specification", "sl"],
+            ["Evaluating user, environmental and ethical impact", "sl"],
+            ["Identifying improvements and further development", "sl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

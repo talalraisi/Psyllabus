@@ -1,0 +1,272 @@
+[
+  {
+    "subject": "Visual Arts SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Visual arts in context",
+        "subtopic": "Introduction to visual arts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Visual arts in context",
+        "subtopic": "Art, culture and identity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Visual arts in context",
+        "subtopic": "The role of artists in society",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Visual arts in context",
+        "subtopic": "Historical and contemporary contexts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Visual arts in context",
+        "subtopic": "Curating and exhibiting art",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Visual arts in context",
+        "subtopic": "Art criticism and interpretation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Visual arts methods and techniques",
+        "subtopic": "Drawing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Visual arts methods and techniques",
+        "subtopic": "Painting",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Visual arts methods and techniques",
+        "subtopic": "Sculpture",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Visual arts methods and techniques",
+        "subtopic": "Printmaking",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Visual arts methods and techniques",
+        "subtopic": "Photography and lens-based media",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Visual arts methods and techniques",
+        "subtopic": "Digital art and mixed media",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Communicating through visual arts",
+        "subtopic": "Visual language",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Communicating through visual arts",
+        "subtopic": "Composition and design",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Communicating through visual arts",
+        "subtopic": "Colour and tone",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Communicating through visual arts",
+        "subtopic": "Materials and processes",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Communicating through visual arts",
+        "subtopic": "Personal intentions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Communicating through visual arts",
+        "subtopic": "Audience and interpretation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical reflection and presentation",
+        "subtopic": "Art journals and documentation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical reflection and presentation",
+        "subtopic": "Research and analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical reflection and presentation",
+        "subtopic": "Reflection on artistic practice",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical reflection and presentation",
+        "subtopic": "Presentation of work",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical reflection and presentation",
+        "subtopic": "Comparing artworks",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical reflection and presentation",
+        "subtopic": "Evaluation of art-making decisions",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Visual Arts HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Visual arts in context",
+        "subtopic": "Introduction to visual arts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Visual arts in context",
+        "subtopic": "Art, culture and identity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Visual arts in context",
+        "subtopic": "The role of artists in society",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Visual arts in context",
+        "subtopic": "Historical and contemporary contexts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Visual arts in context",
+        "subtopic": "Curating and exhibiting art",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Visual arts in context",
+        "subtopic": "Art criticism and interpretation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Visual arts in context",
+        "subtopic": "Deeper exploration of visual arts in context (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - Visual arts methods and techniques",
+        "subtopic": "Drawing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Visual arts methods and techniques",
+        "subtopic": "Painting",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Visual arts methods and techniques",
+        "subtopic": "Sculpture",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Visual arts methods and techniques",
+        "subtopic": "Printmaking",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Visual arts methods and techniques",
+        "subtopic": "Photography and lens-based media",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Visual arts methods and techniques",
+        "subtopic": "Digital art and mixed media",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Visual arts methods and techniques",
+        "subtopic": "Further methods and techniques (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Communicating through visual arts",
+        "subtopic": "Visual language",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Communicating through visual arts",
+        "subtopic": "Composition and design",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Communicating through visual arts",
+        "subtopic": "Colour and tone",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Communicating through visual arts",
+        "subtopic": "Materials and processes",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Communicating through visual arts",
+        "subtopic": "Personal intentions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Communicating through visual arts",
+        "subtopic": "Audience and interpretation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Communicating through visual arts",
+        "subtopic": "Advanced communication in visual arts (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Critical reflection and presentation",
+        "subtopic": "Art journals and documentation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical reflection and presentation",
+        "subtopic": "Research and analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical reflection and presentation",
+        "subtopic": "Reflection on artistic practice",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical reflection and presentation",
+        "subtopic": "Presentation of work",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical reflection and presentation",
+        "subtopic": "Comparing artworks",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical reflection and presentation",
+        "subtopic": "Evaluation of art-making decisions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical reflection and presentation",
+        "subtopic": "Deeper critical reflection (HL only)",
+        "hl_only": true
+      }
+    ]
+  }
+]

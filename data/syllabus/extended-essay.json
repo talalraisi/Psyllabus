@@ -1,0 +1,138 @@
+{
+  "course": "Extended essay",
+  "curriculum": "IB",
+  "guide": "first assessment 2018",
+  "confidence": "high — the five assessment criteria (focus and method, knowledge and understanding, critical thinking, presentation, engagement) and the reflection sessions are the guide's; every DP student writes one",
+  "subjects": { "sl": "Extended Essay", "hl": [] },
+  "note": "Three levels: stage of the essay, unit, then one assessable point.",
+  "topics": [
+    {
+      "topic": "Choosing subject and question",
+      "units": [
+        {
+          "code": "1.1",
+          "unit": "Choosing the subject",
+          "subtopics": [
+            ["Selecting an approved DP subject for the essay", "sl"],
+            ["Subject-specific requirements and expectations", "sl"],
+            ["World studies essays and their two subjects", "sl"],
+            ["Checking your topic fits the subject you chose", "sl"]
+          ]
+        },
+        {
+          "code": "1.2",
+          "unit": "Developing the research question",
+          "subtopics": [
+            ["From a broad topic to a narrow question", "sl"],
+            ["Making a question arguable rather than descriptive", "sl"],
+            ["Defining scope: texts, cases, variables or period", "sl"],
+            ["Checking feasibility, ethics and available sources", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Research",
+      "units": [
+        {
+          "code": "2.1",
+          "unit": "Planning research",
+          "subtopics": [
+            ["Background reading and locating the debate", "sl"],
+            ["Building a research plan and timeline", "sl"],
+            ["Primary and secondary sources", "sl"],
+            ["Keeping a record of sources as you go", "sl"]
+          ]
+        },
+        {
+          "code": "2.2",
+          "unit": "Evaluating sources",
+          "subtopics": [
+            ["Authority, reliability and credibility", "sl"],
+            ["Relevance, currency and bias", "sl"],
+            ["Corroborating and contrasting sources", "sl"]
+          ]
+        },
+        {
+          "code": "2.3",
+          "unit": "Methods",
+          "subtopics": [
+            ["Textual, literary and discourse analysis", "sl"],
+            ["Historical and social-science methods", "sl"],
+            ["Experimental, mathematical and data-based methods", "sl"],
+            ["Surveys, interviews and research ethics", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Writing the essay",
+      "units": [
+        {
+          "code": "3.1",
+          "unit": "Structure",
+          "subtopics": [
+            ["Title page, contents and introduction", "sl"],
+            ["Establishing context and the significance of the question", "sl"],
+            ["Body: analysis, evidence and argument", "sl"],
+            ["Conclusion that answers the research question", "sl"],
+            ["Staying within 4,000 words", "sl"]
+          ]
+        },
+        {
+          "code": "3.2",
+          "unit": "Academic style",
+          "subtopics": [
+            ["Formal academic register", "sl"],
+            ["Paragraphing and signposting the argument", "sl"],
+            ["Integrating quotation, data and evidence", "sl"],
+            ["Tables, figures and appendices", "sl"]
+          ]
+        },
+        {
+          "code": "3.3",
+          "unit": "Referencing and integrity",
+          "subtopics": [
+            ["In-text citation in a consistent style", "sl"],
+            ["Bibliography and reference list", "sl"],
+            ["Academic honesty and avoiding plagiarism", "sl"],
+            ["Responsible use of AI tools and acknowledging them", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Reflection and supervision",
+      "units": [
+        {
+          "code": "4.1",
+          "unit": "The reflection sessions",
+          "subtopics": [
+            ["First reflection session and initial plan", "sl"],
+            ["Interim reflection session and changes of direction", "sl"],
+            ["The viva voce and final reflection", "sl"],
+            ["Writing the Reflections on planning and progress form", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Assessment criteria",
+      "units": [
+        {
+          "code": "5.1",
+          "unit": "What examiners reward",
+          "subtopics": [
+            ["Criterion A: focus and method", "sl"],
+            ["Criterion B: knowledge and understanding", "sl"],
+            ["Criterion C: critical thinking", "sl"],
+            ["Criterion D: presentation", "sl"],
+            ["Criterion E: engagement", "sl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

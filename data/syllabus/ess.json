@@ -1,0 +1,390 @@
+{
+  "course": "Environmental systems and societies",
+  "curriculum": "IB",
+  "guide": "first teaching 2024, first assessment 2026",
+  "confidence": "medium-high — eight topics plus the three HL lenses (environmental law, environmental and ecological economics, environmental ethics) follow the new guide; leaf wording is ours",
+  "subjects": {
+    "sl": ["Environmental Systems and Societies SL", "Environmental Systems & Societies SL"],
+    "hl": "Environmental Systems and Societies HL"
+  },
+  "note": "Three levels: topic, unit, then one assessable point. Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "topics": [
+    {
+      "topic": "Topic 1 - Foundation",
+      "units": [
+        {
+          "code": "1.1",
+          "unit": "Perspectives",
+          "subtopics": [
+            ["Environmental value systems and worldviews", "sl"],
+            ["Ecocentric, anthropocentric and technocentric perspectives", "sl"],
+            ["Influences on perspectives: culture, religion, economy, media", "sl"],
+            ["Changing perspectives over time and key milestones", "sl"],
+            ["Indigenous and local knowledge of the environment", "sl"]
+          ]
+        },
+        {
+          "code": "1.2",
+          "unit": "Systems",
+          "subtopics": [
+            ["Systems, boundaries, inputs, outputs, storages and flows", "sl"],
+            ["Open, closed and isolated systems", "sl"],
+            ["Negative and positive feedback loops", "sl"],
+            ["Equilibria, resilience and tipping points", "sl"],
+            ["Models: their uses and limitations", "sl"]
+          ]
+        },
+        {
+          "code": "1.3",
+          "unit": "Sustainability",
+          "subtopics": [
+            ["Sustainability and sustainable development", "sl"],
+            ["Ecological footprints and planetary boundaries", "sl"],
+            ["Environmental indicators and monitoring", "sl"],
+            ["The Sustainable Development Goals", "sl"],
+            ["Environmental impact assessments", "sl"],
+            ["Citizen science and environmental monitoring", "ext"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Topic 2 - Ecology",
+      "units": [
+        {
+          "code": "2.1",
+          "unit": "Individuals and species",
+          "subtopics": [
+            ["Species, populations, habitats and niches", "sl"],
+            ["Abiotic and biotic factors and limits of tolerance", "sl"],
+            ["Adaptations to environmental conditions", "sl"]
+          ]
+        },
+        {
+          "code": "2.2",
+          "unit": "Communities and ecosystems",
+          "subtopics": [
+            ["Interactions: competition, predation, herbivory, mutualism, parasitism", "sl"],
+            ["Keystone species and their role", "sl"],
+            ["Zonation, succession and climax communities", "sl"],
+            ["Measuring biotic and abiotic components in the field", "sl"]
+          ]
+        },
+        {
+          "code": "2.3",
+          "unit": "Flows of energy and matter",
+          "subtopics": [
+            ["Producers, consumers and decomposers", "sl"],
+            ["Food chains, food webs and trophic levels", "sl"],
+            ["Energy loss between trophic levels and pyramids", "sl"],
+            ["Gross and net primary and secondary productivity", "ext"],
+            ["The carbon cycle and human disruption of it", "sl"],
+            ["The nitrogen cycle and human disruption of it", "sl"]
+          ]
+        },
+        {
+          "code": "2.4",
+          "unit": "Biomes, zonation and succession",
+          "subtopics": [
+            ["Distribution and characteristics of major biomes", "sl"],
+            ["Tricellular model of atmospheric circulation and climate", "sl"],
+            ["Shifts in biome distribution with climate change", "ext"]
+          ]
+        },
+        {
+          "code": "2.5",
+          "unit": "Population dynamics",
+          "subtopics": [
+            ["Population growth curves: exponential and sigmoid", "sl"],
+            ["Carrying capacity and limiting factors", "sl"],
+            ["r-strategists and K-strategists", "sl"],
+            ["Estimating population size: quadrats, transects, mark-release-recapture", "sl"],
+            ["Modelling population change", "ext"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Topic 3 - Biodiversity and conservation",
+      "units": [
+        {
+          "code": "3.1",
+          "unit": "Biodiversity and evolution",
+          "subtopics": [
+            ["Types of biodiversity: species, genetic and habitat", "sl"],
+            ["Measuring biodiversity and diversity indices", "sl"],
+            ["Evolution, natural selection and speciation", "sl"],
+            ["Plate tectonics and the distribution of biodiversity", "ext"]
+          ]
+        },
+        {
+          "code": "3.2",
+          "unit": "Human impact on biodiversity",
+          "subtopics": [
+            ["Causes of biodiversity loss and habitat fragmentation", "sl"],
+            ["Species extinction: natural and anthropogenic", "sl"],
+            ["Factors making species prone to extinction", "sl"],
+            ["Case studies of species loss and recovery", "sl"]
+          ]
+        },
+        {
+          "code": "3.3",
+          "unit": "Conservation and regeneration",
+          "subtopics": [
+            ["In situ conservation: protected areas and their design", "sl"],
+            ["Ex situ conservation: zoos, seed banks and captive breeding", "sl"],
+            ["Rewilding and habitat restoration", "sl"],
+            ["Role of IGOs, NGOs and international agreements", "sl"],
+            ["Evaluating the success of conservation approaches", "ext"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Topic 4 - Water",
+      "units": [
+        {
+          "code": "4.1",
+          "unit": "Water systems",
+          "subtopics": [
+            ["The hydrological cycle: stores and flows", "sl"],
+            ["Ocean circulation and its influence on climate", "sl"],
+            ["Freshwater systems: rivers, lakes and groundwater", "sl"]
+          ]
+        },
+        {
+          "code": "4.2",
+          "unit": "Water access, use and security",
+          "subtopics": [
+            ["Water scarcity: physical and economic", "sl"],
+            ["Demand for water in agriculture, industry and domestic use", "sl"],
+            ["Water management strategies and conflicts", "sl"],
+            ["Desalination, rainwater harvesting and efficiency", "ext"]
+          ]
+        },
+        {
+          "code": "4.3",
+          "unit": "Aquatic food production systems",
+          "subtopics": [
+            ["Fisheries, maximum sustainable yield and overfishing", "sl"],
+            ["Aquaculture and its environmental impacts", "sl"],
+            ["Management of aquatic resources and governance", "sl"]
+          ]
+        },
+        {
+          "code": "4.4",
+          "unit": "Water pollution",
+          "subtopics": [
+            ["Sources and types of water pollution", "sl"],
+            ["Eutrophication and its consequences", "sl"],
+            ["Biochemical oxygen demand and indicator species", "sl"],
+            ["Managing and treating water pollution", "sl"],
+            ["Plastic pollution in the oceans", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Topic 5 - Land",
+      "units": [
+        {
+          "code": "5.1",
+          "unit": "Soil",
+          "subtopics": [
+            ["Soil as a system: formation, horizons and properties", "sl"],
+            ["Soil texture, fertility and productivity", "sl"],
+            ["Soil degradation, erosion and desertification", "sl"],
+            ["Soil conservation and management", "sl"]
+          ]
+        },
+        {
+          "code": "5.2",
+          "unit": "Terrestrial food production systems",
+          "subtopics": [
+            ["Comparing food production systems and their efficiency", "sl"],
+            ["Inputs, outputs and environmental impacts of agriculture", "sl"],
+            ["Food security, food waste and changing diets", "sl"],
+            ["Sustainable agriculture and alternative approaches", "sl"],
+            ["Genetically modified crops: benefits and concerns", "ext"]
+          ]
+        },
+        {
+          "code": "5.3",
+          "unit": "Solid waste",
+          "subtopics": [
+            ["Types and sources of solid domestic waste", "sl"],
+            ["Waste disposal: landfill, incineration, recycling, composting", "sl"],
+            ["The circular economy and waste reduction strategies", "sl"],
+            ["E-waste and hazardous waste", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Topic 6 - Atmosphere and climate change",
+      "units": [
+        {
+          "code": "6.1",
+          "unit": "Atmospheric systems",
+          "subtopics": [
+            ["Structure and composition of the atmosphere", "sl"],
+            ["Energy balance, albedo and the natural greenhouse effect", "sl"],
+            ["Stratospheric ozone: formation, depletion and recovery", "sl"]
+          ]
+        },
+        {
+          "code": "6.2",
+          "unit": "Air pollution",
+          "subtopics": [
+            ["Primary and secondary pollutants", "sl"],
+            ["Photochemical smog and its formation", "sl"],
+            ["Acid deposition: causes, effects and management", "sl"],
+            ["Pollution management strategies at three levels", "sl"]
+          ]
+        },
+        {
+          "code": "6.3",
+          "unit": "Climate change",
+          "subtopics": [
+            ["The enhanced greenhouse effect and its causes", "sl"],
+            ["Evidence for climate change and climate models", "sl"],
+            ["Impacts on ecosystems, societies and food systems", "sl"],
+            ["Mitigation strategies and carbon sequestration", "sl"],
+            ["Adaptation strategies and resilience", "sl"],
+            ["International agreements and climate justice", "ext"],
+            ["Geoengineering proposals and their risks", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Topic 7 - Natural resources",
+      "units": [
+        {
+          "code": "7.1",
+          "unit": "Natural resources and their use",
+          "subtopics": [
+            ["Renewable, non-renewable and replenishable resources", "sl"],
+            ["Natural capital, natural income and ecosystem services", "sl"],
+            ["Dynamic nature of resource value", "sl"]
+          ]
+        },
+        {
+          "code": "7.2",
+          "unit": "Energy sources",
+          "subtopics": [
+            ["Fossil fuels: use, impacts and energy security", "sl"],
+            ["Nuclear power: benefits, risks and waste", "sl"],
+            ["Renewable energy: solar, wind, hydro, geothermal, biomass", "sl"],
+            ["Energy efficiency, conservation and demand management", "sl"],
+            ["Comparing energy sources for a given context", "ext"]
+          ]
+        },
+        {
+          "code": "7.3",
+          "unit": "Resource management",
+          "subtopics": [
+            ["Sustainable yield and resource depletion", "sl"],
+            ["Common pool resources and the tragedy of the commons", "sl"],
+            ["Managing shared resources and governance", "ext"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Topic 8 - Human populations and urban systems",
+      "units": [
+        {
+          "code": "8.1",
+          "unit": "Human populations",
+          "subtopics": [
+            ["Population growth, fertility and mortality", "sl"],
+            ["Demographic transition model and population pyramids", "sl"],
+            ["Population policies and their effects", "sl"],
+            ["Consumption, affluence and environmental impact", "sl"]
+          ]
+        },
+        {
+          "code": "8.2",
+          "unit": "Urban systems",
+          "subtopics": [
+            ["Urbanisation and its causes", "sl"],
+            ["Urban ecosystems, heat islands and air quality", "sl"],
+            ["Urban planning, transport and sustainable cities", "sl"],
+            ["Urban waste and water management", "ext"]
+          ]
+        },
+        {
+          "code": "8.3",
+          "unit": "Development and inequality",
+          "subtopics": [
+            ["Development indicators and environmental quality", "sl"],
+            ["Environmental justice and unequal impacts", "sl"],
+            ["Global inequality in resource consumption", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "HL lenses",
+      "units": [
+        {
+          "code": "HL.a",
+          "unit": "Environmental law",
+          "subtopics": [
+            ["International environmental law and treaties", "hl"],
+            ["National law, regulation and enforcement", "hl"],
+            ["Rights of nature and legal personhood", "hl"],
+            ["Effectiveness and limitations of environmental law", "hl"]
+          ]
+        },
+        {
+          "code": "HL.b",
+          "unit": "Environmental and ecological economics",
+          "subtopics": [
+            ["Valuing ecosystem services and natural capital", "hl"],
+            ["Externalities, market failure and environmental cost", "hl"],
+            ["Economic instruments: taxes, permits and subsidies", "hl"],
+            ["Growth, degrowth and doughnut economics", "hl"]
+          ]
+        },
+        {
+          "code": "HL.c",
+          "unit": "Environmental ethics",
+          "subtopics": [
+            ["Ethical frameworks applied to the environment", "hl"],
+            ["Intergenerational equity and responsibility", "hl"],
+            ["Moral status of non-human species and ecosystems", "hl"],
+            ["Applying an ethical lens to an environmental issue", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Skills and assessment",
+      "units": [
+        {
+          "code": "S.1",
+          "unit": "Practical and research skills",
+          "subtopics": [
+            ["Fieldwork techniques and sampling design", "sl"],
+            ["Processing and presenting environmental data", "sl"],
+            ["Statistical tests and interpreting results", "sl"],
+            ["Ethics and safety in environmental research", "sl"]
+          ]
+        },
+        {
+          "code": "S.2",
+          "unit": "Assessment tasks",
+          "subtopics": [
+            ["Paper 1: working from unseen case-study resources", "sl"],
+            ["Paper 2: data-based and structured essay technique", "sl"],
+            ["The individual investigation", "sl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

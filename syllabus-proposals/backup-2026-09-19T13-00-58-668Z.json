@@ -1,0 +1,417 @@
+[
+  {
+    "subject": "Business Management SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Business organisation and environment",
+        "subtopic": "Nature of business activity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Business organisation and environment",
+        "subtopic": "Types of business organisations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Business organisation and environment",
+        "subtopic": "Business objectives",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Business organisation and environment",
+        "subtopic": "Stakeholders",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Business organisation and environment",
+        "subtopic": "External environment",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human resource management",
+        "subtopic": "Functions and evolution of human resource management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human resource management",
+        "subtopic": "Organisational structure",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human resource management",
+        "subtopic": "Leadership and management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human resource management",
+        "subtopic": "Motivation and demotivation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human resource management",
+        "subtopic": "Organisational culture",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human resource management",
+        "subtopic": "Communication",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human resource management",
+        "subtopic": "Industrial/employee relations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human resource management",
+        "subtopic": "Human resource planning",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human resource management",
+        "subtopic": "Recruitment, selection and training",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Finance and accounts",
+        "subtopic": "Sources of finance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Finance and accounts",
+        "subtopic": "Costs and revenue",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Finance and accounts",
+        "subtopic": "Break-even analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Finance and accounts",
+        "subtopic": "Final accounts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Finance and accounts",
+        "subtopic": "Profitability and liquidity ratio analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Finance and accounts",
+        "subtopic": "Cash flow",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Finance and accounts",
+        "subtopic": "Investment appraisal",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Marketing",
+        "subtopic": "The role of marketing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Marketing",
+        "subtopic": "Marketing planning",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Marketing",
+        "subtopic": "Market research",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Marketing",
+        "subtopic": "The four Ps and the seven Ps",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Marketing",
+        "subtopic": "International marketing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Marketing",
+        "subtopic": "E-commerce",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Operations management",
+        "subtopic": "Production methods",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Operations management",
+        "subtopic": "Lean production and quality management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Operations management",
+        "subtopic": "Location",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Operations management",
+        "subtopic": "Production planning",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Operations management",
+        "subtopic": "Research and development",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Operations management",
+        "subtopic": "Crisis management and contingency planning",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Business strategy",
+        "subtopic": "Strategic objectives",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Business strategy",
+        "subtopic": "Growth and evolution",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Business strategy",
+        "subtopic": "Decision-making tools",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Business strategy",
+        "subtopic": "Analysis of strategic options",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Business strategy",
+        "subtopic": "Ethical objectives and corporate social responsibility",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Business Management HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Business organisation and environment",
+        "subtopic": "Nature of business activity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Business organisation and environment",
+        "subtopic": "Types of business organisations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Business organisation and environment",
+        "subtopic": "Business objectives",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Business organisation and environment",
+        "subtopic": "Stakeholders",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Business organisation and environment",
+        "subtopic": "External environment",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human resource management",
+        "subtopic": "Functions and evolution of human resource management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human resource management",
+        "subtopic": "Organisational structure",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human resource management",
+        "subtopic": "Leadership and management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human resource management",
+        "subtopic": "Motivation and demotivation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human resource management",
+        "subtopic": "Organisational culture",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human resource management",
+        "subtopic": "Communication",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human resource management",
+        "subtopic": "Industrial/employee relations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human resource management",
+        "subtopic": "Human resource planning",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human resource management",
+        "subtopic": "Recruitment, selection and training",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Finance and accounts",
+        "subtopic": "Sources of finance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Finance and accounts",
+        "subtopic": "Costs and revenue",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Finance and accounts",
+        "subtopic": "Break-even analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Finance and accounts",
+        "subtopic": "Final accounts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Finance and accounts",
+        "subtopic": "Profitability and liquidity ratio analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Finance and accounts",
+        "subtopic": "Cash flow",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Finance and accounts",
+        "subtopic": "Investment appraisal",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Marketing",
+        "subtopic": "The role of marketing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Marketing",
+        "subtopic": "Marketing planning",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Marketing",
+        "subtopic": "Market research",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Marketing",
+        "subtopic": "The four Ps and the seven Ps",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Marketing",
+        "subtopic": "International marketing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Marketing",
+        "subtopic": "E-commerce",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Operations management",
+        "subtopic": "Production methods",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Operations management",
+        "subtopic": "Lean production and quality management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Operations management",
+        "subtopic": "Location",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Operations management",
+        "subtopic": "Production planning",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Operations management",
+        "subtopic": "Research and development",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Operations management",
+        "subtopic": "Crisis management and contingency planning",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Business strategy",
+        "subtopic": "Strategic objectives",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Business strategy",
+        "subtopic": "Growth and evolution",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Business strategy",
+        "subtopic": "Decision-making tools",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Business strategy",
+        "subtopic": "Analysis of strategic options",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Business strategy",
+        "subtopic": "Ethical objectives and corporate social responsibility",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Business strategy",
+        "subtopic": "External growth strategies (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 6 - Business strategy",
+        "subtopic": "Portfolio analysis (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 6 - Business strategy",
+        "subtopic": "Decision tree analysis (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 6 - Business strategy",
+        "subtopic": "Ansoff matrix (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 6 - Business strategy",
+        "subtopic": "Change management (HL only)",
+        "hl_only": true
+      }
+    ]
+  }
+]

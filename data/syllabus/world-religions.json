@@ -1,0 +1,139 @@
+{
+  "course": "World religions",
+  "curriculum": "IB",
+  "guide": "first assessment 2013",
+  "confidence": "medium-high — an introductory survey of five religions, an in-depth study of two through five themes, and an investigative study; this course is SL only",
+  "subjects": { "sl": "World Religions SL", "hl": [] },
+  "note": "Three levels: part of the course, unit, then one assessable point.",
+  "topics": [
+    {
+      "topic": "Introduction to world religions",
+      "units": [
+        {
+          "code": "1.1",
+          "unit": "Studying religion",
+          "subtopics": [
+            ["What counts as a religion and how religions are studied", "sl"],
+            ["Insider and outsider perspectives", "sl"],
+            ["Comparing religions fairly and avoiding stereotype", "sl"],
+            ["The three fundamental questions: condition, destiny, path", "sl"]
+          ]
+        },
+        {
+          "code": "1.2",
+          "unit": "Religions of Indian origin",
+          "subtopics": [
+            ["Hinduism: origins, beliefs, texts and practice", "sl"],
+            ["Buddhism: the Buddha, the four noble truths and the path", "sl"],
+            ["Sikhism: the Gurus, the Guru Granth Sahib and practice", "sl"],
+            ["Jainism: ahimsa, asceticism and teachings", "sl"]
+          ]
+        },
+        {
+          "code": "1.3",
+          "unit": "Religions of Middle Eastern origin",
+          "subtopics": [
+            ["Judaism: covenant, Torah, practice and festivals", "sl"],
+            ["Christianity: Jesus, scripture, denominations and worship", "sl"],
+            ["Islam: the Qur'an, the five pillars and the Sunni-Shia distinction", "sl"],
+            ["Baha'i faith and Zoroastrianism: teachings and practice", "sl"]
+          ]
+        },
+        {
+          "code": "1.4",
+          "unit": "Other traditions",
+          "subtopics": [
+            ["Taoism: the Tao, wu wei and practice", "sl"],
+            ["Indigenous and traditional religions", "sl"],
+            ["New religious movements and secular worldviews", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "In-depth study of two religions",
+      "units": [
+        {
+          "code": "2.1",
+          "unit": "Rituals and practices",
+          "subtopics": [
+            ["Daily, weekly and annual ritual cycles", "sl"],
+            ["Rites of passage: birth, initiation, marriage, death", "sl"],
+            ["Pilgrimage and festivals", "sl"],
+            ["Prayer, meditation and devotion", "sl"],
+            ["Ritual change, reform and revival", "sl"]
+          ]
+        },
+        {
+          "code": "2.2",
+          "unit": "Sacred texts and authority",
+          "subtopics": [
+            ["Canon formation and scriptural authority", "sl"],
+            ["Revelation, inspiration and human authorship", "sl"],
+            ["Genres within scripture: law, narrative, poetry, prophecy", "sl"],
+            ["Interpretation: exegesis, tradition and commentary", "sl"],
+            ["Scripture in worship: recitation, memorisation and liturgy", "sl"]
+          ]
+        },
+        {
+          "code": "2.3",
+          "unit": "Doctrines and beliefs",
+          "subtopics": [
+            ["Ultimate reality: God, gods, no-self or emptiness", "sl"],
+            ["Cosmology, creation and the end of things", "sl"],
+            ["Salvation, liberation and the human condition", "sl"],
+            ["Orthodoxy, heterodoxy and internal diversity", "sl"],
+            ["Doctrinal development and modern challenges", "sl"]
+          ]
+        },
+        {
+          "code": "2.4",
+          "unit": "Religious experience",
+          "subtopics": [
+            ["Mysticism, contemplation and asceticism", "sl"],
+            ["Conversion, calling and awakening", "sl"],
+            ["Vision, prophecy and charisma", "sl"],
+            ["Emotion, embodiment and communal experience", "sl"]
+          ]
+        },
+        {
+          "code": "2.5",
+          "unit": "Ethics and moral conduct",
+          "subtopics": [
+            ["Moral principles, virtues and prohibitions", "sl"],
+            ["Sources of moral authority: text, reason, tradition, community", "sl"],
+            ["Applied ethics: life, sexuality, war and wealth", "sl"],
+            ["Social ethics: justice, charity and compassion", "sl"],
+            ["Environmental ethics and stewardship", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Internal assessment - Investigative study",
+      "units": [
+        {
+          "code": "3.1",
+          "unit": "Planning the investigation",
+          "subtopics": [
+            ["Choosing a focused religious question or practice", "sl"],
+            ["Selecting sources: texts, interviews and observation", "sl"],
+            ["Ethical and respectful engagement with a community", "sl"]
+          ]
+        },
+        {
+          "code": "3.2",
+          "unit": "Writing the study",
+          "subtopics": [
+            ["Describing the practice or belief accurately", "sl"],
+            ["Analysing meaning and significance for believers", "sl"],
+            ["Evaluating sources and perspectives", "sl"],
+            ["Reflecting on what was learned and its limits", "sl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

@@ -1,0 +1,194 @@
+{
+  "course": "Language ab initio",
+  "curriculum": "IB",
+  "guide": "first assessment 2020",
+  "confidence": "high on the five prescribed themes, which are fixed by the guide; the skills subtopics are ours. This course is SL only",
+  "subjects": {
+    "sl": [
+      "Arabic ab initio SL",
+      "English ab initio SL",
+      "French ab initio SL",
+      "Spanish ab initio SL",
+      "Mandarin ab initio SL"
+    ],
+    "hl": []
+  },
+  "note": "Three levels: theme, unit, then one assessable point. For beginners with little or no prior experience of the language.",
+  "topics": [
+    {
+      "topic": "Identities",
+      "units": [
+        {
+          "code": "1.1",
+          "unit": "Personal attributes and daily life",
+          "subtopics": [
+            ["Personal information, family and relationships", "sl"],
+            ["Physical appearance and personality", "sl"],
+            ["Daily routine and lifestyle", "sl"],
+            ["Food, drink and eating habits", "sl"],
+            ["Health, illness and well-being", "sl"]
+          ]
+        },
+        {
+          "code": "1.2",
+          "unit": "Talking about yourself",
+          "subtopics": [
+            ["Introducing yourself and others", "sl"],
+            ["Expressing likes, dislikes and preferences", "sl"],
+            ["Describing people and relationships", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Experiences",
+      "units": [
+        {
+          "code": "2.1",
+          "unit": "Everyday experiences",
+          "subtopics": [
+            ["Leisure activities, sport and hobbies", "sl"],
+            ["Holidays, travel and transport", "sl"],
+            ["Festivals, customs and celebrations", "sl"],
+            ["School life and daily schedule", "sl"]
+          ]
+        },
+        {
+          "code": "2.2",
+          "unit": "Narrating experiences",
+          "subtopics": [
+            ["Talking about the past", "sl"],
+            ["Talking about future plans", "sl"],
+            ["Describing an event or a trip", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Human ingenuity",
+      "units": [
+        {
+          "code": "3.1",
+          "unit": "Technology, media and creativity",
+          "subtopics": [
+            ["Entertainment: film, music and television", "sl"],
+            ["Communication technology and social media", "sl"],
+            ["Transport and innovation", "sl"],
+            ["Art, design and creative activity", "sl"]
+          ]
+        },
+        {
+          "code": "3.2",
+          "unit": "Explaining and giving opinions",
+          "subtopics": [
+            ["Explaining how something is used", "sl"],
+            ["Giving advantages and disadvantages", "sl"],
+            ["Agreeing and disagreeing politely", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Social organization",
+      "units": [
+        {
+          "code": "4.1",
+          "unit": "Community and work",
+          "subtopics": [
+            ["Neighbourhood, town and services", "sl"],
+            ["Education and school subjects", "sl"],
+            ["Jobs, careers and the workplace", "sl"],
+            ["Shopping, money and services", "sl"],
+            ["Rules, laws and citizenship", "sl"]
+          ]
+        },
+        {
+          "code": "4.2",
+          "unit": "Formal communication",
+          "subtopics": [
+            ["Making requests and asking for help", "sl"],
+            ["Formal and informal register", "sl"],
+            ["Writing an email, letter or message", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Sharing the planet",
+      "units": [
+        {
+          "code": "5.1",
+          "unit": "Global issues",
+          "subtopics": [
+            ["The environment and protecting it", "sl"],
+            ["Weather, climate and seasons", "sl"],
+            ["Global problems: poverty, equality, peace", "sl"],
+            ["Living in a community and helping others", "sl"]
+          ]
+        },
+        {
+          "code": "5.2",
+          "unit": "Expressing views on issues",
+          "subtopics": [
+            ["Describing a problem and its causes", "sl"],
+            ["Suggesting solutions and actions", "sl"],
+            ["Comparing situations in different countries", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Language and skills",
+      "units": [
+        {
+          "code": "6.1",
+          "unit": "Receptive skills",
+          "subtopics": [
+            ["Reading comprehension: main ideas and detail", "sl"],
+            ["Listening comprehension: gist and detail", "sl"],
+            ["Understanding audience, context and purpose", "sl"]
+          ]
+        },
+        {
+          "code": "6.2",
+          "unit": "Grammar and vocabulary",
+          "subtopics": [
+            ["Present tense and word order", "sl"],
+            ["Past and future forms", "sl"],
+            ["Questions, negation and connectives", "sl"],
+            ["Core vocabulary for the five themes", "sl"],
+            ["Spelling, script and accuracy", "sl"]
+          ]
+        },
+        {
+          "code": "6.3",
+          "unit": "Productive and interactive skills",
+          "subtopics": [
+            ["Writing common text types: message, email, blog, article", "sl"],
+            ["Organising ideas with connectives", "sl"],
+            ["Speaking from a visual stimulus", "sl"],
+            ["Conversation, questions and follow-up", "sl"],
+            ["Pronunciation and intonation", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Assessment",
+      "units": [
+        {
+          "code": "7.1",
+          "unit": "Assessment tasks",
+          "subtopics": [
+            ["Paper 1: productive writing task", "sl"],
+            ["Paper 2: listening comprehension", "sl"],
+            ["Paper 2: reading comprehension", "sl"],
+            ["Individual oral: visual stimulus and conversation", "sl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

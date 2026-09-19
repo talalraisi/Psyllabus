@@ -1,0 +1,100 @@
+{
+  "course": "Dance",
+  "curriculum": "IB",
+  "guide": "first assessment 2024",
+  "confidence": "medium — performance, composition and analysis of dance in context are the three strands of the course; leaf wording is ours",
+  "subjects": { "sl": "Dance SL", "hl": "Dance HL" },
+  "note": "Three levels: strand, unit, then one assessable point. Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "topics": [
+    {
+      "topic": "Performance",
+      "units": [
+        {
+          "code": "1.1",
+          "unit": "Technical skills",
+          "subtopics": [
+            ["Alignment, posture and placement", "sl"],
+            ["Strength, flexibility, stamina and control", "sl"],
+            ["Coordination, balance and weight transfer", "sl"],
+            ["Musicality, timing and rhythm", "sl"],
+            ["Style-specific technique and vocabulary", "sl"]
+          ]
+        },
+        {
+          "code": "1.2",
+          "unit": "Performance skills",
+          "subtopics": [
+            ["Expression, intention and artistry", "sl"],
+            ["Use of space, dynamics and focus", "sl"],
+            ["Projection and stage presence", "sl"],
+            ["Solo, duet and ensemble performance", "sl"],
+            ["Safe practice, warm-up and injury prevention", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Composition and choreography",
+      "units": [
+        {
+          "code": "2.1",
+          "unit": "The choreographic process",
+          "subtopics": [
+            ["Stimulus, intention and choreographic idea", "sl"],
+            ["Movement invention, motif and development", "sl"],
+            ["Structure, form and phrasing", "sl"],
+            ["Use of space, time and energy", "sl"],
+            ["Group work: canon, unison and contrast", "sl"]
+          ]
+        },
+        {
+          "code": "2.2",
+          "unit": "Realising a work",
+          "subtopics": [
+            ["Music, sound and accompaniment choices", "sl"],
+            ["Costume, lighting and staging decisions", "sl"],
+            ["Rehearsal direction and refining material", "sl"],
+            ["Documenting and reflecting on the process", "sl"],
+            ["Extending a work to a larger scale", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Dance in context and analysis",
+      "units": [
+        {
+          "code": "3.1",
+          "unit": "Analysing dance works",
+          "subtopics": [
+            ["Describing movement material accurately", "sl"],
+            ["Analysing choreographic choices and their effect", "sl"],
+            ["Interpreting meaning and intention", "sl"],
+            ["Writing about a professional dance work", "sl"]
+          ]
+        },
+        {
+          "code": "3.2",
+          "unit": "Dance cultures and traditions",
+          "subtopics": [
+            ["Cultural and historical context of dance forms", "sl"],
+            ["Comparing dance styles and traditions", "sl"],
+            ["Respectful engagement with a tradition not your own", "sl"],
+            ["Investigating a dance culture in depth", "hl"]
+          ]
+        },
+        {
+          "code": "3.3",
+          "unit": "World dance investigation",
+          "subtopics": [
+            ["Researching a dance form and its practitioners", "hl"],
+            ["Relating research to your own practice", "hl"],
+            ["Presenting the investigation", "hl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

@@ -1,0 +1,221 @@
+{
+  "course": "Digital society",
+  "curriculum": "IB",
+  "guide": "first assessment 2024",
+  "confidence": "medium-high — concepts, content and contexts are the guide's three strands, and the HL extension is challenges and interventions; leaf wording is ours",
+  "subjects": { "sl": "Digital Society SL", "hl": "Digital Society HL" },
+  "note": "Three levels: strand, unit, then one assessable point. Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "topics": [
+    {
+      "topic": "Concepts",
+      "units": [
+        {
+          "code": "1.1",
+          "unit": "The seven concepts",
+          "subtopics": [
+            ["Change in digital society", "sl"],
+            ["Expression and digital communication", "sl"],
+            ["Identity online and offline", "sl"],
+            ["Power, control and digital technology", "sl"],
+            ["Space, place and digital geography", "sl"],
+            ["Systems thinking and digital infrastructure", "sl"],
+            ["Values and ethics in digital society", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Content",
+      "units": [
+        {
+          "code": "2.1",
+          "unit": "Data",
+          "subtopics": [
+            ["Personal, non-personal and sensitive data", "sl"],
+            ["Data collection, storage and the cloud", "sl"],
+            ["Big data, datafication and analytics", "sl"],
+            ["Data ownership, portability and open data", "sl"],
+            ["Data privacy, surveillance and breaches", "sl"]
+          ]
+        },
+        {
+          "code": "2.2",
+          "unit": "Algorithms",
+          "subtopics": [
+            ["What an algorithm is and what it can do", "sl"],
+            ["Recommendation systems and personalisation", "sl"],
+            ["Filter bubbles and echo chambers", "sl"],
+            ["Algorithmic bias and discrimination", "sl"],
+            ["Transparency, explainability and accountability", "sl"]
+          ]
+        },
+        {
+          "code": "2.3",
+          "unit": "Computers",
+          "subtopics": [
+            ["Hardware components and computer systems", "sl"],
+            ["Embedded systems and the internet of things", "sl"],
+            ["Computing power, miniaturisation and trends", "sl"],
+            ["E-waste, resource extraction and energy use", "sl"]
+          ]
+        },
+        {
+          "code": "2.4",
+          "unit": "Networks and the internet",
+          "subtopics": [
+            ["Types of network and how data travels", "sl"],
+            ["Internet infrastructure, protocols and governance", "sl"],
+            ["Access, the digital divide and connectivity", "sl"],
+            ["Cybersecurity threats and protection", "sl"],
+            ["Encryption, anonymity and digital rights", "sl"]
+          ]
+        },
+        {
+          "code": "2.5",
+          "unit": "Media",
+          "subtopics": [
+            ["Traditional media compared with digital media", "sl"],
+            ["Media ownership, concentration and platforms", "sl"],
+            ["Misinformation, disinformation and deepfakes", "sl"],
+            ["Fact-checking, moderation and regulation", "sl"],
+            ["Social media, participation and wellbeing", "sl"]
+          ]
+        },
+        {
+          "code": "2.6",
+          "unit": "Artificial intelligence",
+          "subtopics": [
+            ["What AI is: definitions and history", "sl"],
+            ["Machine learning, training data and models", "sl"],
+            ["Applications of AI across sectors", "sl"],
+            ["Generative AI and creative work", "sl"],
+            ["Bias, accountability and human oversight", "sl"],
+            ["AI regulation and governance", "ext"]
+          ]
+        },
+        {
+          "code": "2.7",
+          "unit": "Robots and autonomous technologies",
+          "subtopics": [
+            ["Types of robot and degrees of autonomy", "sl"],
+            ["Automation and the future of work", "sl"],
+            ["Human-robot interaction and trust", "ext"],
+            ["Autonomous vehicles and weapons: ethical questions", "ext"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Contexts",
+      "units": [
+        {
+          "code": "3.1",
+          "unit": "Cultural and social contexts",
+          "subtopics": [
+            ["Digital culture, online communities and subcultures", "sl"],
+            ["Social relationships and digital communication", "sl"],
+            ["Globalisation and cultural exchange online", "sl"]
+          ]
+        },
+        {
+          "code": "3.2",
+          "unit": "Economic context",
+          "subtopics": [
+            ["Digital business models and platform economies", "sl"],
+            ["The gig economy and changing work", "sl"],
+            ["Digital entrepreneurship and innovation", "sl"]
+          ]
+        },
+        {
+          "code": "3.3",
+          "unit": "Environmental context",
+          "subtopics": [
+            ["Energy and carbon footprint of digital systems", "sl"],
+            ["E-waste and the life cycle of devices", "sl"],
+            ["Digital technology as an environmental solution", "sl"]
+          ]
+        },
+        {
+          "code": "3.4",
+          "unit": "Health context",
+          "subtopics": [
+            ["Digital health records, telemedicine and wearables", "sl"],
+            ["Data privacy in health systems", "sl"],
+            ["Screen time, mental health and digital wellbeing", "sl"]
+          ]
+        },
+        {
+          "code": "3.5",
+          "unit": "Human knowledge and education",
+          "subtopics": [
+            ["Digital tools and how knowledge is produced", "sl"],
+            ["Access to information and online learning", "sl"],
+            ["Credibility, expertise and authority online", "sl"]
+          ]
+        },
+        {
+          "code": "3.6",
+          "unit": "Political context",
+          "subtopics": [
+            ["E-government and digital public services", "sl"],
+            ["Digital participation, activism and civic technology", "sl"],
+            ["Digital rights, law and regulation", "sl"],
+            ["Digital sovereignty, cyberwarfare and geopolitics", "ext"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "HL extension - Challenges and interventions",
+      "units": [
+        {
+          "code": "4.1",
+          "unit": "Global challenges",
+          "subtopics": [
+            ["Global wellbeing and digital technology", "hl"],
+            ["Governance, sovereignty and global digital policy", "hl"],
+            ["Sustainability and the environmental cost of digital growth", "hl"],
+            ["Equality, inclusion and the widening digital divide", "hl"]
+          ]
+        },
+        {
+          "code": "4.2",
+          "unit": "Interventions and futures",
+          "subtopics": [
+            ["Evaluating proposed interventions and their trade-offs", "hl"],
+            ["Stakeholders, power and who decides", "hl"],
+            ["Scenario planning and speculative futures", "hl"],
+            ["Researching and presenting an HL extension inquiry", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Inquiry and assessment",
+      "units": [
+        {
+          "code": "5.1",
+          "unit": "The inquiry project",
+          "subtopics": [
+            ["Identifying a real-world digital society issue", "sl"],
+            ["Developing a research question and selecting sources", "sl"],
+            ["Gathering and evaluating evidence and perspectives", "sl"],
+            ["Applying concepts, content and context to the issue", "sl"],
+            ["Presenting findings and reflecting on the process", "sl"]
+          ]
+        },
+        {
+          "code": "5.2",
+          "unit": "Examination technique",
+          "subtopics": [
+            ["Answering from a stimulus source", "sl"],
+            ["Using real-world examples as evidence", "sl"],
+            ["Structuring an extended response with multiple perspectives", "sl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

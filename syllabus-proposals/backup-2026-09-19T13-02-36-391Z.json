@@ -1,0 +1,577 @@
+[
+  {
+    "subject": "Environmental Systems and Societies SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Foundations of environmental systems and societies",
+        "subtopic": "Environmental systems and societies",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Foundations of environmental systems and societies",
+        "subtopic": "Systems approach",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Foundations of environmental systems and societies",
+        "subtopic": "Energy and equilibria",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Foundations of environmental systems and societies",
+        "subtopic": "Sustainability",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Foundations of environmental systems and societies",
+        "subtopic": "Human population dynamics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Foundations of environmental systems and societies",
+        "subtopic": "Resource use and security",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Ecosystems and ecology",
+        "subtopic": "Species, populations and communities",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Ecosystems and ecology",
+        "subtopic": "Ecosystem structure and function",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Ecosystems and ecology",
+        "subtopic": "Biomes, zonation and succession",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Ecosystems and ecology",
+        "subtopic": "Soils, nutrients and the water cycle",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Ecosystems and ecology",
+        "subtopic": "Climate change and ecosystems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Biodiversity and conservation",
+        "subtopic": "Biodiversity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Biodiversity and conservation",
+        "subtopic": "Conservation strategies",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Biodiversity and conservation",
+        "subtopic": "Invasive species and ecosystem disruption",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Biodiversity and conservation",
+        "subtopic": "Protected areas and management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Water and aquatic food production systems and societies",
+        "subtopic": "Freshwater systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Water and aquatic food production systems and societies",
+        "subtopic": "Water supply, demand and pollution",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Water and aquatic food production systems and societies",
+        "subtopic": "Aquatic food production systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Water and aquatic food production systems and societies",
+        "subtopic": "Managing water resources",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Soil systems and terrestrial food production systems and societies",
+        "subtopic": "Soil properties and formation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Soil systems and terrestrial food production systems and societies",
+        "subtopic": "Soil degradation and conservation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Soil systems and terrestrial food production systems and societies",
+        "subtopic": "Terrestrial food production systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Soil systems and terrestrial food production systems and societies",
+        "subtopic": "Sustainable agriculture",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Atmospheric systems and societies",
+        "subtopic": "The atmosphere",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Atmospheric systems and societies",
+        "subtopic": "Air pollution and atmospheric impacts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Atmospheric systems and societies",
+        "subtopic": "Climate change causes and effects",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Atmospheric systems and societies",
+        "subtopic": "Mitigation and adaptation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Human systems and resource use",
+        "subtopic": "Economic growth and development",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Human systems and resource use",
+        "subtopic": "Global resource consumption",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Human systems and resource use",
+        "subtopic": "Waste management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Human systems and resource use",
+        "subtopic": "Energy use and transitions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Research and analysis",
+        "subtopic": "Data collection and analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Research and analysis",
+        "subtopic": "Research methods",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Research and analysis",
+        "subtopic": "Case study application",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Research and analysis",
+        "subtopic": "Evaluation of environmental solutions",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Environmental Systems & Societies SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Foundations of environmental systems and societies",
+        "subtopic": "Environmental systems and societies",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Foundations of environmental systems and societies",
+        "subtopic": "Systems approach",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Foundations of environmental systems and societies",
+        "subtopic": "Energy and equilibria",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Foundations of environmental systems and societies",
+        "subtopic": "Sustainability",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Foundations of environmental systems and societies",
+        "subtopic": "Human population dynamics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Foundations of environmental systems and societies",
+        "subtopic": "Resource use and security",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Ecosystems and ecology",
+        "subtopic": "Species, populations and communities",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Ecosystems and ecology",
+        "subtopic": "Ecosystem structure and function",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Ecosystems and ecology",
+        "subtopic": "Biomes, zonation and succession",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Ecosystems and ecology",
+        "subtopic": "Soils, nutrients and the water cycle",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Ecosystems and ecology",
+        "subtopic": "Climate change and ecosystems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Biodiversity and conservation",
+        "subtopic": "Biodiversity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Biodiversity and conservation",
+        "subtopic": "Conservation strategies",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Biodiversity and conservation",
+        "subtopic": "Invasive species and ecosystem disruption",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Biodiversity and conservation",
+        "subtopic": "Protected areas and management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Water and aquatic food production systems and societies",
+        "subtopic": "Freshwater systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Water and aquatic food production systems and societies",
+        "subtopic": "Water supply, demand and pollution",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Water and aquatic food production systems and societies",
+        "subtopic": "Aquatic food production systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Water and aquatic food production systems and societies",
+        "subtopic": "Managing water resources",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Soil systems and terrestrial food production systems and societies",
+        "subtopic": "Soil properties and formation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Soil systems and terrestrial food production systems and societies",
+        "subtopic": "Soil degradation and conservation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Soil systems and terrestrial food production systems and societies",
+        "subtopic": "Terrestrial food production systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Soil systems and terrestrial food production systems and societies",
+        "subtopic": "Sustainable agriculture",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Atmospheric systems and societies",
+        "subtopic": "The atmosphere",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Atmospheric systems and societies",
+        "subtopic": "Air pollution and atmospheric impacts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Atmospheric systems and societies",
+        "subtopic": "Climate change causes and effects",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Atmospheric systems and societies",
+        "subtopic": "Mitigation and adaptation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Human systems and resource use",
+        "subtopic": "Economic growth and development",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Human systems and resource use",
+        "subtopic": "Global resource consumption",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Human systems and resource use",
+        "subtopic": "Waste management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Human systems and resource use",
+        "subtopic": "Energy use and transitions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Research and analysis",
+        "subtopic": "Data collection and analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Research and analysis",
+        "subtopic": "Research methods",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Research and analysis",
+        "subtopic": "Case study application",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Research and analysis",
+        "subtopic": "Evaluation of environmental solutions",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Environmental Systems and Societies HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Foundations of environmental systems and societies",
+        "subtopic": "Environmental systems and societies",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Foundations of environmental systems and societies",
+        "subtopic": "Systems approach",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Foundations of environmental systems and societies",
+        "subtopic": "Energy and equilibria",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Foundations of environmental systems and societies",
+        "subtopic": "Sustainability",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Foundations of environmental systems and societies",
+        "subtopic": "Human population dynamics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Foundations of environmental systems and societies",
+        "subtopic": "Resource use and security",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Ecosystems and ecology",
+        "subtopic": "Species, populations and communities",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Ecosystems and ecology",
+        "subtopic": "Ecosystem structure and function",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Ecosystems and ecology",
+        "subtopic": "Biomes, zonation and succession",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Ecosystems and ecology",
+        "subtopic": "Soils, nutrients and the water cycle",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Ecosystems and ecology",
+        "subtopic": "Climate change and ecosystems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Ecosystems and ecology",
+        "subtopic": "HL extension: more detailed ecological analysis (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Biodiversity and conservation",
+        "subtopic": "Biodiversity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Biodiversity and conservation",
+        "subtopic": "Conservation strategies",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Biodiversity and conservation",
+        "subtopic": "Invasive species and ecosystem disruption",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Biodiversity and conservation",
+        "subtopic": "Protected areas and management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Biodiversity and conservation",
+        "subtopic": "HL extension: advanced conservation planning (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Water and aquatic food production systems and societies",
+        "subtopic": "Freshwater systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Water and aquatic food production systems and societies",
+        "subtopic": "Water supply, demand and pollution",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Water and aquatic food production systems and societies",
+        "subtopic": "Aquatic food production systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Water and aquatic food production systems and societies",
+        "subtopic": "Managing water resources",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Water and aquatic food production systems and societies",
+        "subtopic": "HL extension: complex water resource issues (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Soil systems and terrestrial food production systems and societies",
+        "subtopic": "Soil properties and formation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Soil systems and terrestrial food production systems and societies",
+        "subtopic": "Soil degradation and conservation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Soil systems and terrestrial food production systems and societies",
+        "subtopic": "Terrestrial food production systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Soil systems and terrestrial food production systems and societies",
+        "subtopic": "Sustainable agriculture",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Soil systems and terrestrial food production systems and societies",
+        "subtopic": "HL extension: advanced soil and agriculture analysis (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 6 - Atmospheric systems and societies",
+        "subtopic": "The atmosphere",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Atmospheric systems and societies",
+        "subtopic": "Air pollution and atmospheric impacts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Atmospheric systems and societies",
+        "subtopic": "Climate change causes and effects",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Atmospheric systems and societies",
+        "subtopic": "Mitigation and adaptation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Atmospheric systems and societies",
+        "subtopic": "HL extension: deeper atmospheric modelling and policy analysis (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 7 - Human systems and resource use",
+        "subtopic": "Economic growth and development",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Human systems and resource use",
+        "subtopic": "Global resource consumption",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Human systems and resource use",
+        "subtopic": "Waste management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Human systems and resource use",
+        "subtopic": "Energy use and transitions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Human systems and resource use",
+        "subtopic": "HL extension: complex resource systems and trade-offs (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 8 - Research and analysis",
+        "subtopic": "Data collection and analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Research and analysis",
+        "subtopic": "Research methods",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Research and analysis",
+        "subtopic": "Case study application",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Research and analysis",
+        "subtopic": "Evaluation of environmental solutions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Research and analysis",
+        "subtopic": "HL extension: more advanced inquiry and evaluation (HL only)",
+        "hl_only": true
+      }
+    ]
+  }
+]

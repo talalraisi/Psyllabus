@@ -1,0 +1,82 @@
+[
+  {
+    "subject": "Literature and Performance SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "Close analysis of literary texts and performance elements",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "How texts are constructed by authors (form, structure, style)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "How texts are interpreted in performance (audience, interpretation)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "The relationship between text and performance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Historical and cultural contexts of literary texts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Historical and cultural contexts of performance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Place, setting and representation of location in text and performance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "How literature and performance reflect/shape societies and values",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Relationships between different literary texts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Relationships between literary texts and performance versions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Themes and motifs across different works and performance styles",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Influence and dialogue between authors and performance traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Performance and Presentation (SL only)",
+        "subtopic": "Creating and staging performance interpretations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Performance and Presentation (SL only)",
+        "subtopic": "Collaborative performance production skills",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Performance and Presentation (SL only)",
+        "subtopic": "Presenting performance work to audiences",
+        "hl_only": false
+      }
+    ]
+  }
+]

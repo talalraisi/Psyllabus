@@ -1,0 +1,175 @@
+{
+  "course": "Philosophy",
+  "curriculum": "IB",
+  "guide": "first assessment 2016",
+  "confidence": "medium-high — core theme, optional themes, prescribed text and the HL extension on the nature of philosophical activity follow the guide; SL takes one optional theme, HL takes two",
+  "subjects": { "sl": "Philosophy SL", "hl": "Philosophy HL" },
+  "note": "Three levels: part of the course, unit, then one assessable point. Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "topics": [
+    {
+      "topic": "Core theme - Being human",
+      "units": [
+        {
+          "code": "1.1",
+          "unit": "What is a human being?",
+          "subtopics": [
+            ["Human nature and what distinguishes humans", "sl"],
+            ["The self, personal identity and persistence over time", "sl"],
+            ["Mind and body: dualism and materialism", "sl"],
+            ["Consciousness and the problem of other minds", "sl"]
+          ]
+        },
+        {
+          "code": "1.2",
+          "unit": "Freedom and responsibility",
+          "subtopics": [
+            ["Free will, determinism and compatibilism", "sl"],
+            ["Moral responsibility and its conditions", "sl"],
+            ["Autonomy, authenticity and self-creation", "sl"]
+          ]
+        },
+        {
+          "code": "1.3",
+          "unit": "The human being and others",
+          "subtopics": [
+            ["The individual and society", "sl"],
+            ["Recognition, alienation and the other", "sl"],
+            ["Human beings and non-human animals", "sl"],
+            ["Human beings and technology", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Optional themes",
+      "units": [
+        {
+          "code": "2.1",
+          "unit": "Aesthetics",
+          "subtopics": [
+            ["What is art and what makes something art", "sl"],
+            ["Beauty, taste and aesthetic judgement", "sl"],
+            ["Interpretation, intention and the role of the audience", "sl"],
+            ["Art, morality and censorship", "sl"]
+          ]
+        },
+        {
+          "code": "2.2",
+          "unit": "Epistemology",
+          "subtopics": [
+            ["Knowledge, belief and justification", "sl"],
+            ["Sources of knowledge: reason, perception, testimony", "sl"],
+            ["Scepticism and certainty", "sl"],
+            ["Truth theories and the limits of knowledge", "sl"]
+          ]
+        },
+        {
+          "code": "2.3",
+          "unit": "Ethics",
+          "subtopics": [
+            ["Utilitarianism and consequences", "sl"],
+            ["Deontology, duty and Kantian ethics", "sl"],
+            ["Virtue ethics and character", "sl"],
+            ["Meta-ethics: moral realism, relativism and emotivism", "sl"],
+            ["Applied ethics: bioethics, business and environment", "sl"]
+          ]
+        },
+        {
+          "code": "2.4",
+          "unit": "Philosophy of religion",
+          "subtopics": [
+            ["Arguments for the existence of God: ontological, cosmological, teleological", "sl"],
+            ["The problem of evil and responses to it", "sl"],
+            ["Faith, reason and revelation", "sl"],
+            ["Religious language and meaning", "sl"]
+          ]
+        },
+        {
+          "code": "2.5",
+          "unit": "Philosophy of science",
+          "subtopics": [
+            ["Scientific method, induction and falsification", "sl"],
+            ["Explanation, laws and theory change", "sl"],
+            ["Realism and instrumentalism", "sl"],
+            ["Demarcation: science, pseudoscience and values", "sl"]
+          ]
+        },
+        {
+          "code": "2.6",
+          "unit": "Political philosophy",
+          "subtopics": [
+            ["The state and its justification", "sl"],
+            ["Liberty, authority and the limits of power", "sl"],
+            ["Justice, equality and distribution", "sl"],
+            ["Democracy, rights and legitimacy", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Prescribed text",
+      "units": [
+        {
+          "code": "3.1",
+          "unit": "Studying the text",
+          "subtopics": [
+            ["Historical and philosophical context of the text", "sl"],
+            ["Key arguments and concepts in the text", "sl"],
+            ["Structure and method of the argument", "sl"]
+          ]
+        },
+        {
+          "code": "3.2",
+          "unit": "Critical engagement",
+          "subtopics": [
+            ["Analysis and interpretation of passages", "sl"],
+            ["Objections, counter-arguments and evaluation", "sl"],
+            ["Relevance of the text to contemporary questions", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "HL extension - The nature of philosophical activity",
+      "units": [
+        {
+          "code": "4.1",
+          "unit": "What philosophers do",
+          "subtopics": [
+            ["The nature and function of philosophy", "hl"],
+            ["Methods of philosophical inquiry: argument, analysis, thought experiment", "hl"],
+            ["Philosophy and other disciplines", "hl"],
+            ["The value and limits of philosophical activity", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Skills and internal assessment",
+      "units": [
+        {
+          "code": "5.1",
+          "unit": "Philosophical technique",
+          "subtopics": [
+            ["Constructing a valid and sound argument", "sl"],
+            ["Identifying assumptions and logical fallacies", "sl"],
+            ["Using examples and thought experiments", "sl"],
+            ["Balancing exposition, argument and evaluation in an essay", "sl"]
+          ]
+        },
+        {
+          "code": "5.2",
+          "unit": "The philosophical analysis",
+          "subtopics": [
+            ["Choosing a non-philosophical stimulus", "sl"],
+            ["Identifying a philosophical issue within it", "sl"],
+            ["Developing and evaluating the argument", "sl"],
+            ["Writing the analysis", "sl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

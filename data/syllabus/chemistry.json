@@ -1,0 +1,334 @@
+{
+  "course": "Chemistry",
+  "curriculum": "IB",
+  "guide": "first assessment 2025",
+  "confidence": "high — Structure 1-3 and Reactivity 1-3 with their unit numbering are the guide's; the pasted list had invented themes and broke Ksp and Ka into single letters",
+  "subjects": { "sl": "Chemistry SL", "hl": "Chemistry HL" },
+  "note": "Three levels: theme, the guide's numbered unit, then one assessable point. Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "topics": [
+    {
+      "topic": "Structure 1 - Models of the particulate nature of matter",
+      "units": [
+        {
+          "code": "S1.1",
+          "unit": "Introduction to the particulate nature of matter",
+          "subtopics": [
+            ["Elements, compounds and mixtures", "sl"],
+            ["The kinetic molecular theory and states of matter", "sl"],
+            ["Temperature, kinetic energy and changes of state", "sl"],
+            ["Separation techniques for mixtures", "sl"]
+          ]
+        },
+        {
+          "code": "S1.2",
+          "unit": "The nuclear atom",
+          "subtopics": [
+            ["Protons, neutrons and electrons", "sl"],
+            ["Atomic number, mass number and isotopes", "sl"],
+            ["Relative atomic mass from isotopic abundance", "sl"],
+            ["Mass spectra and their interpretation", "ext"]
+          ]
+        },
+        {
+          "code": "S1.3",
+          "unit": "Electron configurations",
+          "subtopics": [
+            ["Emission spectra and energy levels", "sl"],
+            ["The hydrogen emission spectrum and convergence", "ext"],
+            ["Main energy levels, sublevels and orbitals", "sl"],
+            ["Writing electron configurations", "sl"],
+            ["Configurations of transition elements and their ions", "ext"],
+            ["Ionization energy evidence for sublevels", "ext"]
+          ]
+        },
+        {
+          "code": "S1.4",
+          "unit": "Counting particles by mass: the mole",
+          "subtopics": [
+            ["The mole and the Avogadro constant", "sl"],
+            ["Molar mass and mass-mole conversions", "sl"],
+            ["Empirical and molecular formulas", "sl"],
+            ["Concentration, dilution and standard solutions", "sl"],
+            ["Parts per million and other concentration units", "sl"]
+          ]
+        },
+        {
+          "code": "S1.5",
+          "unit": "Ideal gases",
+          "subtopics": [
+            ["The ideal gas model and its assumptions", "sl"],
+            ["Relationships between pressure, volume, temperature and amount", "sl"],
+            ["The ideal gas equation", "sl"],
+            ["Molar volume and gas density calculations", "sl"],
+            ["Deviation of real gases from ideal behaviour", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Structure 2 - Models of bonding and structure",
+      "units": [
+        {
+          "code": "S2.1",
+          "unit": "The ionic model",
+          "subtopics": [
+            ["Formation of ions and ionic bonding", "sl"],
+            ["Formulae and names of ionic compounds", "sl"],
+            ["Giant ionic lattices and their properties", "sl"],
+            ["Lattice enthalpy and ionic charge and radius", "ext"]
+          ]
+        },
+        {
+          "code": "S2.2",
+          "unit": "The covalent model",
+          "subtopics": [
+            ["Covalent bonds and Lewis formulas", "sl"],
+            ["Single, double and triple bonds and bond strength", "sl"],
+            ["Coordination bonds", "ext"],
+            ["VSEPR theory and molecular shapes", "sl"],
+            ["Bond polarity and molecular polarity", "sl"],
+            ["Intermolecular forces: London, dipole-dipole, hydrogen bonding", "sl"],
+            ["Physical properties explained by intermolecular forces", "sl"],
+            ["Giant covalent structures: diamond, graphite, silicon dioxide", "sl"],
+            ["Formal charge and resonance structures", "hl"],
+            ["Sigma and pi bonding and hybridization", "hl"]
+          ]
+        },
+        {
+          "code": "S2.3",
+          "unit": "The metallic model",
+          "subtopics": [
+            ["Metallic bonding and the sea of delocalized electrons", "sl"],
+            ["Properties of metals explained by bonding", "sl"],
+            ["Trends in metallic bond strength", "ext"],
+            ["Transition elements, alloys and their uses", "ext"]
+          ]
+        },
+        {
+          "code": "S2.4",
+          "unit": "From models to materials",
+          "subtopics": [
+            ["The bonding triangle and bond character", "sl"],
+            ["Alloys and their properties", "sl"],
+            ["Addition and condensation polymers", "sl"],
+            ["Choosing materials: properties and sustainability", "ext"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Structure 3 - Classification of matter",
+      "units": [
+        {
+          "code": "S3.1",
+          "unit": "The periodic table: classification of elements",
+          "subtopics": [
+            ["Organisation of the periodic table: periods, groups, blocks", "sl"],
+            ["Trends in atomic and ionic radius", "sl"],
+            ["Trends in ionization energy and electronegativity", "sl"],
+            ["Trends in metallic and non-metallic character", "sl"],
+            ["Reactivity trends in groups 1 and 17", "sl"],
+            ["Oxides across period 3 and acid-base character", "sl"],
+            ["Transition elements: variable oxidation states and catalysis", "hl"],
+            ["Coloured complexes and the d-block", "hl"]
+          ]
+        },
+        {
+          "code": "S3.2",
+          "unit": "Functional groups: classification of organic compounds",
+          "subtopics": [
+            ["Homologous series and their trends", "sl"],
+            ["IUPAC naming of organic compounds", "sl"],
+            ["Structural, condensed and skeletal formulas", "sl"],
+            ["Functional groups: alcohols, halogenoalkanes, aldehydes, ketones, acids, esters, amines, amides", "sl"],
+            ["Structural isomers", "sl"],
+            ["Stereoisomers: cis-trans and optical isomerism", "hl"],
+            ["Infrared spectroscopy and functional group identification", "sl"],
+            ["Mass spectrometry and fragmentation patterns", "ext"],
+            ["Proton NMR spectroscopy", "hl"],
+            ["Combining spectroscopic techniques to determine structure", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Reactivity 1 - What drives chemical reactions",
+      "units": [
+        {
+          "code": "R1.1",
+          "unit": "Measuring enthalpy changes",
+          "subtopics": [
+            ["Exothermic and endothermic reactions", "sl"],
+            ["Enthalpy change and energy profile diagrams", "sl"],
+            ["Calorimetry and calculating enthalpy change", "sl"],
+            ["Standard enthalpy changes of reaction", "sl"]
+          ]
+        },
+        {
+          "code": "R1.2",
+          "unit": "Energy cycles in reactions",
+          "subtopics": [
+            ["Bond enthalpies and enthalpy change estimates", "sl"],
+            ["Hess's law and enthalpy cycles", "sl"],
+            ["Enthalpy of formation and combustion calculations", "sl"],
+            ["Born-Haber cycles and lattice enthalpy", "hl"],
+            ["Enthalpy of solution, hydration and dissolving", "hl"]
+          ]
+        },
+        {
+          "code": "R1.3",
+          "unit": "Energy from fuels",
+          "subtopics": [
+            ["Combustion reactions of fuels", "sl"],
+            ["Fossil fuels, biofuels and their impacts", "sl"],
+            ["Incomplete combustion and its products", "sl"],
+            ["Fuel cells and hydrogen as a fuel", "ext"]
+          ]
+        },
+        {
+          "code": "R1.4",
+          "unit": "Entropy and spontaneity",
+          "subtopics": [
+            ["Entropy as a measure of dispersal of energy", "hl"],
+            ["Predicting the sign of entropy change", "hl"],
+            ["Gibbs energy and spontaneity", "hl"],
+            ["Temperature dependence of spontaneity", "hl"],
+            ["Gibbs energy and the equilibrium constant", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Reactivity 2 - How much, how fast and how far",
+      "units": [
+        {
+          "code": "R2.1",
+          "unit": "How much? The amount of chemical change",
+          "subtopics": [
+            ["Writing and balancing chemical equations", "sl"],
+            ["State symbols and ionic equations", "sl"],
+            ["Reacting mass and volume calculations", "sl"],
+            ["Limiting and excess reactants", "sl"],
+            ["Theoretical, experimental and percentage yield", "sl"],
+            ["Atom economy and green chemistry", "sl"]
+          ]
+        },
+        {
+          "code": "R2.2",
+          "unit": "How fast? The rate of chemical change",
+          "subtopics": [
+            ["Rate of reaction and how it is measured", "sl"],
+            ["Collision theory, activation energy and orientation", "sl"],
+            ["Factors affecting rate: concentration, temperature, surface area, catalyst", "sl"],
+            ["Maxwell-Boltzmann distribution curves", "sl"],
+            ["Rate equations, order of reaction and the rate constant", "hl"],
+            ["Determining rate equations from experimental data", "hl"],
+            ["Reaction mechanisms and the rate-determining step", "hl"],
+            ["The Arrhenius equation and activation energy", "hl"]
+          ]
+        },
+        {
+          "code": "R2.3",
+          "unit": "How far? The extent of chemical change",
+          "subtopics": [
+            ["Dynamic equilibrium and its characteristics", "sl"],
+            ["The equilibrium constant expression", "sl"],
+            ["Magnitude of K and the position of equilibrium", "sl"],
+            ["Le Chatelier's principle and changing conditions", "sl"],
+            ["Industrial applications: the Haber and Contact processes", "sl"],
+            ["Equilibrium calculations using Kc", "hl"],
+            ["The reaction quotient and predicting direction of change", "hl"],
+            ["Relationship between Gibbs energy and K", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Reactivity 3 - What are the mechanisms of chemical change",
+      "units": [
+        {
+          "code": "R3.1",
+          "unit": "Proton transfer reactions",
+          "subtopics": [
+            ["Bronsted-Lowry acids and bases", "sl"],
+            ["Conjugate acid-base pairs and amphiprotic species", "sl"],
+            ["The pH scale and the ionic product of water", "sl"],
+            ["Strong and weak acids and bases", "sl"],
+            ["Neutralisation reactions and salts", "sl"],
+            ["Acid deposition and its environmental effects", "sl"],
+            ["Ka, Kb, pKa and pKb calculations", "hl"],
+            ["pH curves for titrations and choice of indicator", "hl"],
+            ["Buffer solutions and how they resist pH change", "hl"]
+          ]
+        },
+        {
+          "code": "R3.2",
+          "unit": "Electron transfer reactions",
+          "subtopics": [
+            ["Oxidation and reduction and oxidation states", "sl"],
+            ["Half-equations and balancing redox equations", "sl"],
+            ["Reactivity series and displacement reactions", "sl"],
+            ["Voltaic cells and cell diagrams", "sl"],
+            ["Electrolysis of molten salts and aqueous solutions", "sl"],
+            ["Redox titrations and calculations", "ext"],
+            ["Standard electrode potentials and cell potential", "hl"],
+            ["Predicting spontaneity from cell potential", "hl"],
+            ["Electroplating and industrial electrolysis", "hl"]
+          ]
+        },
+        {
+          "code": "R3.3",
+          "unit": "Electron sharing reactions",
+          "subtopics": [
+            ["Homolytic fission and free radicals", "sl"],
+            ["Free-radical substitution of alkanes", "sl"],
+            ["Initiation, propagation and termination steps", "sl"],
+            ["Ozone depletion and radical chemistry", "ext"]
+          ]
+        },
+        {
+          "code": "R3.4",
+          "unit": "Electron-pair sharing reactions",
+          "subtopics": [
+            ["Nucleophiles, electrophiles and heterolytic fission", "sl"],
+            ["Nucleophilic substitution of halogenoalkanes", "sl"],
+            ["Electrophilic addition to alkenes", "sl"],
+            ["Oxidation of alcohols and reduction reactions", "sl"],
+            ["Esterification and condensation reactions", "sl"],
+            ["SN1 and SN2 mechanisms and their conditions", "hl"],
+            ["Electrophilic substitution of benzene", "hl"],
+            ["Reaction pathways and multi-step synthesis", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Tools and inquiry",
+      "units": [
+        {
+          "code": "T.1",
+          "unit": "Laboratory technique",
+          "subtopics": [
+            ["Safety, risk assessment and handling chemicals", "sl"],
+            ["Titration technique and preparing solutions", "sl"],
+            ["Qualitative analysis and identifying ions", "sl"],
+            ["Green chemistry and reducing waste", "sl"]
+          ]
+        },
+        {
+          "code": "T.2",
+          "unit": "Data and analysis",
+          "subtopics": [
+            ["Significant figures and uncertainty in measurement", "sl"],
+            ["Propagating uncertainty through calculations", "sl"],
+            ["Graphing, gradients and interpreting trends", "sl"],
+            ["Percentage error and evaluating a method", "sl"],
+            ["The scientific investigation report", "sl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

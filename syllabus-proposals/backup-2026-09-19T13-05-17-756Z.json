@@ -1,0 +1,332 @@
+[
+  {
+    "subject": "Social and Cultural Anthropology SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Introduction to anthropology",
+        "subtopic": "What is anthropology?",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Introduction to anthropology",
+        "subtopic": "Culture and society",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Introduction to anthropology",
+        "subtopic": "Fieldwork and ethnography",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Introduction to anthropology",
+        "subtopic": "Comparison and interpretation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Introduction to anthropology",
+        "subtopic": "Anthropological perspectives",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Social organization",
+        "subtopic": "Kinship and family",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Social organization",
+        "subtopic": "Marriage and descent",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Social organization",
+        "subtopic": "Political organization",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Social organization",
+        "subtopic": "Law, order and conflict",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Social organization",
+        "subtopic": "Social hierarchy and power",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Belief systems and ritual",
+        "subtopic": "Religion and cosmology",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Belief systems and ritual",
+        "subtopic": "Ritual and ceremony",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Belief systems and ritual",
+        "subtopic": "Myth and symbolism",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Belief systems and ritual",
+        "subtopic": "Belief and social cohesion",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Belief systems and ritual",
+        "subtopic": "Change in belief systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Economic systems",
+        "subtopic": "Production and exchange",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Economic systems",
+        "subtopic": "Subsistence strategies",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Economic systems",
+        "subtopic": "Markets and trade",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Economic systems",
+        "subtopic": "Work and labour",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Economic systems",
+        "subtopic": "Globalisation and economics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Health and healing",
+        "subtopic": "Health beliefs and practices",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Health and healing",
+        "subtopic": "Illness and healing systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Health and healing",
+        "subtopic": "Medicine and biomedicine",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Health and healing",
+        "subtopic": "Mental health and wellbeing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Health and healing",
+        "subtopic": "Culture and the body",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Identity and representation",
+        "subtopic": "Gender",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Identity and representation",
+        "subtopic": "Age and life course",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Identity and representation",
+        "subtopic": "Ethnicity and race",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Identity and representation",
+        "subtopic": "Identity and belonging",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Identity and representation",
+        "subtopic": "Representation of others",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Social and Cultural Anthropology HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Introduction to anthropology",
+        "subtopic": "What is anthropology?",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Introduction to anthropology",
+        "subtopic": "Culture and society",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Introduction to anthropology",
+        "subtopic": "Fieldwork and ethnography",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Introduction to anthropology",
+        "subtopic": "Comparison and interpretation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Introduction to anthropology",
+        "subtopic": "Anthropological perspectives",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Social organization",
+        "subtopic": "Kinship and family",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Social organization",
+        "subtopic": "Marriage and descent",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Social organization",
+        "subtopic": "Political organization",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Social organization",
+        "subtopic": "Law, order and conflict",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Social organization",
+        "subtopic": "Social hierarchy and power",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Belief systems and ritual",
+        "subtopic": "Religion and cosmology",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Belief systems and ritual",
+        "subtopic": "Ritual and ceremony",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Belief systems and ritual",
+        "subtopic": "Myth and symbolism",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Belief systems and ritual",
+        "subtopic": "Belief and social cohesion",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Belief systems and ritual",
+        "subtopic": "Change in belief systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Economic systems",
+        "subtopic": "Production and exchange",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Economic systems",
+        "subtopic": "Subsistence strategies",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Economic systems",
+        "subtopic": "Markets and trade",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Economic systems",
+        "subtopic": "Work and labour",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Economic systems",
+        "subtopic": "Globalisation and economics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Health and healing",
+        "subtopic": "Health beliefs and practices",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Health and healing",
+        "subtopic": "Illness and healing systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Health and healing",
+        "subtopic": "Medicine and biomedicine",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Health and healing",
+        "subtopic": "Mental health and wellbeing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Health and healing",
+        "subtopic": "Culture and the body",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Identity and representation",
+        "subtopic": "Gender",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Identity and representation",
+        "subtopic": "Age and life course",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Identity and representation",
+        "subtopic": "Ethnicity and race",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Identity and representation",
+        "subtopic": "Identity and belonging",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Identity and representation",
+        "subtopic": "Representation of others",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - HL extension",
+        "subtopic": "More advanced ethnographic analysis (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 7 - HL extension",
+        "subtopic": "Deeper comparison of societies and cultures (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 7 - HL extension",
+        "subtopic": "Extended anthropological argumentation (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 7 - HL extension",
+        "subtopic": "More complex use of theory and evidence (HL only)",
+        "hl_only": true
+      }
+    ]
+  }
+]

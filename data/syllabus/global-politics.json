@@ -1,0 +1,209 @@
+{
+  "course": "Global politics",
+  "curriculum": "IB",
+  "guide": "first assessment 2026",
+  "confidence": "medium — follows the new guide's thematic structure (rights and justice, development and sustainability, peace and conflict) with the HL global political challenges extension. Worth checking against your teacher's unit plan",
+  "subjects": { "sl": "Global Politics SL", "hl": "Global Politics HL" },
+  "note": "Three levels: part of the course, unit, then one assessable point. Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "topics": [
+    {
+      "topic": "Core - Power, sovereignty and international relations",
+      "units": [
+        {
+          "code": "1.1",
+          "unit": "Power",
+          "subtopics": [
+            ["Definitions of power in global politics", "sl"],
+            ["Hard, soft and smart power", "sl"],
+            ["Sources of power: military, economic, cultural", "sl"],
+            ["Shifts in the global balance of power", "sl"]
+          ]
+        },
+        {
+          "code": "1.2",
+          "unit": "Sovereignty and statehood",
+          "subtopics": [
+            ["The state, sovereignty and recognition", "sl"],
+            ["Legitimacy and political authority", "sl"],
+            ["Challenges to sovereignty: intervention and globalisation", "sl"],
+            ["Failed and fragile states", "sl"]
+          ]
+        },
+        {
+          "code": "1.3",
+          "unit": "Actors in global politics",
+          "subtopics": [
+            ["States and governments", "sl"],
+            ["Intergovernmental organisations, including the UN", "sl"],
+            ["Non-governmental organisations and civil society", "sl"],
+            ["Multinational corporations and economic actors", "sl"],
+            ["Social movements, individuals and violent non-state actors", "sl"]
+          ]
+        },
+        {
+          "code": "1.4",
+          "unit": "Interdependence and global governance",
+          "subtopics": [
+            ["Interdependence and globalisation", "sl"],
+            ["International law, treaties and norms", "sl"],
+            ["Diplomacy, negotiation and international institutions", "sl"],
+            ["Limits of global governance and enforcement", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Thematic study - Rights and justice",
+      "units": [
+        {
+          "code": "2.1",
+          "unit": "Nature and evolution of human rights",
+          "subtopics": [
+            ["Contested meanings of rights and justice", "sl"],
+            ["The Universal Declaration and human rights treaties", "sl"],
+            ["Civil, political, economic, social and cultural rights", "sl"],
+            ["Universalism versus cultural relativism", "sl"]
+          ]
+        },
+        {
+          "code": "2.2",
+          "unit": "Codification, protection and monitoring",
+          "subtopics": [
+            ["Human rights institutions and courts", "sl"],
+            ["Role of NGOs in monitoring and advocacy", "sl"],
+            ["Enforcement, compliance and its limits", "sl"]
+          ]
+        },
+        {
+          "code": "2.3",
+          "unit": "Practice of human rights",
+          "subtopics": [
+            ["Violations of human rights and their causes", "sl"],
+            ["Political and legal responses to violations", "sl"],
+            ["Transitional justice and reconciliation", "sl"],
+            ["Debates: humanitarian intervention and responsibility to protect", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Thematic study - Development and sustainability",
+      "units": [
+        {
+          "code": "3.1",
+          "unit": "Contested meanings of development",
+          "subtopics": [
+            ["Definitions and models of development", "sl"],
+            ["Measuring development and its limitations", "sl"],
+            ["Sustainability and the Sustainable Development Goals", "sl"]
+          ]
+        },
+        {
+          "code": "3.2",
+          "unit": "Factors affecting development",
+          "subtopics": [
+            ["Political factors: governance, corruption, conflict", "sl"],
+            ["Economic factors: trade, debt, investment", "sl"],
+            ["Social and cultural factors: education, gender, health", "sl"],
+            ["Environmental factors and climate vulnerability", "sl"]
+          ]
+        },
+        {
+          "code": "3.3",
+          "unit": "Pathways towards development",
+          "subtopics": [
+            ["Aid, trade and foreign direct investment", "sl"],
+            ["Role of IGOs, NGOs and multinational corporations", "sl"],
+            ["Grassroots and bottom-up development approaches", "sl"],
+            ["Debates about growth, degrowth and alternatives", "ext"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Thematic study - Peace and conflict",
+      "units": [
+        {
+          "code": "4.1",
+          "unit": "Contested meanings of peace and conflict",
+          "subtopics": [
+            ["Positive and negative peace", "sl"],
+            ["Violence: direct, structural and cultural", "sl"],
+            ["Types of conflict and their actors", "sl"]
+          ]
+        },
+        {
+          "code": "4.2",
+          "unit": "Causes and parties to conflict",
+          "subtopics": [
+            ["Structural and proximate causes of conflict", "sl"],
+            ["Identity, resources and ideology as drivers", "sl"],
+            ["Non-state armed groups and terrorism", "sl"]
+          ]
+        },
+        {
+          "code": "4.3",
+          "unit": "Conflict resolution and peacebuilding",
+          "subtopics": [
+            ["Negotiation, mediation and arbitration", "sl"],
+            ["Peacekeeping, peacemaking and peacebuilding", "sl"],
+            ["Role of IGOs and NGOs in peace processes", "sl"],
+            ["Justice, reconciliation and memory after conflict", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "HL extension - Global political challenges",
+      "units": [
+        {
+          "code": "5.1",
+          "unit": "Researching a global challenge",
+          "subtopics": [
+            ["Selecting and framing a global political challenge", "hl"],
+            ["Political issues within borders, environment and health", "hl"],
+            ["Political issues within identity, poverty and security", "hl"],
+            ["Political issues within equality and technology", "hl"]
+          ]
+        },
+        {
+          "code": "5.2",
+          "unit": "Presenting the HL extension",
+          "subtopics": [
+            ["Using case studies at different scales", "hl"],
+            ["Applying key concepts and theoretical perspectives", "hl"],
+            ["Evaluating responses to the challenge", "hl"],
+            ["Structuring and delivering the oral presentation", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Engagement project and assessment",
+      "units": [
+        {
+          "code": "6.1",
+          "unit": "The engagement project",
+          "subtopics": [
+            ["Choosing a political issue and engaging with it", "sl"],
+            ["Planning activities, ethics and safety", "sl"],
+            ["Linking experience to political concepts and theory", "sl"],
+            ["Analysing power relations and stakeholders", "sl"],
+            ["Writing the report and reflecting on your own position", "sl"]
+          ]
+        },
+        {
+          "code": "6.2",
+          "unit": "Examination technique",
+          "subtopics": [
+            ["Source-based questions and evaluating perspectives", "sl"],
+            ["Using real-world examples as evidence", "sl"],
+            ["Structuring an argument with counterclaims", "sl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

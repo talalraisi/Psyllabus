@@ -1,0 +1,272 @@
+[
+  {
+    "subject": "Music SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Exploring music in context",
+        "subtopic": "Musical perception and expression",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Exploring music in context",
+        "subtopic": "Music in local and global contexts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Exploring music in context",
+        "subtopic": "Music for sociocultural and ideological expression",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Exploring music in context",
+        "subtopic": "Music for dramatic impact, movement and entertainment",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Exploring music in context",
+        "subtopic": "Music for political and civic expression",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Exploring music in context",
+        "subtopic": "Music and technology",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Creating music",
+        "subtopic": "Composition",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Creating music",
+        "subtopic": "Improvisation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Creating music",
+        "subtopic": "Arranging",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Creating music",
+        "subtopic": "Musical elements and devices",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Creating music",
+        "subtopic": "Notation and recording",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Creating music",
+        "subtopic": "Refining and developing ideas",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Developing music in performance",
+        "subtopic": "Technical skills",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Developing music in performance",
+        "subtopic": "Interpretation and expression",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Developing music in performance",
+        "subtopic": "Solo performance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Developing music in performance",
+        "subtopic": "Ensemble performance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Developing music in performance",
+        "subtopic": "Rehearsal strategies",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Developing music in performance",
+        "subtopic": "Performance evaluation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Music analysis and reflection",
+        "subtopic": "Listening and analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Music analysis and reflection",
+        "subtopic": "Comparing musical works",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Music analysis and reflection",
+        "subtopic": "Musical structure and form",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Music analysis and reflection",
+        "subtopic": "Harmony, melody and rhythm",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Music analysis and reflection",
+        "subtopic": "Reflection on musical choices",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Music analysis and reflection",
+        "subtopic": "Presentation and communication",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Music HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Exploring music in context",
+        "subtopic": "Musical perception and expression",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Exploring music in context",
+        "subtopic": "Music in local and global contexts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Exploring music in context",
+        "subtopic": "Music for sociocultural and ideological expression",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Exploring music in context",
+        "subtopic": "Music for dramatic impact, movement and entertainment",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Exploring music in context",
+        "subtopic": "Music for political and civic expression",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Exploring music in context",
+        "subtopic": "Music and technology",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Exploring music in context",
+        "subtopic": "Further exploration of musical context (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - Creating music",
+        "subtopic": "Composition",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Creating music",
+        "subtopic": "Improvisation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Creating music",
+        "subtopic": "Arranging",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Creating music",
+        "subtopic": "Musical elements and devices",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Creating music",
+        "subtopic": "Notation and recording",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Creating music",
+        "subtopic": "Refining and developing ideas",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Creating music",
+        "subtopic": "Extended music creation (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Developing music in performance",
+        "subtopic": "Technical skills",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Developing music in performance",
+        "subtopic": "Interpretation and expression",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Developing music in performance",
+        "subtopic": "Solo performance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Developing music in performance",
+        "subtopic": "Ensemble performance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Developing music in performance",
+        "subtopic": "Rehearsal strategies",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Developing music in performance",
+        "subtopic": "Performance evaluation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Developing music in performance",
+        "subtopic": "Advanced performance development (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Music analysis and reflection",
+        "subtopic": "Listening and analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Music analysis and reflection",
+        "subtopic": "Comparing musical works",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Music analysis and reflection",
+        "subtopic": "Musical structure and form",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Music analysis and reflection",
+        "subtopic": "Harmony, melody and rhythm",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Music analysis and reflection",
+        "subtopic": "Reflection on musical choices",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Music analysis and reflection",
+        "subtopic": "Presentation and communication",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Music analysis and reflection",
+        "subtopic": "Deeper analytical study (HL only)",
+        "hl_only": true
+      }
+    ]
+  }
+]

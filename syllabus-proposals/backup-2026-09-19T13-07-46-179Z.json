@@ -1,0 +1,362 @@
+[
+  {
+    "subject": "Dance SL",
+    "rows": [
+      {
+        "topic": "Topic 3 - Dance history and traditions",
+        "subtopic": "Dance as a changing art form",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Dance in global context",
+        "subtopic": "Dance as a body of knowledge",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Dance in global context",
+        "subtopic": "Personal and cultural identity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Dance in global context",
+        "subtopic": "Dance and society",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Dance in global context",
+        "subtopic": "Aesthetics and appreciation of dance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Dance in global context",
+        "subtopic": "Dance in relation to time and space",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Dance in global context",
+        "subtopic": "Dance as communication",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Performance and choreography",
+        "subtopic": "Technical skills and performance practice",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Performance and choreography",
+        "subtopic": "Choreographic devices",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Performance and choreography",
+        "subtopic": "Composition and structuring",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Performance and choreography",
+        "subtopic": "Dance elements",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Performance and choreography",
+        "subtopic": "Improvisation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Performance and choreography",
+        "subtopic": "Performance analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Dance history and traditions",
+        "subtopic": "Dance in historical context",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Dance history and traditions",
+        "subtopic": "Traditional dance forms",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Dance history and traditions",
+        "subtopic": "Contemporary dance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Dance history and traditions",
+        "subtopic": "Dance in different cultures",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical analysis and reflection",
+        "subtopic": "Critical thinking in dance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical analysis and reflection",
+        "subtopic": "Evaluating performances",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical analysis and reflection",
+        "subtopic": "Reflective practice",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical analysis and reflection",
+        "subtopic": "Dance notation and documentation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical analysis and reflection",
+        "subtopic": "Research and presentation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Dance and the creative process",
+        "subtopic": "Creative exploration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Dance and the creative process",
+        "subtopic": "Artistic intention",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Dance and the creative process",
+        "subtopic": "Collaboration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Dance and the creative process",
+        "subtopic": "Refining and developing ideas",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Dance and the creative process",
+        "subtopic": "Presentation and audience",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Dance in practice",
+        "subtopic": "Rehearsal and preparation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Dance in practice",
+        "subtopic": "Safety and physical awareness",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Dance in practice",
+        "subtopic": "Performing in context",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Dance in practice",
+        "subtopic": "Using feedback to improve",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Dance in practice",
+        "subtopic": "Evaluating practice",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Dance HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Dance in global context",
+        "subtopic": "Dance as a body of knowledge",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Dance in global context",
+        "subtopic": "Personal and cultural identity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Dance in global context",
+        "subtopic": "Dance and society",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Dance in global context",
+        "subtopic": "Aesthetics and appreciation of dance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Dance in global context",
+        "subtopic": "Dance in relation to time and space",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Dance in global context",
+        "subtopic": "Dance as communication",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Dance in global context",
+        "subtopic": "Extended study of dance in global context (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - Performance and choreography",
+        "subtopic": "Technical skills and performance practice",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Performance and choreography",
+        "subtopic": "Choreographic devices",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Performance and choreography",
+        "subtopic": "Composition and structuring",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Performance and choreography",
+        "subtopic": "Dance elements",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Performance and choreography",
+        "subtopic": "Improvisation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Performance and choreography",
+        "subtopic": "Performance analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Performance and choreography",
+        "subtopic": "Advanced performance and choreography study (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Dance history and traditions",
+        "subtopic": "Dance in historical context",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Dance history and traditions",
+        "subtopic": "Traditional dance forms",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Dance history and traditions",
+        "subtopic": "Contemporary dance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Dance history and traditions",
+        "subtopic": "Dance in different cultures",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Dance history and traditions",
+        "subtopic": "Dance as a changing art form",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Dance history and traditions",
+        "subtopic": "Deeper historical and contextual study (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Critical analysis and reflection",
+        "subtopic": "Critical thinking in dance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical analysis and reflection",
+        "subtopic": "Evaluating performances",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical analysis and reflection",
+        "subtopic": "Reflective practice",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical analysis and reflection",
+        "subtopic": "Dance notation and documentation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical analysis and reflection",
+        "subtopic": "Research and presentation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical analysis and reflection",
+        "subtopic": "More advanced critical analysis (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Dance and the creative process",
+        "subtopic": "Creative exploration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Dance and the creative process",
+        "subtopic": "Artistic intention",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Dance and the creative process",
+        "subtopic": "Collaboration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Dance and the creative process",
+        "subtopic": "Refining and developing ideas",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Dance and the creative process",
+        "subtopic": "Presentation and audience",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Dance and the creative process",
+        "subtopic": "Extended creative process (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 6 - Dance in practice",
+        "subtopic": "Rehearsal and preparation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Dance in practice",
+        "subtopic": "Safety and physical awareness",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Dance in practice",
+        "subtopic": "Performing in context",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Dance in practice",
+        "subtopic": "Using feedback to improve",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Dance in practice",
+        "subtopic": "Evaluating practice",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Dance in practice",
+        "subtopic": "More advanced dance practice (HL only)",
+        "hl_only": true
+      }
+    ]
+  }
+]

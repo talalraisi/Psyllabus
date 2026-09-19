@@ -1,0 +1,423 @@
+{
+  "course": "Business management",
+  "curriculum": "IB",
+  "guide": "first assessment 2024",
+  "confidence": "high on the five units and their numbering; HL-only marking follows the 2024 guide, where social enterprise is no longer a separate unit but runs through the course",
+  "subjects": { "sl": "Business Management SL", "hl": "Business Management HL" },
+  "note": "Three levels: unit, numbered section, then one assessable point. Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "topics": [
+    {
+      "topic": "Unit 1 - Introduction to business management",
+      "units": [
+        {
+          "code": "1.1",
+          "unit": "What is a business?",
+          "subtopics": [
+            ["The nature of business and business functions", "sl"],
+            ["Primary, secondary, tertiary and quaternary sectors", "sl"],
+            ["Entrepreneurship, intrapreneurship and risk", "sl"],
+            ["Reasons for starting a business and common challenges", "sl"]
+          ]
+        },
+        {
+          "code": "1.2",
+          "unit": "Types of business entities",
+          "subtopics": [
+            ["Sole traders and partnerships", "sl"],
+            ["Privately held and publicly held companies", "sl"],
+            ["For-profit social enterprises: cooperatives and microfinance", "sl"],
+            ["Non-profit social enterprises: NGOs and charities", "sl"],
+            ["Choosing a legal structure and its consequences", "sl"]
+          ]
+        },
+        {
+          "code": "1.3",
+          "unit": "Business objectives",
+          "subtopics": [
+            ["Vision and mission statements", "sl"],
+            ["Aims, objectives, strategies and tactics", "sl"],
+            ["Ethical objectives and corporate social responsibility", "sl"],
+            ["The triple bottom line and sustainability", "sl"],
+            ["Strategic and tactical objectives compared", "ext"]
+          ]
+        },
+        {
+          "code": "1.4",
+          "unit": "Stakeholders",
+          "subtopics": [
+            ["Internal and external stakeholders", "sl"],
+            ["Stakeholder interests and conflicts", "sl"],
+            ["Managing stakeholder relationships", "sl"]
+          ]
+        },
+        {
+          "code": "1.5",
+          "unit": "Growth and evolution",
+          "subtopics": [
+            ["Economies and diseconomies of scale", "sl"],
+            ["Internal and external growth", "sl"],
+            ["Mergers, acquisitions, joint ventures and franchising", "sl"],
+            ["Reasons businesses stay small", "sl"],
+            ["Multinational companies and their impact", "sl"]
+          ]
+        },
+        {
+          "code": "1.6",
+          "unit": "Multinational companies and the external environment",
+          "subtopics": [
+            ["STEEPLE analysis", "sl"],
+            ["Opportunities and threats in the external environment", "sl"],
+            ["Impact of globalisation on business decisions", "sl"],
+            ["Ethical and environmental consequences of multinationals", "ext"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Unit 2 - Human resource management",
+      "units": [
+        {
+          "code": "2.1",
+          "unit": "Functions and evolution of HRM",
+          "subtopics": [
+            ["Workforce planning and labour turnover", "sl"],
+            ["Recruitment, selection and induction", "sl"],
+            ["Training: induction, on the job, off the job", "sl"],
+            ["Appraisal and employee performance", "sl"],
+            ["Dismissal, redundancy and outsourcing", "sl"],
+            ["Changing work patterns and practices", "sl"]
+          ]
+        },
+        {
+          "code": "2.2",
+          "unit": "Organizational structure",
+          "subtopics": [
+            ["Organisation charts, hierarchy and chain of command", "sl"],
+            ["Span of control, delayering and delegation", "sl"],
+            ["Centralisation and decentralisation", "sl"],
+            ["Flat, tall, matrix and project-based structures", "sl"],
+            ["Shamrock organisation and flexible working", "ext"]
+          ]
+        },
+        {
+          "code": "2.3",
+          "unit": "Leadership and management",
+          "subtopics": [
+            ["Leadership versus management", "sl"],
+            ["Autocratic, paternalistic, democratic and laissez-faire styles", "sl"],
+            ["Situational leadership", "sl"],
+            ["Ethical leadership and its effects", "ext"]
+          ]
+        },
+        {
+          "code": "2.4",
+          "unit": "Motivation and demotivation",
+          "subtopics": [
+            ["Taylor, Maslow and Herzberg", "sl"],
+            ["Adams' equity theory and Pink's drive theory", "ext"],
+            ["Financial rewards: salary, wages, commission, bonuses, profit sharing", "sl"],
+            ["Non-financial rewards: job enrichment, empowerment, teamwork, purpose", "sl"],
+            ["Choosing motivation methods for a situation", "sl"]
+          ]
+        },
+        {
+          "code": "2.5",
+          "unit": "Organizational culture",
+          "subtopics": [
+            ["Types of organisational culture", "hl"],
+            ["Culture clash after mergers and takeovers", "hl"],
+            ["Changing an organisational culture", "hl"]
+          ]
+        },
+        {
+          "code": "2.6",
+          "unit": "Communication",
+          "subtopics": [
+            ["Formal and informal communication channels", "sl"],
+            ["Barriers to effective communication", "sl"],
+            ["Improving communication in an organisation", "sl"]
+          ]
+        },
+        {
+          "code": "2.7",
+          "unit": "Industrial and employee relations",
+          "subtopics": [
+            ["Employer and employee representation", "hl"],
+            ["Sources of conflict in the workplace", "hl"],
+            ["Industrial action: strikes, work-to-rule, go-slow", "hl"],
+            ["Employer responses: threats, lockouts, closure", "hl"],
+            ["Conflict resolution: negotiation, arbitration, conciliation", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Unit 3 - Finance and accounts",
+      "units": [
+        {
+          "code": "3.1",
+          "unit": "Sources of finance",
+          "subtopics": [
+            ["Internal sources: personal funds, retained profit, sale of assets", "sl"],
+            ["External sources: share capital, loans, overdrafts, leasing", "sl"],
+            ["Trade credit, grants, subsidies, crowdfunding and microfinance", "sl"],
+            ["Short, medium and long-term finance and choosing a source", "sl"]
+          ]
+        },
+        {
+          "code": "3.2",
+          "unit": "Costs and revenues",
+          "subtopics": [
+            ["Fixed, variable, semi-variable, direct and indirect costs", "sl"],
+            ["Total revenue and revenue streams", "sl"]
+          ]
+        },
+        {
+          "code": "3.3",
+          "unit": "Break-even analysis",
+          "subtopics": [
+            ["Contribution per unit and total contribution", "sl"],
+            ["Break-even quantity and the break-even chart", "sl"],
+            ["Margin of safety, target profit and target price", "sl"],
+            ["Effects of changes in price and costs on break-even", "sl"],
+            ["Benefits and limitations of break-even analysis", "sl"]
+          ]
+        },
+        {
+          "code": "3.4",
+          "unit": "Final accounts",
+          "subtopics": [
+            ["Profit and loss accounts (income statements)", "sl"],
+            ["Balance sheets (statements of financial position)", "sl"],
+            ["Intangible assets and their valuation", "sl"],
+            ["Depreciation: straight line and reducing balance", "hl"]
+          ]
+        },
+        {
+          "code": "3.5",
+          "unit": "Profitability and liquidity ratio analysis",
+          "subtopics": [
+            ["Gross profit margin, profit margin and ROCE", "sl"],
+            ["Current ratio and acid test ratio", "sl"],
+            ["Interpreting ratios and possible strategies to improve them", "sl"]
+          ]
+        },
+        {
+          "code": "3.6",
+          "unit": "Efficiency ratio analysis",
+          "subtopics": [
+            ["Inventory turnover, debtor days and creditor days", "hl"],
+            ["Gearing ratio and financial risk", "hl"],
+            ["Using efficiency ratios to evaluate performance", "hl"]
+          ]
+        },
+        {
+          "code": "3.7",
+          "unit": "Cash flow",
+          "subtopics": [
+            ["Difference between profit and cash flow", "sl"],
+            ["Working capital and the working capital cycle", "sl"],
+            ["Constructing and interpreting cash-flow forecasts", "sl"],
+            ["Strategies to deal with cash-flow problems", "sl"]
+          ]
+        },
+        {
+          "code": "3.8",
+          "unit": "Investment appraisal",
+          "subtopics": [
+            ["Payback period", "sl"],
+            ["Average rate of return", "sl"],
+            ["Net present value and discounted cash flow", "hl"],
+            ["Comparing investment options", "sl"]
+          ]
+        },
+        {
+          "code": "3.9",
+          "unit": "Budgets",
+          "subtopics": [
+            ["Purpose and construction of budgets", "hl"],
+            ["Variance analysis: favourable and adverse", "hl"],
+            ["Using budgets to control a business", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Unit 4 - Marketing",
+      "units": [
+        {
+          "code": "4.1",
+          "unit": "Introduction to marketing",
+          "subtopics": [
+            ["The role of marketing and marketing objectives", "sl"],
+            ["Market orientation versus product orientation", "sl"],
+            ["Market share, market growth and market leadership", "sl"],
+            ["Social marketing and marketing of services", "ext"]
+          ]
+        },
+        {
+          "code": "4.2",
+          "unit": "Marketing planning",
+          "subtopics": [
+            ["The elements of a marketing plan", "sl"],
+            ["Market segmentation and consumer profiles", "sl"],
+            ["Targeting and positioning, including position maps", "sl"],
+            ["Unique selling point and differentiation", "sl"]
+          ]
+        },
+        {
+          "code": "4.3",
+          "unit": "Sales forecasting",
+          "subtopics": [
+            ["Extrapolating from past sales data", "hl"],
+            ["Seasonal, cyclical and random variation", "hl"],
+            ["Benefits and limitations of sales forecasting", "hl"]
+          ]
+        },
+        {
+          "code": "4.4",
+          "unit": "Market research",
+          "subtopics": [
+            ["Primary and secondary research methods", "sl"],
+            ["Qualitative and quantitative data", "sl"],
+            ["Sampling methods and sampling error", "sl"],
+            ["Interpreting research results and their limitations", "sl"]
+          ]
+        },
+        {
+          "code": "4.5",
+          "unit": "The seven Ps of the marketing mix",
+          "subtopics": [
+            ["Product: the product life cycle and the Boston matrix", "sl"],
+            ["Price: cost-plus, penetration, skimming, psychological, competitive", "sl"],
+            ["Promotion: above, below and through the line", "sl"],
+            ["Place: distribution channels and their selection", "sl"],
+            ["People, process and physical evidence in services", "sl"],
+            ["Branding, brand loyalty and brand value", "sl"]
+          ]
+        },
+        {
+          "code": "4.6",
+          "unit": "International marketing",
+          "subtopics": [
+            ["Methods of entering international markets", "hl"],
+            ["Opportunities and threats of international marketing", "hl"],
+            ["Cultural differences and adapting the marketing mix", "hl"]
+          ]
+        },
+        {
+          "code": "4.7",
+          "unit": "E-commerce and digital marketing",
+          "subtopics": [
+            ["Types of e-commerce and business models", "sl"],
+            ["Social media marketing and viral marketing", "sl"],
+            ["Effects of digital technology on the marketing mix", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Unit 5 - Operations management",
+      "units": [
+        {
+          "code": "5.1",
+          "unit": "Introduction to operations management",
+          "subtopics": [
+            ["The role of operations and its links to other functions", "sl"],
+            ["Operations management and sustainability", "sl"],
+            ["The circular economy and reducing waste", "sl"]
+          ]
+        },
+        {
+          "code": "5.2",
+          "unit": "Operations methods",
+          "subtopics": [
+            ["Job, batch, mass and flow production", "sl"],
+            ["Mass customisation and flexible production", "sl"],
+            ["Choosing an appropriate production method", "sl"]
+          ]
+        },
+        {
+          "code": "5.3",
+          "unit": "Lean production and quality management",
+          "subtopics": [
+            ["Lean production, kaizen and just-in-time", "hl"],
+            ["Cradle-to-cradle design and manufacturing", "hl"],
+            ["Quality control versus quality assurance", "hl"],
+            ["Quality circles, benchmarking and total quality management", "hl"]
+          ]
+        },
+        {
+          "code": "5.4",
+          "unit": "Location",
+          "subtopics": [
+            ["Factors affecting the location of production", "sl"],
+            ["Outsourcing, offshoring and insourcing", "sl"],
+            ["Reshoring and its reasons", "ext"]
+          ]
+        },
+        {
+          "code": "5.5",
+          "unit": "Break-even and production planning",
+          "subtopics": [
+            ["Capacity utilisation and productivity rate", "hl"],
+            ["Cost to buy versus cost to make", "hl"],
+            ["Stock control charts, buffer stock and lead time", "hl"],
+            ["Just-in-case versus just-in-time stock control", "hl"],
+            ["Supply chain management and logistics", "hl"]
+          ]
+        },
+        {
+          "code": "5.6",
+          "unit": "Research and development",
+          "subtopics": [
+            ["The importance of research and development", "hl"],
+            ["Incremental and disruptive innovation", "hl"],
+            ["Adaptive creativity and process innovation", "hl"],
+            ["Intellectual property: patents, copyright and trademarks", "hl"]
+          ]
+        },
+        {
+          "code": "5.7",
+          "unit": "Crisis management and contingency planning",
+          "subtopics": [
+            ["Factors affecting effective crisis management", "hl"],
+            ["Advantages and disadvantages of contingency planning", "hl"],
+            ["Managing reputation after a crisis", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Tools, techniques and assessment",
+      "units": [
+        {
+          "code": "6.1",
+          "unit": "Business tools",
+          "subtopics": [
+            ["SWOT analysis", "sl"],
+            ["Ansoff matrix", "sl"],
+            ["Business plans", "sl"],
+            ["Decision trees", "hl"],
+            ["Descriptive statistics and interpreting data", "sl"],
+            ["Circular business models", "sl"],
+            ["Force field analysis", "hl"],
+            ["Gantt charts and critical path analysis", "hl"]
+          ]
+        },
+        {
+          "code": "6.2",
+          "unit": "Assessment tasks",
+          "subtopics": [
+            ["Answering from a case study and applying tools", "sl"],
+            ["Evaluation: stakeholders, short and long term, assumptions", "sl"],
+            ["The internal assessment: research question and evidence", "sl"],
+            ["The HL internal assessment research project", "hl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

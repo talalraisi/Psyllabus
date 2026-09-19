@@ -1,0 +1,284 @@
+{
+  "course": "History",
+  "curriculum": "IB",
+  "guide": "first assessment 2017",
+  "confidence": "medium-high — this follows the established guide (Paper 1 prescribed subjects, Paper 2 world history topics, Paper 3 regional depth for HL). The pasted list used different names, which may belong to a newer guide: check which one your school teaches",
+  "subjects": { "sl": "History SL", "hl": "History HL" },
+  "note": "Schools choose one Paper 1 prescribed subject and two Paper 2 topics; HL adds two Paper 3 regional sections. Three levels: paper, topic, then one assessable point.",
+  "topics": [
+    {
+      "topic": "Paper 1 - Prescribed subjects",
+      "units": [
+        {
+          "code": "PS.1",
+          "unit": "Military leaders",
+          "subtopics": [
+            ["Genghis Khan: rise to power and leadership", "sl"],
+            ["Mongol military campaigns and their impact", "sl"],
+            ["Richard I: crusading and conflict with Saladin", "sl"],
+            ["Leadership, legacy and historiographical debate", "sl"]
+          ]
+        },
+        {
+          "code": "PS.2",
+          "unit": "Conquest and its impact",
+          "subtopics": [
+            ["The final stages of Muslim rule in Spain", "sl"],
+            ["The conquest of Mexico and Peru", "sl"],
+            ["Colonial government and treatment of indigenous peoples", "sl"],
+            ["Economic, social and religious consequences of conquest", "sl"]
+          ]
+        },
+        {
+          "code": "PS.3",
+          "unit": "The move to global war",
+          "subtopics": [
+            ["Japanese expansion in East Asia 1931-1941", "sl"],
+            ["Causes of Japanese expansion and international response", "sl"],
+            ["German and Italian expansion 1933-1940", "sl"],
+            ["Appeasement and the failure of collective security", "sl"]
+          ]
+        },
+        {
+          "code": "PS.4",
+          "unit": "Rights and protest",
+          "subtopics": [
+            ["The civil rights movement in the United States 1954-1965", "sl"],
+            ["Key legislation, leaders and opposition", "sl"],
+            ["Apartheid South Africa 1948-1964", "sl"],
+            ["Protest, repression and international response", "sl"]
+          ]
+        },
+        {
+          "code": "PS.5",
+          "unit": "Conflict and intervention",
+          "subtopics": [
+            ["Rwanda 1990-1998: causes and course of the genocide", "sl"],
+            ["International and regional response to Rwanda", "sl"],
+            ["Kosovo 1989-2002: causes, course and intervention", "sl"],
+            ["Justifications for and consequences of intervention", "sl"]
+          ]
+        },
+        {
+          "code": "PS.6",
+          "unit": "Source skills for Paper 1",
+          "subtopics": [
+            ["Comprehension of a source and its message", "sl"],
+            ["Comparing and contrasting two sources", "sl"],
+            ["Value and limitations from origin, purpose and content", "sl"],
+            ["Using sources and own knowledge in a mini-essay", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Paper 2 - World history topics",
+      "units": [
+        {
+          "code": "WH.1",
+          "unit": "Society and economy (750-1400)",
+          "subtopics": [
+            ["Social structures, hierarchy and daily life", "sl"],
+            ["Trade networks and economic change", "sl"],
+            ["Religion, education and intellectual life", "sl"]
+          ]
+        },
+        {
+          "code": "WH.2",
+          "unit": "Causes and effects of medieval wars (750-1500)",
+          "subtopics": [
+            ["Political, economic and religious causes of war", "sl"],
+            ["Practices of warfare, technology and strategy", "sl"],
+            ["Effects on society, economy and borders", "sl"]
+          ]
+        },
+        {
+          "code": "WH.3",
+          "unit": "Dynasties and rulers (750-1500)",
+          "subtopics": [
+            ["Rise to power of a dynasty or ruler", "sl"],
+            ["Methods of governing and consolidating power", "sl"],
+            ["Achievements, decline and legacy", "sl"]
+          ]
+        },
+        {
+          "code": "WH.4",
+          "unit": "Societies in transition (1400-1700)",
+          "subtopics": [
+            ["Social, cultural and religious change", "sl"],
+            ["Economic and technological transformation", "sl"],
+            ["Political change and the growth of states", "sl"]
+          ]
+        },
+        {
+          "code": "WH.5",
+          "unit": "Early modern states (1450-1789)",
+          "subtopics": [
+            ["Emergence and consolidation of early modern states", "sl"],
+            ["Absolutism, reform and challenges to authority", "sl"],
+            ["Foreign policy and imperial expansion", "sl"]
+          ]
+        },
+        {
+          "code": "WH.6",
+          "unit": "Causes and effects of early modern wars (1500-1750)",
+          "subtopics": [
+            ["Long-term and short-term causes of war", "sl"],
+            ["Nature of warfare and its practice", "sl"],
+            ["Political, economic and social effects", "sl"]
+          ]
+        },
+        {
+          "code": "WH.7",
+          "unit": "Industrialisation (1750-2005)",
+          "subtopics": [
+            ["Origins and causes of industrialisation", "sl"],
+            ["Social and economic impact on classes and cities", "sl"],
+            ["Political responses: reform, protest and labour movements", "sl"]
+          ]
+        },
+        {
+          "code": "WH.8",
+          "unit": "Independence movements (1800-2000)",
+          "subtopics": [
+            ["Origins and rise of independence movements", "sl"],
+            ["Methods: violent and non-violent resistance", "sl"],
+            ["Challenges of the first ten years of independence", "sl"],
+            ["Role of leaders and ideology", "sl"]
+          ]
+        },
+        {
+          "code": "WH.9",
+          "unit": "Emergence and development of democratic states (1848-2000)",
+          "subtopics": [
+            ["Conditions for the emergence of democratic states", "sl"],
+            ["Constitutions, franchise and political structures", "sl"],
+            ["Social and economic policies and their impact", "sl"],
+            ["Struggles for equality and civil rights", "sl"]
+          ]
+        },
+        {
+          "code": "WH.10",
+          "unit": "Authoritarian states (20th century)",
+          "subtopics": [
+            ["Conditions and methods of emergence of authoritarian states", "sl"],
+            ["Consolidation and maintenance of power: force, propaganda, legality", "sl"],
+            ["Ideology, opposition and the treatment of groups", "sl"],
+            ["Domestic policies: economic, social and religious", "sl"],
+            ["Aims and results of foreign policy", "sl"]
+          ]
+        },
+        {
+          "code": "WH.11",
+          "unit": "Causes and effects of 20th-century wars",
+          "subtopics": [
+            ["Long, short and immediate causes of a war", "sl"],
+            ["Types of war: total, civil, guerrilla and limited", "sl"],
+            ["Technology, strategy and the nature of fighting", "sl"],
+            ["Effects on civilians, women and minorities", "sl"],
+            ["Political, economic and territorial consequences", "sl"]
+          ]
+        },
+        {
+          "code": "WH.12",
+          "unit": "The Cold War: superpower tensions and rivalries",
+          "subtopics": [
+            ["Origins and early development of the Cold War", "sl"],
+            ["Crises, confrontations and their resolution", "sl"],
+            ["Leaders, nations and their role in the rivalry", "sl"],
+            ["Detente, arms control and the end of the Cold War", "sl"],
+            ["Impact on societies and the non-aligned movement", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Paper 3 - HL regional depth studies",
+      "units": [
+        {
+          "code": "R.1",
+          "unit": "Africa and the Middle East",
+          "subtopics": [
+            ["Pre-colonial states and societies", "hl"],
+            ["Colonial rule, resistance and its impact", "hl"],
+            ["Nationalism, decolonisation and independence", "hl"],
+            ["Post-independence politics, conflict and development", "hl"],
+            ["The Arab-Israeli conflict and regional politics", "hl"]
+          ]
+        },
+        {
+          "code": "R.2",
+          "unit": "The Americas",
+          "subtopics": [
+            ["Indigenous societies and European colonisation", "hl"],
+            ["Independence movements and nation-building", "hl"],
+            ["Slavery, abolition and civil rights", "hl"],
+            ["The Great Depression and the New Deal", "hl"],
+            ["The Americas and the Cold War", "hl"],
+            ["Dictatorships and transitions to democracy", "hl"]
+          ]
+        },
+        {
+          "code": "R.3",
+          "unit": "Asia and Oceania",
+          "subtopics": [
+            ["Traditional empires and their decline", "hl"],
+            ["Imperialism, war and occupation", "hl"],
+            ["Decolonisation and the creation of new states", "hl"],
+            ["Nation-building, development and authoritarian rule", "hl"],
+            ["Regional conflict, cooperation and the Cold War in Asia", "hl"]
+          ]
+        },
+        {
+          "code": "R.4",
+          "unit": "Europe",
+          "subtopics": [
+            ["Medieval and early modern kingdoms and states", "hl"],
+            ["The French Revolution and Napoleonic era", "hl"],
+            ["Nationalism, unification and imperial rivalry", "hl"],
+            ["The World Wars and their European consequences", "hl"],
+            ["Interwar dictatorships: Italy, Germany, Spain and the USSR", "hl"],
+            ["Post-war division, integration and the collapse of communism", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Historical skills and the internal assessment",
+      "units": [
+        {
+          "code": "S.1",
+          "unit": "Working with sources",
+          "subtopics": [
+            ["Primary and secondary sources and their uses", "sl"],
+            ["Origin, purpose, value and limitations", "sl"],
+            ["Corroboration and contradiction between sources", "sl"],
+            ["Historiography and competing interpretations", "sl"]
+          ]
+        },
+        {
+          "code": "S.2",
+          "unit": "Essay technique",
+          "subtopics": [
+            ["Understanding command terms: to what extent, evaluate, compare", "sl"],
+            ["Building an argument with specific evidence", "sl"],
+            ["Counter-arguments and balanced judgement", "sl"],
+            ["Structuring introductions and conclusions", "sl"]
+          ]
+        },
+        {
+          "code": "S.3",
+          "unit": "The historical investigation",
+          "subtopics": [
+            ["Choosing a focused research question", "sl"],
+            ["Identifying and evaluating sources", "sl"],
+            ["Writing the investigation and its analysis", "sl"],
+            ["Reflection on the methods of the historian", "sl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

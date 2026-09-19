@@ -1,0 +1,462 @@
+[
+  {
+    "subject": "Global Politics SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Power, sovereignty and international relations",
+        "subtopic": "Power in global politics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Power, sovereignty and international relations",
+        "subtopic": "Sovereignty",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Power, sovereignty and international relations",
+        "subtopic": "Legitimacy and authority",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Power, sovereignty and international relations",
+        "subtopic": "Peace and conflict",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Power, sovereignty and international relations",
+        "subtopic": "Cooperation and integration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Power, sovereignty and international relations",
+        "subtopic": "Human rights and justice",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Power, sovereignty and international relations",
+        "subtopic": "Global governance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human rights",
+        "subtopic": "Nature and development of human rights",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human rights",
+        "subtopic": "International human rights law and instruments",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human rights",
+        "subtopic": "Human rights violations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human rights",
+        "subtopic": "Advocacy and protection",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human rights",
+        "subtopic": "State and non-state actors",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human rights",
+        "subtopic": "Rights in practice across regions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human rights",
+        "subtopic": "Challenges to implementation and enforcement",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Development",
+        "subtopic": "Measuring development",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Development",
+        "subtopic": "Poverty and inequality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Development",
+        "subtopic": "Development strategies",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Development",
+        "subtopic": "Sustainability and human development",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Development",
+        "subtopic": "Aid, trade and debt",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Development",
+        "subtopic": "Globalisation and development",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Development",
+        "subtopic": "Development institutions and actors",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Peace and conflict",
+        "subtopic": "Causes of conflict",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Peace and conflict",
+        "subtopic": "Types of conflict",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Peace and conflict",
+        "subtopic": "War and violence",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Peace and conflict",
+        "subtopic": "Peacebuilding and conflict resolution",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Peace and conflict",
+        "subtopic": "Security and terrorism",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Peace and conflict",
+        "subtopic": "Reconciliation and transitional justice",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Peace and conflict",
+        "subtopic": "The role of international organisations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Global governance",
+        "subtopic": "Purpose and limits of global governance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Global governance",
+        "subtopic": "International organisations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Global governance",
+        "subtopic": "Regional organisations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Global governance",
+        "subtopic": "Non-governmental organisations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Global governance",
+        "subtopic": "Multinational corporations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Global governance",
+        "subtopic": "Environmental governance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Global governance",
+        "subtopic": "Economic governance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Equality and inequality",
+        "subtopic": "Equality and discrimination",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Equality and inequality",
+        "subtopic": "Gender politics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Equality and inequality",
+        "subtopic": "Race, ethnicity and identity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Equality and inequality",
+        "subtopic": "Migration and refugees",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Equality and inequality",
+        "subtopic": "Social and economic inequality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Equality and inequality",
+        "subtopic": "Intersectionality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Equality and inequality",
+        "subtopic": "Representation and participation",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Global Politics HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Power, sovereignty and international relations",
+        "subtopic": "Power in global politics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Power, sovereignty and international relations",
+        "subtopic": "Sovereignty",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Power, sovereignty and international relations",
+        "subtopic": "Legitimacy and authority",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Power, sovereignty and international relations",
+        "subtopic": "Peace and conflict",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Power, sovereignty and international relations",
+        "subtopic": "Cooperation and integration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Power, sovereignty and international relations",
+        "subtopic": "Human rights and justice",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Power, sovereignty and international relations",
+        "subtopic": "Global governance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Power, sovereignty and international relations",
+        "subtopic": "HL depth: more complex analysis of theories, institutions and cases (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - Human rights",
+        "subtopic": "Nature and development of human rights",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human rights",
+        "subtopic": "International human rights law and instruments",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human rights",
+        "subtopic": "Human rights violations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human rights",
+        "subtopic": "Advocacy and protection",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human rights",
+        "subtopic": "State and non-state actors",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human rights",
+        "subtopic": "Rights in practice across regions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human rights",
+        "subtopic": "Challenges to implementation and enforcement",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Human rights",
+        "subtopic": "HL depth: more detailed case studies and evaluation (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Development",
+        "subtopic": "Measuring development",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Development",
+        "subtopic": "Poverty and inequality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Development",
+        "subtopic": "Development strategies",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Development",
+        "subtopic": "Sustainability and human development",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Development",
+        "subtopic": "Aid, trade and debt",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Development",
+        "subtopic": "Globalisation and development",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Development",
+        "subtopic": "Development institutions and actors",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Development",
+        "subtopic": "HL depth: more advanced evaluation of development models (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Peace and conflict",
+        "subtopic": "Causes of conflict",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Peace and conflict",
+        "subtopic": "Types of conflict",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Peace and conflict",
+        "subtopic": "War and violence",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Peace and conflict",
+        "subtopic": "Peacebuilding and conflict resolution",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Peace and conflict",
+        "subtopic": "Security and terrorism",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Peace and conflict",
+        "subtopic": "Reconciliation and transitional justice",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Peace and conflict",
+        "subtopic": "The role of international organisations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Peace and conflict",
+        "subtopic": "HL depth: more sophisticated analysis of conflict dynamics (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Global governance",
+        "subtopic": "Purpose and limits of global governance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Global governance",
+        "subtopic": "International organisations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Global governance",
+        "subtopic": "Regional organisations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Global governance",
+        "subtopic": "Non-governmental organisations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Global governance",
+        "subtopic": "Multinational corporations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Global governance",
+        "subtopic": "Environmental governance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Global governance",
+        "subtopic": "Economic governance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Global governance",
+        "subtopic": "HL depth: more critical evaluation of governance structures (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 6 - Equality and inequality",
+        "subtopic": "Equality and discrimination",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Equality and inequality",
+        "subtopic": "Gender politics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Equality and inequality",
+        "subtopic": "Race, ethnicity and identity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Equality and inequality",
+        "subtopic": "Migration and refugees",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Equality and inequality",
+        "subtopic": "Social and economic inequality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Equality and inequality",
+        "subtopic": "Intersectionality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Equality and inequality",
+        "subtopic": "Representation and participation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Equality and inequality",
+        "subtopic": "HL depth: more detailed comparison of equality issues (HL only)",
+        "hl_only": true
+      }
+    ]
+  }
+]

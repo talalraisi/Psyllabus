@@ -1,0 +1,196 @@
+{
+  "course": "Theory of knowledge",
+  "curriculum": "IB",
+  "guide": "first assessment 2022",
+  "confidence": "high — the core theme, the five optional themes, the five areas of knowledge and the knowledge framework are the guide's structure; every DP student takes this",
+  "subjects": { "sl": "Theory of Knowledge", "hl": [] },
+  "note": "Three levels: part of the course, unit, then one assessable point. Schools choose two optional themes.",
+  "topics": [
+    {
+      "topic": "Core theme - Knowledge and the knower",
+      "units": [
+        {
+          "code": "1.1",
+          "unit": "Knowledge and knowers",
+          "subtopics": [
+            ["What counts as knowledge", "sl"],
+            ["Knowledge questions and knowledge claims", "sl"],
+            ["Belief, truth and justification", "sl"],
+            ["Personal and shared knowledge", "sl"],
+            ["Certainty, doubt and the limits of knowing", "sl"]
+          ]
+        },
+        {
+          "code": "1.2",
+          "unit": "Perspectives and communities",
+          "subtopics": [
+            ["How personal experience shapes what we know", "sl"],
+            ["Cultural and disciplinary perspectives", "sl"],
+            ["Indigenous and marginalised perspectives", "sl"],
+            ["Communities of knowers and expertise", "sl"],
+            ["Bias, assumptions and unexamined beliefs", "sl"]
+          ]
+        },
+        {
+          "code": "1.3",
+          "unit": "Responsibility of the knower",
+          "subtopics": [
+            ["Ethical responsibilities in producing knowledge", "sl"],
+            ["Power, authority and whose knowledge counts", "sl"],
+            ["Consequences of what we choose to know or ignore", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Optional themes",
+      "units": [
+        {
+          "code": "2.1",
+          "unit": "Knowledge and technology",
+          "subtopics": [
+            ["Technology as a tool for producing knowledge", "sl"],
+            ["Algorithms, data and what they make visible", "sl"],
+            ["Artificial intelligence and knowledge production", "sl"],
+            ["Access, the digital divide and misinformation", "sl"]
+          ]
+        },
+        {
+          "code": "2.2",
+          "unit": "Knowledge and language",
+          "subtopics": [
+            ["How language shapes and limits thought", "sl"],
+            ["Meaning, ambiguity and interpretation", "sl"],
+            ["Translation and what is lost", "sl"],
+            ["Language, power and persuasion", "sl"]
+          ]
+        },
+        {
+          "code": "2.3",
+          "unit": "Knowledge and politics",
+          "subtopics": [
+            ["Political power and the production of knowledge", "sl"],
+            ["Propaganda, censorship and public discourse", "sl"],
+            ["Expertise, trust and political decisions", "sl"]
+          ]
+        },
+        {
+          "code": "2.4",
+          "unit": "Knowledge and religion",
+          "subtopics": [
+            ["Religious knowledge systems and their claims", "sl"],
+            ["Faith, reason and evidence", "sl"],
+            ["Interpretation of sacred texts and authority", "sl"]
+          ]
+        },
+        {
+          "code": "2.5",
+          "unit": "Knowledge and indigenous societies",
+          "subtopics": [
+            ["Indigenous knowledge systems and their methods", "sl"],
+            ["Land, environment and embedded knowledge", "sl"],
+            ["Ownership, appropriation and preservation", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Areas of knowledge",
+      "units": [
+        {
+          "code": "3.1",
+          "unit": "History",
+          "subtopics": [
+            ["Scope: what history can and cannot tell us", "sl"],
+            ["Perspectives: bias, hindsight and competing accounts", "sl"],
+            ["Methods: sources, evidence and interpretation", "sl"],
+            ["Ethics: memory, responsibility and difficult pasts", "sl"]
+          ]
+        },
+        {
+          "code": "3.2",
+          "unit": "The human sciences",
+          "subtopics": [
+            ["Scope: studying people scientifically", "sl"],
+            ["Perspectives: culture, values and the observer", "sl"],
+            ["Methods: models, data and experiment with human subjects", "sl"],
+            ["Ethics: consent, harm and the use of findings", "sl"]
+          ]
+        },
+        {
+          "code": "3.3",
+          "unit": "The natural sciences",
+          "subtopics": [
+            ["Scope: what makes a question scientific", "sl"],
+            ["Perspectives: paradigms and theory change", "sl"],
+            ["Methods: observation, experiment, falsification, peer review", "sl"],
+            ["Ethics: research, funding and consequences", "sl"]
+          ]
+        },
+        {
+          "code": "3.4",
+          "unit": "Mathematics",
+          "subtopics": [
+            ["Scope: invented or discovered", "sl"],
+            ["Perspectives: certainty and the role of intuition", "sl"],
+            ["Methods: axioms, proof and deduction", "sl"],
+            ["Ethics: applications and the uses of mathematics", "sl"]
+          ]
+        },
+        {
+          "code": "3.5",
+          "unit": "The arts",
+          "subtopics": [
+            ["Scope: what the arts can tell us", "sl"],
+            ["Perspectives: interpretation, taste and the audience", "sl"],
+            ["Methods: convention, technique and creativity", "sl"],
+            ["Ethics: representation, censorship and responsibility", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "The knowledge framework",
+      "units": [
+        {
+          "code": "4.1",
+          "unit": "Four elements",
+          "subtopics": [
+            ["Scope: what an area of knowledge covers and why it matters", "sl"],
+            ["Perspectives: who is knowing and from where", "sl"],
+            ["Methods and tools: how knowledge is produced", "sl"],
+            ["Ethics: the values at stake in knowing", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Assessment",
+      "units": [
+        {
+          "code": "5.1",
+          "unit": "The TOK exhibition",
+          "subtopics": [
+            ["Choosing an IA prompt", "sl"],
+            ["Selecting three real-world objects", "sl"],
+            ["Justifying each object's contribution to the prompt", "sl"],
+            ["Writing the exhibition commentary", "sl"]
+          ]
+        },
+        {
+          "code": "5.2",
+          "unit": "The TOK essay",
+          "subtopics": [
+            ["Interpreting a prescribed title and its key terms", "sl"],
+            ["Selecting areas of knowledge and examples", "sl"],
+            ["Developing an argument with counterclaims", "sl"],
+            ["Using specific real-world examples as evidence", "sl"],
+            ["Structure, clarity and the 1,600-word limit", "sl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

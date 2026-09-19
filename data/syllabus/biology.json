@@ -1,0 +1,540 @@
+{
+  "course": "Biology",
+  "curriculum": "IB",
+  "guide": "first assessment 2025",
+  "confidence": "high — the four themes, the molecules/cells/organisms/ecosystems levels and the unit numbering are the guide's; six units are HL only (A2.1, A2.3, A3.2, B3.3, C2.1, D2.2), which the pasted list had wrong",
+  "subjects": { "sl": "Biology SL", "hl": "Biology HL" },
+  "note": "Three levels: theme, the guide's numbered unit, then one assessable point. Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "topics": [
+    {
+      "topic": "A. Unity and diversity",
+      "units": [
+        {
+          "code": "A1.1",
+          "unit": "Water",
+          "subtopics": [
+            ["Polarity and hydrogen bonding in water", "sl"],
+            ["Cohesion, adhesion and surface tension", "sl"],
+            ["Water as a solvent and medium for metabolism", "sl"],
+            ["Thermal properties of water and their consequences", "sl"],
+            ["Adaptations of organisms to water as a habitat", "sl"],
+            ["The search for extraterrestrial life and water", "sl"]
+          ]
+        },
+        {
+          "code": "A1.2",
+          "unit": "Nucleic acids",
+          "subtopics": [
+            ["DNA and RNA as information-carrying molecules", "sl"],
+            ["Nucleotide structure and the sugar-phosphate backbone", "sl"],
+            ["Complementary base pairing and the double helix", "sl"],
+            ["Directionality of nucleic acids and antiparallel strands", "ext"],
+            ["Evidence for the structure of DNA", "ext"],
+            ["Diversity of possible DNA base sequences", "sl"]
+          ]
+        },
+        {
+          "code": "A2.1",
+          "unit": "Origins of cells",
+          "subtopics": [
+            ["Conditions on early Earth and the origin of carbon compounds", "hl"],
+            ["Spontaneous formation of vesicles and membranes", "hl"],
+            ["RNA as a self-replicating molecule", "hl"],
+            ["The last universal common ancestor", "hl"],
+            ["Evidence from deep-sea vents and hydrothermal systems", "hl"]
+          ]
+        },
+        {
+          "code": "A2.2",
+          "unit": "Cell structure",
+          "subtopics": [
+            ["The cell theory and characteristics of life", "sl"],
+            ["Microscopy, magnification and scale", "sl"],
+            ["Prokaryotic cell structure", "sl"],
+            ["Eukaryotic cell structure", "sl"],
+            ["Differences between plant and animal cells", "sl"],
+            ["Atypical cells: aseptate fungi, skeletal muscle, red blood cells", "sl"],
+            ["Origin of eukaryotic cells by endosymbiosis", "ext"]
+          ]
+        },
+        {
+          "code": "A2.3",
+          "unit": "Viruses",
+          "subtopics": [
+            ["Structural features common to viruses", "hl"],
+            ["Diversity of viral structure and genetic material", "hl"],
+            ["The lytic cycle", "hl"],
+            ["The lysogenic cycle", "hl"],
+            ["Rapid evolution of viruses and emergent diseases", "hl"]
+          ]
+        },
+        {
+          "code": "A3.1",
+          "unit": "Diversity of organisms",
+          "subtopics": [
+            ["Variation between and within species", "sl"],
+            ["The biological species concept and hybrids", "sl"],
+            ["Chromosome number as a shared trait within a species", "sl"],
+            ["Karyotyping and karyograms", "sl"],
+            ["Unity and diversity of genomes within a species", "sl"],
+            ["Difficulties applying the species concept: asexual and ring species", "ext"]
+          ]
+        },
+        {
+          "code": "A3.2",
+          "unit": "Classification and cladistics",
+          "subtopics": [
+            ["Binomial nomenclature and the taxonomic hierarchy", "hl"],
+            ["Advantages of a natural classification", "hl"],
+            ["Clades and evidence from base and amino acid sequences", "hl"],
+            ["Constructing and interpreting cladograms", "hl"],
+            ["Molecular clocks and reclassification", "hl"]
+          ]
+        },
+        {
+          "code": "A4.1",
+          "unit": "Evolution and speciation",
+          "subtopics": [
+            ["Evolution as change in heritable characteristics", "sl"],
+            ["Evidence from base sequences and amino acid sequences", "sl"],
+            ["Evidence from selective breeding and artificial selection", "sl"],
+            ["Homologous structures and the fossil record", "sl"],
+            ["Speciation by splitting of gene pools", "sl"],
+            ["Reproductive isolation and the tempo of speciation", "ext"]
+          ]
+        },
+        {
+          "code": "A4.2",
+          "unit": "Conservation of biodiversity",
+          "subtopics": [
+            ["Biodiversity as the variety of life at several levels", "sl"],
+            ["Estimating the number of species on Earth", "sl"],
+            ["Causes of anthropogenic species extinction", "sl"],
+            ["Evidence for a sixth mass extinction", "sl"],
+            ["Conservation approaches: in situ and ex situ", "sl"],
+            ["The EDGE of Existence approach to prioritising species", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "B. Form and function",
+      "units": [
+        {
+          "code": "B1.1",
+          "unit": "Carbohydrates and lipids",
+          "subtopics": [
+            ["Carbon compounds and the versatility of carbon", "sl"],
+            ["Monosaccharides, disaccharides and polysaccharides", "sl"],
+            ["Condensation and hydrolysis reactions", "sl"],
+            ["Structure and function of cellulose, starch and glycogen", "sl"],
+            ["Triglycerides, phospholipids and steroids", "sl"],
+            ["Saturated and unsaturated fatty acids and health claims", "sl"],
+            ["Energy storage in lipids compared with carbohydrates", "sl"]
+          ]
+        },
+        {
+          "code": "B1.2",
+          "unit": "Proteins",
+          "subtopics": [
+            ["Amino acid structure and the peptide bond", "sl"],
+            ["Diversity of possible polypeptide sequences", "sl"],
+            ["Primary, secondary, tertiary and quaternary structure", "ext"],
+            ["Effects of pH and temperature on protein conformation", "sl"],
+            ["Functional diversity of proteins", "sl"],
+            ["Protein structure and function relationships", "ext"]
+          ]
+        },
+        {
+          "code": "B2.1",
+          "unit": "Membranes and membrane transport",
+          "subtopics": [
+            ["The phospholipid bilayer and amphipathic molecules", "sl"],
+            ["Simple diffusion and facilitated diffusion", "sl"],
+            ["Osmosis and water movement across membranes", "sl"],
+            ["Active transport and pump proteins", "sl"],
+            ["Endocytosis, exocytosis and vesicle transport", "sl"],
+            ["The fluid mosaic model and evidence for it", "sl"],
+            ["Glycoproteins, cell adhesion and membrane fluidity", "ext"]
+          ]
+        },
+        {
+          "code": "B2.2",
+          "unit": "Organelles and compartmentalization",
+          "subtopics": [
+            ["Functions of the nucleus, ribosomes and endoplasmic reticulum", "sl"],
+            ["Golgi apparatus, vesicles and lysosomes", "sl"],
+            ["Mitochondria and chloroplasts", "sl"],
+            ["Advantages of compartmentalization in cells", "sl"],
+            ["The cytoskeleton and cell shape", "ext"]
+          ]
+        },
+        {
+          "code": "B2.3",
+          "unit": "Cell specialization",
+          "subtopics": [
+            ["Stem cells and their properties", "sl"],
+            ["Differentiation and gene expression", "sl"],
+            ["Surface area to volume ratio and cell size", "sl"],
+            ["Adaptations of specialized cells", "sl"],
+            ["Stem cell niches and therapeutic use", "ext"]
+          ]
+        },
+        {
+          "code": "B3.1",
+          "unit": "Gas exchange",
+          "subtopics": [
+            ["Properties of gas exchange surfaces", "sl"],
+            ["Ventilation and maintaining concentration gradients", "sl"],
+            ["Alveoli and the human respiratory system", "sl"],
+            ["Measuring lung volumes and ventilation rate", "sl"],
+            ["Gas exchange in leaves and stomatal control", "sl"],
+            ["Gas exchange in fish and adaptations to habitat", "ext"],
+            ["Haemoglobin, oxygen dissociation and the Bohr shift", "ext"]
+          ]
+        },
+        {
+          "code": "B3.2",
+          "unit": "Transport",
+          "subtopics": [
+            ["Arteries, capillaries and veins", "sl"],
+            ["Structure of the heart and the cardiac cycle", "sl"],
+            ["Control of heart rate", "sl"],
+            ["Blood composition and function", "sl"],
+            ["Transpiration and water transport in xylem", "sl"],
+            ["Translocation of sugars in phloem", "sl"],
+            ["Adaptations of plants to water availability", "ext"]
+          ]
+        },
+        {
+          "code": "B3.3",
+          "unit": "Muscle and motility",
+          "subtopics": [
+            ["Sarcomere structure and skeletal muscle", "hl"],
+            ["The sliding filament model of contraction", "hl"],
+            ["Roles of ATP, calcium ions and troponin", "hl"],
+            ["Antagonistic muscle pairs and joints", "hl"],
+            ["Motility in unicellular organisms: cilia and flagella", "hl"]
+          ]
+        },
+        {
+          "code": "B4.1",
+          "unit": "Adaptation to environment",
+          "subtopics": [
+            ["Habitat as the place where a species lives", "sl"],
+            ["Abiotic factors and limits of tolerance", "sl"],
+            ["Adaptations of plants and animals to extreme habitats", "sl"],
+            ["Biomes and their distribution", "sl"],
+            ["Adaptations to abiotic conditions within a biome", "sl"]
+          ]
+        },
+        {
+          "code": "B4.2",
+          "unit": "Ecological niches",
+          "subtopics": [
+            ["The niche concept and the role of a species", "sl"],
+            ["Obligate and facultative anaerobes and autotrophs", "sl"],
+            ["Modes of nutrition: holozoic, saprotrophic, parasitic, mixotrophic", "sl"],
+            ["Adaptations for obtaining food and nutrients", "sl"],
+            ["Competitive exclusion and the fundamental versus realized niche", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "C. Interaction and interdependence",
+      "units": [
+        {
+          "code": "C1.1",
+          "unit": "Enzymes and metabolism",
+          "subtopics": [
+            ["Enzymes as catalysts and the active site", "sl"],
+            ["Enzyme-substrate specificity and induced fit", "sl"],
+            ["Effects of temperature, pH and substrate concentration", "sl"],
+            ["Denaturation and enzyme activity experiments", "sl"],
+            ["Anabolic and catabolic reactions in metabolism", "sl"],
+            ["Competitive and non-competitive inhibition", "ext"],
+            ["End-product inhibition and control of metabolic pathways", "ext"]
+          ]
+        },
+        {
+          "code": "C1.2",
+          "unit": "Cell respiration",
+          "subtopics": [
+            ["ATP as the energy currency of the cell", "sl"],
+            ["Anaerobic respiration in humans and yeast", "sl"],
+            ["Aerobic respiration and its yield", "sl"],
+            ["Variables affecting the rate of respiration", "sl"],
+            ["Glycolysis and the link reaction", "hl"],
+            ["The Krebs cycle", "hl"],
+            ["Oxidative phosphorylation and chemiosmosis", "hl"],
+            ["Respiration of lipids and proteins", "hl"]
+          ]
+        },
+        {
+          "code": "C1.3",
+          "unit": "Photosynthesis",
+          "subtopics": [
+            ["Photosynthesis as energy conversion", "sl"],
+            ["Absorption spectra and action spectra", "sl"],
+            ["Limiting factors and rates of photosynthesis", "sl"],
+            ["Carbon fixation and the products of photosynthesis", "sl"],
+            ["Light-dependent reactions and photosystems", "hl"],
+            ["The Calvin cycle", "hl"],
+            ["Chloroplast structure and its adaptations", "hl"]
+          ]
+        },
+        {
+          "code": "C2.1",
+          "unit": "Chemical signalling",
+          "subtopics": [
+            ["Hormones, signalling molecules and receptors", "hl"],
+            ["Transmembrane receptors and intracellular receptors", "hl"],
+            ["Signal transduction and second messengers", "hl"],
+            ["Quorum sensing and cell-to-cell signalling", "hl"],
+            ["Feedback control of hormone secretion", "hl"]
+          ]
+        },
+        {
+          "code": "C2.2",
+          "unit": "Neural signalling",
+          "subtopics": [
+            ["Neuron structure and the nerve impulse", "sl"],
+            ["Resting potential and action potential", "sl"],
+            ["Saltatory conduction and myelination", "sl"],
+            ["Synaptic transmission and neurotransmitters", "sl"],
+            ["Effects of drugs and toxins on synapses", "ext"],
+            ["Summation, inhibition and decision-making in the brain", "ext"]
+          ]
+        },
+        {
+          "code": "C3.1",
+          "unit": "Integration of body systems",
+          "subtopics": [
+            ["Systems as interacting components", "sl"],
+            ["The nervous system and the brain", "sl"],
+            ["Reflex arcs and involuntary responses", "sl"],
+            ["Endocrine control and comparison with nervous control", "sl"],
+            ["Feedback control in the body", "sl"],
+            ["Epinephrine, the fight-or-flight response and integration", "ext"],
+            ["Plant responses: tropisms and auxin", "ext"]
+          ]
+        },
+        {
+          "code": "C3.2",
+          "unit": "Defence against disease",
+          "subtopics": [
+            ["Pathogens and transmission of infectious disease", "sl"],
+            ["Skin and mucous membranes as primary defence", "sl"],
+            ["Blood clotting and the inflammatory response", "sl"],
+            ["Phagocytes and the innate immune response", "sl"],
+            ["Antibody production and the adaptive immune response", "sl"],
+            ["Vaccination and herd immunity", "sl"],
+            ["Antibiotics, resistance and zoonotic disease", "ext"]
+          ]
+        },
+        {
+          "code": "C4.1",
+          "unit": "Populations and communities",
+          "subtopics": [
+            ["Populations, carrying capacity and limiting factors", "sl"],
+            ["Estimating population size: quadrats and capture-mark-release", "sl"],
+            ["Sigmoid population growth curves", "sl"],
+            ["Competition, herbivory, predation and disease", "sl"],
+            ["Mutualism, parasitism and symbiosis", "sl"],
+            ["Keystone species and community interactions", "ext"]
+          ]
+        },
+        {
+          "code": "C4.2",
+          "unit": "Transfers of energy and matter",
+          "subtopics": [
+            ["Ecosystems as open systems of energy and matter", "sl"],
+            ["Autotrophs, heterotrophs and trophic levels", "sl"],
+            ["Food chains, food webs and energy loss", "sl"],
+            ["Pyramids of energy and biomass", "sl"],
+            ["Carbon cycling and the role of decomposers", "sl"],
+            ["Gross and net primary production", "ext"],
+            ["Recycling of nutrients and the nitrogen cycle", "ext"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "D. Continuity and change",
+      "units": [
+        {
+          "code": "D1.1",
+          "unit": "DNA replication",
+          "subtopics": [
+            ["Semi-conservative replication and complementary base pairing", "sl"],
+            ["Helicase, DNA polymerase and the replication fork", "sl"],
+            ["The polymerase chain reaction and DNA profiling", "sl"],
+            ["Leading and lagging strands and Okazaki fragments", "hl"],
+            ["Proofreading and repair of replication errors", "hl"]
+          ]
+        },
+        {
+          "code": "D1.2",
+          "unit": "Protein synthesis",
+          "subtopics": [
+            ["Transcription and messenger RNA", "sl"],
+            ["The genetic code and codons", "sl"],
+            ["Translation, ribosomes and transfer RNA", "sl"],
+            ["Effect of the sequence of a gene on the protein", "sl"],
+            ["Promoters, transcription factors and initiation", "hl"],
+            ["Splicing of introns and alternative splicing", "hl"],
+            ["Polysomes and free versus bound ribosomes", "hl"]
+          ]
+        },
+        {
+          "code": "D1.3",
+          "unit": "Mutations and gene editing",
+          "subtopics": [
+            ["Gene mutations as changes to base sequence", "sl"],
+            ["Substitution, insertion and deletion mutations", "sl"],
+            ["Consequences of mutation in germ and somatic cells", "sl"],
+            ["Mutagens, radiation and cancer", "sl"],
+            ["Gene knockout and CRISPR gene editing", "ext"]
+          ]
+        },
+        {
+          "code": "D2.1",
+          "unit": "Cell and nuclear division",
+          "subtopics": [
+            ["The cell cycle and interphase", "sl"],
+            ["Mitosis and its phases", "sl"],
+            ["Cytokinesis in plant and animal cells", "sl"],
+            ["Meiosis, crossing over and independent assortment", "sl"],
+            ["Non-disjunction and chromosome abnormalities", "sl"],
+            ["Cyclins, checkpoints and control of the cell cycle", "ext"],
+            ["Tumours, oncogenes and metastasis", "ext"]
+          ]
+        },
+        {
+          "code": "D2.2",
+          "unit": "Gene expression",
+          "subtopics": [
+            ["Regulation of transcription by proteins", "hl"],
+            ["Epigenetic changes: methylation and acetylation", "hl"],
+            ["Environmental influence on gene expression", "hl"],
+            ["Differential gene expression and cell differentiation", "hl"],
+            ["Reversibility of epigenetic change", "hl"]
+          ]
+        },
+        {
+          "code": "D2.3",
+          "unit": "Water potential",
+          "subtopics": [
+            ["Solvation and solute concentration", "sl"],
+            ["Water movement by osmosis in tissues", "sl"],
+            ["Solute potential and pressure potential", "ext"],
+            ["Effects of hypotonic, isotonic and hypertonic solutions", "sl"],
+            ["Turgor, plasmolysis and cytolysis", "ext"]
+          ]
+        },
+        {
+          "code": "D3.1",
+          "unit": "Reproduction",
+          "subtopics": [
+            ["Sexual and asexual reproduction compared", "sl"],
+            ["Male and female reproductive systems", "sl"],
+            ["Gametogenesis and fertilization in humans", "sl"],
+            ["Hormonal control of the menstrual cycle", "sl"],
+            ["Pregnancy, the placenta and birth", "sl"],
+            ["Reproduction in flowering plants and pollination", "ext"],
+            ["IVF, contraception and reproductive technology", "ext"]
+          ]
+        },
+        {
+          "code": "D3.2",
+          "unit": "Inheritance",
+          "subtopics": [
+            ["Genes, alleles and the genome", "sl"],
+            ["Dominance, codominance and multiple alleles", "sl"],
+            ["Monohybrid crosses and Punnett grids", "sl"],
+            ["Sex determination and sex linkage", "sl"],
+            ["Pedigree charts and genetic disorders", "sl"],
+            ["Dihybrid crosses and independent assortment", "hl"],
+            ["Linkage, recombination and the chi-squared test", "hl"],
+            ["Continuous variation and polygenic inheritance", "hl"]
+          ]
+        },
+        {
+          "code": "D3.3",
+          "unit": "Homeostasis",
+          "subtopics": [
+            ["Homeostasis and negative feedback", "sl"],
+            ["Thermoregulation in humans", "sl"],
+            ["Blood glucose regulation and diabetes", "sl"],
+            ["The kidney, osmoregulation and urine production", "ext"],
+            ["ADH, the loop of Henle and water conservation", "ext"]
+          ]
+        },
+        {
+          "code": "D4.1",
+          "unit": "Natural selection",
+          "subtopics": [
+            ["Variation as a necessity for natural selection", "sl"],
+            ["Overproduction, competition and differential survival", "sl"],
+            ["Adaptation and change in allele frequency", "sl"],
+            ["Sexual selection and selective breeding", "sl"],
+            ["Antibiotic resistance as evidence of selection", "sl"],
+            ["Stabilizing, directional and disruptive selection", "ext"]
+          ]
+        },
+        {
+          "code": "D4.2",
+          "unit": "Stability and change",
+          "subtopics": [
+            ["Ecosystem stability and requirements for it", "sl"],
+            ["Keystone species and tipping points", "sl"],
+            ["Deforestation, soil erosion and ecosystem collapse", "sl"],
+            ["Rewilding and restoration of ecosystems", "sl"],
+            ["Assessing sustainability of resource harvesting", "ext"]
+          ]
+        },
+        {
+          "code": "D4.3",
+          "unit": "Climate change",
+          "subtopics": [
+            ["The greenhouse effect and greenhouse gases", "sl"],
+            ["Human causes of rising carbon dioxide concentration", "sl"],
+            ["Evidence for anthropogenic climate change", "sl"],
+            ["Effects on ecosystems, species distribution and phenology", "sl"],
+            ["Ocean acidification and coral reefs", "sl"],
+            ["Mitigation, carbon sequestration and policy", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Tools and inquiry",
+      "units": [
+        {
+          "code": "T.1",
+          "unit": "Experimental techniques",
+          "subtopics": [
+            ["Microscopy and preparing temporary mounts", "sl"],
+            ["Sampling techniques in the field", "sl"],
+            ["Chromatography, colorimetry and biological assays", "sl"],
+            ["Safety, ethics and the use of organisms in research", "sl"]
+          ]
+        },
+        {
+          "code": "T.2",
+          "unit": "Data and analysis",
+          "subtopics": [
+            ["Processing data, tables and graphs", "sl"],
+            ["Error bars, standard deviation and uncertainty", "sl"],
+            ["Correlation, causation and statistical tests", "sl"],
+            ["Designing an investigation and evaluating a method", "sl"],
+            ["The scientific investigation report", "sl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

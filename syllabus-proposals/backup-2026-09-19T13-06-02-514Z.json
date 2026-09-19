@@ -1,0 +1,282 @@
+[
+  {
+    "subject": "Design Technology SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Human factors and ergonomics",
+        "subtopic": "Anthropometrics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Human factors and ergonomics",
+        "subtopic": "Ergonomics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Human factors and ergonomics",
+        "subtopic": "User-centered design",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Human factors and ergonomics",
+        "subtopic": "Accessibility and inclusivity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Resource management and sustainable development",
+        "subtopic": "Natural and synthetic materials",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Resource management and sustainable development",
+        "subtopic": "Environmental impact",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Resource management and sustainable development",
+        "subtopic": "Life cycle assessment",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Resource management and sustainable development",
+        "subtopic": "Sustainable design",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Materials",
+        "subtopic": "Properties of materials",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Materials",
+        "subtopic": "Material selection",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Materials",
+        "subtopic": "Material testing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Materials",
+        "subtopic": "Material processing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Modelling",
+        "subtopic": "Sketching and communication",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Modelling",
+        "subtopic": "CAD",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Modelling",
+        "subtopic": "Prototyping",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Modelling",
+        "subtopic": "Testing models",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Prototypes and production",
+        "subtopic": "Prototype development",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Prototypes and production",
+        "subtopic": "Manufacturing methods",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Prototypes and production",
+        "subtopic": "Tools, machines and safety",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Prototypes and production",
+        "subtopic": "Production planning",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Innovation and design",
+        "subtopic": "Design cycle",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Innovation and design",
+        "subtopic": "Creativity and innovation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Innovation and design",
+        "subtopic": "Aesthetics and function",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Innovation and design",
+        "subtopic": "Evaluation of design solutions",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Design Technology HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Human factors and ergonomics",
+        "subtopic": "Anthropometrics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Human factors and ergonomics",
+        "subtopic": "Ergonomics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Human factors and ergonomics",
+        "subtopic": "User-centered design",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Human factors and ergonomics",
+        "subtopic": "Accessibility and inclusivity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Human factors and ergonomics",
+        "subtopic": "HL extension: more detailed human factors analysis (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - Resource management and sustainable development",
+        "subtopic": "Natural and synthetic materials",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Resource management and sustainable development",
+        "subtopic": "Environmental impact",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Resource management and sustainable development",
+        "subtopic": "Life cycle assessment",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Resource management and sustainable development",
+        "subtopic": "Sustainable design",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Resource management and sustainable development",
+        "subtopic": "HL extension: advanced sustainability analysis (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Materials",
+        "subtopic": "Properties of materials",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Materials",
+        "subtopic": "Material selection",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Materials",
+        "subtopic": "Material testing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Materials",
+        "subtopic": "Material processing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Materials",
+        "subtopic": "HL extension: advanced material science (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Modelling",
+        "subtopic": "Sketching and communication",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Modelling",
+        "subtopic": "CAD",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Modelling",
+        "subtopic": "Prototyping",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Modelling",
+        "subtopic": "Testing models",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Modelling",
+        "subtopic": "HL extension: advanced modelling techniques (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Prototypes and production",
+        "subtopic": "Prototype development",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Prototypes and production",
+        "subtopic": "Manufacturing methods",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Prototypes and production",
+        "subtopic": "Tools, machines and safety",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Prototypes and production",
+        "subtopic": "Production planning",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Prototypes and production",
+        "subtopic": "HL extension: advanced production systems (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 6 - Innovation and design",
+        "subtopic": "Design cycle",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Innovation and design",
+        "subtopic": "Creativity and innovation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Innovation and design",
+        "subtopic": "Aesthetics and function",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Innovation and design",
+        "subtopic": "Evaluation of design solutions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Innovation and design",
+        "subtopic": "HL extension: more advanced design evaluation (HL only)",
+        "hl_only": true
+      }
+    ]
+  }
+]

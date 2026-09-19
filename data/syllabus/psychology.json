@@ -1,0 +1,268 @@
+{
+  "course": "Psychology",
+  "curriculum": "IB",
+  "guide": "first assessment 2019",
+  "confidence": "medium-high — the three approaches, the options and research methods are the guide's; note that the options are studied at BOTH levels (SL takes one, HL takes two), which the pasted list had wrong. Check with your teacher whether your year sits a newer guide",
+  "subjects": { "sl": "Psychology SL", "hl": "Psychology HL" },
+  "note": "Three levels: approach, unit, then one assessable point. Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "topics": [
+    {
+      "topic": "Biological approach to behaviour",
+      "units": [
+        {
+          "code": "1.1",
+          "unit": "The brain and behaviour",
+          "subtopics": [
+            ["Localisation of function in the brain", "sl"],
+            ["Neuroplasticity and neural pruning", "sl"],
+            ["Neurotransmitters and their effect on behaviour", "sl"],
+            ["Techniques for studying the brain: fMRI, PET, EEG", "sl"],
+            ["Evaluating brain-imaging evidence", "sl"]
+          ]
+        },
+        {
+          "code": "1.2",
+          "unit": "Hormones and pheromones",
+          "subtopics": [
+            ["Hormones and behaviour: cortisol, oxytocin, testosterone", "sl"],
+            ["Pheromones and human behaviour", "sl"],
+            ["Evaluating research into hormones and pheromones", "sl"]
+          ]
+        },
+        {
+          "code": "1.3",
+          "unit": "Genetics and behaviour",
+          "subtopics": [
+            ["Genes and behaviour: genetic similarities", "sl"],
+            ["Twin and kinship studies and heritability", "sl"],
+            ["Evolutionary explanations of behaviour", "sl"],
+            ["Gene-environment interaction and epigenetics", "ext"]
+          ]
+        },
+        {
+          "code": "1.4",
+          "unit": "The role of animal research",
+          "subtopics": [
+            ["Value of animal models in understanding behaviour", "hl"],
+            ["Generalising animal findings to humans", "hl"],
+            ["Ethical considerations in animal research", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Cognitive approach to behaviour",
+      "units": [
+        {
+          "code": "2.1",
+          "unit": "Cognitive processing",
+          "subtopics": [
+            ["Models of memory: multi-store model", "sl"],
+            ["Models of memory: working memory model", "sl"],
+            ["Schema theory", "sl"],
+            ["Thinking and decision-making: dual process model", "sl"],
+            ["Heuristics and biases in decision-making", "sl"]
+          ]
+        },
+        {
+          "code": "2.2",
+          "unit": "Reliability of cognitive processes",
+          "subtopics": [
+            ["Reconstructive memory and false memories", "sl"],
+            ["Eyewitness testimony and leading questions", "sl"],
+            ["Biases in thinking and decision-making", "sl"],
+            ["Evaluating laboratory research into memory", "ext"]
+          ]
+        },
+        {
+          "code": "2.3",
+          "unit": "Emotion and cognition",
+          "subtopics": [
+            ["The influence of emotion on cognitive processes", "sl"],
+            ["Flashbulb memory theory and its evidence", "sl"],
+            ["Evaluating research into emotion and memory", "sl"]
+          ]
+        },
+        {
+          "code": "2.4",
+          "unit": "Cognitive processing in the digital world",
+          "subtopics": [
+            ["Effect of digital technology on cognitive processes", "hl"],
+            ["Positive and negative effects of modern technology", "hl"],
+            ["Methods used to study interaction between technology and cognition", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Sociocultural approach to behaviour",
+      "units": [
+        {
+          "code": "3.1",
+          "unit": "The individual and the group",
+          "subtopics": [
+            ["Social identity theory", "sl"],
+            ["Social cognitive theory", "sl"],
+            ["Stereotypes: formation and effects", "sl"],
+            ["Conformity and compliance", "sl"]
+          ]
+        },
+        {
+          "code": "3.2",
+          "unit": "Cultural origins of behaviour and cognition",
+          "subtopics": [
+            ["Culture and its influence on behaviour and cognition", "sl"],
+            ["Cultural dimensions: individualism and collectivism", "sl"],
+            ["Enculturation and cultural norms", "sl"],
+            ["Acculturation and its effects", "sl"]
+          ]
+        },
+        {
+          "code": "3.3",
+          "unit": "Cultural influences on individual attitudes and behaviour",
+          "subtopics": [
+            ["Cultural transmission of behaviour", "sl"],
+            ["Evaluating cross-cultural research", "sl"],
+            ["Emic and etic approaches to research", "ext"]
+          ]
+        },
+        {
+          "code": "3.4",
+          "unit": "The influence of globalisation on behaviour",
+          "subtopics": [
+            ["Effects of globalisation on individual behaviour", "hl"],
+            ["Effects of the interaction of local and global influences", "hl"],
+            ["Methods used to study the influence of globalisation", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Options",
+      "units": [
+        {
+          "code": "4.1",
+          "unit": "Abnormal psychology",
+          "subtopics": [
+            ["Normality, abnormality and classification systems", "sl"],
+            ["Validity and reliability of diagnosis", "sl"],
+            ["Biological, cognitive and sociocultural explanations of disorders", "sl"],
+            ["Prevalence rates and factors influencing diagnosis", "sl"],
+            ["Biological, psychological and sociocultural treatment", "sl"],
+            ["Assessing the effectiveness of treatment", "sl"],
+            ["The role of culture in treatment", "sl"]
+          ]
+        },
+        {
+          "code": "4.2",
+          "unit": "Developmental psychology",
+          "subtopics": [
+            ["Brain development and the role of peers and play", "sl"],
+            ["Childhood trauma and resilience", "sl"],
+            ["Cognitive development: Piaget and Vygotsky", "sl"],
+            ["Development of empathy and theory of mind", "sl"],
+            ["Attachment and its long-term effects", "sl"],
+            ["Gender identity and social roles", "sl"]
+          ]
+        },
+        {
+          "code": "4.3",
+          "unit": "Health psychology",
+          "subtopics": [
+            ["Determinants of health and biopsychosocial model", "sl"],
+            ["Health problems: explanations and prevalence", "sl"],
+            ["Risk and protective factors", "sl"],
+            ["Stress: physiology, sources and effects", "sl"],
+            ["Health promotion and effectiveness of interventions", "sl"]
+          ]
+        },
+        {
+          "code": "4.4",
+          "unit": "Psychology of human relationships",
+          "subtopics": [
+            ["Formation of personal relationships", "sl"],
+            ["Role of communication in relationships", "sl"],
+            ["Explanations for why relationships change or end", "sl"],
+            ["Social responsibility: prosocial behaviour and bystanderism", "sl"],
+            ["Origins of conflict and conflict resolution", "sl"]
+          ]
+        },
+        {
+          "code": "4.5",
+          "unit": "Sport psychology",
+          "subtopics": [
+            ["Emotion and motivation in sport", "sl"],
+            ["Goal setting and self-efficacy", "sl"],
+            ["Arousal, anxiety and performance", "sl"],
+            ["Team dynamics and cohesion", "sl"],
+            ["Burnout, overtraining and drug use in sport", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Approaches to researching behaviour",
+      "units": [
+        {
+          "code": "5.1",
+          "unit": "Quantitative research methods",
+          "subtopics": [
+            ["Experiments: laboratory, field, natural and quasi", "sl"],
+            ["Independent, dependent and confounding variables", "sl"],
+            ["Experimental design and sampling techniques", "sl"],
+            ["Correlational studies and their limitations", "sl"],
+            ["Descriptive statistics and interpreting results", "sl"],
+            ["Generalisability, credibility and bias", "sl"]
+          ]
+        },
+        {
+          "code": "5.2",
+          "unit": "Qualitative research methods",
+          "subtopics": [
+            ["Interviews, focus groups and case studies", "sl"],
+            ["Observations: participant, naturalistic and covert", "sl"],
+            ["Sampling in qualitative research", "sl"],
+            ["Credibility, transferability and researcher bias", "sl"],
+            ["Triangulation and reflexivity", "hl"]
+          ]
+        },
+        {
+          "code": "5.3",
+          "unit": "Ethics in research",
+          "subtopics": [
+            ["Informed consent, deception and debriefing", "sl"],
+            ["Anonymity, confidentiality and the right to withdraw", "sl"],
+            ["Protection from harm and ethical review", "sl"]
+          ]
+        },
+        {
+          "code": "5.4",
+          "unit": "Evaluating research (Paper 3)",
+          "subtopics": [
+            ["Evaluating a research design and its methodology", "hl"],
+            ["Interpreting a stimulus study and its results", "hl"],
+            ["Suggesting alternative methods and improvements", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Internal assessment",
+      "units": [
+        {
+          "code": "6.1",
+          "unit": "The experimental study",
+          "subtopics": [
+            ["Selecting a published study to replicate", "sl"],
+            ["Formulating aims, hypotheses and operationalised variables", "sl"],
+            ["Experimental design, participants and ethics", "sl"],
+            ["Descriptive and inferential statistics", "sl"],
+            ["Writing the report: analysis, discussion and evaluation", "sl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

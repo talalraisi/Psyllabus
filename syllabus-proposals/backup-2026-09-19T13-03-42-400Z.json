@@ -1,0 +1,272 @@
+[
+  {
+    "subject": "History SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Prescribed subjects",
+        "subtopic": "Rights and protest",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Prescribed subjects",
+        "subtopic": "The move to global war",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Prescribed subjects",
+        "subtopic": "Authoritarian states",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Prescribed subjects",
+        "subtopic": "Military leaders and war",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Prescribed subjects",
+        "subtopic": "The Cold War",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - World history topics",
+        "subtopic": "Societies in transition",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - World history topics",
+        "subtopic": "Causes and effects of wars",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - World history topics",
+        "subtopic": "The emergence and development of single-party states",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - World history topics",
+        "subtopic": "Nationalist and independence movements",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - World history topics",
+        "subtopic": "Imperialism and decolonization",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - World history topics",
+        "subtopic": "The Cold War: superpower tensions and rivalries",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - HL regional options",
+        "subtopic": "History of Europe",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - HL regional options",
+        "subtopic": "History of the Americas",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - HL regional options",
+        "subtopic": "History of Asia and Oceania",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - HL regional options",
+        "subtopic": "History of Africa and the Middle East",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Historical investigation",
+        "subtopic": "Choosing a historical question",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Historical investigation",
+        "subtopic": "Using primary and secondary sources",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Historical investigation",
+        "subtopic": "Evaluating evidence and perspectives",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Historical investigation",
+        "subtopic": "Structuring historical argument",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Historical investigation",
+        "subtopic": "Writing the investigation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Internal assessment skills",
+        "subtopic": "Source analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Internal assessment skills",
+        "subtopic": "Origin, purpose, content and value",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Internal assessment skills",
+        "subtopic": "Reliability and usefulness",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Internal assessment skills",
+        "subtopic": "Contextual interpretation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Internal assessment skills",
+        "subtopic": "Evidence-based argumentation",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "History HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Prescribed subjects",
+        "subtopic": "Rights and protest",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Prescribed subjects",
+        "subtopic": "The move to global war",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Prescribed subjects",
+        "subtopic": "Authoritarian states",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Prescribed subjects",
+        "subtopic": "Military leaders and war",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Prescribed subjects",
+        "subtopic": "The Cold War",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - World history topics",
+        "subtopic": "Societies in transition",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - World history topics",
+        "subtopic": "Causes and effects of wars",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - World history topics",
+        "subtopic": "The emergence and development of single-party states",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - World history topics",
+        "subtopic": "Nationalist and independence movements",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - World history topics",
+        "subtopic": "Imperialism and decolonization",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - World history topics",
+        "subtopic": "The Cold War: superpower tensions and rivalries",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - World history topics",
+        "subtopic": "HL only depth: more detailed historiography and thematic comparison (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - HL regional options",
+        "subtopic": "History of Europe",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - HL regional options",
+        "subtopic": "History of the Americas",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - HL regional options",
+        "subtopic": "History of Asia and Oceania",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - HL regional options",
+        "subtopic": "History of Africa and the Middle East",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - HL regional options",
+        "subtopic": "Detailed regional case studies and comparisons (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Historical investigation",
+        "subtopic": "Choosing a historical question",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Historical investigation",
+        "subtopic": "Using primary and secondary sources",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Historical investigation",
+        "subtopic": "Evaluating evidence and perspectives",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Historical investigation",
+        "subtopic": "Structuring historical argument",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Historical investigation",
+        "subtopic": "Writing the investigation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Internal assessment skills",
+        "subtopic": "Source analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Internal assessment skills",
+        "subtopic": "Origin, purpose, content and value",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Internal assessment skills",
+        "subtopic": "Reliability and usefulness",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Internal assessment skills",
+        "subtopic": "Contextual interpretation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Internal assessment skills",
+        "subtopic": "Evidence-based argumentation",
+        "hl_only": false
+      }
+    ]
+  }
+]

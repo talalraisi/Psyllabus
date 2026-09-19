@@ -1,0 +1,327 @@
+[
+  {
+    "subject": "Film SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Film language and concepts",
+        "subtopic": "Film as a medium",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Film language and concepts",
+        "subtopic": "Film language",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Film language and concepts",
+        "subtopic": "Narrative and meaning",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Film language and concepts",
+        "subtopic": "Genre and style",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Film language and concepts",
+        "subtopic": "Audience and context",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Film language and concepts",
+        "subtopic": "Film analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Film production roles and processes",
+        "subtopic": "Roles in film production",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Film production roles and processes",
+        "subtopic": "Pre-production",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Film production roles and processes",
+        "subtopic": "Production",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Film production roles and processes",
+        "subtopic": "Post-production",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Film production roles and processes",
+        "subtopic": "Collaboration and teamwork",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Film production roles and processes",
+        "subtopic": "Technical and creative decision-making",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Film texts and contexts",
+        "subtopic": "Cultural context",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Film texts and contexts",
+        "subtopic": "Historical context",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Film texts and contexts",
+        "subtopic": "National cinemas",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Film texts and contexts",
+        "subtopic": "Global cinema",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Film texts and contexts",
+        "subtopic": "Film movements",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Film texts and contexts",
+        "subtopic": "Comparative study",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical and reflective study",
+        "subtopic": "Critical reflection",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical and reflective study",
+        "subtopic": "Research skills",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical and reflective study",
+        "subtopic": "Evaluation of film work",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical and reflective study",
+        "subtopic": "Film journal and documentation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical and reflective study",
+        "subtopic": "Presentation and discussion",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Practical film making",
+        "subtopic": "Idea development",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Practical film making",
+        "subtopic": "Scriptwriting",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Practical film making",
+        "subtopic": "Cinematography",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Practical film making",
+        "subtopic": "Editing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Practical film making",
+        "subtopic": "Sound design",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Practical film making",
+        "subtopic": "Production management",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Film HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Film language and concepts",
+        "subtopic": "Film as a medium",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Film language and concepts",
+        "subtopic": "Film language",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Film language and concepts",
+        "subtopic": "Narrative and meaning",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Film language and concepts",
+        "subtopic": "Genre and style",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Film language and concepts",
+        "subtopic": "Audience and context",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Film language and concepts",
+        "subtopic": "Film analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Film language and concepts",
+        "subtopic": "Further film analysis and theory (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - Film production roles and processes",
+        "subtopic": "Roles in film production",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Film production roles and processes",
+        "subtopic": "Pre-production",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Film production roles and processes",
+        "subtopic": "Production",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Film production roles and processes",
+        "subtopic": "Post-production",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Film production roles and processes",
+        "subtopic": "Collaboration and teamwork",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Film production roles and processes",
+        "subtopic": "Technical and creative decision-making",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Film production roles and processes",
+        "subtopic": "Advanced production practice (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Film texts and contexts",
+        "subtopic": "Cultural context",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Film texts and contexts",
+        "subtopic": "Historical context",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Film texts and contexts",
+        "subtopic": "National cinemas",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Film texts and contexts",
+        "subtopic": "Global cinema",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Film texts and contexts",
+        "subtopic": "Film movements",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Film texts and contexts",
+        "subtopic": "Comparative study",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Film texts and contexts",
+        "subtopic": "Deeper contextual analysis (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Critical and reflective study",
+        "subtopic": "Critical reflection",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical and reflective study",
+        "subtopic": "Research skills",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical and reflective study",
+        "subtopic": "Evaluation of film work",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical and reflective study",
+        "subtopic": "Film journal and documentation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical and reflective study",
+        "subtopic": "Presentation and discussion",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Critical and reflective study",
+        "subtopic": "Advanced critical reflection (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Practical film making",
+        "subtopic": "Idea development",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Practical film making",
+        "subtopic": "Scriptwriting",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Practical film making",
+        "subtopic": "Cinematography",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Practical film making",
+        "subtopic": "Editing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Practical film making",
+        "subtopic": "Sound design",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Practical film making",
+        "subtopic": "Production management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Practical film making",
+        "subtopic": "Extended practical film making (HL only)",
+        "hl_only": true
+      }
+    ]
+  }
+]

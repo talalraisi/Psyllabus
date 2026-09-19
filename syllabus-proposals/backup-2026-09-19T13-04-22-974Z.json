@@ -1,0 +1,287 @@
+[
+  {
+    "subject": "Math Applications & Interpretation SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Number and algebra",
+        "subtopic": "Number and sets",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Number and algebra",
+        "subtopic": "Sequences and series",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Number and algebra",
+        "subtopic": "Financial mathematics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Number and algebra",
+        "subtopic": "Algebraic thinking",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Number and algebra",
+        "subtopic": "Euclidean and non-Euclidean geometry",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Functions and graphs",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Transformations of graphs",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Modelling with functions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Inverse functions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Geometry and trigonometry",
+        "subtopic": "Trigonometric ratios and identities",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Geometry and trigonometry",
+        "subtopic": "Radians and arc length",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Geometry and trigonometry",
+        "subtopic": "Sine and cosine rules",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Geometry and trigonometry",
+        "subtopic": "Vectors",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and probability",
+        "subtopic": "Data collection and presentation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and probability",
+        "subtopic": "Descriptive statistics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and probability",
+        "subtopic": "Probability",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and probability",
+        "subtopic": "Discrete random variables",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and probability",
+        "subtopic": "Binomial distribution",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and probability",
+        "subtopic": "Normal distribution",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Limits and differentiation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Applications of differentiation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Integration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Applications of integration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Differential equations",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Math Applications & Interpretation HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Number and algebra",
+        "subtopic": "Number and sets",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Number and algebra",
+        "subtopic": "Sequences and series",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Number and algebra",
+        "subtopic": "Financial mathematics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Number and algebra",
+        "subtopic": "Algebraic thinking",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Number and algebra",
+        "subtopic": "Euclidean and non-Euclidean geometry",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Number and algebra",
+        "subtopic": "Proof by induction (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Functions and graphs",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Transformations of graphs",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Modelling with functions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Inverse functions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Rational, exponential and logarithmic functions in more depth (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Graph behaviour and function analysis (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Geometry and trigonometry",
+        "subtopic": "Trigonometric ratios and identities",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Geometry and trigonometry",
+        "subtopic": "Radians and arc length",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Geometry and trigonometry",
+        "subtopic": "Sine and cosine rules",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Geometry and trigonometry",
+        "subtopic": "Vectors",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Geometry and trigonometry",
+        "subtopic": "Advanced trigonometric equations (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Geometry and trigonometry",
+        "subtopic": "Lines, planes and vector geometry (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Statistics and probability",
+        "subtopic": "Data collection and presentation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and probability",
+        "subtopic": "Descriptive statistics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and probability",
+        "subtopic": "Probability",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and probability",
+        "subtopic": "Discrete random variables",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and probability",
+        "subtopic": "Binomial distribution",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and probability",
+        "subtopic": "Normal distribution",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and probability",
+        "subtopic": "More advanced statistical distributions and inference (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Limits and differentiation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Applications of differentiation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Integration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Applications of integration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Differential equations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Advanced calculus techniques (HL only)",
+        "hl_only": true
+      }
+    ]
+  }
+]

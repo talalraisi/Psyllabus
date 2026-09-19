@@ -1,0 +1,232 @@
+{
+  "course": "Language A: literature",
+  "curriculum": "IB",
+  "guide": "first assessment 2021",
+  "confidence": "high on the three areas of exploration and the seven concepts; like language and literature, this course has no content list, so the subtopics are the things that can be practised",
+  "subjects": {
+    "sl": [
+      "English A: Literature SL",
+      "Arabic A: Literature SL",
+      "French A: Literature SL",
+      "Spanish A: Literature SL"
+    ],
+    "hl": [
+      "English A: Literature HL",
+      "Arabic A: Literature HL",
+      "French A: Literature HL",
+      "Spanish A: Literature HL"
+    ]
+  },
+  "note": "Three levels: area of exploration, unit, then one assessable point. Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "topics": [
+    {
+      "topic": "Readers, writers and texts",
+      "units": [
+        {
+          "code": "1.1",
+          "unit": "Reading and interpretation",
+          "subtopics": [
+            ["How readers construct meaning from a literary text", "sl"],
+            ["Multiple and competing interpretations", "sl"],
+            ["Authorial choices of form, structure and style", "sl"],
+            ["Purpose, audience and the context of writing", "sl"]
+          ]
+        },
+        {
+          "code": "1.2",
+          "unit": "Genres and forms",
+          "subtopics": [
+            ["Poetry: form, sound and imagery", "sl"],
+            ["Prose fiction: narrative, plot and character", "sl"],
+            ["Drama: dialogue, staging and dramatic irony", "sl"],
+            ["Prose non-fiction and hybrid forms", "sl"],
+            ["Genre conventions and reader expectations", "sl"]
+          ]
+        },
+        {
+          "code": "1.3",
+          "unit": "Language and style",
+          "subtopics": [
+            ["Diction, register and tone", "sl"],
+            ["Metaphor, symbol and allegory", "sl"],
+            ["Syntax, rhythm and sound patterning", "sl"],
+            ["Narrative voice, point of view and focalisation", "sl"],
+            ["Characterisation and character development", "sl"],
+            ["Structure, sequencing and pacing", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Time and space",
+      "units": [
+        {
+          "code": "2.1",
+          "unit": "Contexts of production and reception",
+          "subtopics": [
+            ["Historical context of a work's production", "sl"],
+            ["Cultural and social context", "sl"],
+            ["Political and economic context", "sl"],
+            ["Contexts of reception and changing interpretations", "sl"],
+            ["Place, setting and the representation of location", "sl"],
+            ["Time, chronology and memory in narrative", "sl"]
+          ]
+        },
+        {
+          "code": "2.2",
+          "unit": "Culture, identity and representation",
+          "subtopics": [
+            ["Individual and collective identity in literature", "sl"],
+            ["Gender, race, class and power", "sl"],
+            ["Beliefs, values and ideologies in texts", "sl"],
+            ["Representation of communities and cultures", "sl"],
+            ["Stereotypes, counter-narratives and resistance", "sl"]
+          ]
+        },
+        {
+          "code": "2.3",
+          "unit": "Literature in society",
+          "subtopics": [
+            ["How literature reflects and shapes societies and values", "sl"],
+            ["Literature and social or political change", "sl"],
+            ["Censorship, banning and freedom of expression", "sl"],
+            ["Ethical, moral and philosophical questions in literature", "sl"],
+            ["The effect of literature on the individual reader", "sl"],
+            ["Works in translation and what translation changes", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Intertextuality: connecting texts",
+      "units": [
+        {
+          "code": "3.1",
+          "unit": "Relationships between texts",
+          "subtopics": [
+            ["Allusion, quotation and reference", "sl"],
+            ["Adaptation, appropriation and re-imagining", "sl"],
+            ["Parody, pastiche and homage", "sl"],
+            ["Influence and dialogue between authors and traditions", "sl"]
+          ]
+        },
+        {
+          "code": "3.2",
+          "unit": "Comparing works",
+          "subtopics": [
+            ["Shared themes and motifs across works", "sl"],
+            ["Comparing style, form and technique", "sl"],
+            ["Comparing contexts and perspectives", "sl"],
+            ["Building a comparative thesis", "sl"]
+          ]
+        },
+        {
+          "code": "3.3",
+          "unit": "Textual conversations",
+          "subtopics": [
+            ["Works answering or challenging earlier works", "sl"],
+            ["Transformation of conventions over time", "sl"],
+            ["Intertextuality and the making of meaning", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "The seven concepts",
+      "units": [
+        {
+          "code": "4.1",
+          "unit": "The seven concepts",
+          "subtopics": [
+            ["Identity", "sl"],
+            ["Culture", "sl"],
+            ["Creativity", "sl"],
+            ["Communication", "sl"],
+            ["Perspective", "sl"],
+            ["Transformation", "sl"],
+            ["Representation", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Global issues and the individual oral",
+      "units": [
+        {
+          "code": "5.1",
+          "unit": "Choosing a global issue",
+          "subtopics": [
+            ["Identifying a global issue in a literary work", "sl"],
+            ["Fields of inquiry: culture, identity and community", "sl"],
+            ["Fields of inquiry: beliefs, values and education", "sl"],
+            ["Fields of inquiry: politics, power and justice", "sl"],
+            ["Fields of inquiry: art, creativity and the imagination", "sl"],
+            ["Fields of inquiry: science, technology and the environment", "sl"]
+          ]
+        },
+        {
+          "code": "5.2",
+          "unit": "The individual oral",
+          "subtopics": [
+            ["Selecting extracts from two works", "sl"],
+            ["Structuring and delivering the oral", "sl"],
+            ["Responding to follow-up questions", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Assessment technique",
+      "units": [
+        {
+          "code": "6.1",
+          "unit": "Paper 1: guided literary analysis",
+          "subtopics": [
+            ["Analysing an unseen poem or prose passage", "sl"],
+            ["Using the guiding question", "sl"],
+            ["Writing about effect rather than listing devices", "sl"]
+          ]
+        },
+        {
+          "code": "6.2",
+          "unit": "Paper 2: comparative essay",
+          "subtopics": [
+            ["Comparing two studied works", "sl"],
+            ["Selecting evidence and integrating quotation", "sl"],
+            ["Essay structure, signposting and conclusions", "sl"]
+          ]
+        },
+        {
+          "code": "6.3",
+          "unit": "The HL essay",
+          "subtopics": [
+            ["Developing a line of inquiry", "hl"],
+            ["Research, referencing and academic register", "hl"],
+            ["Sustaining an argument across 1,200-1,500 words", "hl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {
+    "How texts are read and interpreted by audiences": "How readers construct meaning from a literary text",
+    "How texts are shaped by their authors": "Authorial choices of form, structure and style",
+    "Literary features and techniques (e.g., imagery, narration, symbolism)": "Metaphor, symbol and allegory",
+    "Genre conventions and expectations": "Genre conventions and reader expectations",
+    "Historical and cultural contexts of texts": "Historical context of a work's production",
+    "Place and setting in literature": "Place, setting and the representation of location",
+    "Representation of time, chronology and memory": "Time, chronology and memory in narrative",
+    "How literature reflects and shapes societies and values": "How literature reflects and shapes societies and values",
+    "Literature’s role in social and political change": "Literature and social or political change",
+    "Literature's role in social and political change": "Literature and social or political change",
+    "Ethical, moral and philosophical questions in literature": "Ethical, moral and philosophical questions in literature",
+    "Literature’s impact on individuals (identity, empathy)": "The effect of literature on the individual reader",
+    "Literature's impact on individuals (identity, empathy)": "The effect of literature on the individual reader",
+    "Shared themes and motifs across works": "Shared themes and motifs across works",
+    "Influence and dialogue between authors and traditions": "Influence and dialogue between authors and traditions",
+    "Relationships between texts (allusion, homage, response)": "Allusion, quotation and reference",
+    "Adaptations, translations and re-imaginings": "Adaptation, appropriation and re-imagining",
+    "Adaptations, translations and re‑imaginings": "Adaptation, appropriation and re-imagining"
+  },
+  "retire": {}
+}

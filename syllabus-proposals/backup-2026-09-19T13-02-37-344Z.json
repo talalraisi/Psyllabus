@@ -1,0 +1,587 @@
+[
+  {
+    "subject": "Geography SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Population and Development",
+        "subtopic": "Population distribution and change",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Population and Development",
+        "subtopic": "Demographic transition",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Population and Development",
+        "subtopic": "Fertility, mortality and migration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Population and Development",
+        "subtopic": "Population structure and policies",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Population and Development",
+        "subtopic": "Development indicators and disparities",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Global Climate",
+        "subtopic": "Climate systems and change",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Global Climate",
+        "subtopic": "Weather and climate patterns",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Global Climate",
+        "subtopic": "Causes and impacts of climate change",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Global Climate",
+        "subtopic": "Vulnerability, resilience and adaptation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Global Climate",
+        "subtopic": "Climate policy and responses",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Global Resource Consumption and Security",
+        "subtopic": "Resource availability and distribution",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Global Resource Consumption and Security",
+        "subtopic": "Food, water and energy security",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Global Resource Consumption and Security",
+        "subtopic": "Consumption patterns and demand",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Global Resource Consumption and Security",
+        "subtopic": "Sustainability and resource management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Global Resource Consumption and Security",
+        "subtopic": "Global inequalities in resource access",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Freshwater",
+        "subtopic": "Drainage basins and river processes",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Freshwater",
+        "subtopic": "Floods and droughts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Freshwater",
+        "subtopic": "Water scarcity and water stress",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Freshwater",
+        "subtopic": "Water management strategies",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Freshwater",
+        "subtopic": "Conflicts over water",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Oceans and Coastal Margins",
+        "subtopic": "Coastal processes and landforms",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Oceans and Coastal Margins",
+        "subtopic": "Ocean circulation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Oceans and Coastal Margins",
+        "subtopic": "Coastal management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Oceans and Coastal Margins",
+        "subtopic": "Marine resources and sustainability",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Oceans and Coastal Margins",
+        "subtopic": "Risks and human impacts on coasts and oceans",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Extreme Environments",
+        "subtopic": "Characteristics of extreme environments",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Extreme Environments",
+        "subtopic": "Physical processes in extreme environments",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Extreme Environments",
+        "subtopic": "Human use and adaptation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Extreme Environments",
+        "subtopic": "Fragility and sustainability",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Extreme Environments",
+        "subtopic": "Management and conservation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Geophysical Hazards",
+        "subtopic": "Plate tectonics and hazard distribution",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Geophysical Hazards",
+        "subtopic": "Earthquakes, volcanoes and tsunamis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Geophysical Hazards",
+        "subtopic": "Risk, vulnerability and resilience",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Geophysical Hazards",
+        "subtopic": "Hazard management strategies",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Geophysical Hazards",
+        "subtopic": "Disaster response and recovery",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Leisure, Tourism and Sport",
+        "subtopic": "Patterns and growth of tourism",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Leisure, Tourism and Sport",
+        "subtopic": "Impacts of tourism and sport",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Leisure, Tourism and Sport",
+        "subtopic": "Sustainability in leisure and tourism",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Leisure, Tourism and Sport",
+        "subtopic": "Planning and management of tourist areas",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Leisure, Tourism and Sport",
+        "subtopic": "Global and local variations in leisure and sport",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 9 - Food and Health",
+        "subtopic": "Food production and distribution",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 9 - Food and Health",
+        "subtopic": "Food security and insecurity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 9 - Food and Health",
+        "subtopic": "Nutrition and health outcomes",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 9 - Food and Health",
+        "subtopic": "Global patterns of disease and wellbeing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 9 - Food and Health",
+        "subtopic": "Responses to food and health challenges",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 10 - Urban Environments",
+        "subtopic": "Urbanisation and city growth",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 10 - Urban Environments",
+        "subtopic": "Urban structure and land use",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 10 - Urban Environments",
+        "subtopic": "Urban inequality and segregation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 10 - Urban Environments",
+        "subtopic": "Sustainable urban planning",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 10 - Urban Environments",
+        "subtopic": "Challenges and opportunities in cities",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Geography HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Population and Development",
+        "subtopic": "Population distribution and change",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Population and Development",
+        "subtopic": "Demographic transition",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Population and Development",
+        "subtopic": "Fertility, mortality and migration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Population and Development",
+        "subtopic": "Population structure and policies",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Population and Development",
+        "subtopic": "Development indicators and disparities",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Population and Development",
+        "subtopic": "More complex evaluation of population and development issues (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - Global Climate",
+        "subtopic": "Climate systems and change",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Global Climate",
+        "subtopic": "Weather and climate patterns",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Global Climate",
+        "subtopic": "Causes and impacts of climate change",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Global Climate",
+        "subtopic": "Vulnerability, resilience and adaptation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Global Climate",
+        "subtopic": "Climate policy and responses",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Global Climate",
+        "subtopic": "Deeper analysis of climate systems and global risk (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Global Resource Consumption and Security",
+        "subtopic": "Resource availability and distribution",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Global Resource Consumption and Security",
+        "subtopic": "Food, water and energy security",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Global Resource Consumption and Security",
+        "subtopic": "Consumption patterns and demand",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Global Resource Consumption and Security",
+        "subtopic": "Sustainability and resource management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Global Resource Consumption and Security",
+        "subtopic": "Global inequalities in resource access",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Global Resource Consumption and Security",
+        "subtopic": "More advanced evaluation of resource security and sustainability (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Freshwater",
+        "subtopic": "Drainage basins and river processes",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Freshwater",
+        "subtopic": "Floods and droughts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Freshwater",
+        "subtopic": "Water scarcity and water stress",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Freshwater",
+        "subtopic": "Water management strategies",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Freshwater",
+        "subtopic": "Conflicts over water",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Freshwater",
+        "subtopic": "Greater depth in freshwater systems and management (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Oceans and Coastal Margins",
+        "subtopic": "Coastal processes and landforms",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Oceans and Coastal Margins",
+        "subtopic": "Ocean circulation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Oceans and Coastal Margins",
+        "subtopic": "Coastal management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Oceans and Coastal Margins",
+        "subtopic": "Marine resources and sustainability",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Oceans and Coastal Margins",
+        "subtopic": "Risks and human impacts on coasts and oceans",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Oceans and Coastal Margins",
+        "subtopic": "More detailed analysis of ocean and coastal systems (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 6 - Extreme Environments",
+        "subtopic": "Characteristics of extreme environments",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Extreme Environments",
+        "subtopic": "Physical processes in extreme environments",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Extreme Environments",
+        "subtopic": "Human use and adaptation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Extreme Environments",
+        "subtopic": "Fragility and sustainability",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Extreme Environments",
+        "subtopic": "Management and conservation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Extreme Environments",
+        "subtopic": "Deeper evaluation of extreme environments (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 7 - Geophysical Hazards",
+        "subtopic": "Plate tectonics and hazard distribution",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Geophysical Hazards",
+        "subtopic": "Earthquakes, volcanoes and tsunamis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Geophysical Hazards",
+        "subtopic": "Risk, vulnerability and resilience",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Geophysical Hazards",
+        "subtopic": "Hazard management strategies",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Geophysical Hazards",
+        "subtopic": "Disaster response and recovery",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Geophysical Hazards",
+        "subtopic": "More advanced hazard analysis and global risk (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 8 - Leisure, Tourism and Sport",
+        "subtopic": "Patterns and growth of tourism",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Leisure, Tourism and Sport",
+        "subtopic": "Impacts of tourism and sport",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Leisure, Tourism and Sport",
+        "subtopic": "Sustainability in leisure and tourism",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Leisure, Tourism and Sport",
+        "subtopic": "Planning and management of tourist areas",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Leisure, Tourism and Sport",
+        "subtopic": "Global and local variations in leisure and sport",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Leisure, Tourism and Sport",
+        "subtopic": "More detailed evaluation of tourism and leisure systems (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 9 - Food and Health",
+        "subtopic": "Food production and distribution",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 9 - Food and Health",
+        "subtopic": "Food security and insecurity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 9 - Food and Health",
+        "subtopic": "Nutrition and health outcomes",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 9 - Food and Health",
+        "subtopic": "Global patterns of disease and wellbeing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 9 - Food and Health",
+        "subtopic": "Responses to food and health challenges",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 9 - Food and Health",
+        "subtopic": "Greater depth in food and health geography (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 10 - Urban Environments",
+        "subtopic": "Urbanisation and city growth",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 10 - Urban Environments",
+        "subtopic": "Urban structure and land use",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 10 - Urban Environments",
+        "subtopic": "Urban inequality and segregation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 10 - Urban Environments",
+        "subtopic": "Sustainable urban planning",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 10 - Urban Environments",
+        "subtopic": "Challenges and opportunities in cities",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 10 - Urban Environments",
+        "subtopic": "More advanced urban analysis and planning (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 11 - Global Interactions",
+        "subtopic": "Power, places and networks (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 11 - Global Interactions",
+        "subtopic": "Human development and diversity (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 11 - Global Interactions",
+        "subtopic": "Global risks and resilience (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 11 - Global Interactions",
+        "subtopic": "Global flows of people, money, information and goods (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 11 - Global Interactions",
+        "subtopic": "Globalisation, inequality and interdependence (HL only)",
+        "hl_only": true
+      }
+    ]
+  }
+]

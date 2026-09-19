@@ -1,0 +1,397 @@
+[
+  {
+    "subject": "Digital Society SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - An introduction to Digital Society",
+        "subtopic": "Digital technologies and social change",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - An introduction to Digital Society",
+        "subtopic": "Key concepts in Digital Society",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - An introduction to Digital Society",
+        "subtopic": "Interdisciplinary approaches to digital issues",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - An introduction to Digital Society",
+        "subtopic": "Ethical, social and political dimensions of digital society",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - An introduction to Digital Society",
+        "subtopic": "The role of data and information in society",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Power and inequality in the digital age",
+        "subtopic": "Digital divides and access",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Power and inequality in the digital age",
+        "subtopic": "Power, surveillance and control",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Power and inequality in the digital age",
+        "subtopic": "Algorithms and inequality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Power and inequality in the digital age",
+        "subtopic": "Digital labour and the gig economy",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Power and inequality in the digital age",
+        "subtopic": "Online identity and representation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Data and knowledge",
+        "subtopic": "Data collection and analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Data and knowledge",
+        "subtopic": "Big data and datafication",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Data and knowledge",
+        "subtopic": "Knowledge production and dissemination",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Data and knowledge",
+        "subtopic": "Credibility, misinformation and disinformation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Data and knowledge",
+        "subtopic": "Open data, privacy and consent",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Digital communications and media",
+        "subtopic": "Social media and networked communication",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Digital communications and media",
+        "subtopic": "News, media and digital platforms",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Digital communications and media",
+        "subtopic": "Participation, activism and community",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Digital communications and media",
+        "subtopic": "Representation and storytelling online",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Digital communications and media",
+        "subtopic": "Digital culture and audience behaviour",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Digital interactions and well-being",
+        "subtopic": "Relationships and communication online",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Digital interactions and well-being",
+        "subtopic": "Gaming and virtual environments",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Digital interactions and well-being",
+        "subtopic": "Mental health and digital life",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Digital interactions and well-being",
+        "subtopic": "Cyberbullying, harassment and safety",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Digital interactions and well-being",
+        "subtopic": "Digital habits and balance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Systems, security and governance",
+        "subtopic": "Digital infrastructure and systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Systems, security and governance",
+        "subtopic": "Cybersecurity and risks",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Systems, security and governance",
+        "subtopic": "Regulation and governance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Systems, security and governance",
+        "subtopic": "Intellectual property and ownership",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Systems, security and governance",
+        "subtopic": "Rights, responsibilities and the law",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Digital futures",
+        "subtopic": "Emerging technologies",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Digital futures",
+        "subtopic": "Artificial intelligence and automation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Digital futures",
+        "subtopic": "Sustainability and technology",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Digital futures",
+        "subtopic": "Innovation and social impact",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Digital futures",
+        "subtopic": "Future scenarios and decision-making",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Digital Society HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - An introduction to Digital Society",
+        "subtopic": "Digital technologies and social change",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - An introduction to Digital Society",
+        "subtopic": "Key concepts in Digital Society",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - An introduction to Digital Society",
+        "subtopic": "Interdisciplinary approaches to digital issues",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - An introduction to Digital Society",
+        "subtopic": "Ethical, social and political dimensions of digital society",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - An introduction to Digital Society",
+        "subtopic": "The role of data and information in society",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - An introduction to Digital Society",
+        "subtopic": "Deeper comparative analysis of digital issues (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - Power and inequality in the digital age",
+        "subtopic": "Digital divides and access",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Power and inequality in the digital age",
+        "subtopic": "Power, surveillance and control",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Power and inequality in the digital age",
+        "subtopic": "Algorithms and inequality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Power and inequality in the digital age",
+        "subtopic": "Digital labour and the gig economy",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Power and inequality in the digital age",
+        "subtopic": "Online identity and representation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Power and inequality in the digital age",
+        "subtopic": "More complex evaluation of power relationships and inequality (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Data and knowledge",
+        "subtopic": "Data collection and analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Data and knowledge",
+        "subtopic": "Big data and datafication",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Data and knowledge",
+        "subtopic": "Knowledge production and dissemination",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Data and knowledge",
+        "subtopic": "Credibility, misinformation and disinformation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Data and knowledge",
+        "subtopic": "Open data, privacy and consent",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Data and knowledge",
+        "subtopic": "More advanced investigation of data ethics and knowledge systems (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Digital communications and media",
+        "subtopic": "Social media and networked communication",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Digital communications and media",
+        "subtopic": "News, media and digital platforms",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Digital communications and media",
+        "subtopic": "Participation, activism and community",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Digital communications and media",
+        "subtopic": "Representation and storytelling online",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Digital communications and media",
+        "subtopic": "Digital culture and audience behaviour",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Digital communications and media",
+        "subtopic": "Greater depth in media analysis and platform effects (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Digital interactions and well-being",
+        "subtopic": "Relationships and communication online",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Digital interactions and well-being",
+        "subtopic": "Gaming and virtual environments",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Digital interactions and well-being",
+        "subtopic": "Mental health and digital life",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Digital interactions and well-being",
+        "subtopic": "Cyberbullying, harassment and safety",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Digital interactions and well-being",
+        "subtopic": "Digital habits and balance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Digital interactions and well-being",
+        "subtopic": "More nuanced discussion of digital wellbeing and social impact (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 6 - Systems, security and governance",
+        "subtopic": "Digital infrastructure and systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Systems, security and governance",
+        "subtopic": "Cybersecurity and risks",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Systems, security and governance",
+        "subtopic": "Regulation and governance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Systems, security and governance",
+        "subtopic": "Intellectual property and ownership",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Systems, security and governance",
+        "subtopic": "Rights, responsibilities and the law",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Systems, security and governance",
+        "subtopic": "Deeper analysis of governance and security frameworks (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 7 - Digital futures",
+        "subtopic": "Emerging technologies",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Digital futures",
+        "subtopic": "Artificial intelligence and automation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Digital futures",
+        "subtopic": "Sustainability and technology",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Digital futures",
+        "subtopic": "Innovation and social impact",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Digital futures",
+        "subtopic": "Future scenarios and decision-making",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - Digital futures",
+        "subtopic": "More advanced future-oriented evaluation and prediction (HL only)",
+        "hl_only": true
+      }
+    ]
+  }
+]

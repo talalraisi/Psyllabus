@@ -1,0 +1,136 @@
+{
+  "course": "Theatre",
+  "curriculum": "IB",
+  "guide": "first assessment 2024",
+  "confidence": "medium — the four areas (staging play texts, world theatre traditions, collaborative theatre creation and the HL solo theatre piece) follow the guide",
+  "subjects": { "sl": "Theatre SL", "hl": "Theatre HL" },
+  "note": "Three levels: area of the course, unit, then one assessable point. Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "topics": [
+    {
+      "topic": "Staging play texts",
+      "units": [
+        {
+          "code": "1.1",
+          "unit": "Interpreting a play text",
+          "subtopics": [
+            ["Reading a play text for structure and action", "sl"],
+            ["Character, motivation and relationships", "sl"],
+            ["Themes, context and the playwright's intentions", "sl"],
+            ["Theatrical conventions of the text", "sl"]
+          ]
+        },
+        {
+          "code": "1.2",
+          "unit": "Director's vision",
+          "subtopics": [
+            ["Developing a directorial concept", "sl"],
+            ["Staging configurations and the actor-audience relationship", "sl"],
+            ["Directing actors: blocking, pace and coaching", "sl"],
+            ["Justifying artistic choices with evidence from the text", "sl"]
+          ]
+        },
+        {
+          "code": "1.3",
+          "unit": "Design for production",
+          "subtopics": [
+            ["Set design and use of space", "sl"],
+            ["Costume, hair and make-up design", "sl"],
+            ["Lighting design and its effects", "sl"],
+            ["Sound design and music", "sl"],
+            ["Integrating design elements into one vision", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "World theatre traditions",
+      "units": [
+        {
+          "code": "2.1",
+          "unit": "Researching a tradition",
+          "subtopics": [
+            ["Historical and cultural context of a theatre tradition", "sl"],
+            ["Performance conventions and aesthetics", "sl"],
+            ["Key practitioners, texts and performance spaces", "sl"],
+            ["Respectful engagement with a tradition not your own", "sl"]
+          ]
+        },
+        {
+          "code": "2.2",
+          "unit": "Embodying the tradition",
+          "subtopics": [
+            ["Physical and vocal conventions in practice", "sl"],
+            ["Masks, movement and stylised performance", "sl"],
+            ["Adapting conventions to your own performance", "sl"],
+            ["Reflecting on challenges and discoveries", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Collaborative theatre creation",
+      "units": [
+        {
+          "code": "3.1",
+          "unit": "Devising original work",
+          "subtopics": [
+            ["Generating ideas and a starting stimulus", "sl"],
+            ["Structuring and shaping devised material", "sl"],
+            ["Ensemble work and shared decision-making", "sl"],
+            ["Integrating performance, design and technology", "sl"]
+          ]
+        },
+        {
+          "code": "3.2",
+          "unit": "Process and evaluation",
+          "subtopics": [
+            ["Documenting individual contribution", "sl"],
+            ["Evaluating rehearsal experiments", "sl"],
+            ["Audience response and impact", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Solo theatre piece",
+      "units": [
+        {
+          "code": "4.1",
+          "unit": "Theatre theorist research",
+          "subtopics": [
+            ["Selecting and researching a theatre theorist", "hl"],
+            ["Analysing key concepts and methods", "hl"],
+            ["Applying theory to your own performance", "hl"]
+          ]
+        },
+        {
+          "code": "4.2",
+          "unit": "Performance and report",
+          "subtopics": [
+            ["Creating and performing the solo piece", "hl"],
+            ["Writing the reflective report", "hl"],
+            ["Evaluating the effect of the theorist's approach", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Performance skills",
+      "units": [
+        {
+          "code": "5.1",
+          "unit": "The performer's craft",
+          "subtopics": [
+            ["Voice: projection, clarity, pace and tone", "sl"],
+            ["Physicality: movement, gesture and stillness", "sl"],
+            ["Characterisation and given circumstances", "sl"],
+            ["Rehearsal technique and taking direction", "sl"],
+            ["Performing to an audience and maintaining focus", "sl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

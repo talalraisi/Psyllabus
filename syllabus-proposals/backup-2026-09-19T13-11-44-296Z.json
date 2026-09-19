@@ -1,0 +1,132 @@
+[
+  {
+    "subject": "Extended Essay",
+    "rows": [
+      {
+        "topic": "Getting started",
+        "subtopic": "Choosing a subject for the essay",
+        "hl_only": false
+      },
+      {
+        "topic": "Getting started",
+        "subtopic": "Narrowing a topic to a viable scope",
+        "hl_only": false
+      },
+      {
+        "topic": "Getting started",
+        "subtopic": "Writing a focused research question",
+        "hl_only": false
+      },
+      {
+        "topic": "Getting started",
+        "subtopic": "Understanding subject-specific requirements",
+        "hl_only": false
+      },
+      {
+        "topic": "Research process",
+        "subtopic": "Planning the research timeline",
+        "hl_only": false
+      },
+      {
+        "topic": "Research process",
+        "subtopic": "Locating and evaluating sources",
+        "hl_only": false
+      },
+      {
+        "topic": "Research process",
+        "subtopic": "Primary versus secondary sources",
+        "hl_only": false
+      },
+      {
+        "topic": "Research process",
+        "subtopic": "Recording evidence and note taking",
+        "hl_only": false
+      },
+      {
+        "topic": "Research process",
+        "subtopic": "Research ethics and permissions",
+        "hl_only": false
+      },
+      {
+        "topic": "Writing",
+        "subtopic": "Structuring the introduction",
+        "hl_only": false
+      },
+      {
+        "topic": "Writing",
+        "subtopic": "Developing a sustained line of argument",
+        "hl_only": false
+      },
+      {
+        "topic": "Writing",
+        "subtopic": "Analysis versus description",
+        "hl_only": false
+      },
+      {
+        "topic": "Writing",
+        "subtopic": "Writing an effective conclusion",
+        "hl_only": false
+      },
+      {
+        "topic": "Writing",
+        "subtopic": "Formal register and academic voice",
+        "hl_only": false
+      },
+      {
+        "topic": "Referencing",
+        "subtopic": "Choosing and applying a citation style",
+        "hl_only": false
+      },
+      {
+        "topic": "Referencing",
+        "subtopic": "Building the bibliography",
+        "hl_only": false
+      },
+      {
+        "topic": "Referencing",
+        "subtopic": "Avoiding plagiarism and academic misconduct",
+        "hl_only": false
+      },
+      {
+        "topic": "Assessment criteria",
+        "subtopic": "Criterion A: Focus and method",
+        "hl_only": false
+      },
+      {
+        "topic": "Assessment criteria",
+        "subtopic": "Criterion B: Knowledge and understanding",
+        "hl_only": false
+      },
+      {
+        "topic": "Assessment criteria",
+        "subtopic": "Criterion C: Critical thinking",
+        "hl_only": false
+      },
+      {
+        "topic": "Assessment criteria",
+        "subtopic": "Criterion D: Presentation",
+        "hl_only": false
+      },
+      {
+        "topic": "Assessment criteria",
+        "subtopic": "Criterion E: Engagement and the RPPF",
+        "hl_only": false
+      },
+      {
+        "topic": "Supervision",
+        "subtopic": "Preparing for the first reflection session",
+        "hl_only": false
+      },
+      {
+        "topic": "Supervision",
+        "subtopic": "Preparing for the interim reflection",
+        "hl_only": false
+      },
+      {
+        "topic": "Supervision",
+        "subtopic": "The viva voce and final reflection",
+        "hl_only": false
+      }
+    ]
+  }
+]

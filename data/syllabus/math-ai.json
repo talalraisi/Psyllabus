@@ -1,0 +1,299 @@
+{
+  "course": "Mathematics: applications and interpretation",
+  "curriculum": "IB",
+  "guide": "first assessment 2021",
+  "confidence": "high — five topics and the HL split follow the guide; this is the course that genuinely contains hypothesis testing, matrices, graph theory and Voronoi diagrams",
+  "subjects": { "sl": "Math Applications & Interpretation SL", "hl": "Math Applications & Interpretation HL" },
+  "note": "Three levels: topic, unit, then one assessable point. Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "topics": [
+    {
+      "topic": "Topic 1 - Number and algebra",
+      "units": [
+        {
+          "code": "1.1",
+          "unit": "Number and approximation",
+          "subtopics": [
+            ["Standard form and operations in scientific notation", "sl"],
+            ["Rounding, decimal places and significant figures", "sl"],
+            ["Absolute and percentage error", "sl"],
+            ["Upper and lower bounds of a rounded value", "ext"]
+          ]
+        },
+        {
+          "code": "1.2",
+          "unit": "Sequences and series",
+          "subtopics": [
+            ["Arithmetic sequences and series", "sl"],
+            ["Geometric sequences and series", "sl"],
+            ["Sigma notation", "sl"],
+            ["Modelling with sequences: growth and decay", "sl"]
+          ]
+        },
+        {
+          "code": "1.3",
+          "unit": "Financial mathematics",
+          "subtopics": [
+            ["Simple and compound interest", "sl"],
+            ["Depreciation and real value", "sl"],
+            ["Annuities and amortisation", "hl"],
+            ["Inflation, real interest rates and currency conversion", "sl"]
+          ]
+        },
+        {
+          "code": "1.4",
+          "unit": "Exponents and logarithms",
+          "subtopics": [
+            ["Laws of exponents with integer and rational exponents", "sl"],
+            ["Introduction to logarithms and their laws", "sl"],
+            ["Solving exponential equations using logarithms", "sl"],
+            ["Log-log and semi-log graphs for linearising data", "hl"]
+          ]
+        },
+        {
+          "code": "1.5",
+          "unit": "Matrices",
+          "subtopics": [
+            ["Matrix operations: addition, multiplication and scalar multiples", "hl"],
+            ["Determinants and inverse matrices", "hl"],
+            ["Solving systems of equations with matrices", "hl"],
+            ["Eigenvalues, eigenvectors and matrix powers", "hl"],
+            ["Transition matrices and Markov chains", "hl"]
+          ]
+        },
+        {
+          "code": "1.6",
+          "unit": "Complex numbers",
+          "subtopics": [
+            ["Cartesian, polar and Euler form", "hl"],
+            ["Complex arithmetic and Argand diagrams", "hl"],
+            ["Applications to alternating current and phase", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Topic 2 - Functions",
+      "units": [
+        {
+          "code": "2.1",
+          "unit": "Linear models",
+          "subtopics": [
+            ["Equations of straight lines and gradient", "sl"],
+            ["Parallel and perpendicular lines", "sl"],
+            ["Linear modelling and interpretation of parameters", "sl"]
+          ]
+        },
+        {
+          "code": "2.2",
+          "unit": "Functions and graphs",
+          "subtopics": [
+            ["Function notation, domain and range", "sl"],
+            ["Reading graphs: intercepts, maxima, minima and asymptotes", "sl"],
+            ["Composite and inverse functions", "sl"],
+            ["Piecewise models", "ext"]
+          ]
+        },
+        {
+          "code": "2.3",
+          "unit": "Modelling with functions",
+          "subtopics": [
+            ["Quadratic models and optimisation", "sl"],
+            ["Exponential growth and decay models", "sl"],
+            ["Cubic and direct/inverse variation models", "sl"],
+            ["Sinusoidal models", "sl"],
+            ["Logistic models", "hl"],
+            ["Choosing and evaluating a model for data", "sl"],
+            ["Transformations of graphs in modelling", "ext"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Topic 3 - Geometry and trigonometry",
+      "units": [
+        {
+          "code": "3.1",
+          "unit": "Geometry and measurement",
+          "subtopics": [
+            ["Distance and midpoint in two and three dimensions", "sl"],
+            ["Volume and surface area of solids", "sl"],
+            ["Right-angled trigonometry and angles of elevation", "sl"],
+            ["Sine rule, cosine rule and area of a triangle", "sl"],
+            ["Bearings and applications", "sl"]
+          ]
+        },
+        {
+          "code": "3.2",
+          "unit": "Circles, radians and trigonometric functions",
+          "subtopics": [
+            ["Radian measure, arc length and sector area", "sl"],
+            ["The unit circle and trigonometric ratios", "sl"],
+            ["Graphs of sine and cosine and their transformations", "sl"],
+            ["Modelling periodic phenomena", "sl"]
+          ]
+        },
+        {
+          "code": "3.3",
+          "unit": "Voronoi diagrams and geometric applications",
+          "subtopics": [
+            ["Voronoi diagrams and perpendicular bisectors", "sl"],
+            ["Nearest neighbour interpolation and the toxic waste dump problem", "sl"],
+            ["Applications to site selection", "sl"]
+          ]
+        },
+        {
+          "code": "3.4",
+          "unit": "Vectors",
+          "subtopics": [
+            ["Vector concepts, magnitude and direction", "hl"],
+            ["Scalar and vector products", "hl"],
+            ["Vector equations of lines and planes", "hl"],
+            ["Applications to kinematics and forces", "hl"]
+          ]
+        },
+        {
+          "code": "3.5",
+          "unit": "Graph theory",
+          "subtopics": [
+            ["Graphs, adjacency matrices and weighted graphs", "hl"],
+            ["Walks, trails, paths and cycles", "hl"],
+            ["Minimum spanning trees: Kruskal's and Prim's algorithms", "hl"],
+            ["Chinese postman problem", "hl"],
+            ["Travelling salesman problem and bounds", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Topic 4 - Statistics and probability",
+      "units": [
+        {
+          "code": "4.1",
+          "unit": "Collecting and describing data",
+          "subtopics": [
+            ["Populations, samples and sampling techniques", "sl"],
+            ["Reliability, bias and outliers", "sl"],
+            ["Frequency tables, histograms and cumulative frequency", "sl"],
+            ["Measures of central tendency and dispersion", "sl"],
+            ["Box plots, quartiles and comparing distributions", "sl"]
+          ]
+        },
+        {
+          "code": "4.2",
+          "unit": "Correlation and regression",
+          "subtopics": [
+            ["Scatter diagrams and lines of best fit", "sl"],
+            ["Pearson's correlation coefficient and interpretation", "sl"],
+            ["Least squares regression and prediction", "sl"],
+            ["Spearman's rank correlation coefficient", "sl"],
+            ["Non-linear regression and choosing a model", "hl"]
+          ]
+        },
+        {
+          "code": "4.3",
+          "unit": "Probability",
+          "subtopics": [
+            ["Sample space, events and probability rules", "sl"],
+            ["Venn diagrams, tree diagrams and tables", "sl"],
+            ["Conditional probability and independence", "sl"],
+            ["Bayes' theorem", "hl"]
+          ]
+        },
+        {
+          "code": "4.4",
+          "unit": "Probability distributions",
+          "subtopics": [
+            ["Discrete random variables and expected value", "sl"],
+            ["Binomial distribution and its parameters", "sl"],
+            ["Normal distribution and inverse normal", "sl"],
+            ["Continuous random variables and density functions", "hl"],
+            ["Poisson distribution", "hl"],
+            ["Linear combinations and transformations of variables", "hl"]
+          ]
+        },
+        {
+          "code": "4.5",
+          "unit": "Statistical tests",
+          "subtopics": [
+            ["The chi-squared test for independence", "sl"],
+            ["The chi-squared goodness of fit test", "sl"],
+            ["The t-test for a difference in means", "sl"],
+            ["Hypotheses, p-values and significance levels", "sl"],
+            ["Type I and Type II errors", "hl"],
+            ["Confidence intervals for a mean", "hl"],
+            ["Testing a correlation coefficient and reliability", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Topic 5 - Calculus",
+      "units": [
+        {
+          "code": "5.1",
+          "unit": "Differentiation",
+          "subtopics": [
+            ["Rate of change and the derivative", "sl"],
+            ["Differentiating polynomials and power functions", "sl"],
+            ["Tangents, normals and gradient at a point", "sl"],
+            ["Derivatives of exponential, logarithmic and trigonometric functions", "hl"],
+            ["Chain, product and quotient rules", "hl"],
+            ["Implicit differentiation and related rates", "hl"]
+          ]
+        },
+        {
+          "code": "5.2",
+          "unit": "Applications of differentiation",
+          "subtopics": [
+            ["Increasing, decreasing and stationary points", "sl"],
+            ["Optimisation problems in context", "sl"],
+            ["Second derivative, concavity and points of inflection", "sl"],
+            ["Marginal cost, revenue and profit", "ext"]
+          ]
+        },
+        {
+          "code": "5.3",
+          "unit": "Integration",
+          "subtopics": [
+            ["Anti-differentiation and indefinite integrals", "sl"],
+            ["Definite integrals and area under a curve", "sl"],
+            ["The trapezoidal rule for numerical integration", "sl"],
+            ["Integration by substitution and by parts", "hl"],
+            ["Volumes of revolution", "hl"],
+            ["Kinematics: displacement, velocity and acceleration", "sl"]
+          ]
+        },
+        {
+          "code": "5.4",
+          "unit": "Differential equations",
+          "subtopics": [
+            ["Setting up a differential equation from a context", "hl"],
+            ["Euler's method for first-order equations", "hl"],
+            ["Separation of variables", "hl"],
+            ["Slope fields and qualitative behaviour", "hl"],
+            ["Coupled systems and phase portraits", "hl"],
+            ["Second-order differential equations and Euler's method", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Toolkit and the exploration",
+      "units": [
+        {
+          "code": "6.1",
+          "unit": "The mathematical exploration",
+          "subtopics": [
+            ["Choosing a topic and formulating an aim", "sl"],
+            ["Collecting and cleaning real data", "sl"],
+            ["Selecting mathematics appropriate to the level", "sl"],
+            ["Mathematical communication and notation", "sl"],
+            ["Reflection, limitations and extensions", "sl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

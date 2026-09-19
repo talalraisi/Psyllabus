@@ -1,0 +1,143 @@
+{
+  "course": "Creativity, activity, service",
+  "curriculum": "IB",
+  "guide": "first teaching 2016",
+  "confidence": "high — three strands, seven learning outcomes, the CAS project and the portfolio are the guide's structure. CAS is not graded, so these are checkpoints rather than exam content",
+  "subjects": { "sl": "Creativity Activity Service", "hl": [] },
+  "note": "Three levels: part of CAS, unit, then one thing to do or evidence.",
+  "topics": [
+    {
+      "topic": "The three strands",
+      "units": [
+        {
+          "code": "1.1",
+          "unit": "Creativity",
+          "subtopics": [
+            ["Arts and creative thinking experiences", "sl"],
+            ["Designing, making or performing something new", "sl"],
+            ["Developing a creative skill over time", "sl"]
+          ]
+        },
+        {
+          "code": "1.2",
+          "unit": "Activity",
+          "subtopics": [
+            ["Physical exertion and a healthy lifestyle", "sl"],
+            ["Individual fitness and skill development", "sl"],
+            ["Team sport and collaborative activity", "sl"]
+          ]
+        },
+        {
+          "code": "1.3",
+          "unit": "Service",
+          "subtopics": [
+            ["Identifying a genuine community need", "sl"],
+            ["Direct, indirect, advocacy and research service", "sl"],
+            ["Reciprocity, respect and dignity in service", "sl"],
+            ["Avoiding service that helps the helper more than the community", "sl"]
+          ]
+        },
+        {
+          "code": "1.4",
+          "unit": "Balance and commitment",
+          "subtopics": [
+            ["Balancing the three strands across 18 months", "sl"],
+            ["Regular commitment rather than one-off events", "sl"],
+            ["Managing CAS alongside academic work", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "The CAS stages",
+      "units": [
+        {
+          "code": "2.1",
+          "unit": "Planning an experience",
+          "subtopics": [
+            ["Investigation: identifying interests and needs", "sl"],
+            ["Preparation: skills, resources and timeline", "sl"],
+            ["Risk assessment, safety and permissions", "sl"],
+            ["Setting personal goals for an experience", "sl"]
+          ]
+        },
+        {
+          "code": "2.2",
+          "unit": "Doing and reviewing",
+          "subtopics": [
+            ["Action: carrying out the experience", "sl"],
+            ["Reflection: what happened and what was learned", "sl"],
+            ["Demonstration: sharing outcomes and evidence", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "The seven learning outcomes",
+      "units": [
+        {
+          "code": "3.1",
+          "unit": "Personal growth outcomes",
+          "subtopics": [
+            ["Identify your own strengths and areas for growth", "sl"],
+            ["Undertake new challenges and develop new skills", "sl"],
+            ["Initiate and plan a CAS experience", "sl"],
+            ["Show perseverance and commitment", "sl"]
+          ]
+        },
+        {
+          "code": "3.2",
+          "unit": "Working with others and the wider world",
+          "subtopics": [
+            ["Demonstrate the skills and benefits of working collaboratively", "sl"],
+            ["Engage with issues of global significance", "sl"],
+            ["Recognise and consider the ethics of choices and actions", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "The CAS project",
+      "units": [
+        {
+          "code": "4.1",
+          "unit": "Running the project",
+          "subtopics": [
+            ["Choosing a project idea and its purpose", "sl"],
+            ["Collaborating and agreeing roles", "sl"],
+            ["Planning timeline, resources and responsibilities", "sl"],
+            ["Carrying out the project over at least one month", "sl"],
+            ["Evaluating outcomes and community impact", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Portfolio and interviews",
+      "units": [
+        {
+          "code": "5.1",
+          "unit": "The CAS portfolio",
+          "subtopics": [
+            ["Recording experiences and collecting evidence", "sl"],
+            ["Using written, visual, audio and digital reflection", "sl"],
+            ["Linking evidence to the seven learning outcomes", "sl"],
+            ["Keeping the portfolio organised and up to date", "sl"]
+          ]
+        },
+        {
+          "code": "5.2",
+          "unit": "Reflection quality",
+          "subtopics": [
+            ["Describing what happened", "sl"],
+            ["Analysing decisions, difficulties and learning", "sl"],
+            ["Evaluating growth, impact and what you would do next", "sl"],
+            ["Preparing for the three CAS interviews", "sl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

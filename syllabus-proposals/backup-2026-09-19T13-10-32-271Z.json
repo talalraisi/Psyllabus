@@ -1,0 +1,572 @@
+[
+  {
+    "subject": "Classical Languages: Latin SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Translation and Comprehension",
+        "subtopic": "Unseen Latin passage translation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Translation and Comprehension",
+        "subtopic": "Reading for meaning and syntax",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Translation and Comprehension",
+        "subtopic": "Grammatical accuracy and idiom",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Translation and Comprehension",
+        "subtopic": "Vocabulary and morphology",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Translation and Comprehension",
+        "subtopic": "Contextual understanding of the passage",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Core Latin Texts",
+        "subtopic": "Study of prescribed core authors",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Core Latin Texts",
+        "subtopic": "Literary features and stylistic analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Core Latin Texts",
+        "subtopic": "Rhetorical and poetic techniques",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Core Latin Texts",
+        "subtopic": "Historical and cultural context",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Core Latin Texts",
+        "subtopic": "Interpretation of meaning and purpose",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Companion Texts",
+        "subtopic": "Study of prescribed companion authors",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Companion Texts",
+        "subtopic": "Comparison with core texts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Companion Texts",
+        "subtopic": "Themes, ideas and perspectives",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Companion Texts",
+        "subtopic": "Literary and historical significance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Companion Texts",
+        "subtopic": "Broader Roman and classical context",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Options and Additional Study",
+        "subtopic": "Teacher-selected option texts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Options and Additional Study",
+        "subtopic": "Themes from prescribed options",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Options and Additional Study",
+        "subtopic": "Further literary and cultural exploration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Options and Additional Study",
+        "subtopic": "Wider classical background",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Options and Additional Study",
+        "subtopic": "Interpretation across genres and authors",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Research Dossier",
+        "subtopic": "Selecting a Roman/classical topic",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Research Dossier",
+        "subtopic": "Gathering and using primary sources",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Research Dossier",
+        "subtopic": "Organizing evidence and argument",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Research Dossier",
+        "subtopic": "Writing a formal research dossier",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Research Dossier",
+        "subtopic": "Presenting analysis in English",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Composition",
+        "subtopic": "Writing in Latin",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Composition",
+        "subtopic": "Controlled expression and style",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Composition",
+        "subtopic": "Using prescribed vocabulary and syntax",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Composition",
+        "subtopic": "Creating an original short composition",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Composition",
+        "subtopic": "Applying knowledge of Latin usage",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Classical Languages: Classical Greek SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Study of the Language",
+        "subtopic": "Unseen translation and comprehension",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Study of the Language",
+        "subtopic": "Grammar, syntax and vocabulary",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Study of the Language",
+        "subtopic": "Reading for meaning and context",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Study of the Language",
+        "subtopic": "Accuracy and fluency in translation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Study of the Language",
+        "subtopic": "Textual interpretation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Prescribed Author",
+        "subtopic": "Study of a prescribed Greek author",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Prescribed Author",
+        "subtopic": "Literary style and technique",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Prescribed Author",
+        "subtopic": "Themes and ideas in the text",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Prescribed Author",
+        "subtopic": "Historical and cultural context",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Prescribed Author",
+        "subtopic": "Analysis of meaning and purpose",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Additional Texts / Options",
+        "subtopic": "Further prescribed texts or options",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Additional Texts / Options",
+        "subtopic": "Comparison of passages and themes",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Additional Texts / Options",
+        "subtopic": "Literary and historical significance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Additional Texts / Options",
+        "subtopic": "Broader Greek cultural context",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Additional Texts / Options",
+        "subtopic": "Interpretation across genres",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Research Dossier",
+        "subtopic": "Choosing a classical Greek topic",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Research Dossier",
+        "subtopic": "Using primary sources",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Research Dossier",
+        "subtopic": "Researching Greek life, culture or literature",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Research Dossier",
+        "subtopic": "Organizing evidence and argument",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Research Dossier",
+        "subtopic": "Writing the dossier",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Composition",
+        "subtopic": "Writing original Greek prose or verse",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Composition",
+        "subtopic": "Applying grammar and syntax accurately",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Composition",
+        "subtopic": "Using prescribed vocabulary and structures",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Composition",
+        "subtopic": "Creating and explaining an original composition",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Composition",
+        "subtopic": "Translating ideas into Greek expression",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Classical Languages: Latin HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Translation and Comprehension",
+        "subtopic": "Unseen Latin passage translation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Translation and Comprehension",
+        "subtopic": "Reading for meaning and syntax",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Translation and Comprehension",
+        "subtopic": "Grammatical accuracy and idiom",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Translation and Comprehension",
+        "subtopic": "Vocabulary and morphology",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Translation and Comprehension",
+        "subtopic": "Contextual understanding of the passage",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Core Latin Texts",
+        "subtopic": "Study of prescribed core authors",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Core Latin Texts",
+        "subtopic": "Literary features and stylistic analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Core Latin Texts",
+        "subtopic": "Rhetorical and poetic techniques",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Core Latin Texts",
+        "subtopic": "Historical and cultural context",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Core Latin Texts",
+        "subtopic": "Interpretation of meaning and purpose",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Companion Texts",
+        "subtopic": "Study of prescribed companion authors",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Companion Texts",
+        "subtopic": "Comparison with core texts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Companion Texts",
+        "subtopic": "Themes, ideas and perspectives",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Companion Texts",
+        "subtopic": "Literary and historical significance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Companion Texts",
+        "subtopic": "Broader Roman and classical context",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Options and Additional Study",
+        "subtopic": "Teacher-selected option texts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Options and Additional Study",
+        "subtopic": "Themes from prescribed options",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Options and Additional Study",
+        "subtopic": "Further literary and cultural exploration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Options and Additional Study",
+        "subtopic": "Wider classical background",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Options and Additional Study",
+        "subtopic": "Interpretation across genres and authors",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Research Dossier",
+        "subtopic": "Selecting a Roman/classical topic",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Research Dossier",
+        "subtopic": "Gathering and using primary sources",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Research Dossier",
+        "subtopic": "Organizing evidence and argument",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Research Dossier",
+        "subtopic": "Writing a formal research dossier",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Research Dossier",
+        "subtopic": "Presenting analysis in English",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Composition",
+        "subtopic": "Writing in Latin",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Composition",
+        "subtopic": "Controlled expression and style",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Composition",
+        "subtopic": "Using prescribed vocabulary and syntax",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Composition",
+        "subtopic": "Creating an original short composition",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Composition",
+        "subtopic": "Applying knowledge of Latin usage",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Classical Languages: Classical Greek HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Study of the Language",
+        "subtopic": "Unseen translation and comprehension",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Study of the Language",
+        "subtopic": "Grammar, syntax and vocabulary",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Study of the Language",
+        "subtopic": "Reading for meaning and context",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Study of the Language",
+        "subtopic": "Accuracy and fluency in translation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Study of the Language",
+        "subtopic": "Textual interpretation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Prescribed Author",
+        "subtopic": "Study of a prescribed Greek author",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Prescribed Author",
+        "subtopic": "Literary style and technique",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Prescribed Author",
+        "subtopic": "Themes and ideas in the text",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Prescribed Author",
+        "subtopic": "Historical and cultural context",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Prescribed Author",
+        "subtopic": "Analysis of meaning and purpose",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Additional Texts / Options",
+        "subtopic": "Further prescribed texts or options",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Additional Texts / Options",
+        "subtopic": "Comparison of passages and themes",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Additional Texts / Options",
+        "subtopic": "Literary and historical significance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Additional Texts / Options",
+        "subtopic": "Broader Greek cultural context",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Additional Texts / Options",
+        "subtopic": "Interpretation across genres",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Research Dossier",
+        "subtopic": "Choosing a classical Greek topic",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Research Dossier",
+        "subtopic": "Using primary sources",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Research Dossier",
+        "subtopic": "Researching Greek life, culture or literature",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Research Dossier",
+        "subtopic": "Organizing evidence and argument",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Research Dossier",
+        "subtopic": "Writing the dossier",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Composition",
+        "subtopic": "Writing original Greek prose or verse",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Composition",
+        "subtopic": "Applying grammar and syntax accurately",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Composition",
+        "subtopic": "Using prescribed vocabulary and structures",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Composition",
+        "subtopic": "Creating and explaining an original composition",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Composition",
+        "subtopic": "Translating ideas into Greek expression",
+        "hl_only": false
+      }
+    ]
+  }
+]

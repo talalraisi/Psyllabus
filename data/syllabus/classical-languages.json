@@ -1,0 +1,120 @@
+{
+  "course": "Classical languages",
+  "curriculum": "IB",
+  "guide": "first assessment 2016",
+  "confidence": "medium-high — language, literature and the research dossier are the three parts of the course; the prescribed authors change, so those are kept general",
+  "subjects": {
+    "sl": ["Classical Languages: Latin SL", "Classical Languages: Classical Greek SL"],
+    "hl": ["Classical Languages: Latin HL", "Classical Languages: Classical Greek HL"]
+  },
+  "note": "Three levels: part of the course, unit, then one assessable point. Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "topics": [
+    {
+      "topic": "Language",
+      "units": [
+        {
+          "code": "1.1",
+          "unit": "Morphology",
+          "subtopics": [
+            ["Noun declensions and case endings", "sl"],
+            ["Adjectives, agreement and comparison", "sl"],
+            ["Verb conjugations, tense and voice", "sl"],
+            ["Participles and verbal nouns", "sl"],
+            ["Pronouns, prepositions and particles", "sl"],
+            ["Irregular and defective forms", "ext"]
+          ]
+        },
+        {
+          "code": "1.2",
+          "unit": "Syntax",
+          "subtopics": [
+            ["Uses of the cases", "sl"],
+            ["Subordinate clauses and conjunctions", "sl"],
+            ["Indirect statement, command and question", "sl"],
+            ["Conditional and concessive constructions", "sl"],
+            ["Purpose, result and causal clauses", "sl"],
+            ["Complex periodic sentences", "hl"]
+          ]
+        },
+        {
+          "code": "1.3",
+          "unit": "Translation and comprehension",
+          "subtopics": [
+            ["Strategy for translating an unseen passage", "sl"],
+            ["Vocabulary building and word families", "sl"],
+            ["Answering comprehension questions on a passage", "sl"],
+            ["Translating an extended unseen passage", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Literature",
+      "units": [
+        {
+          "code": "2.1",
+          "unit": "Studying the prescribed texts",
+          "subtopics": [
+            ["Author, genre and historical context", "sl"],
+            ["Themes, characters and narrative", "sl"],
+            ["Literary devices and stylistic features", "sl"],
+            ["Metre and sound in verse", "sl"],
+            ["Values and attitudes expressed in the text", "sl"]
+          ]
+        },
+        {
+          "code": "2.2",
+          "unit": "Writing about literature",
+          "subtopics": [
+            ["Translating and explaining a set passage", "sl"],
+            ["Close analysis of style and effect", "sl"],
+            ["Essay on themes across a work", "sl"],
+            ["Comparing passages and arguing an interpretation", "hl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "Culture and civilisation",
+      "units": [
+        {
+          "code": "3.1",
+          "unit": "Society and daily life",
+          "subtopics": [
+            ["Social structure, family and slavery", "sl"],
+            ["Politics, law and the state", "sl"],
+            ["Warfare and the army", "sl"],
+            ["Daily life, housing and the city", "sl"]
+          ]
+        },
+        {
+          "code": "3.2",
+          "unit": "Religion, myth and the arts",
+          "subtopics": [
+            ["Gods, ritual and religious practice", "sl"],
+            ["Myth and its retelling", "sl"],
+            ["Art, architecture and material culture", "sl"],
+            ["Reception and legacy of the classical world", "sl"]
+          ]
+        }
+      ]
+    },
+    {
+      "topic": "The research dossier",
+      "units": [
+        {
+          "code": "4.1",
+          "unit": "Building the dossier",
+          "subtopics": [
+            ["Choosing a research question and theme", "sl"],
+            ["Selecting ancient source material", "sl"],
+            ["Annotating and connecting sources", "sl"],
+            ["Writing the rationale and conclusion", "sl"]
+          ]
+        }
+      ]
+    }
+  ],
+  "merge": {},
+  "retire": {}
+}

@@ -1,0 +1,572 @@
+[
+  {
+    "subject": "Sports, Exercise, and Health Science SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Anatomy",
+        "subtopic": "Skeletal system",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Anatomy",
+        "subtopic": "Muscular system",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Anatomy",
+        "subtopic": "Respiratory system",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Anatomy",
+        "subtopic": "Cardiovascular system",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Anatomy",
+        "subtopic": "Nervous system",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Exercise physiology",
+        "subtopic": "Energy systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Exercise physiology",
+        "subtopic": "Movement analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Exercise physiology",
+        "subtopic": "Training adaptations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Exercise physiology",
+        "subtopic": "Fatigue and recovery",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Health, physical activity and society",
+        "subtopic": "Lifestyle-related diseases",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Health, physical activity and society",
+        "subtopic": "Nutrition",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Health, physical activity and society",
+        "subtopic": "Psychology of sport and exercise",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Health, physical activity and society",
+        "subtopic": "Physical activity and health",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Biomechanics",
+        "subtopic": "Forces and motion",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Biomechanics",
+        "subtopic": "Projectile motion",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Biomechanics",
+        "subtopic": "Fluid dynamics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Biomechanics",
+        "subtopic": "Levers and movement",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Skill in sport",
+        "subtopic": "Information processing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Skill in sport",
+        "subtopic": "Skill classification",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Skill in sport",
+        "subtopic": "Goal setting and motivation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Skill in sport",
+        "subtopic": "Feedback",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Measurement and evaluation of human performance",
+        "subtopic": "Fitness testing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Measurement and evaluation of human performance",
+        "subtopic": "Data collection and interpretation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Measurement and evaluation of human performance",
+        "subtopic": "Ethical issues",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Measurement and evaluation of human performance",
+        "subtopic": "Research methods",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Sports Exercise & Health Science SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Anatomy",
+        "subtopic": "Skeletal system",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Anatomy",
+        "subtopic": "Muscular system",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Anatomy",
+        "subtopic": "Respiratory system",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Anatomy",
+        "subtopic": "Cardiovascular system",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Anatomy",
+        "subtopic": "Nervous system",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Exercise physiology",
+        "subtopic": "Energy systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Exercise physiology",
+        "subtopic": "Movement analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Exercise physiology",
+        "subtopic": "Training adaptations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Exercise physiology",
+        "subtopic": "Fatigue and recovery",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Health, physical activity and society",
+        "subtopic": "Lifestyle-related diseases",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Health, physical activity and society",
+        "subtopic": "Nutrition",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Health, physical activity and society",
+        "subtopic": "Psychology of sport and exercise",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Health, physical activity and society",
+        "subtopic": "Physical activity and health",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Biomechanics",
+        "subtopic": "Forces and motion",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Biomechanics",
+        "subtopic": "Projectile motion",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Biomechanics",
+        "subtopic": "Fluid dynamics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Biomechanics",
+        "subtopic": "Levers and movement",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Skill in sport",
+        "subtopic": "Information processing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Skill in sport",
+        "subtopic": "Skill classification",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Skill in sport",
+        "subtopic": "Goal setting and motivation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Skill in sport",
+        "subtopic": "Feedback",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Measurement and evaluation of human performance",
+        "subtopic": "Fitness testing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Measurement and evaluation of human performance",
+        "subtopic": "Data collection and interpretation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Measurement and evaluation of human performance",
+        "subtopic": "Ethical issues",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Measurement and evaluation of human performance",
+        "subtopic": "Research methods",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Sports, Exercise, and Health Science HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Anatomy",
+        "subtopic": "Skeletal system",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Anatomy",
+        "subtopic": "Muscular system",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Anatomy",
+        "subtopic": "Respiratory system",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Anatomy",
+        "subtopic": "Cardiovascular system",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Anatomy",
+        "subtopic": "Nervous system",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Exercise physiology",
+        "subtopic": "Energy systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Exercise physiology",
+        "subtopic": "Movement analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Exercise physiology",
+        "subtopic": "Training adaptations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Exercise physiology",
+        "subtopic": "Fatigue and recovery",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Exercise physiology",
+        "subtopic": "More detailed exercise physiology (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Health, physical activity and society",
+        "subtopic": "Lifestyle-related diseases",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Health, physical activity and society",
+        "subtopic": "Nutrition",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Health, physical activity and society",
+        "subtopic": "Psychology of sport and exercise",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Health, physical activity and society",
+        "subtopic": "Physical activity and health",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Health, physical activity and society",
+        "subtopic": "Deeper analysis of health and society (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Biomechanics",
+        "subtopic": "Forces and motion",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Biomechanics",
+        "subtopic": "Projectile motion",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Biomechanics",
+        "subtopic": "Fluid dynamics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Biomechanics",
+        "subtopic": "Levers and movement",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Biomechanics",
+        "subtopic": "Advanced biomechanics (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Skill in sport",
+        "subtopic": "Information processing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Skill in sport",
+        "subtopic": "Skill classification",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Skill in sport",
+        "subtopic": "Goal setting and motivation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Skill in sport",
+        "subtopic": "Feedback",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Skill in sport",
+        "subtopic": "Advanced skill development (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 6 - Measurement and evaluation of human performance",
+        "subtopic": "Fitness testing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Measurement and evaluation of human performance",
+        "subtopic": "Data collection and interpretation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Measurement and evaluation of human performance",
+        "subtopic": "Ethical issues",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Measurement and evaluation of human performance",
+        "subtopic": "Research methods",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Measurement and evaluation of human performance",
+        "subtopic": "More advanced evaluation methods (HL only)",
+        "hl_only": true
+      }
+    ]
+  },
+  {
+    "subject": "Sports Exercise & Health Science HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Anatomy",
+        "subtopic": "Skeletal system",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Anatomy",
+        "subtopic": "Muscular system",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Anatomy",
+        "subtopic": "Respiratory system",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Anatomy",
+        "subtopic": "Cardiovascular system",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Anatomy",
+        "subtopic": "Nervous system",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Exercise physiology",
+        "subtopic": "Energy systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Exercise physiology",
+        "subtopic": "Movement analysis",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Exercise physiology",
+        "subtopic": "Training adaptations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Exercise physiology",
+        "subtopic": "Fatigue and recovery",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Exercise physiology",
+        "subtopic": "More detailed exercise physiology (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Health, physical activity and society",
+        "subtopic": "Lifestyle-related diseases",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Health, physical activity and society",
+        "subtopic": "Nutrition",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Health, physical activity and society",
+        "subtopic": "Psychology of sport and exercise",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Health, physical activity and society",
+        "subtopic": "Physical activity and health",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Health, physical activity and society",
+        "subtopic": "Deeper analysis of health and society (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Biomechanics",
+        "subtopic": "Forces and motion",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Biomechanics",
+        "subtopic": "Projectile motion",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Biomechanics",
+        "subtopic": "Fluid dynamics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Biomechanics",
+        "subtopic": "Levers and movement",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Biomechanics",
+        "subtopic": "Advanced biomechanics (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Skill in sport",
+        "subtopic": "Information processing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Skill in sport",
+        "subtopic": "Skill classification",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Skill in sport",
+        "subtopic": "Goal setting and motivation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Skill in sport",
+        "subtopic": "Feedback",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Skill in sport",
+        "subtopic": "Advanced skill development (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 6 - Measurement and evaluation of human performance",
+        "subtopic": "Fitness testing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Measurement and evaluation of human performance",
+        "subtopic": "Data collection and interpretation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Measurement and evaluation of human performance",
+        "subtopic": "Ethical issues",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Measurement and evaluation of human performance",
+        "subtopic": "Research methods",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Measurement and evaluation of human performance",
+        "subtopic": "More advanced evaluation methods (HL only)",
+        "hl_only": true
+      }
+    ]
+  }
+]

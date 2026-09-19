@@ -1,0 +1,652 @@
+[
+  {
+    "subject": "Arabic ab initio SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal information and background",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Family and relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Appearance and personality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Daily life and routines",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Interests and leisure",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "School and study",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Past events and experiences",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Travel and holidays",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Food and drink",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Health and wellbeing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Technology and communication",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Media and entertainment",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Shopping and consumerism",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Art, music and creativity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Innovation and invention",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Home and local area",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Community and services",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Education and work",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Social issues",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Customs and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Environment and climate",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Weather and natural disasters",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Global issues",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Sustainability and responsibility",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Action for change",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "English ab initio SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal information and background",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Family and relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Appearance and personality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Daily life and routines",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Interests and leisure",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "School and study",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Past events and experiences",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Travel and holidays",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Food and drink",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Health and wellbeing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Technology and communication",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Media and entertainment",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Shopping and consumerism",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Art, music and creativity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Innovation and invention",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Home and local area",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Community and services",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Education and work",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Social issues",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Customs and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Environment and climate",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Weather and natural disasters",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Global issues",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Sustainability and responsibility",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Action for change",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "French ab initio SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal information and background",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Family and relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Appearance and personality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Daily life and routines",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Interests and leisure",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "School and study",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Past events and experiences",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Travel and holidays",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Food and drink",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Health and wellbeing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Technology and communication",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Media and entertainment",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Shopping and consumerism",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Art, music and creativity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Innovation and invention",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Home and local area",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Community and services",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Education and work",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Social issues",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Customs and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Environment and climate",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Weather and natural disasters",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Global issues",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Sustainability and responsibility",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Action for change",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Spanish ab initio SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal information and background",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Family and relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Appearance and personality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Daily life and routines",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Interests and leisure",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "School and study",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Past events and experiences",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Travel and holidays",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Food and drink",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Health and wellbeing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Technology and communication",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Media and entertainment",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Shopping and consumerism",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Art, music and creativity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Innovation and invention",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Home and local area",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Community and services",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Education and work",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Social issues",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Customs and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Environment and climate",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Weather and natural disasters",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Global issues",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Sustainability and responsibility",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Action for change",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Mandarin ab initio SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal information and background",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Family and relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Appearance and personality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Daily life and routines",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Interests and leisure",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "School and study",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Past events and experiences",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Travel and holidays",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Food and drink",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Health and wellbeing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Technology and communication",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Media and entertainment",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Shopping and consumerism",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Art, music and creativity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Innovation and invention",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Home and local area",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Community and services",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Education and work",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Social issues",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Customs and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Environment and climate",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Weather and natural disasters",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Global issues",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Sustainability and responsibility",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Action for change",
+        "hl_only": false
+      }
+    ]
+  }
+]
