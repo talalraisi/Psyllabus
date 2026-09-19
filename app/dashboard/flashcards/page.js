@@ -59,6 +59,8 @@ export default function FlashcardsPage() {
   // of them they have already taken a copy of.
   const [presets, setPresets] = useState([])
   const [startingDeck, setStartingDeck] = useState('')
+  const [startingSubject, setStartingSubject] = useState('')
+  const [openPresetSubject, setOpenPresetSubject] = useState(null)
 
   const router = useRouter()
   const supabase = createClient()
@@ -179,6 +181,24 @@ export default function FlashcardsPage() {
       .sort((a, b) => a.subject.localeCompare(b.subject) || a.subtopic.localeCompare(b.subtopic))
   }, [presets, cards, openDeck])
 
+  /**
+   * Ready-made decks, gathered under their subject.
+   *
+   * Offered one subtopic at a time, a science was thirty separate decisions
+   * and nobody made thirty. Under a subject heading it is one: take biology,
+   * or take the enzymes deck out of it.
+   */
+  const presetsBySubject = useMemo(() => {
+    const map = new Map()
+    for (const deck of availablePresets) {
+      if (!map.has(deck.subject)) map.set(deck.subject, { subject: deck.subject, decks: [], cards: 0 })
+      const entry = map.get(deck.subject)
+      entry.decks.push(deck)
+      entry.cards += deck.total - deck.have
+    }
+    return [...map.values()].sort((a, b) => b.cards - a.cards)
+  }, [availablePresets])
+
   /** Copy a ready-made deck into this student's own cards. */
   const startPreset = useCallback(
     async (deck) => {
@@ -198,6 +218,37 @@ export default function FlashcardsPage() {
     },
     [supabase, load]
   )
+
+  /**
+   * Take every ready-made deck for a subject at once.
+   *
+   * One request per subtopic, run in series rather than in parallel: this is
+   * the same RPC the single button calls, and thirty of them at once is a
+   * thundering herd for a button somebody pressed out of curiosity. Reloading
+   * happens once, at the end.
+   */
+  const startSubjectPresets = useCallback(
+    async (group) => {
+      setStartingSubject(group.subject)
+      setError('')
+      let added = 0
+      for (const deck of group.decks) {
+        const { data, error: rpcError } = await supabase.rpc('start_preset_deck', {
+          p_subject: deck.subject,
+          p_subtopic: deck.subtopic,
+        })
+        if (rpcError) {
+          setError(rpcError.message)
+          break
+        }
+        added += data || 0
+      }
+      setStartingSubject('')
+      if (added > 0) await load()
+    },
+    [supabase, load]
+  )
+
   const totalDue = useMemo(() => cards.filter(isDue).length, [cards])
 
   /* ----------------------------------------------------------------- review */
@@ -415,6 +466,17 @@ export default function FlashcardsPage() {
                     Review {totalDue} due
                     <IconArrowRight width={16} height={16} />
                   </button>
+                ) : cards.length > 0 ? (
+                  // Nothing due is not nothing to do. Ten cards, ahead of
+                  // schedule, marked as cramming so it does not disturb the
+                  // spacing that is doing the real work.
+                  <button
+                    onClick={() => review(cards.slice(0, 10), true)}
+                    className="btn btn-outline control-md"
+                  >
+                    Quick 10
+                    <IconArrowRight width={16} height={16} />
+                  </button>
                 ) : null
               }
             />
@@ -426,10 +488,12 @@ export default function FlashcardsPage() {
             )}
 
             {cards.length === 0 ? (
-              <EmptyState
-                title="No cards yet"
-                description="Write one, or turn notes you have already made into a set. Both take a minute."
-              />
+              presetsBySubject.length === 0 ? (
+                <EmptyState
+                  title="No cards yet"
+                  description="Write one, or turn notes you have already made into a set. Both take a minute."
+                />
+              ) : null
             ) : (
               <div className="mb-10 grid gap-3 sm:grid-cols-2">
                 {decks.map((d) => (
@@ -497,38 +561,74 @@ export default function FlashcardsPage() {
                   copies it into your cards, so the schedule and anything you delete are yours.
                 </p>
 
-                <ul className="flex flex-col">
-                  {availablePresets.map((deck) => {
-                    const key = `${deck.subject}||${deck.subtopic}`
-                    const missing = deck.total - deck.have
-                    const partial = deck.have > 0
+                <ul className="stagger flex flex-col">
+                  {presetsBySubject.map((group) => {
+                    const expanded = openPresetSubject === group.subject
+                    const busy = startingSubject === group.subject
                     return (
                       <li
-                        key={key}
-                        className="flex items-center gap-4 border-b py-3 last:border-b-0"
+                        key={group.subject}
+                        className="border-b py-3 last:border-b-0"
                         style={{ borderColor: 'var(--border)' }}
                       >
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
-                            {deck.subject}
-                          </p>
-                          <p className="mt-0.5 truncate text-[14px]" style={{ color: 'var(--text-body)' }}>
-                            {displaySubtopic(deck.subtopic)}
-                          </p>
+                        <div className="flex items-center gap-4">
+                          <button
+                            onClick={() =>
+                              setOpenPresetSubject(expanded ? null : group.subject)
+                            }
+                            aria-expanded={expanded}
+                            className="min-w-0 flex-1 text-left"
+                          >
+                            <p className="truncate text-[14px]" style={{ color: 'var(--text-body)' }}>
+                              {group.subject}
+                            </p>
+                            <p className="mt-0.5 text-[12px]" style={{ color: 'var(--text-faint)' }}>
+                              {group.cards} cards across {group.decks.length}{' '}
+                              {group.decks.length === 1 ? 'subtopic' : 'subtopics'}
+                            </p>
+                          </button>
+                          <button
+                            onClick={() => startSubjectPresets(group)}
+                            disabled={busy}
+                            className="btn btn-outline control-sm shrink-0 disabled:opacity-40"
+                          >
+                            {busy ? 'Adding' : 'Add all'}
+                          </button>
                         </div>
-                        <span
-                          className="shrink-0 text-[12.5px] tabular-nums"
-                          style={{ color: 'var(--text-faint)' }}
-                        >
-                          {partial ? `${missing} new` : `${deck.total} cards`}
-                        </span>
-                        <button
-                          onClick={() => startPreset(deck)}
-                          disabled={startingDeck === key}
-                          className="btn btn-outline control-sm shrink-0 disabled:opacity-40"
-                        >
-                          {startingDeck === key ? 'Adding' : partial ? 'Top up' : 'Add'}
-                        </button>
+
+                        {expanded && (
+                          <ul className="mt-2 flex flex-col pl-1">
+                            {group.decks.map((deck) => {
+                              const key = `${deck.subject}||${deck.subtopic}`
+                              const missing = deck.total - deck.have
+                              const partial = deck.have > 0
+                              return (
+                                <li key={key} className="flex items-center gap-3 py-1.5">
+                                  <span
+                                    className="min-w-0 flex-1 truncate text-[13px]"
+                                    style={{ color: 'var(--text-muted)' }}
+                                  >
+                                    {displaySubtopic(deck.subtopic)}
+                                  </span>
+                                  <span
+                                    className="shrink-0 text-[12px] tabular-nums"
+                                    style={{ color: 'var(--text-faint)' }}
+                                  >
+                                    {partial ? `${missing} new` : deck.total}
+                                  </span>
+                                  <button
+                                    onClick={() => startPreset(deck)}
+                                    disabled={startingDeck === key || busy}
+                                    className="shrink-0 text-[12.5px] font-medium underline-offset-2 hover:underline disabled:opacity-40"
+                                    style={{ color: 'var(--brand)' }}
+                                  >
+                                    {startingDeck === key ? 'Adding' : partial ? 'Top up' : 'Add'}
+                                  </button>
+                                </li>
+                              )
+                            })}
+                          </ul>
+                        )}
                       </li>
                     )
                   })}
