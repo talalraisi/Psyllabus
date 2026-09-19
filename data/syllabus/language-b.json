@@ -1,0 +1,118 @@
+{
+  "course": "Language B",
+  "curriculum": "IB",
+  "guide": "first assessment 2020",
+  "confidence": "high — the five prescribed themes and their recommended topics are fixed by the guide; the skills subtopics are ours",
+  "subjects": {
+    "sl": ["Arabic B SL", "English B SL", "French B SL", "Spanish B SL", "Mandarin B SL"],
+    "hl": ["Arabic B HL", "English B HL", "French B HL", "Spanish B HL", "Mandarin B HL"]
+  },
+  "note": "Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "topics": [
+    {
+      "topic": "Identities",
+      "subtopics": [
+        ["Lifestyles and daily routine", "sl"],
+        ["Health and well-being", "sl"],
+        ["Beliefs, values and opinions", "sl"],
+        ["Subcultures and belonging", "sl"],
+        ["Language and identity", "sl"],
+        ["Personal attributes and relationships", "sl"],
+        ["Describing people and relationships", "sl"],
+        ["Giving and justifying a personal opinion", "sl"]
+      ]
+    },
+    {
+      "topic": "Experiences",
+      "subtopics": [
+        ["Leisure, hobbies and interests", "sl"],
+        ["Holidays and travel", "sl"],
+        ["Life stories and life stages", "sl"],
+        ["Rites of passage", "sl"],
+        ["Customs, festivals and traditions", "sl"],
+        ["Migration and moving between cultures", "sl"],
+        ["Narrating events in past, present and future", "sl"],
+        ["Expressing feelings and reactions", "sl"]
+      ]
+    },
+    {
+      "topic": "Human ingenuity",
+      "subtopics": [
+        ["Entertainment and the arts", "sl"],
+        ["Communication and social media", "sl"],
+        ["Technology and everyday life", "sl"],
+        ["Scientific innovation and discovery", "sl"],
+        ["Products, services and consumer culture", "sl"],
+        ["Explaining how something works and its effects", "sl"],
+        ["Weighing advantages and disadvantages", "sl"]
+      ]
+    },
+    {
+      "topic": "Social organization",
+      "subtopics": [
+        ["Community and social relationships", "sl"],
+        ["Education and learning", "sl"],
+        ["Work, careers and the economy", "sl"],
+        ["Government, law and citizenship", "sl"],
+        ["Social issues and equality", "sl"],
+        ["Making requests, complaints and proposals", "sl"],
+        ["Formal register and professional communication", "sl"]
+      ]
+    },
+    {
+      "topic": "Sharing the planet",
+      "subtopics": [
+        ["The environment and sustainability", "sl"],
+        ["Natural resources and conservation", "sl"],
+        ["Human rights and equality", "sl"],
+        ["Conflict, peace and cooperation", "sl"],
+        ["Globalization and ethics", "sl"],
+        ["Local and global action", "sl"],
+        ["Describing causes, effects and consequences", "sl"],
+        ["Arguing for a solution or policy", "sl"]
+      ]
+    },
+    {
+      "topic": "Language and text types",
+      "subtopics": [
+        ["Reading comprehension: main ideas, detail and inference", "sl"],
+        ["Listening comprehension: gist, detail and speaker attitude", "sl"],
+        ["Audience, context, purpose and meaning", "sl"],
+        ["Personal text types: blog, diary, email, letter", "sl"],
+        ["Professional text types: report, proposal, formal letter", "sl"],
+        ["Mass media text types: article, review, speech, interview", "sl"],
+        ["Register and conventions of each text type", "sl"],
+        ["Grammar and accuracy", "sl"],
+        ["Vocabulary range and idiom", "sl"],
+        ["Cohesion, organisation and development of ideas", "sl"],
+        ["Pronunciation, intonation and fluency", "sl"],
+        ["Spontaneous conversation and turn-taking", "sl"]
+      ]
+    },
+    {
+      "topic": "Literature and assessment",
+      "subtopics": [
+        ["Paper 1: writing one text type from a choice of tasks", "sl"],
+        ["Paper 2: listening and reading comprehension", "sl"],
+        ["Individual oral from a visual stimulus", "sl"],
+        ["Reading two literary works in the target language", "hl"],
+        ["Analysing an extract from a studied literary work", "hl"],
+        ["Individual oral from a literary extract", "hl"]
+      ]
+    }
+  ],
+  "merge": {
+    "Personal experiences and life stages": "Life stories and life stages",
+    "Cultural identity and heritage": "Language and identity",
+    "Daily routine and lifestyle": "Lifestyles and daily routine",
+    "Health, wellbeing and emotions": "Health and well-being",
+    "Travel and exploration": "Holidays and travel",
+    "Festivals, customs and traditions": "Customs, festivals and traditions",
+    "Entertainment, arts and media": "Entertainment and the arts",
+    "Creativity and innovation": "Scientific innovation and discovery",
+    "Science, technology and progress": "Technology and everyday life",
+    "Global challenges and responsibility": "Globalization and ethics",
+    "Environment and sustainability": "The environment and sustainability"
+  },
+  "retire": {}
+}

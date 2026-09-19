@@ -1,0 +1,191 @@
+{
+  "course": "Computer science",
+  "curriculum": "IB",
+  "guide": "first teaching 2025, first assessment 2027",
+  "confidence": "medium — anyone in the DP now sits the new guide, so this follows it, but I could not check the guide itself. Verify with your teacher whether databases and machine learning are HL-only for your cohort; they are marked shared here.",
+  "subjects": { "sl": "Computer Science SL", "hl": "Computer Science HL" },
+  "note": "Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "topics": [
+    {
+      "topic": "A. Computer fundamentals",
+      "subtopics": [
+        ["Components of a computer system", "sl"],
+        ["Input, output and storage devices", "sl"],
+        ["Primary and secondary memory", "sl"],
+        ["Binary representation of integers", "sl"],
+        ["Hexadecimal and conversion between number bases", "sl"],
+        ["Representing text, images, sound and video", "sl"],
+        ["Boolean logic and logic gates", "sl"],
+        ["Truth tables and logic circuits", "sl"],
+        ["The CPU, registers and the fetch-execute cycle", "sl"],
+        ["Cache, buses and performance", "ext"],
+        ["Operating systems and their functions", "sl"],
+        ["Memory, processor and file management", "ext"],
+        ["Translators: compilers and interpreters", "sl"],
+        ["Utility software and system maintenance", "sl"],
+        ["Cybersecurity threats and protection", "sl"],
+        ["Privacy, ethics and the social impact of computing", "sl"]
+      ]
+    },
+    {
+      "topic": "B. Networks",
+      "subtopics": [
+        ["Network types: LAN, WAN and the internet", "sl"],
+        ["Network topologies", "sl"],
+        ["Network hardware and transmission media", "sl"],
+        ["Protocols, packets and data transmission", "sl"],
+        ["The TCP/IP stack and internet protocols", "ext"],
+        ["IP addressing, DNS and routing", "ext"],
+        ["Client-server and peer-to-peer models", "sl"],
+        ["Wireless networks and their trade-offs", "sl"],
+        ["Network security: encryption, authentication and firewalls", "sl"],
+        ["Social, environmental and economic effects of networks", "sl"]
+      ]
+    },
+    {
+      "topic": "C. Databases",
+      "subtopics": [
+        ["Data, information and data quality", "sl"],
+        ["Database concepts and database management systems", "sl"],
+        ["Tables, fields, records and data types", "sl"],
+        ["Primary keys, foreign keys and relationships", "sl"],
+        ["Normalisation and redundancy", "ext"],
+        ["Querying data and SQL", "ext"],
+        ["Transactions, concurrency and integrity", "hl"],
+        ["Database security, backup and privacy", "sl"]
+      ]
+    },
+    {
+      "topic": "D. Machine learning",
+      "subtopics": [
+        ["What machine learning is and is not", "sl"],
+        ["Data sets, features and labels", "sl"],
+        ["Supervised, unsupervised and reinforcement learning", "sl"],
+        ["Training, testing and evaluating a model", "sl"],
+        ["Overfitting, underfitting and generalisation", "ext"],
+        ["Neural networks and deep learning", "hl"],
+        ["Bias, fairness and limitations of models", "sl"],
+        ["Ethical, social and environmental implications", "sl"]
+      ]
+    },
+    {
+      "topic": "E. Computational thinking and problem-solving",
+      "subtopics": [
+        ["Problem specification and success criteria", "sl"],
+        ["Decomposition", "sl"],
+        ["Abstraction", "sl"],
+        ["Pattern recognition and generalisation", "sl"],
+        ["Algorithmic thinking and stepwise refinement", "sl"],
+        ["Pseudocode", "sl"],
+        ["Flowcharts and trace tables", "sl"],
+        ["Variables, constants and data types", "sl"],
+        ["Sequence, selection and iteration", "sl"],
+        ["Linear and binary search", "sl"],
+        ["Bubble, selection and insertion sort", "sl"],
+        ["Merge sort and quicksort", "hl"],
+        ["Algorithm efficiency and Big-O complexity", "ext"],
+        ["Recursion", "hl"],
+        ["Testing strategies and test data", "sl"],
+        ["Debugging and error types", "sl"]
+      ]
+    },
+    {
+      "topic": "F. Programming",
+      "subtopics": [
+        ["Program structure and syntax", "sl"],
+        ["Expressions, operators and input/output", "sl"],
+        ["Conditional statements", "sl"],
+        ["Loops and iteration", "sl"],
+        ["Functions, parameters and return values", "sl"],
+        ["Scope, modularity and code reuse", "sl"],
+        ["Arrays and lists", "sl"],
+        ["Two-dimensional arrays", "ext"],
+        ["Strings and string manipulation", "sl"],
+        ["File handling and persistent data", "sl"],
+        ["Exception handling", "ext"],
+        ["Code quality, readability and documentation", "sl"],
+        ["Classes and objects", "sl"],
+        ["Attributes, methods and constructors", "sl"],
+        ["Encapsulation and information hiding", "sl"],
+        ["Inheritance and polymorphism", "ext"],
+        ["Object-oriented design and modelling", "ext"]
+      ]
+    },
+    {
+      "topic": "G. Abstract data types",
+      "subtopics": [
+        ["Abstract data types and their interfaces", "hl"],
+        ["Stacks and their applications", "hl"],
+        ["Queues and circular queues", "hl"],
+        ["Singly and doubly linked lists", "hl"],
+        ["Binary trees and traversals", "hl"],
+        ["Graphs and graph traversal", "hl"],
+        ["Hash tables and collision handling", "hl"],
+        ["Choosing an appropriate data structure", "hl"]
+      ]
+    },
+    {
+      "topic": "H. The computational solution",
+      "subtopics": [
+        ["Identifying a real problem and its stakeholders", "sl"],
+        ["Requirements, success criteria and planning", "sl"],
+        ["Designing a computational solution", "sl"],
+        ["Developing and implementing the solution", "sl"],
+        ["Testing against the success criteria", "sl"],
+        ["Evaluation and future improvements", "sl"],
+        ["The collaborative sciences project", "sl"]
+      ]
+    }
+  ],
+  "merge": {
+    "Hardware and software": "Components of a computer system",
+    "Number representation": "Binary representation of integers",
+    "Operating systems": "Operating systems and their functions",
+    "Network fundamentals": "Network types: LAN, WAN and the internet",
+    "Data structures": "Arrays and lists",
+    "Algorithms and pseudocode": "Pseudocode",
+    "Programming constructs": "Sequence, selection and iteration",
+    "Program design and development": "Designing a computational solution",
+    "Debugging and testing": "Debugging and error types",
+    "Logic and validation": "Boolean logic and logic gates",
+    "Arrays": "Arrays and lists",
+    "Stacks": "Stacks and their applications",
+    "Queues": "Queues and circular queues",
+    "Linked lists": "Singly and doubly linked lists",
+    "Trees and graphs": "Binary trees and traversals",
+    "Recursion (HL only)": "Recursion",
+    "Advanced algorithm design and analysis (HL only)": "Algorithm efficiency and Big-O complexity",
+    "More advanced data structure applications (HL only)": "Choosing an appropriate data structure",
+    "File management": "File handling and persistent data",
+    "Memory management": "Memory, processor and file management",
+    "Processor management": "The CPU, registers and the fetch-execute cycle",
+    "Storage management": "Primary and secondary memory",
+    "Peripheral management": "Input, output and storage devices",
+    "Deeper system resource analysis (HL only)": "Cache, buses and performance",
+    "Interactions between hardware and software": "Components of a computer system",
+    "Networking and communication protocols": "Protocols, packets and data transmission",
+    "System life cycle": "Requirements, success criteria and planning",
+    "Translation of code": "Translators: compilers and interpreters",
+    "Utility software": "Utility software and system maintenance",
+    "HL depth in systems and architecture (HL only)": "Cache, buses and performance",
+    "Database design": "Tables, fields, records and data types",
+    "Relational databases": "Primary keys, foreign keys and relationships",
+    "Data modelling": "Database concepts and database management systems",
+    "Database systems": "Querying data and SQL",
+    "System evaluation": "Evaluation and future improvements",
+    "User interface design": "Identifying a real problem and its stakeholders",
+    "More complex design and evaluation (HL only)": "Object-oriented design and modelling",
+    "Object-oriented programming": "Classes and objects",
+    "Web science": "Social, environmental and economic effects of networks",
+    "Multi-agent systems": "Supervised, unsupervised and reinforcement learning",
+    "HL-only extension for option content (HL only)": "Neural networks and deep learning"
+  },
+  "retire": {
+    "Automation systems": "The control option was removed in the new guide",
+    "Control models and simulation": "The control option was removed in the new guide",
+    "Feedback loops": "The control option was removed in the new guide",
+    "Microcontrollers": "The control option was removed in the new guide",
+    "Sensors and actuators": "The control option was removed in the new guide",
+    "More advanced control applications (HL only)": "The control option was removed in the new guide"
+  }
+}

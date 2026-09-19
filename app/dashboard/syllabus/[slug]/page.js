@@ -289,6 +289,18 @@ export default function SyllabusPage() {
                                   HL
                                 </span>
                               )}
+                              {/* Shared with SL, taken further at HL: not the
+                                  same thing as HL-only, and a student planning
+                                  revision needs to see the difference. */}
+                              {item.hl_extension && (
+                                <span
+                                  title="Studied at both levels, in more depth at HL"
+                                  className="ml-2 align-middle text-[10px] font-semibold uppercase tracking-[0.1em]"
+                                  style={{ color: 'var(--text-faint)' }}
+                                >
+                                  HL depth
+                                </span>
+                              )}
                             </div>
                             <div className="flex shrink-0 items-center gap-4">
                               <span

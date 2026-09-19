@@ -1,0 +1,130 @@
+{
+  "course": "Language A: language and literature",
+  "curriculum": "IB",
+  "guide": "first assessment 2021",
+  "confidence": "high on the three areas of exploration and the seven concepts; this course has no content list, so the subtopics are the things that can actually be practised",
+  "subjects": {
+    "sl": [
+      "English A: Language & Literature SL",
+      "Arabic A: Language & Literature SL",
+      "French A: Language & Literature SL",
+      "Spanish A: Language & Literature SL",
+      "Mandarin A: Language & Literature SL"
+    ],
+    "hl": [
+      "English A: Language & Literature HL",
+      "Arabic A: Language & Literature HL",
+      "French A: Language & Literature HL",
+      "Spanish A: Language & Literature HL",
+      "Mandarin A: Language & Literature HL"
+    ]
+  },
+  "note": "Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "topics": [
+    {
+      "topic": "Readers, writers and texts",
+      "subtopics": [
+        ["How readers construct meaning from a text", "sl"],
+        ["Writer's choices: form, structure and style", "sl"],
+        ["Purpose, audience and context of production", "sl"],
+        ["Literary forms: poetry, prose fiction, prose non-fiction, drama", "sl"],
+        ["Non-literary text types and their conventions", "sl"],
+        ["Visual, audio and multimodal texts", "sl"],
+        ["Diction, register and tone", "sl"],
+        ["Imagery, metaphor and symbolism", "sl"],
+        ["Rhetorical and persuasive techniques", "sl"],
+        ["Narrative voice, point of view and characterisation", "sl"],
+        ["Structure, sequencing and pacing of a text", "sl"],
+        ["Bias, assumptions and implied values", "sl"]
+      ]
+    },
+    {
+      "topic": "Time and space",
+      "subtopics": [
+        ["Historical context of a text's production", "sl"],
+        ["Cultural and social context", "sl"],
+        ["Political and economic context", "sl"],
+        ["Contexts of reception and changing interpretations", "sl"],
+        ["Place, setting and the representation of location", "sl"],
+        ["Identity: individual and collective", "sl"],
+        ["Gender, race, class and power in texts", "sl"],
+        ["Beliefs, values and ideologies", "sl"],
+        ["Media, communication and public discourse", "sl"],
+        ["Language, power and ideology", "sl"],
+        ["Censorship, ownership and freedom of expression", "sl"],
+        ["Texts as social and cultural practices", "sl"]
+      ]
+    },
+    {
+      "topic": "Intertextuality: connecting texts",
+      "subtopics": [
+        ["Allusion, quotation and reference", "sl"],
+        ["Adaptation and appropriation", "sl"],
+        ["Genre conventions and their transformation", "sl"],
+        ["Parody, pastiche and homage", "sl"],
+        ["Comparing themes across texts", "sl"],
+        ["Comparing style and form across texts", "sl"],
+        ["Connections between literary and non-literary texts", "sl"],
+        ["Texts answering and challenging earlier texts", "sl"],
+        ["Building a comparative thesis", "sl"]
+      ]
+    },
+    {
+      "topic": "The seven concepts",
+      "subtopics": [
+        ["Identity", "sl"],
+        ["Culture", "sl"],
+        ["Creativity", "sl"],
+        ["Communication", "sl"],
+        ["Perspective", "sl"],
+        ["Transformation", "sl"],
+        ["Representation", "sl"]
+      ]
+    },
+    {
+      "topic": "Global issues and the individual oral",
+      "subtopics": [
+        ["Identifying a global issue in a text", "sl"],
+        ["Fields of inquiry: culture, identity and community", "sl"],
+        ["Fields of inquiry: beliefs, values and education", "sl"],
+        ["Fields of inquiry: politics, power and justice", "sl"],
+        ["Fields of inquiry: art, creativity and the imagination", "sl"],
+        ["Fields of inquiry: science, technology and the environment", "sl"],
+        ["Choosing extracts from a literary work and a body of work", "sl"],
+        ["Structuring and delivering the oral", "sl"],
+        ["Responding to follow-up questions", "sl"]
+      ]
+    },
+    {
+      "topic": "Assessment technique",
+      "subtopics": [
+        ["Paper 1: analysing an unseen non-literary text", "sl"],
+        ["Paper 1: using the guiding question", "sl"],
+        ["Paper 2: comparing two literary works", "sl"],
+        ["Paper 2: selecting evidence and integrating quotation", "sl"],
+        ["Writing about effect rather than listing devices", "sl"],
+        ["Essay structure, signposting and conclusions", "sl"],
+        ["The HL essay: developing a line of inquiry", "hl"],
+        ["The HL essay: research, referencing and academic register", "hl"]
+      ]
+    }
+  ],
+  "merge": {
+    "How readers interpret texts (audience, purpose, interpretation)": "How readers construct meaning from a text",
+    "How texts are constructed by authors (form, structure, style)": "Writer's choices: form, structure and style",
+    "Close analysis of language and literary techniques": "Imagery, metaphor and symbolism",
+    "Text types and genres (literary and non-literary)": "Non-literary text types and their conventions",
+    "Historical and cultural contexts of production": "Historical context of a text's production",
+    "Reception contexts (how time/culture shapes meaning)": "Contexts of reception and changing interpretations",
+    "Place, setting and representation of location": "Place, setting and the representation of location",
+    "How literature and language reflect/shape societies and values": "Texts as social and cultural practices",
+    "Relationships between literary and non-literary texts": "Connections between literary and non-literary texts",
+    "Themes and motifs across different works and text types": "Comparing themes across texts",
+    "Adaptations, translations and re‑imaginings": "Adaptation and appropriation",
+    "Influence and dialogue between authors and traditions": "Texts answering and challenging earlier texts",
+    "Identifying and analyzing global issues in texts": "Identifying a global issue in a text",
+    "How texts address social, cultural and political issues": "Fields of inquiry: politics, power and justice",
+    "The role of language and literature in global issues": "Fields of inquiry: culture, identity and community"
+  },
+  "retire": {}
+}

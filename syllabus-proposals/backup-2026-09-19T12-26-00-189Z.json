@@ -1,0 +1,3762 @@
+[
+  {
+    "subject": "Computer Science SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Computer fundamentals",
+        "subtopic": "Hardware and software",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Computer fundamentals",
+        "subtopic": "Number representation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Computer fundamentals",
+        "subtopic": "Data structures",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Computer fundamentals",
+        "subtopic": "Operating systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Computer fundamentals",
+        "subtopic": "Network fundamentals",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Computational thinking, problem-solving and programming",
+        "subtopic": "Algorithms and pseudocode",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Computational thinking, problem-solving and programming",
+        "subtopic": "Program design and development",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Computational thinking, problem-solving and programming",
+        "subtopic": "Programming constructs",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Computational thinking, problem-solving and programming",
+        "subtopic": "Debugging and testing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Computational thinking, problem-solving and programming",
+        "subtopic": "Logic and validation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Abstract data structures",
+        "subtopic": "Arrays",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Abstract data structures",
+        "subtopic": "Stacks",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Abstract data structures",
+        "subtopic": "Queues",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Abstract data structures",
+        "subtopic": "Linked lists",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Abstract data structures",
+        "subtopic": "Trees and graphs",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Resource management",
+        "subtopic": "Memory management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Resource management",
+        "subtopic": "Storage management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Resource management",
+        "subtopic": "Processor management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Resource management",
+        "subtopic": "Peripheral management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Resource management",
+        "subtopic": "File management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Control",
+        "subtopic": "Sensors and actuators",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Control",
+        "subtopic": "Feedback loops",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Control",
+        "subtopic": "Microcontrollers",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Control",
+        "subtopic": "Automation systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Control",
+        "subtopic": "Control models and simulation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - System fundamentals",
+        "subtopic": "System life cycle",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - System fundamentals",
+        "subtopic": "Interactions between hardware and software",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - System fundamentals",
+        "subtopic": "Utility software",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - System fundamentals",
+        "subtopic": "Translation of code",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - System fundamentals",
+        "subtopic": "Networking and communication protocols",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - System design",
+        "subtopic": "Database design",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - System design",
+        "subtopic": "Relational databases",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - System design",
+        "subtopic": "Data modelling",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - System design",
+        "subtopic": "User interface design",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - System design",
+        "subtopic": "System evaluation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Option topic",
+        "subtopic": "Database systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Option topic",
+        "subtopic": "Web science",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Option topic",
+        "subtopic": "Object-oriented programming",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Option topic",
+        "subtopic": "Multi-agent systems",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Computer Science HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Computer fundamentals",
+        "subtopic": "Hardware and software",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Computer fundamentals",
+        "subtopic": "Number representation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Computer fundamentals",
+        "subtopic": "Data structures",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Computer fundamentals",
+        "subtopic": "Operating systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Computer fundamentals",
+        "subtopic": "Network fundamentals",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Computational thinking, problem-solving and programming",
+        "subtopic": "Algorithms and pseudocode",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Computational thinking, problem-solving and programming",
+        "subtopic": "Program design and development",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Computational thinking, problem-solving and programming",
+        "subtopic": "Programming constructs",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Computational thinking, problem-solving and programming",
+        "subtopic": "Debugging and testing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Computational thinking, problem-solving and programming",
+        "subtopic": "Logic and validation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Computational thinking, problem-solving and programming",
+        "subtopic": "Recursion (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - Computational thinking, problem-solving and programming",
+        "subtopic": "Advanced algorithm design and analysis (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Abstract data structures",
+        "subtopic": "Arrays",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Abstract data structures",
+        "subtopic": "Stacks",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Abstract data structures",
+        "subtopic": "Queues",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Abstract data structures",
+        "subtopic": "Linked lists",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Abstract data structures",
+        "subtopic": "Trees and graphs",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Abstract data structures",
+        "subtopic": "More advanced data structure applications (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Resource management",
+        "subtopic": "Memory management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Resource management",
+        "subtopic": "Storage management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Resource management",
+        "subtopic": "Processor management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Resource management",
+        "subtopic": "Peripheral management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Resource management",
+        "subtopic": "File management",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Resource management",
+        "subtopic": "Deeper system resource analysis (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Control",
+        "subtopic": "Sensors and actuators",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Control",
+        "subtopic": "Feedback loops",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Control",
+        "subtopic": "Microcontrollers",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Control",
+        "subtopic": "Automation systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Control",
+        "subtopic": "Control models and simulation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Control",
+        "subtopic": "More advanced control applications (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 6 - System fundamentals",
+        "subtopic": "System life cycle",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - System fundamentals",
+        "subtopic": "Interactions between hardware and software",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - System fundamentals",
+        "subtopic": "Utility software",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - System fundamentals",
+        "subtopic": "Translation of code",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - System fundamentals",
+        "subtopic": "Networking and communication protocols",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - System fundamentals",
+        "subtopic": "HL depth in systems and architecture (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 7 - System design",
+        "subtopic": "Database design",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - System design",
+        "subtopic": "Relational databases",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - System design",
+        "subtopic": "Data modelling",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - System design",
+        "subtopic": "User interface design",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - System design",
+        "subtopic": "System evaluation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 7 - System design",
+        "subtopic": "More complex design and evaluation (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 8 - Option topic",
+        "subtopic": "Database systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Option topic",
+        "subtopic": "Web science",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Option topic",
+        "subtopic": "Object-oriented programming",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Option topic",
+        "subtopic": "Multi-agent systems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 8 - Option topic",
+        "subtopic": "HL-only extension for option content (HL only)",
+        "hl_only": true
+      }
+    ]
+  },
+  {
+    "subject": "Economics SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Introduction to economics",
+        "subtopic": "Scarcity, choice and opportunity cost",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Introduction to economics",
+        "subtopic": "Resource allocation and efficiency",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Introduction to economics",
+        "subtopic": "Economic well-being and sustainability",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Introduction to economics",
+        "subtopic": "Positive and normative economics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Microeconomics",
+        "subtopic": "Demand",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Microeconomics",
+        "subtopic": "Supply",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Microeconomics",
+        "subtopic": "Market equilibrium",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Microeconomics",
+        "subtopic": "Elasticity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Microeconomics",
+        "subtopic": "Government intervention",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Microeconomics",
+        "subtopic": "Market failure",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Macroeconomics",
+        "subtopic": "Economic activity and measurement",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Macroeconomics",
+        "subtopic": "Aggregate demand and aggregate supply",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Macroeconomics",
+        "subtopic": "Macroeconomic objectives",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Macroeconomics",
+        "subtopic": "Fiscal policy",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Macroeconomics",
+        "subtopic": "Monetary policy",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Macroeconomics",
+        "subtopic": "Supply-side policy",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Macroeconomics",
+        "subtopic": "The role of the state",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The global economy",
+        "subtopic": "International trade",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The global economy",
+        "subtopic": "Exchange rates",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The global economy",
+        "subtopic": "Balance of payments",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The global economy",
+        "subtopic": "Economic integration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The global economy",
+        "subtopic": "Economic development",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The global economy",
+        "subtopic": "Sustainability and global interdependence",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Economics HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Introduction to economics",
+        "subtopic": "Scarcity, choice and opportunity cost",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Introduction to economics",
+        "subtopic": "Resource allocation and efficiency",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Introduction to economics",
+        "subtopic": "Economic well-being and sustainability",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Introduction to economics",
+        "subtopic": "Positive and normative economics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Microeconomics",
+        "subtopic": "Demand",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Microeconomics",
+        "subtopic": "Supply",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Microeconomics",
+        "subtopic": "Market equilibrium",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Microeconomics",
+        "subtopic": "Elasticity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Microeconomics",
+        "subtopic": "Government intervention",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Microeconomics",
+        "subtopic": "Market failure",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Microeconomics",
+        "subtopic": "Theory of the firm and market structures (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - Microeconomics",
+        "subtopic": "Revenue, costs and profits (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Macroeconomics",
+        "subtopic": "Economic activity and measurement",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Macroeconomics",
+        "subtopic": "Aggregate demand and aggregate supply",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Macroeconomics",
+        "subtopic": "Macroeconomic objectives",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Macroeconomics",
+        "subtopic": "Fiscal policy",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Macroeconomics",
+        "subtopic": "Monetary policy",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Macroeconomics",
+        "subtopic": "Supply-side policy",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Macroeconomics",
+        "subtopic": "The role of the state",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Macroeconomics",
+        "subtopic": "Further macroeconomic models and diagrams (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - The global economy",
+        "subtopic": "International trade",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The global economy",
+        "subtopic": "Exchange rates",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The global economy",
+        "subtopic": "Balance of payments",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The global economy",
+        "subtopic": "Economic integration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The global economy",
+        "subtopic": "Economic development",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The global economy",
+        "subtopic": "Sustainability and global interdependence",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The global economy",
+        "subtopic": "Quantitative analysis and extended application (HL only)",
+        "hl_only": true
+      }
+    ]
+  },
+  {
+    "subject": "English A: Language & Literature SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "Close analysis of language and literary techniques",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "How texts are constructed by authors (form, structure, style)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "How readers interpret texts (audience, purpose, interpretation)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "Text types and genres (literary and non-literary)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Historical and cultural contexts of production",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Reception contexts (how time/culture shapes meaning)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Place, setting and representation of location",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "How literature and language reflect/shape societies and values",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Relationships between literary and non-literary texts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Adaptations, translations and re‑imaginings",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Themes and motifs across different works and text types",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Influence and dialogue between authors and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Global Issues",
+        "subtopic": "Identifying and analyzing global issues in texts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Global Issues",
+        "subtopic": "How texts address social, cultural and political issues",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Global Issues",
+        "subtopic": "The role of language and literature in global issues",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Arabic A: Language & Literature SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "How texts are shaped by their authors",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "How texts are read and interpreted by audiences",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "Literary features and techniques (e.g., imagery, narration, symbolism)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "Genre conventions and expectations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Historical and cultural contexts of texts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Place and setting in literature",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Representation of time, chronology and memory",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "How literature reflects and shapes societies and values",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Relationships between texts (allusion, homage, response)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Adaptations, translations and re-imaginings",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Shared themes and motifs across works",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Influence and dialogue between authors and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The Power of Literature",
+        "subtopic": "Literature’s impact on individuals (identity, empathy)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The Power of Literature",
+        "subtopic": "Literature’s role in social and political change",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The Power of Literature",
+        "subtopic": "Ethical, moral and philosophical questions in literature",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "French A: Language & Literature SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "How texts are shaped by their authors",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "How texts are read and interpreted by audiences",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "Literary features and techniques (e.g., imagery, narration, symbolism)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "Genre conventions and expectations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Historical and cultural contexts of texts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Place and setting in literature",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Representation of time, chronology and memory",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "How literature reflects and shapes societies and values",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Relationships between texts (allusion, homage, response)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Adaptations, translations and re-imaginings",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Shared themes and motifs across works",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Influence and dialogue between authors and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The Power of Literature",
+        "subtopic": "Literature’s impact on individuals (identity, empathy)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The Power of Literature",
+        "subtopic": "Literature’s role in social and political change",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The Power of Literature",
+        "subtopic": "Ethical, moral and philosophical questions in literature",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Spanish A: Language & Literature SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "How texts are shaped by their authors",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "How texts are read and interpreted by audiences",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "Literary features and techniques (e.g., imagery, narration, symbolism)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "Genre conventions and expectations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Historical and cultural contexts of texts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Place and setting in literature",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Representation of time, chronology and memory",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "How literature reflects and shapes societies and values",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Relationships between texts (allusion, homage, response)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Adaptations, translations and re-imaginings",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Shared themes and motifs across works",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Influence and dialogue between authors and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The Power of Literature",
+        "subtopic": "Literature’s impact on individuals (identity, empathy)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The Power of Literature",
+        "subtopic": "Literature’s role in social and political change",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The Power of Literature",
+        "subtopic": "Ethical, moral and philosophical questions in literature",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Mandarin A: Language & Literature SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "How texts are shaped by their authors",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "How texts are read and interpreted by audiences",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "Literary features and techniques (e.g., imagery, narration, symbolism)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "Genre conventions and expectations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Historical and cultural contexts of texts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Place and setting in literature",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Representation of time, chronology and memory",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "How literature reflects and shapes societies and values",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Relationships between texts (allusion, homage, response)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Adaptations, translations and re-imaginings",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Shared themes and motifs across works",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Influence and dialogue between authors and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The Power of Literature",
+        "subtopic": "Literature’s impact on individuals (identity, empathy)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The Power of Literature",
+        "subtopic": "Literature’s role in social and political change",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The Power of Literature",
+        "subtopic": "Ethical, moral and philosophical questions in literature",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "English A: Language & Literature HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "Close analysis of language and literary techniques",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "How texts are constructed by authors (form, structure, style)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "How readers interpret texts (audience, purpose, interpretation)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "Text types and genres (literary and non-literary)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Historical and cultural contexts of production",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Reception contexts (how time/culture shapes meaning)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Place, setting and representation of location",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "How literature and language reflect/shape societies and values",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Relationships between literary and non-literary texts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Adaptations, translations and re‑imaginings",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Themes and motifs across different works and text types",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Influence and dialogue between authors and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Global Issues",
+        "subtopic": "Identifying and analyzing global issues in texts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Global Issues",
+        "subtopic": "How texts address social, cultural and political issues",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Global Issues",
+        "subtopic": "The role of language and literature in global issues",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Arabic A: Language & Literature HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "How texts are shaped by their authors",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "How texts are read and interpreted by audiences",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "Literary features and techniques (e.g., imagery, narration, symbolism)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "Genre conventions and expectations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Historical and cultural contexts of texts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Place and setting in literature",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Representation of time, chronology and memory",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "How literature reflects and shapes societies and values",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Relationships between texts (allusion, homage, response)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Adaptations, translations and re-imaginings",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Shared themes and motifs across works",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Influence and dialogue between authors and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The Power of Literature",
+        "subtopic": "Literature’s impact on individuals (identity, empathy)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The Power of Literature",
+        "subtopic": "Literature’s role in social and political change",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The Power of Literature",
+        "subtopic": "Ethical, moral and philosophical questions in literature",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "French A: Language & Literature HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "How texts are shaped by their authors",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "How texts are read and interpreted by audiences",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "Literary features and techniques (e.g., imagery, narration, symbolism)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "Genre conventions and expectations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Historical and cultural contexts of texts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Place and setting in literature",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Representation of time, chronology and memory",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "How literature reflects and shapes societies and values",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Relationships between texts (allusion, homage, response)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Adaptations, translations and re-imaginings",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Shared themes and motifs across works",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Influence and dialogue between authors and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The Power of Literature",
+        "subtopic": "Literature’s impact on individuals (identity, empathy)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The Power of Literature",
+        "subtopic": "Literature’s role in social and political change",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The Power of Literature",
+        "subtopic": "Ethical, moral and philosophical questions in literature",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Spanish A: Language & Literature HL",
+    "rows": [
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Influence and dialogue between authors and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The Power of Literature",
+        "subtopic": "Literature’s impact on individuals (identity, empathy)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The Power of Literature",
+        "subtopic": "Literature’s role in social and political change",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The Power of Literature",
+        "subtopic": "Ethical, moral and philosophical questions in literature",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "How texts are shaped by their authors",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "How texts are read and interpreted by audiences",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "Literary features and techniques (e.g., imagery, narration, symbolism)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "Genre conventions and expectations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Historical and cultural contexts of texts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Place and setting in literature",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Representation of time, chronology and memory",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "How literature reflects and shapes societies and values",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Relationships between texts (allusion, homage, response)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Adaptations, translations and re-imaginings",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Shared themes and motifs across works",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Mandarin A: Language & Literature HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "How texts are shaped by their authors",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "How texts are read and interpreted by audiences",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "Literary features and techniques (e.g., imagery, narration, symbolism)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Readers, Writers and Texts",
+        "subtopic": "Genre conventions and expectations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Historical and cultural contexts of texts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Place and setting in literature",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "Representation of time, chronology and memory",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Time and Space",
+        "subtopic": "How literature reflects and shapes societies and values",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Relationships between texts (allusion, homage, response)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Adaptations, translations and re-imaginings",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Shared themes and motifs across works",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Intertextuality: Connecting Texts",
+        "subtopic": "Influence and dialogue between authors and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The Power of Literature",
+        "subtopic": "Literature’s impact on individuals (identity, empathy)",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The Power of Literature",
+        "subtopic": "Literature’s role in social and political change",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - The Power of Literature",
+        "subtopic": "Ethical, moral and philosophical questions in literature",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Arabic B SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal attributes and relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Beliefs, values and opinions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal experiences and life stages",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Cultural identity and heritage",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Language and identity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Daily routine and lifestyle",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Leisure, hobbies and interests",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Travel and exploration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Festivals, customs and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Health, wellbeing and emotions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Creativity and innovation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Entertainment, arts and media",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Science, technology and progress",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Communication and social media",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Products, services and consumer culture",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Community and social relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Education and learning",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Work, careers and the economy",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Government, law and citizenship",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Social issues and equality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Environment and sustainability",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Global challenges and responsibility",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Natural resources and conservation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Conflict, peace and cooperation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Local and global action",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "English B SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal attributes and relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Beliefs, values and opinions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal experiences and life stages",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Cultural identity and heritage",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Language and identity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Daily routine and lifestyle",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Leisure, hobbies and interests",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Travel and exploration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Festivals, customs and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Health, wellbeing and emotions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Creativity and innovation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Entertainment, arts and media",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Science, technology and progress",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Communication and social media",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Products, services and consumer culture",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Community and social relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Education and learning",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Work, careers and the economy",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Government, law and citizenship",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Social issues and equality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Environment and sustainability",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Global challenges and responsibility",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Natural resources and conservation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Conflict, peace and cooperation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Local and global action",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "French B SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal attributes and relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Beliefs, values and opinions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal experiences and life stages",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Cultural identity and heritage",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Language and identity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Daily routine and lifestyle",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Leisure, hobbies and interests",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Travel and exploration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Festivals, customs and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Health, wellbeing and emotions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Creativity and innovation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Entertainment, arts and media",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Science, technology and progress",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Communication and social media",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Products, services and consumer culture",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Community and social relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Education and learning",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Work, careers and the economy",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Government, law and citizenship",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Social issues and equality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Environment and sustainability",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Global challenges and responsibility",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Natural resources and conservation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Conflict, peace and cooperation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Local and global action",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Spanish B SL",
+    "rows": [
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Community and social relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Education and learning",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Work, careers and the economy",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Government, law and citizenship",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Social issues and equality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Environment and sustainability",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Global challenges and responsibility",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Natural resources and conservation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Conflict, peace and cooperation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Local and global action",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal attributes and relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Beliefs, values and opinions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal experiences and life stages",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Cultural identity and heritage",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Language and identity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Daily routine and lifestyle",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Leisure, hobbies and interests",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Travel and exploration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Festivals, customs and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Health, wellbeing and emotions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Creativity and innovation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Entertainment, arts and media",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Science, technology and progress",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Communication and social media",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Products, services and consumer culture",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Mandarin B SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal attributes and relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Beliefs, values and opinions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal experiences and life stages",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Cultural identity and heritage",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Language and identity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Daily routine and lifestyle",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Leisure, hobbies and interests",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Travel and exploration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Festivals, customs and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Health, wellbeing and emotions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Creativity and innovation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Entertainment, arts and media",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Science, technology and progress",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Communication and social media",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Products, services and consumer culture",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Community and social relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Education and learning",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Work, careers and the economy",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Government, law and citizenship",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Social issues and equality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Environment and sustainability",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Global challenges and responsibility",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Natural resources and conservation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Conflict, peace and cooperation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Local and global action",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Arabic B HL",
+    "rows": [
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Products, services and consumer culture",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal attributes and relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Beliefs, values and opinions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal experiences and life stages",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Cultural identity and heritage",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Language and identity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "More detailed and abstract discussion of identity and perspective (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Daily routine and lifestyle",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Leisure, hobbies and interests",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Travel and exploration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Festivals, customs and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Health, wellbeing and emotions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "More nuanced narration, comparison, and personal reflection (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Creativity and innovation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Entertainment, arts and media",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Science, technology and progress",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Communication and social media",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "More sophisticated analysis of media, ideas, and viewpoints (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Community and social relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Education and learning",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Work, careers and the economy",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Government, law and citizenship",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Social issues and equality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "More detailed argumentation about institutions and social issues (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Environment and sustainability",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Global challenges and responsibility",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Natural resources and conservation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Conflict, peace and cooperation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Local and global action",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "More complex global perspective and evaluative discussion (HL only)",
+        "hl_only": true
+      }
+    ]
+  },
+  {
+    "subject": "English B HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal attributes and relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Beliefs, values and opinions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal experiences and life stages",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Cultural identity and heritage",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Language and identity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "More detailed and abstract discussion of identity and perspective (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Daily routine and lifestyle",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Leisure, hobbies and interests",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Travel and exploration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Festivals, customs and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Health, wellbeing and emotions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "More nuanced narration, comparison, and personal reflection (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Creativity and innovation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Entertainment, arts and media",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Science, technology and progress",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Communication and social media",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Products, services and consumer culture",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "More sophisticated analysis of media, ideas, and viewpoints (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Community and social relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Education and learning",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Work, careers and the economy",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Government, law and citizenship",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Social issues and equality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "More detailed argumentation about institutions and social issues (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Environment and sustainability",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Global challenges and responsibility",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Natural resources and conservation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Conflict, peace and cooperation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Local and global action",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "More complex global perspective and evaluative discussion (HL only)",
+        "hl_only": true
+      }
+    ]
+  },
+  {
+    "subject": "French B HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal attributes and relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Beliefs, values and opinions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal experiences and life stages",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Cultural identity and heritage",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Language and identity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "More detailed and abstract discussion of identity and perspective (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Daily routine and lifestyle",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Leisure, hobbies and interests",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Travel and exploration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Festivals, customs and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Health, wellbeing and emotions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "More nuanced narration, comparison, and personal reflection (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Creativity and innovation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Entertainment, arts and media",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Science, technology and progress",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Communication and social media",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Products, services and consumer culture",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "More sophisticated analysis of media, ideas, and viewpoints (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Community and social relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Education and learning",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Work, careers and the economy",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Government, law and citizenship",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Social issues and equality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "More detailed argumentation about institutions and social issues (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Environment and sustainability",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Global challenges and responsibility",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Natural resources and conservation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Conflict, peace and cooperation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Local and global action",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "More complex global perspective and evaluative discussion (HL only)",
+        "hl_only": true
+      }
+    ]
+  },
+  {
+    "subject": "Spanish B HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal attributes and relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Beliefs, values and opinions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal experiences and life stages",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Cultural identity and heritage",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Language and identity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "More detailed and abstract discussion of identity and perspective (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Daily routine and lifestyle",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Leisure, hobbies and interests",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Travel and exploration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Festivals, customs and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Health, wellbeing and emotions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "More nuanced narration, comparison, and personal reflection (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Creativity and innovation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Entertainment, arts and media",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Science, technology and progress",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Communication and social media",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Products, services and consumer culture",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "More sophisticated analysis of media, ideas, and viewpoints (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Community and social relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Education and learning",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Work, careers and the economy",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Government, law and citizenship",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Social issues and equality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "More detailed argumentation about institutions and social issues (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Environment and sustainability",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Global challenges and responsibility",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Natural resources and conservation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Conflict, peace and cooperation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Local and global action",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "More complex global perspective and evaluative discussion (HL only)",
+        "hl_only": true
+      }
+    ]
+  },
+  {
+    "subject": "Mandarin B HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal attributes and relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Beliefs, values and opinions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Personal experiences and life stages",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Cultural identity and heritage",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "Language and identity",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Identities",
+        "subtopic": "More detailed and abstract discussion of identity and perspective (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Daily routine and lifestyle",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Leisure, hobbies and interests",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Travel and exploration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Festivals, customs and traditions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "Health, wellbeing and emotions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Experiences",
+        "subtopic": "More nuanced narration, comparison, and personal reflection (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Creativity and innovation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Entertainment, arts and media",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Science, technology and progress",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Communication and social media",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "Products, services and consumer culture",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Human Ingenuity",
+        "subtopic": "More sophisticated analysis of media, ideas, and viewpoints (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Community and social relationships",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Education and learning",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Work, careers and the economy",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Government, law and citizenship",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "Social issues and equality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Social Organization",
+        "subtopic": "More detailed argumentation about institutions and social issues (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Environment and sustainability",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Global challenges and responsibility",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Natural resources and conservation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Conflict, peace and cooperation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "Local and global action",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Sharing the Planet",
+        "subtopic": "More complex global perspective and evaluative discussion (HL only)",
+        "hl_only": true
+      }
+    ]
+  },
+  {
+    "subject": "Math Analysis & Approaches SL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Number and algebra",
+        "subtopic": "Number",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Number and algebra",
+        "subtopic": "Sequences and series",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Number and algebra",
+        "subtopic": "Exponents and logarithms",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Number and algebra",
+        "subtopic": "Algebraic expressions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Number and algebra",
+        "subtopic": "Equations and inequalities",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Functions and graphs",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Transformations of functions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Quadratic, polynomial and rational functions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Exponential and logarithmic functions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Function notation and inverse functions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Graphing techniques",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "The graph of the derivative",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Modelling with functions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Geometry and trigonometry",
+        "subtopic": "Trigonometric ratios",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Geometry and trigonometry",
+        "subtopic": "Non-right-angled trigonometry",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Geometry and trigonometry",
+        "subtopic": "Radians",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Geometry and trigonometry",
+        "subtopic": "Trigonometric identities and equations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Geometry and trigonometry",
+        "subtopic": "Vectors",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Geometry and trigonometry",
+        "subtopic": "The circular functions sine and cosine",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Geometry and trigonometry",
+        "subtopic": "Solution of trigonometric equations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Geometry and trigonometry",
+        "subtopic": "Angles of elevation and depression",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and probability",
+        "subtopic": "Descriptive statistics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and probability",
+        "subtopic": "Probability",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and probability",
+        "subtopic": "Discrete random variables",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and probability",
+        "subtopic": "Binomial distribution",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and probability",
+        "subtopic": "Normal distribution",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and probability",
+        "subtopic": "Sampling and data presentation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and probability",
+        "subtopic": "Confidence intervals and hypothesis testing",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and probability",
+        "subtopic": "Correlation and regression",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Limits and differentiation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Applications of differentiation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Integration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Applications of integration",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Differential equations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Kinematics",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Math Analysis & Approaches HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Number and Algebra",
+        "subtopic": "Operations with numbers in scientific notation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Number and Algebra",
+        "subtopic": "Arithmetic sequences and series",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Number and Algebra",
+        "subtopic": "Geometric sequences and series",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Number and Algebra",
+        "subtopic": "Financial applications of sequences and series",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Number and Algebra",
+        "subtopic": "Laws of exponents and logarithms",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Number and Algebra",
+        "subtopic": "Solving exponential equations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Number and Algebra",
+        "subtopic": "Binomial theorem for positive integer n",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Number and Algebra",
+        "subtopic": "Proof by mathematical induction",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 1 - Number and Algebra",
+        "subtopic": "Complex numbers",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 1 - Number and Algebra",
+        "subtopic": "Systems of linear equations using matrices",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Concept of a function domain range",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Linear functions and their graphs",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Quadratic functions vertex form",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Rational functions and asymptotes",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Exponential and logarithmic functions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Transformations of graphs",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Solving equations graphically and analytically",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Inverse functions",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Partial fractions",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - Functions",
+        "subtopic": "Odd and even functions",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Geometry and Trigonometry",
+        "subtopic": "Distance midpoint and gradient formulae",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Geometry and Trigonometry",
+        "subtopic": "Trigonometric ratios in right triangles",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Geometry and Trigonometry",
+        "subtopic": "Sine and cosine rule",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Geometry and Trigonometry",
+        "subtopic": "Area of triangle using sine",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Geometry and Trigonometry",
+        "subtopic": "Radians arc length and sector area",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Geometry and Trigonometry",
+        "subtopic": "Unit circle and exact trigonometric values",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Geometry and Trigonometry",
+        "subtopic": "Trigonometric identities Pythagorean and double angle",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Geometry and Trigonometry",
+        "subtopic": "Solving trigonometric equations",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Geometry and Trigonometry",
+        "subtopic": "Vectors magnitude and direction",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Geometry and Trigonometry",
+        "subtopic": "Scalar product and angle between vectors",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Geometry and Trigonometry",
+        "subtopic": "Vector equations of lines",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Geometry and Trigonometry",
+        "subtopic": "Planes and angles in 3D",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Statistics and Probability",
+        "subtopic": "Sampling techniques and bias",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and Probability",
+        "subtopic": "Data presentation histograms box plots",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and Probability",
+        "subtopic": "Measures of central tendency and spread",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and Probability",
+        "subtopic": "Linear correlation Pearson coefficient",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and Probability",
+        "subtopic": "Regression lines",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and Probability",
+        "subtopic": "Probability addition and multiplication rules",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and Probability",
+        "subtopic": "Conditional probability",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and Probability",
+        "subtopic": "Discrete random variables and expected value",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and Probability",
+        "subtopic": "Binomial distribution",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and Probability",
+        "subtopic": "Normal distribution and standardisation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Statistics and Probability",
+        "subtopic": "Hypothesis testing for mean",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Statistics and Probability",
+        "subtopic": "Poisson distribution",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Statistics and Probability",
+        "subtopic": "Transition matrices",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Introduction to limits and derivatives",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Differentiation rules power product quotient chain",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Tangents and normals to curves",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Increasing and decreasing functions",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Local and global maximum and minimum",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Optimisation problems",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Integration as antidifferentiation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Definite integrals and area under curve",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Kinematics with calculus",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Integration by substitution",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Integration by parts",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "First order differential equations",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Calculus",
+        "subtopic": "Maclaurin series",
+        "hl_only": true
+      }
+    ]
+  },
+  {
+    "subject": "Physics SL",
+    "rows": [
+      {
+        "topic": "Topic 4 - Fields",
+        "subtopic": "Electric fields",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Fields",
+        "subtopic": "Magnetic fields",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Space, time and motion",
+        "subtopic": "Measurement and uncertainties",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Space, time and motion",
+        "subtopic": "Kinematics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Space, time and motion",
+        "subtopic": "Forces and dynamics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Space, time and motion",
+        "subtopic": "Work, energy and power",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Space, time and motion",
+        "subtopic": "Circular motion and gravitation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - The particulate nature of matter",
+        "subtopic": "Thermal concepts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - The particulate nature of matter",
+        "subtopic": "Modelling a gas",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - The particulate nature of matter",
+        "subtopic": "Heat transfer and change of state",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - The particulate nature of matter",
+        "subtopic": "Ideal gases",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Wave behaviour",
+        "subtopic": "Wave characteristics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Wave behaviour",
+        "subtopic": "Wave phenomena",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Wave behaviour",
+        "subtopic": "Standing waves",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Wave behaviour",
+        "subtopic": "Doppler effect",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Wave behaviour",
+        "subtopic": "Polarization",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Fields",
+        "subtopic": "Gravitational fields",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Fields",
+        "subtopic": "Field strength and potential",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Fields",
+        "subtopic": "Motion in fields",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Fields",
+        "subtopic": "Capacitance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Fields",
+        "subtopic": "Electromagnetic induction",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Nuclear and quantum physics",
+        "subtopic": "The nuclear atom",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Nuclear and quantum physics",
+        "subtopic": "Radioactive decay",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Nuclear and quantum physics",
+        "subtopic": "Fission and fusion",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Nuclear and quantum physics",
+        "subtopic": "Quantum phenomena",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Nuclear and quantum physics",
+        "subtopic": "Photoelectric effect",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Nuclear and quantum physics",
+        "subtopic": "Wave-particle duality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Option topic",
+        "subtopic": "Engineering physics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Option topic",
+        "subtopic": "Imaging",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Option topic",
+        "subtopic": "Astrophysics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Option topic",
+        "subtopic": "Relativity",
+        "hl_only": false
+      }
+    ]
+  },
+  {
+    "subject": "Physics HL",
+    "rows": [
+      {
+        "topic": "Topic 1 - Space, time and motion",
+        "subtopic": "Measurement and uncertainties",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Space, time and motion",
+        "subtopic": "Kinematics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Space, time and motion",
+        "subtopic": "Forces and dynamics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Space, time and motion",
+        "subtopic": "Work, energy and power",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Space, time and motion",
+        "subtopic": "Circular motion and gravitation",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 1 - Space, time and motion",
+        "subtopic": "Simple harmonic motion (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 1 - Space, time and motion",
+        "subtopic": "Thermal energy, processes and the laws of thermodynamics (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - The particulate nature of matter",
+        "subtopic": "Thermal concepts",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - The particulate nature of matter",
+        "subtopic": "Modelling a gas",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - The particulate nature of matter",
+        "subtopic": "Heat transfer and change of state",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - The particulate nature of matter",
+        "subtopic": "Ideal gases",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 2 - The particulate nature of matter",
+        "subtopic": "Kinetic theory of gases (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 2 - The particulate nature of matter",
+        "subtopic": "Thermodynamic processes (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 3 - Wave behaviour",
+        "subtopic": "Wave characteristics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Wave behaviour",
+        "subtopic": "Wave phenomena",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Wave behaviour",
+        "subtopic": "Standing waves",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Wave behaviour",
+        "subtopic": "Doppler effect",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Wave behaviour",
+        "subtopic": "Polarization",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 3 - Wave behaviour",
+        "subtopic": "Interference and diffraction in greater depth (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 4 - Fields",
+        "subtopic": "Gravitational fields",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Fields",
+        "subtopic": "Electric fields",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Fields",
+        "subtopic": "Magnetic fields",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Fields",
+        "subtopic": "Field strength and potential",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Fields",
+        "subtopic": "Motion in fields",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Fields",
+        "subtopic": "Capacitance",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Fields",
+        "subtopic": "Electromagnetic induction",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 4 - Fields",
+        "subtopic": "More detailed field theory and flux analysis (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Nuclear and quantum physics",
+        "subtopic": "The nuclear atom",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Nuclear and quantum physics",
+        "subtopic": "Radioactive decay",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Nuclear and quantum physics",
+        "subtopic": "Fission and fusion",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Nuclear and quantum physics",
+        "subtopic": "Quantum phenomena",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Nuclear and quantum physics",
+        "subtopic": "Photoelectric effect",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Nuclear and quantum physics",
+        "subtopic": "Wave-particle duality",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 5 - Nuclear and quantum physics",
+        "subtopic": "Nuclear reactions and mass-energy equivalence (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 5 - Nuclear and quantum physics",
+        "subtopic": "More advanced quantum models and applications (HL only)",
+        "hl_only": true
+      },
+      {
+        "topic": "Topic 6 - Option topic",
+        "subtopic": "Engineering physics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Option topic",
+        "subtopic": "Imaging",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Option topic",
+        "subtopic": "Astrophysics",
+        "hl_only": false
+      },
+      {
+        "topic": "Topic 6 - Option topic",
+        "subtopic": "Relativity",
+        "hl_only": false
+      }
+    ]
+  }
+]
