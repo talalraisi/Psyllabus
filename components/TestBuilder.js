@@ -149,6 +149,7 @@ export default function TestBuilder({
   focusModes, focusMode, onFocusMode,
   topics, selected, onToggleTopic, onSelectAll, perTopicCounts,
   subtopicsByTopic, pickedSubtopics, onToggleSubtopic, openTopic, onOpenTopic, loadingPool,
+  unitBySubtopic = {},
   difficulties, difficulty, onDifficulty, difficultyCount,
   questionTypes, qtype, onQtype, qtypeCount,
   orders, order, onOrder,
@@ -293,7 +294,23 @@ export default function TestBuilder({
                 const n = perTopicCounts[topic] || 0
                 const isSelected = selected.includes(topic)
                 const within = subtopicsByTopic[topic] || {}
-                const names = Object.keys(within).sort()
+                // Guide order, not alphabetical: kinematics comes before
+                // momentum in every class and on every paper.
+                const names = Object.keys(within).sort(
+                  (a, b) =>
+                    (unitBySubtopic[a]?.position ?? Number.MAX_SAFE_INTEGER) -
+                      (unitBySubtopic[b]?.position ?? Number.MAX_SAFE_INTEGER) ||
+                    a.localeCompare(b)
+                )
+                // The middle level of the syllabus, kept as runs of the same
+                // unit so a long topic reads as a few short lists.
+                const unitRuns = []
+                for (const name of names) {
+                  const unit = unitBySubtopic[name]?.unit || null
+                  const last = unitRuns[unitRuns.length - 1]
+                  if (last && last.unit === unit) last.names.push(name)
+                  else unitRuns.push({ unit, code: unitBySubtopic[name]?.code || null, names: [name] })
+                }
                 const picked = pickedSubtopics[topic] || []
                 const isOpen = openTopic === topic
 
@@ -345,8 +362,26 @@ export default function TestBuilder({
                     </div>
 
                     {isOpen && (
-                      <ul className="flex flex-col border-t px-5" style={{ borderColor: 'var(--border)' }}>
-                        {names.map((name) => {
+                      <div className="border-t px-5" style={{ borderColor: 'var(--border)' }}>
+                        {unitRuns.map(({ unit, code, names: unitNames }) => (
+                          <div key={unit || 'ungrouped'}>
+                            {unit && (
+                              <div className="flex items-baseline gap-2 pt-3">
+                                {code && (
+                                  <span
+                                    className="text-[11px] font-semibold tabular-nums"
+                                    style={{ color: 'var(--text-faint)' }}
+                                  >
+                                    {code}
+                                  </span>
+                                )}
+                                <span className="text-[12.5px] font-medium" style={{ color: 'var(--text-muted)' }}>
+                                  {unit}
+                                </span>
+                              </div>
+                            )}
+                            <ul className="flex flex-col">
+                        {unitNames.map((name) => {
                           const on = picked.includes(name)
                           return (
                             <li key={name}>
@@ -375,7 +410,10 @@ export default function TestBuilder({
                             </li>
                           )
                         })}
-                      </ul>
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </div>
                 )

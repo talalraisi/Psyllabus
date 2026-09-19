@@ -23,6 +23,7 @@ import {
   computeCompletionPercent,
   progressKey,
   groupByTopic,
+  groupByUnit,
   sortTopics,
 } from '@/lib/progress'
 import { buildProgressDetailMap, effectiveStatus, isDecayed, daysSince, DECAY_DAYS } from '@/lib/decay'
@@ -141,6 +142,7 @@ export default function SyllabusPage() {
   )
   const completion = computeCompletionPercent(syllabusData, effectiveMap, subjectName)
   const topicCount = new Set(syllabusData.map((i) => i.topic)).size
+  const unitCount = new Set(syllabusData.map((i) => i.unit).filter(Boolean)).size
   const anyOpen = Object.values(expandedTopics).some(Boolean)
   const slugPath = `/dashboard/syllabus/${slug}`
 
@@ -159,7 +161,11 @@ export default function SyllabusPage() {
         <PageHeader
           eyebrow="Syllabus"
           title={subjectName}
-          subtitle={`${topicCount} topic${topicCount !== 1 ? 's' : ''} · ${syllabusData.length} subtopic${syllabusData.length !== 1 ? 's' : ''}`}
+          subtitle={
+            unitCount
+              ? `${topicCount} topic${topicCount !== 1 ? 's' : ''} · ${unitCount} unit${unitCount !== 1 ? 's' : ''} · ${syllabusData.length} subtopic${syllabusData.length !== 1 ? 's' : ''}`
+              : `${topicCount} topic${topicCount !== 1 ? 's' : ''} · ${syllabusData.length} subtopic${syllabusData.length !== 1 ? 's' : ''}`
+          }
           action={
             <div className="flex items-center gap-2">
               {syllabusData.length > 0 && (
@@ -213,6 +219,7 @@ export default function SyllabusPage() {
                 (s) => progress[progressKey(subjectName, s.subtopic)] === 'mastered'
               ).length
               const expanded = !!expandedTopics[topic]
+              const topicUnits = new Set(subtopics.map((s) => s.unit).filter(Boolean)).size
 
               return (
                 <section
@@ -235,6 +242,7 @@ export default function SyllabusPage() {
                       <span className="min-w-0">
                         <span className="block text-[14.5px] font-medium">{topic}</span>
                         <span className="mt-0.5 block text-[12px]" style={{ color: 'var(--text-faint)' }}>
+                          {topicUnits ? `${topicUnits} unit${topicUnits !== 1 ? 's' : ''} · ` : ''}
                           {subtopics.length} subtopic{subtopics.length !== 1 ? 's' : ''} ·{' '}
                           {topicMastered} mastered
                         </span>
@@ -251,8 +259,27 @@ export default function SyllabusPage() {
                   </div>
 
                   {expanded && (
-                    <ul className="mb-3 flex flex-col pl-6">
-                      {subtopics.map((item) => {
+                    <div className="mb-3 flex flex-col pl-6">
+                      {/* The middle level. A theme with twenty-two subtopics
+                          under it is a wall; the guide's own units are how a
+                          teacher refers to them, so they are the heading. */}
+                      {groupByUnit(subtopics).map(({ unit, code, items }) => (
+                        <div key={unit || 'ungrouped'}>
+                          {unit && (
+                            <div className="flex items-baseline gap-2 pt-4 pb-1">
+                              {code && (
+                                <span
+                                  className="text-[11.5px] font-semibold tabular-nums"
+                                  style={{ color: 'var(--text-faint)' }}
+                                >
+                                  {code}
+                                </span>
+                              )}
+                              <span className="text-[13px] font-medium">{unit}</span>
+                            </div>
+                          )}
+                          <ul className="flex flex-col">
+                      {items.map((item) => {
                         const key = progressKey(subjectName, item.subtopic)
                         const currentStatus = isDecayed(
                           progressDetail[key]?.status,
@@ -331,7 +358,10 @@ export default function SyllabusPage() {
                           </li>
                         )
                       })}
-                    </ul>
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </section>
               )

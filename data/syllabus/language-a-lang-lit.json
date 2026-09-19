@@ -19,93 +19,366 @@
       "Mandarin A: Language & Literature HL"
     ]
   },
-  "note": "Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "note": "Three levels: topic, unit, then one assessable point. Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
   "topics": [
     {
       "topic": "Readers, writers and texts",
-      "subtopics": [
-        ["How readers construct meaning from a text", "sl"],
-        ["Writer's choices: form, structure and style", "sl"],
-        ["Purpose, audience and context of production", "sl"],
-        ["Literary forms: poetry, prose fiction, prose non-fiction, drama", "sl"],
-        ["Non-literary text types and their conventions", "sl"],
-        ["Visual, audio and multimodal texts", "sl"],
-        ["Diction, register and tone", "sl"],
-        ["Imagery, metaphor and symbolism", "sl"],
-        ["Rhetorical and persuasive techniques", "sl"],
-        ["Narrative voice, point of view and characterisation", "sl"],
-        ["Structure, sequencing and pacing of a text", "sl"],
-        ["Bias, assumptions and implied values", "sl"]
+      "units": [
+        {
+          "code": "1.1",
+          "unit": "Readers and interpretation",
+          "subtopics": [
+            [
+              "How readers construct meaning from a text",
+              "sl"
+            ],
+            [
+              "Writer's choices: form, structure and style",
+              "sl"
+            ],
+            [
+              "Purpose, audience and context of production",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "1.2",
+          "unit": "Text types and forms",
+          "subtopics": [
+            [
+              "Literary forms: poetry, prose fiction, prose non-fiction, drama",
+              "sl"
+            ],
+            [
+              "Non-literary text types and their conventions",
+              "sl"
+            ],
+            [
+              "Visual, audio and multimodal texts",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "1.3",
+          "unit": "Language and style",
+          "subtopics": [
+            [
+              "Diction, register and tone",
+              "sl"
+            ],
+            [
+              "Imagery, metaphor and symbolism",
+              "sl"
+            ],
+            [
+              "Rhetorical and persuasive techniques",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "1.4",
+          "unit": "Voice and structure",
+          "subtopics": [
+            [
+              "Narrative voice, point of view and characterisation",
+              "sl"
+            ],
+            [
+              "Structure, sequencing and pacing of a text",
+              "sl"
+            ],
+            [
+              "Bias, assumptions and implied values",
+              "sl"
+            ]
+          ]
+        }
       ]
     },
     {
       "topic": "Time and space",
-      "subtopics": [
-        ["Historical context of a text's production", "sl"],
-        ["Cultural and social context", "sl"],
-        ["Political and economic context", "sl"],
-        ["Contexts of reception and changing interpretations", "sl"],
-        ["Place, setting and the representation of location", "sl"],
-        ["Identity: individual and collective", "sl"],
-        ["Gender, race, class and power in texts", "sl"],
-        ["Beliefs, values and ideologies", "sl"],
-        ["Media, communication and public discourse", "sl"],
-        ["Language, power and ideology", "sl"],
-        ["Censorship, ownership and freedom of expression", "sl"],
-        ["Texts as social and cultural practices", "sl"]
+      "units": [
+        {
+          "code": "2.1",
+          "unit": "Contexts of production and reception",
+          "subtopics": [
+            [
+              "Historical context of a text's production",
+              "sl"
+            ],
+            [
+              "Cultural and social context",
+              "sl"
+            ],
+            [
+              "Political and economic context",
+              "sl"
+            ],
+            [
+              "Contexts of reception and changing interpretations",
+              "sl"
+            ],
+            [
+              "Place, setting and the representation of location",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "2.2",
+          "unit": "Culture, identity and representation",
+          "subtopics": [
+            [
+              "Identity: individual and collective",
+              "sl"
+            ],
+            [
+              "Gender, race, class and power in texts",
+              "sl"
+            ],
+            [
+              "Beliefs, values and ideologies",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "2.3",
+          "unit": "Texts in society",
+          "subtopics": [
+            [
+              "Media, communication and public discourse",
+              "sl"
+            ],
+            [
+              "Language, power and ideology",
+              "sl"
+            ],
+            [
+              "Censorship, ownership and freedom of expression",
+              "sl"
+            ],
+            [
+              "Texts as social and cultural practices",
+              "sl"
+            ]
+          ]
+        }
       ]
     },
     {
       "topic": "Intertextuality: connecting texts",
-      "subtopics": [
-        ["Allusion, quotation and reference", "sl"],
-        ["Adaptation and appropriation", "sl"],
-        ["Genre conventions and their transformation", "sl"],
-        ["Parody, pastiche and homage", "sl"],
-        ["Comparing themes across texts", "sl"],
-        ["Comparing style and form across texts", "sl"],
-        ["Connections between literary and non-literary texts", "sl"],
-        ["Texts answering and challenging earlier texts", "sl"],
-        ["Building a comparative thesis", "sl"]
+      "units": [
+        {
+          "code": "3.1",
+          "unit": "Relationships between texts",
+          "subtopics": [
+            [
+              "Allusion, quotation and reference",
+              "sl"
+            ],
+            [
+              "Adaptation and appropriation",
+              "sl"
+            ],
+            [
+              "Genre conventions and their transformation",
+              "sl"
+            ],
+            [
+              "Parody, pastiche and homage",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "3.2",
+          "unit": "Comparing texts",
+          "subtopics": [
+            [
+              "Comparing themes across texts",
+              "sl"
+            ],
+            [
+              "Comparing style and form across texts",
+              "sl"
+            ],
+            [
+              "Connections between literary and non-literary texts",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "3.3",
+          "unit": "Textual conversations",
+          "subtopics": [
+            [
+              "Texts answering and challenging earlier texts",
+              "sl"
+            ],
+            [
+              "Building a comparative thesis",
+              "sl"
+            ]
+          ]
+        }
       ]
     },
     {
       "topic": "The seven concepts",
-      "subtopics": [
-        ["Identity", "sl"],
-        ["Culture", "sl"],
-        ["Creativity", "sl"],
-        ["Communication", "sl"],
-        ["Perspective", "sl"],
-        ["Transformation", "sl"],
-        ["Representation", "sl"]
+      "units": [
+        {
+          "code": "4.1",
+          "unit": "The seven concepts",
+          "subtopics": [
+            [
+              "Identity",
+              "sl"
+            ],
+            [
+              "Culture",
+              "sl"
+            ],
+            [
+              "Creativity",
+              "sl"
+            ],
+            [
+              "Communication",
+              "sl"
+            ],
+            [
+              "Perspective",
+              "sl"
+            ],
+            [
+              "Transformation",
+              "sl"
+            ],
+            [
+              "Representation",
+              "sl"
+            ]
+          ]
+        }
       ]
     },
     {
       "topic": "Global issues and the individual oral",
-      "subtopics": [
-        ["Identifying a global issue in a text", "sl"],
-        ["Fields of inquiry: culture, identity and community", "sl"],
-        ["Fields of inquiry: beliefs, values and education", "sl"],
-        ["Fields of inquiry: politics, power and justice", "sl"],
-        ["Fields of inquiry: art, creativity and the imagination", "sl"],
-        ["Fields of inquiry: science, technology and the environment", "sl"],
-        ["Choosing extracts from a literary work and a body of work", "sl"],
-        ["Structuring and delivering the oral", "sl"],
-        ["Responding to follow-up questions", "sl"]
+      "units": [
+        {
+          "code": "5.1",
+          "unit": "Choosing a global issue",
+          "subtopics": [
+            [
+              "Identifying a global issue in a text",
+              "sl"
+            ],
+            [
+              "Fields of inquiry: culture, identity and community",
+              "sl"
+            ],
+            [
+              "Fields of inquiry: beliefs, values and education",
+              "sl"
+            ],
+            [
+              "Fields of inquiry: politics, power and justice",
+              "sl"
+            ],
+            [
+              "Fields of inquiry: art, creativity and the imagination",
+              "sl"
+            ],
+            [
+              "Fields of inquiry: science, technology and the environment",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "5.2",
+          "unit": "The individual oral",
+          "subtopics": [
+            [
+              "Choosing extracts from a literary work and a body of work",
+              "sl"
+            ],
+            [
+              "Structuring and delivering the oral",
+              "sl"
+            ],
+            [
+              "Responding to follow-up questions",
+              "sl"
+            ]
+          ]
+        }
       ]
     },
     {
       "topic": "Assessment technique",
-      "subtopics": [
-        ["Paper 1: analysing an unseen non-literary text", "sl"],
-        ["Paper 1: using the guiding question", "sl"],
-        ["Paper 2: comparing two literary works", "sl"],
-        ["Paper 2: selecting evidence and integrating quotation", "sl"],
-        ["Writing about effect rather than listing devices", "sl"],
-        ["Essay structure, signposting and conclusions", "sl"],
-        ["The HL essay: developing a line of inquiry", "hl"],
-        ["The HL essay: research, referencing and academic register", "hl"]
+      "units": [
+        {
+          "code": "6.1",
+          "unit": "Paper 1: guided textual analysis",
+          "subtopics": [
+            [
+              "Paper 1: analysing an unseen non-literary text",
+              "sl"
+            ],
+            [
+              "Paper 1: using the guiding question",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "6.2",
+          "unit": "Paper 2: comparative essay",
+          "subtopics": [
+            [
+              "Paper 2: comparing two literary works",
+              "sl"
+            ],
+            [
+              "Paper 2: selecting evidence and integrating quotation",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "6.3",
+          "unit": "Writing technique",
+          "subtopics": [
+            [
+              "Writing about effect rather than listing devices",
+              "sl"
+            ],
+            [
+              "Essay structure, signposting and conclusions",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "6.4",
+          "unit": "The HL essay",
+          "subtopics": [
+            [
+              "The HL essay: developing a line of inquiry",
+              "hl"
+            ],
+            [
+              "The HL essay: research, referencing and academic register",
+              "hl"
+            ]
+          ]
+        }
       ]
     }
   ],

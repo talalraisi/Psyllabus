@@ -3,137 +3,632 @@
   "curriculum": "IB",
   "guide": "first teaching 2025, first assessment 2027",
   "confidence": "medium — anyone in the DP now sits the new guide, so this follows it, but I could not check the guide itself. Verify with your teacher whether databases and machine learning are HL-only for your cohort; they are marked shared here.",
-  "subjects": { "sl": "Computer Science SL", "hl": "Computer Science HL" },
-  "note": "Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
+  "subjects": {
+    "sl": "Computer Science SL",
+    "hl": "Computer Science HL"
+  },
+  "note": "Three levels: topic, unit, then one assessable point. Levels: sl = studied by both, ext = studied by both with extra depth at HL, hl = HL only.",
   "topics": [
     {
       "topic": "A. Computer fundamentals",
-      "subtopics": [
-        ["Components of a computer system", "sl"],
-        ["Input, output and storage devices", "sl"],
-        ["Primary and secondary memory", "sl"],
-        ["Binary representation of integers", "sl"],
-        ["Hexadecimal and conversion between number bases", "sl"],
-        ["Representing text, images, sound and video", "sl"],
-        ["Boolean logic and logic gates", "sl"],
-        ["Truth tables and logic circuits", "sl"],
-        ["The CPU, registers and the fetch-execute cycle", "sl"],
-        ["Cache, buses and performance", "ext"],
-        ["Operating systems and their functions", "sl"],
-        ["Memory, processor and file management", "ext"],
-        ["Translators: compilers and interpreters", "sl"],
-        ["Utility software and system maintenance", "sl"],
-        ["Cybersecurity threats and protection", "sl"],
-        ["Privacy, ethics and the social impact of computing", "sl"]
+      "units": [
+        {
+          "code": "A.1",
+          "unit": "System components",
+          "subtopics": [
+            [
+              "Components of a computer system",
+              "sl"
+            ],
+            [
+              "Input, output and storage devices",
+              "sl"
+            ],
+            [
+              "Primary and secondary memory",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "A.2",
+          "unit": "Data representation",
+          "subtopics": [
+            [
+              "Binary representation of integers",
+              "sl"
+            ],
+            [
+              "Hexadecimal and conversion between number bases",
+              "sl"
+            ],
+            [
+              "Representing text, images, sound and video",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "A.3",
+          "unit": "Logic",
+          "subtopics": [
+            [
+              "Boolean logic and logic gates",
+              "sl"
+            ],
+            [
+              "Truth tables and logic circuits",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "A.4",
+          "unit": "Architecture and performance",
+          "subtopics": [
+            [
+              "The CPU, registers and the fetch-execute cycle",
+              "sl"
+            ],
+            [
+              "Cache, buses and performance",
+              "ext"
+            ]
+          ]
+        },
+        {
+          "code": "A.5",
+          "unit": "Systems software",
+          "subtopics": [
+            [
+              "Operating systems and their functions",
+              "sl"
+            ],
+            [
+              "Memory, processor and file management",
+              "ext"
+            ],
+            [
+              "Translators: compilers and interpreters",
+              "sl"
+            ],
+            [
+              "Utility software and system maintenance",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "A.6",
+          "unit": "Security and ethics",
+          "subtopics": [
+            [
+              "Cybersecurity threats and protection",
+              "sl"
+            ],
+            [
+              "Privacy, ethics and the social impact of computing",
+              "sl"
+            ]
+          ]
+        }
       ]
     },
     {
       "topic": "B. Networks",
-      "subtopics": [
-        ["Network types: LAN, WAN and the internet", "sl"],
-        ["Network topologies", "sl"],
-        ["Network hardware and transmission media", "sl"],
-        ["Protocols, packets and data transmission", "sl"],
-        ["The TCP/IP stack and internet protocols", "ext"],
-        ["IP addressing, DNS and routing", "ext"],
-        ["Client-server and peer-to-peer models", "sl"],
-        ["Wireless networks and their trade-offs", "sl"],
-        ["Network security: encryption, authentication and firewalls", "sl"],
-        ["Social, environmental and economic effects of networks", "sl"]
+      "units": [
+        {
+          "code": "B.1",
+          "unit": "Network structure",
+          "subtopics": [
+            [
+              "Network types: LAN, WAN and the internet",
+              "sl"
+            ],
+            [
+              "Network topologies",
+              "sl"
+            ],
+            [
+              "Network hardware and transmission media",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "B.2",
+          "unit": "Protocols and addressing",
+          "subtopics": [
+            [
+              "Protocols, packets and data transmission",
+              "sl"
+            ],
+            [
+              "The TCP/IP stack and internet protocols",
+              "ext"
+            ],
+            [
+              "IP addressing, DNS and routing",
+              "ext"
+            ]
+          ]
+        },
+        {
+          "code": "B.3",
+          "unit": "Network models and access",
+          "subtopics": [
+            [
+              "Client-server and peer-to-peer models",
+              "sl"
+            ],
+            [
+              "Wireless networks and their trade-offs",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "B.4",
+          "unit": "Network security and impact",
+          "subtopics": [
+            [
+              "Network security: encryption, authentication and firewalls",
+              "sl"
+            ],
+            [
+              "Social, environmental and economic effects of networks",
+              "sl"
+            ]
+          ]
+        }
       ]
     },
     {
       "topic": "C. Databases",
-      "subtopics": [
-        ["Data, information and data quality", "sl"],
-        ["Database concepts and database management systems", "sl"],
-        ["Tables, fields, records and data types", "sl"],
-        ["Primary keys, foreign keys and relationships", "sl"],
-        ["Normalisation and redundancy", "ext"],
-        ["Querying data and SQL", "ext"],
-        ["Transactions, concurrency and integrity", "hl"],
-        ["Database security, backup and privacy", "sl"]
+      "units": [
+        {
+          "code": "C.1",
+          "unit": "Data and database concepts",
+          "subtopics": [
+            [
+              "Data, information and data quality",
+              "sl"
+            ],
+            [
+              "Database concepts and database management systems",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "C.2",
+          "unit": "Relational design",
+          "subtopics": [
+            [
+              "Tables, fields, records and data types",
+              "sl"
+            ],
+            [
+              "Primary keys, foreign keys and relationships",
+              "sl"
+            ],
+            [
+              "Normalisation and redundancy",
+              "ext"
+            ]
+          ]
+        },
+        {
+          "code": "C.3",
+          "unit": "Using a database",
+          "subtopics": [
+            [
+              "Querying data and SQL",
+              "ext"
+            ],
+            [
+              "Transactions, concurrency and integrity",
+              "hl"
+            ]
+          ]
+        },
+        {
+          "code": "C.4",
+          "unit": "Database security and privacy",
+          "subtopics": [
+            [
+              "Database security, backup and privacy",
+              "sl"
+            ]
+          ]
+        }
       ]
     },
     {
       "topic": "D. Machine learning",
-      "subtopics": [
-        ["What machine learning is and is not", "sl"],
-        ["Data sets, features and labels", "sl"],
-        ["Supervised, unsupervised and reinforcement learning", "sl"],
-        ["Training, testing and evaluating a model", "sl"],
-        ["Overfitting, underfitting and generalisation", "ext"],
-        ["Neural networks and deep learning", "hl"],
-        ["Bias, fairness and limitations of models", "sl"],
-        ["Ethical, social and environmental implications", "sl"]
+      "units": [
+        {
+          "code": "D.1",
+          "unit": "Foundations of machine learning",
+          "subtopics": [
+            [
+              "What machine learning is and is not",
+              "sl"
+            ],
+            [
+              "Data sets, features and labels",
+              "sl"
+            ],
+            [
+              "Supervised, unsupervised and reinforcement learning",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "D.2",
+          "unit": "Training and evaluating models",
+          "subtopics": [
+            [
+              "Training, testing and evaluating a model",
+              "sl"
+            ],
+            [
+              "Overfitting, underfitting and generalisation",
+              "ext"
+            ],
+            [
+              "Neural networks and deep learning",
+              "hl"
+            ]
+          ]
+        },
+        {
+          "code": "D.3",
+          "unit": "Ethics and limitations",
+          "subtopics": [
+            [
+              "Bias, fairness and limitations of models",
+              "sl"
+            ],
+            [
+              "Ethical, social and environmental implications",
+              "sl"
+            ]
+          ]
+        }
       ]
     },
     {
       "topic": "E. Computational thinking and problem-solving",
-      "subtopics": [
-        ["Problem specification and success criteria", "sl"],
-        ["Decomposition", "sl"],
-        ["Abstraction", "sl"],
-        ["Pattern recognition and generalisation", "sl"],
-        ["Algorithmic thinking and stepwise refinement", "sl"],
-        ["Pseudocode", "sl"],
-        ["Flowcharts and trace tables", "sl"],
-        ["Variables, constants and data types", "sl"],
-        ["Sequence, selection and iteration", "sl"],
-        ["Linear and binary search", "sl"],
-        ["Bubble, selection and insertion sort", "sl"],
-        ["Merge sort and quicksort", "hl"],
-        ["Algorithm efficiency and Big-O complexity", "ext"],
-        ["Recursion", "hl"],
-        ["Testing strategies and test data", "sl"],
-        ["Debugging and error types", "sl"]
+      "units": [
+        {
+          "code": "E.1",
+          "unit": "Computational thinking",
+          "subtopics": [
+            [
+              "Problem specification and success criteria",
+              "sl"
+            ],
+            [
+              "Decomposition",
+              "sl"
+            ],
+            [
+              "Abstraction",
+              "sl"
+            ],
+            [
+              "Pattern recognition and generalisation",
+              "sl"
+            ],
+            [
+              "Algorithmic thinking and stepwise refinement",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "E.2",
+          "unit": "Describing algorithms",
+          "subtopics": [
+            [
+              "Pseudocode",
+              "sl"
+            ],
+            [
+              "Flowcharts and trace tables",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "E.3",
+          "unit": "Algorithm building blocks",
+          "subtopics": [
+            [
+              "Variables, constants and data types",
+              "sl"
+            ],
+            [
+              "Sequence, selection and iteration",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "E.4",
+          "unit": "Searching and sorting",
+          "subtopics": [
+            [
+              "Linear and binary search",
+              "sl"
+            ],
+            [
+              "Bubble, selection and insertion sort",
+              "sl"
+            ],
+            [
+              "Merge sort and quicksort",
+              "hl"
+            ]
+          ]
+        },
+        {
+          "code": "E.5",
+          "unit": "Efficiency and recursion",
+          "subtopics": [
+            [
+              "Algorithm efficiency and Big-O complexity",
+              "ext"
+            ],
+            [
+              "Recursion",
+              "hl"
+            ]
+          ]
+        },
+        {
+          "code": "E.6",
+          "unit": "Testing and debugging",
+          "subtopics": [
+            [
+              "Testing strategies and test data",
+              "sl"
+            ],
+            [
+              "Debugging and error types",
+              "sl"
+            ]
+          ]
+        }
       ]
     },
     {
       "topic": "F. Programming",
-      "subtopics": [
-        ["Program structure and syntax", "sl"],
-        ["Expressions, operators and input/output", "sl"],
-        ["Conditional statements", "sl"],
-        ["Loops and iteration", "sl"],
-        ["Functions, parameters and return values", "sl"],
-        ["Scope, modularity and code reuse", "sl"],
-        ["Arrays and lists", "sl"],
-        ["Two-dimensional arrays", "ext"],
-        ["Strings and string manipulation", "sl"],
-        ["File handling and persistent data", "sl"],
-        ["Exception handling", "ext"],
-        ["Code quality, readability and documentation", "sl"],
-        ["Classes and objects", "sl"],
-        ["Attributes, methods and constructors", "sl"],
-        ["Encapsulation and information hiding", "sl"],
-        ["Inheritance and polymorphism", "ext"],
-        ["Object-oriented design and modelling", "ext"]
+      "units": [
+        {
+          "code": "F.1",
+          "unit": "Program basics",
+          "subtopics": [
+            [
+              "Program structure and syntax",
+              "sl"
+            ],
+            [
+              "Expressions, operators and input/output",
+              "sl"
+            ],
+            [
+              "Conditional statements",
+              "sl"
+            ],
+            [
+              "Loops and iteration",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "F.2",
+          "unit": "Functions and structure",
+          "subtopics": [
+            [
+              "Functions, parameters and return values",
+              "sl"
+            ],
+            [
+              "Scope, modularity and code reuse",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "F.3",
+          "unit": "Data in programs",
+          "subtopics": [
+            [
+              "Arrays and lists",
+              "sl"
+            ],
+            [
+              "Two-dimensional arrays",
+              "ext"
+            ],
+            [
+              "Strings and string manipulation",
+              "sl"
+            ],
+            [
+              "File handling and persistent data",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "F.4",
+          "unit": "Robust code",
+          "subtopics": [
+            [
+              "Exception handling",
+              "ext"
+            ],
+            [
+              "Code quality, readability and documentation",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "F.5",
+          "unit": "Object-oriented programming",
+          "subtopics": [
+            [
+              "Classes and objects",
+              "sl"
+            ],
+            [
+              "Attributes, methods and constructors",
+              "sl"
+            ],
+            [
+              "Encapsulation and information hiding",
+              "sl"
+            ],
+            [
+              "Inheritance and polymorphism",
+              "ext"
+            ],
+            [
+              "Object-oriented design and modelling",
+              "ext"
+            ]
+          ]
+        }
       ]
     },
     {
       "topic": "G. Abstract data types",
-      "subtopics": [
-        ["Abstract data types and their interfaces", "hl"],
-        ["Stacks and their applications", "hl"],
-        ["Queues and circular queues", "hl"],
-        ["Singly and doubly linked lists", "hl"],
-        ["Binary trees and traversals", "hl"],
-        ["Graphs and graph traversal", "hl"],
-        ["Hash tables and collision handling", "hl"],
-        ["Choosing an appropriate data structure", "hl"]
+      "units": [
+        {
+          "code": "G.1",
+          "unit": "Abstract data types",
+          "subtopics": [
+            [
+              "Abstract data types and their interfaces",
+              "hl"
+            ]
+          ]
+        },
+        {
+          "code": "G.2",
+          "unit": "Stacks and queues",
+          "subtopics": [
+            [
+              "Stacks and their applications",
+              "hl"
+            ],
+            [
+              "Queues and circular queues",
+              "hl"
+            ]
+          ]
+        },
+        {
+          "code": "G.3",
+          "unit": "Linked lists",
+          "subtopics": [
+            [
+              "Singly and doubly linked lists",
+              "hl"
+            ]
+          ]
+        },
+        {
+          "code": "G.4",
+          "unit": "Trees and graphs",
+          "subtopics": [
+            [
+              "Binary trees and traversals",
+              "hl"
+            ],
+            [
+              "Graphs and graph traversal",
+              "hl"
+            ]
+          ]
+        },
+        {
+          "code": "G.5",
+          "unit": "Hashing and choosing a structure",
+          "subtopics": [
+            [
+              "Hash tables and collision handling",
+              "hl"
+            ],
+            [
+              "Choosing an appropriate data structure",
+              "hl"
+            ]
+          ]
+        }
       ]
     },
     {
       "topic": "H. The computational solution",
-      "subtopics": [
-        ["Identifying a real problem and its stakeholders", "sl"],
-        ["Requirements, success criteria and planning", "sl"],
-        ["Designing a computational solution", "sl"],
-        ["Developing and implementing the solution", "sl"],
-        ["Testing against the success criteria", "sl"],
-        ["Evaluation and future improvements", "sl"],
-        ["The collaborative sciences project", "sl"]
+      "units": [
+        {
+          "code": "H.1",
+          "unit": "Identifying the problem",
+          "subtopics": [
+            [
+              "Identifying a real problem and its stakeholders",
+              "sl"
+            ],
+            [
+              "Requirements, success criteria and planning",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "H.2",
+          "unit": "Designing and building",
+          "subtopics": [
+            [
+              "Designing a computational solution",
+              "sl"
+            ],
+            [
+              "Developing and implementing the solution",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "H.3",
+          "unit": "Testing and evaluation",
+          "subtopics": [
+            [
+              "Testing against the success criteria",
+              "sl"
+            ],
+            [
+              "Evaluation and future improvements",
+              "sl"
+            ]
+          ]
+        },
+        {
+          "code": "H.4",
+          "unit": "Collaborative sciences project",
+          "subtopics": [
+            [
+              "The collaborative sciences project",
+              "sl"
+            ]
+          ]
+        }
       ]
     }
   ],

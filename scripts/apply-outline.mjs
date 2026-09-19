@@ -62,15 +62,23 @@ const asList = (v) => (Array.isArray(v) ? v : v ? [v] : []);
 /** Every row the outline says a given subject should have. */
 function rowsFor(outline, level) {
   const rows = [];
-  for (const { topic, subtopics } of outline.topics) {
-    for (const [subtopic, lvl] of subtopics) {
-      if (level === "sl" && lvl === "hl") continue;
-      rows.push({
-        topic,
-        subtopic,
-        hl_only: level === "hl" && lvl === "hl",
-        hl_extension: level === "hl" && lvl === "ext",
-      });
+  // Position counts through the whole subject in guide order, so the app can
+  // show kinematics before momentum instead of sorting the course by name.
+  let position = 0;
+  for (const { topic, units } of outline.topics) {
+    for (const { code, unit, subtopics } of units) {
+      for (const [subtopic, lvl] of subtopics) {
+        if (level === "sl" && lvl === "hl") continue;
+        rows.push({
+          topic,
+          unit,
+          code,
+          subtopic,
+          position: position++,
+          hl_only: level === "hl" && lvl === "hl",
+          hl_extension: level === "hl" && lvl === "ext",
+        });
+      }
     }
   }
   return rows;
@@ -222,11 +230,16 @@ async function applyPlan(db, plan) {
     }
     for (const r of [...plan.add, ...plan.keep]) {
       await db.query(
-        `INSERT INTO syllabus_content (curriculum, subject, topic, subtopic, hl_only, hl_extension)
-         VALUES ($1,$2,$3,$4,$5,$6)
+        `INSERT INTO syllabus_content
+           (curriculum, subject, topic, unit, code, subtopic, position, hl_only, hl_extension)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
          ON CONFLICT (curriculum, subject, topic, subtopic) DO UPDATE
-           SET hl_only = EXCLUDED.hl_only, hl_extension = EXCLUDED.hl_extension`,
-        [plan.curriculum, plan.subject, r.topic, r.subtopic, r.hl_only, r.hl_extension]
+           SET unit = EXCLUDED.unit, code = EXCLUDED.code, position = EXCLUDED.position,
+               hl_only = EXCLUDED.hl_only, hl_extension = EXCLUDED.hl_extension`,
+        [
+          plan.curriculum, plan.subject, r.topic, r.unit, r.code, r.subtopic,
+          r.position, r.hl_only, r.hl_extension,
+        ]
       );
     }
     // Questions and the rest carry their own copy of the topic name. Anything

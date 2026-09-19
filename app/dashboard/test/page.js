@@ -11,7 +11,14 @@ import TestBuilder from '@/components/TestBuilder'
 import { Page, PageHeader, PageLoading, SkeletonLine } from '@/components/PageShell'
 import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { IconClock, IconCheck, IconChevronRight } from '@/components/Icons'
-import { sortTopics, progressKey, displaySubtopic, HEAT_LEVELS, HEAT_RANGES } from '@/lib/progress'
+import {
+  sortTopics,
+  groupByTopic,
+  progressKey,
+  displaySubtopic,
+  HEAT_LEVELS,
+  HEAT_RANGES,
+} from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 import { accessibleSubjects, isPremium } from '@/lib/access'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
@@ -92,6 +99,7 @@ export default function TestBuilderPage() {
   // it", so ticking a topic and never opening it behaves as it always did.
   const [pickedSubtopics, setPickedSubtopics] = useState({})
   const [openTopic, setOpenTopic] = useState(null)
+  const [unitBySubtopic, setUnitBySubtopic] = useState({})
   // 'questions' | 'marks' | 'minutes' — how the length is counted out.
   const [lengthMetric, setLengthMetric] = useState('questions')
   const [review, setReview] = useState('exam')
@@ -172,9 +180,16 @@ export default function TestBuilderPage() {
       const hlMap = {}
       for (const row of syllabus || []) hlMap[row.subtopic] = !!row.hl_only
 
-      const unique = [...new Set((syllabus || []).map((r) => r.topic))]
-      const ordered = sortTopics(unique.map((t) => [t, null])).map(([t]) => t)
+      // Topics in the guide's order, and where each subtopic sits inside one:
+      // the builder groups by unit, and a picker sorted alphabetically puts
+      // momentum before kinematics.
+      const ordered = sortTopics(Object.entries(groupByTopic(syllabus || []))).map(([t]) => t)
+      const units = {}
+      for (const row of syllabus || []) {
+        units[row.subtopic] = { unit: row.unit || null, code: row.code || null, position: row.position }
+      }
 
+      setUnitBySubtopic(units)
       setTopics(ordered)
       setHlBySubtopic(hlMap)
       setPool(questions || [])
@@ -431,6 +446,7 @@ export default function TestBuilderPage() {
           onSelectAll={() => setSelected(selected.length === topics.length ? [] : topics)}
           perTopicCounts={perTopicCounts}
           subtopicsByTopic={subtopicsByTopic}
+          unitBySubtopic={unitBySubtopic}
           pickedSubtopics={pickedSubtopics}
           onToggleSubtopic={(topic, name) =>
             setPickedSubtopics((prev) => {
