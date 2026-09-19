@@ -17,6 +17,7 @@ import {
   IconCalendar,
   IconCards,
   IconSchool,
+  IconEye,
   IconUser,
   IconLogout,
   IconMenu,
@@ -42,6 +43,12 @@ const NAV_ITEMS = [
     label: 'Diploma Core',
     Icon: IconSchool,
     match: (p) => p === '/dashboard/core',
+  },
+  {
+    href: '/dashboard/syllabi',
+    label: 'Syllabi',
+    Icon: IconEye,
+    match: (p) => p === '/dashboard/syllabi',
   },
   {
     href: '/dashboard/flashcards',
