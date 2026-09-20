@@ -20,7 +20,7 @@ import {
   HEAT_RANGES,
 } from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
-import { accessibleSubjects, isPremium } from '@/lib/access'
+import { accessibleSubjects, hasAllSubjects } from '@/lib/access'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
 
 // Five is there because most revision is not an hour of it. Five questions is
@@ -434,7 +434,7 @@ export default function TestBuilderPage() {
           subjects={usable}
           onSubject={setSubject}
           freeNote={
-            !isPremium(profile) && (profile.subjects || []).length > usable.length
+            !hasAllSubjects(profile) && (profile.subjects || []).length > usable.length
               ? 'The free plan covers one subject. A school code opens the rest.'
               : null
           }

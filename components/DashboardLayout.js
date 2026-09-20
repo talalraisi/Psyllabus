@@ -23,7 +23,7 @@ import {
   IconClose,
   IconChevronRight,
 } from '@/components/Icons'
-import { planLabel, isPremium } from '@/lib/access'
+import { planLabel, hasAllSubjects } from '@/lib/access'
 import { clearCache } from '@/lib/cache'
 import TimerPill from '@/components/TimerPill'
 import FeedbackButton from '@/components/FeedbackButton'
@@ -288,7 +288,7 @@ export default function DashboardLayout({ children, profile }) {
           </div>
         )}
 
-        {profile && !isPremium(profile) && !compact && (
+        {profile && !hasAllSubjects(profile) && !compact && (
           <Link
             href="/dashboard/profile#unlock"
             className="mb-3 ml-3 block border-l-2 py-1 pl-3"

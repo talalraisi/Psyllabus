@@ -25,7 +25,7 @@ import {
 } from '@/lib/progress'
 import { buildEffectiveProgressMap, buildProgressDetailMap } from '@/lib/decay'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
-import { isPremium, isSubjectLocked } from '@/lib/access'
+import { hasAllSubjects, isSubjectLocked } from '@/lib/access'
 
 function greeting(now) {
   const hour = now.getHours()
@@ -224,7 +224,7 @@ export default function Dashboard() {
   const allSubjects = profile.subjects || []
   const subjects = allSubjects.filter((s) => !IB_CORE_SUBJECTS.includes(s))
   const core = allSubjects.filter((s) => IB_CORE_SUBJECTS.includes(s))
-  const premium = isPremium(profile)
+  const premium = hasAllSubjects(profile)
 
   // A student who has not been tested yet gets an orientation screen instead of
   // a wall of zeros. Metrics appear once there is something real to show.

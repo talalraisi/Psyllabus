@@ -15,7 +15,7 @@ import { buildEffectiveProgressMap } from '@/lib/decay'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
 import {
   isSubjectLocked,
-  isPremium,
+  hasAllSubjects,
   freeSubject,
   canSwitchFreeSubject,
   freeSubjectLockUntil,
@@ -280,7 +280,7 @@ export default function SubjectsPage() {
             ))}
           </div>
 
-          {!isPremium(profile) && subjects.length > 1 && (
+          {!hasAllSubjects(profile) && subjects.length > 1 && (
             <div className="mt-6 border-l-2 pl-4" style={{ borderColor: 'var(--border-strong)' }}>
               <p className="text-[14px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
                 You are on the free plan, which opens one subject at a time. Right now that is{' '}

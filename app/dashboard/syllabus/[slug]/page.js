@@ -13,7 +13,7 @@ import { Page, PageHeader, EmptyState } from '@/components/PageShell'
 import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { IconArrowLeft, IconChevronRight } from '@/components/Icons'
 import { resolveSubjectFromSlug } from '@/lib/subject-map'
-import { isSubjectLocked, isPremium } from '@/lib/access'
+import { isSubjectLocked, hasAllSubjects } from '@/lib/access'
 import {
   STATUS_COLORS,
   STATUS_LABELS,

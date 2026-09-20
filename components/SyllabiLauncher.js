@@ -44,7 +44,7 @@ const TASKS = [
   },
 ]
 
-export default function SyllabiLauncher({ subject = '', subjects = [] }) {
+export default function SyllabiLauncher({ subject = '', subjects = [], locked = false }) {
   const [open, setOpen] = useState(false)
   const [task, setTask] = useState(TASKS[0])
   const [chosenSubject, setChosenSubject] = useState('')
@@ -188,6 +188,15 @@ export default function SyllabiLauncher({ subject = '', subjects = [] }) {
         {error && (
           <p className="mt-3 text-[12.5px] leading-relaxed" style={{ color: 'var(--danger)' }}>
             {error}
+            {error.includes('Premium') && (
+              <>
+                {' '}
+                <a href="/pricing" className="underline underline-offset-2">
+                  See the plans
+                </a>
+                .
+              </>
+            )}
           </p>
         )}
 

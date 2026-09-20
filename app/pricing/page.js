@@ -1,181 +1,179 @@
+'use client'
+
 import Link from 'next/link'
-import { IconCheck, IconArrowRight } from '@/components/Icons'
+import { IconCheck, IconArrowRight, IconClose } from '@/components/Icons'
+import { PLANS, SCHOOL_PLAN } from '@/lib/plans'
 
-export const metadata = {
-  title: 'Pricing',
-  description:
-    'What Project Syllabus costs, and how a school code opens everything for a whole year group.',
-}
-
-const PLANS = [
-  {
-    name: 'Free',
-    price: 'Free',
-    cadence: 'no time limit',
-    summary: 'One subject, open properly, for as long as you want it.',
-    features: [
-      'One subject, every topic and subtopic',
-      'Quizzes on any subtopic in that subject',
-      'Heatmap built from what you actually got right',
-      'Study plan for that subject',
-      'Switch which subject it is whenever you want',
-    ],
-    cta: { label: 'Create a free account', href: '/signup' },
-    emphasis: false,
-  },
-  {
-    name: 'Everything',
-    price: '$12',
-    cadence: 'a month, or $108 a year',
-    summary: 'Every subject you take, and the tools that only work across all of them.',
-    features: [
-      'Every subject you take',
-      'Whole-topic and whole-subject papers, timed',
-      'Predicted grade out of 45 against your targets',
-      'Topics fade when you leave them and come back into your plan',
-      'Mistake bank that brings wrong answers back on a schedule',
-      'Planner that ranks across every subject at once',
-      'Hand-picked resources on every subtopic',
-    ],
-    cta: { label: 'Create a free account first', href: '/signup' },
-    emphasis: true,
-    note: 'Card payments are not open yet. If your school has a code, all of this is already yours for nothing.',
-  },
-  {
-    name: 'Whole school',
-    price: '$500',
-    cadence: 'to $2,000 a year, by size',
-    summary: 'One code for the year group. Cheaper than a handful of students paying alone.',
-    features: [
-      'Every student at the school, no seat counting',
-      'Everything in the paid plan, for all of them',
-      'They type the code in once, no card involved',
-      'We help you get the first cohort set up',
-    ],
-    cta: {
-      label: 'Email us about your school',
-      href: 'mailto:talalraisi1@gmail.com?subject=Project%20Syllabus%20for%20our%20school',
-    },
-    emphasis: false,
-  },
-]
-
+/**
+ * Three plans and a footnote.
+ *
+ * The shape is the argument. Free is the whole product for one subject, so it
+ * is worth using rather than a demo that nags; Basic is the same thing for
+ * every subject you take, which is the decision most students are actually
+ * making; Premium is Basic plus Syllabi for two pounds more, which is the
+ * decision nobody agonises over.
+ *
+ * Schools are at the foot of the page. A student comparing plans is not going
+ * to buy a site licence, and a fourth column that says "contact us" makes the
+ * page read like procurement. The teacher who came looking for it will scroll.
+ *
+ * Nothing takes money yet, so every button says what it actually does.
+ */
 export default function PricingPage() {
   return (
-    <main className="min-h-screen bg-[var(--bg)]">
+    <main className="ground min-h-screen">
       <div className="mx-auto max-w-5xl px-5 py-12 md:py-16">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--brand)] hover:underline"
+          className="inline-flex items-center gap-1.5 text-[13px] font-medium"
+          style={{ color: 'var(--brand)' }}
         >
           <span aria-hidden="true">&larr;</span>
           Back to Project Syllabus
         </Link>
 
-        <header className="mt-6 mb-10 max-w-2xl">
-          <h1 className="t-page-title mb-2">Pricing</h1>
-          <p className="t-body">
-            One subject free, for as long as you like. A school code opens the rest.
+        <header className="app-enter mt-8 mb-12 max-w-2xl">
+          <h1 className="text-[clamp(2rem,5vw,2.8rem)] font-semibold leading-[1.08] tracking-[-0.032em]">
+            One subject free. All of them for the price of a coffee.
+          </h1>
+          <p className="mt-4 text-[15px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+            No trial running out, no card to start.
           </p>
         </header>
 
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+        <div className="stagger grid grid-cols-1 gap-3 md:grid-cols-3">
           {PLANS.map((plan) => (
             <section
-              key={plan.name}
-              className={`surface flex flex-col p-6 ${
-                plan.emphasis ? 'border-[var(--brand)]' : ''
-              }`}
+              key={plan.id}
+              className="lift flex flex-col rounded-[16px] border p-6"
+              style={{
+                borderColor: plan.featured ? 'var(--brand)' : 'var(--border-strong)',
+                background: plan.featured ? 'var(--brand-tint)' : 'var(--surface)',
+              }}
             >
-              <h2 className="t-card-title mb-4">{plan.name}</h2>
+              <div className="flex items-baseline justify-between gap-3">
+                <h2 className="text-[15px] font-semibold tracking-[-0.012em]">{plan.name}</h2>
+                {plan.featured && (
+                  <span
+                    className="rounded-full px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-[0.1em]"
+                    style={{ background: 'var(--brand)', color: '#fff' }}
+                  >
+                    Most useful
+                  </span>
+                )}
+              </div>
 
-              <p className="mb-1">
-                <span className="t-stat text-[var(--text)]">{plan.price}</span>{' '}
-                <span className="t-small">{plan.cadence}</span>
+              <p className="mt-4">
+                <span className="text-[34px] font-semibold leading-none tracking-[-0.03em] tabular-nums">
+                  {plan.priceLabel}
+                </span>{' '}
+                <span className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
+                  {plan.cadence}
+                </span>
               </p>
-              <p className="t-small mb-6">{plan.summary}</p>
 
-              <ul className="mb-6 flex flex-1 flex-col gap-3">
-                {plan.features.map((f) => (
-                  <li key={f} className="flex gap-3">
+              <p className="mt-3 text-[13.5px] font-medium">{plan.tagline}</p>
+
+              <ul className="mb-6 mt-5 flex flex-1 flex-col gap-2.5">
+                {plan.includes.map((f) => (
+                  <li key={f} className="flex gap-2.5">
                     <IconCheck
-                      width={16}
-                      height={16}
-                      className="mt-1 shrink-0 text-[var(--brand)]"
+                      width={15}
+                      height={15}
+                      className="mt-0.5 shrink-0"
+                      style={{ color: 'var(--brand)' }}
                     />
-                    <span className="text-sm text-[var(--text-body)]">{f}</span>
+                    <span className="text-[13.5px] leading-snug" style={{ color: 'var(--text-body)' }}>
+                      {f}
+                    </span>
+                  </li>
+                ))}
+                {plan.excludes.map((f) => (
+                  <li key={f} className="flex gap-2.5">
+                    <IconClose
+                      width={15}
+                      height={15}
+                      className="mt-0.5 shrink-0"
+                      style={{ color: 'var(--text-faint)' }}
+                    />
+                    <span className="text-[13.5px] leading-snug" style={{ color: 'var(--text-faint)' }}>
+                      {f}
+                    </span>
                   </li>
                 ))}
               </ul>
 
               <Link
-                href={plan.cta.href}
-                className={`btn control-md w-full ${plan.emphasis ? 'btn-solid' : 'btn-quiet'}`}
+                href={plan.id === 'free' ? '/signup' : '/signup?plan=' + plan.id}
+                className={`btn control-md w-full ${plan.featured ? 'btn-solid' : 'btn-outline'}`}
               >
-                {plan.cta.label}
+                {plan.cta}
                 <IconArrowRight width={16} height={16} />
               </Link>
 
-              {plan.note && <p className="t-caption mt-3">{plan.note}</p>}
+              {plan.note && (
+                <p className="mt-3 text-[12px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
+                  {plan.note}
+                </p>
+              )}
             </section>
           ))}
         </div>
 
-        <section className="surface mt-10 p-6">
-          <h2 className="t-card-title mb-4">If your school buys a code</h2>
-          <ol className="flex flex-col gap-3 text-sm text-[var(--text-body)]">
-            <li>
-              <span className="font-medium text-[var(--text)]">1.</span> A code tied to the school&rsquo;s email domain, or one per student. A leaked code is no use outside the school.
-            </li>
-            <li>
-              <span className="font-medium text-[var(--text)]">2.</span> Students make a free
-              account and type the code into their profile page.
-            </li>
-            <li>
-              <span className="font-medium text-[var(--text)]">3.</span> Every subject opens on the
-              spot. No card, no trial that quietly ends.
-            </li>
-            <li>
-              <span className="font-medium text-[var(--text)]">4.</span> No admin panel, no teacher account. Students use this on their own.
-            </li>
-          </ol>
-          <p className="t-caption mt-4">
-            Nobody at the school can see a student&rsquo;s results. That is enforced by the database
-            itself, not by a setting someone could change. Details in the{' '}
-            <Link href="/privacy" className="text-[var(--brand)] hover:underline">
-              privacy policy
-            </Link>
-            .
+        {/* Said once, plainly, rather than printed on three buttons. */}
+        <p className="mt-5 text-[13px]" style={{ color: 'var(--text-muted)' }}>
+          Paid plans are not live yet — sign up free and you will be the first to be offered one.
+        </p>
+
+        {/* The footnote for teachers. */}
+        <section
+          className="mt-14 rounded-[16px] border p-6 md:p-8"
+          style={{ borderColor: 'var(--border-strong)' }}
+        >
+          <h2 className="text-[15px] font-semibold tracking-[-0.012em]">{SCHOOL_PLAN.name}</h2>
+          <p
+            className="mt-2.5 max-w-2xl text-[14px] leading-relaxed"
+            style={{ color: 'var(--text-body)' }}
+          >
+            {SCHOOL_PLAN.blurb}
           </p>
+          <Link
+            href="mailto:talalraisi1@gmail.com?subject=Project%20Syllabus%20for%20our%20school"
+            className="btn btn-outline control-md mt-5"
+          >
+            {SCHOOL_PLAN.cta}
+          </Link>
         </section>
 
-        <section className="mt-10">
-          <h2 className="t-card-title mb-4">Questions people actually ask</h2>
-          <div className="flex flex-col gap-3">
+        <section className="mt-14">
+          <h2 className="mb-5 text-[15px] font-semibold tracking-[-0.012em]">Questions</h2>
+          <dl className="flex flex-col">
             {[
               [
-                'Does the free plan run out?',
-                'No. It is one subject for as long as you want it, not a trial with a clock on it.',
+                'What does free actually include?',
+                'One subject, and everything the app does for it: the full syllabus map, quizzes that set your levels, redemption, flashcards, the planner and the calendar. It does not run out.',
               ],
               [
-                'Can I change which subject is the free one?',
-                'Yes, from the My Subjects page. There is a wait of about a month between changes, because otherwise the free plan becomes every subject one quiz at a time. Your results in the closed subjects are kept, so nothing is lost when you swap.',
+                'What is Syllabi?',
+                'It reads an IA, EE or TOK draft and tells you what an examiner would say, suggests research questions, and works out what to study from your own results. It comments on your work and never writes it.',
               ],
               [
-                'Can I pay right now?',
-                'Not yet. Card payments are still being set up, so the only way to open everything today is a school code.',
+                'Can I change subject on the free plan?',
+                'Yes, once every 30 days. The hold stops a free account reading the whole syllabus a subject at a time.',
               ],
               [
-                'What happens to my work if I stop paying?',
-                'Nothing is deleted. You drop back to one open subject and the rest sit there until you open them again.',
+                'Does my school see my results?',
+                'No. There is no teacher account and no admin panel, on any plan. A school code unlocks the app for students and shows the school nothing.',
               ],
             ].map(([q, a]) => (
-              <div key={q} className="surface p-5">
-                <p className="text-sm font-semibold text-[var(--text)]">{q}</p>
-                <p className="t-small mt-1">{a}</p>
+              <div key={q} className="border-b py-4" style={{ borderColor: 'var(--border)' }}>
+                <dt className="text-[14px] font-medium">{q}</dt>
+                <dd className="mt-1.5 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                  {a}
+                </dd>
               </div>
             ))}
-          </div>
+          </dl>
         </section>
       </div>
     </main>

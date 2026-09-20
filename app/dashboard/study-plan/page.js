@@ -25,7 +25,7 @@ import {
 } from '@/lib/progress'
 import { buildEffectiveProgressMap, buildProgressDetailMap } from '@/lib/decay'
 import { buildQueue, buildSession, groupBySubjectRanked } from '@/lib/planner'
-import { accessibleSubjects, isPremium } from '@/lib/access'
+import { accessibleSubjects, hasAllSubjects } from '@/lib/access'
 import { upcoming, relativeDay, KIND_LABEL, KIND_DOT } from '@/lib/calendar'
 import {
   notificationsSupported,
@@ -565,7 +565,7 @@ export default function StudyPlanPage() {
               </div>
             )}
 
-            {!isPremium(profile) && (profile.subjects || []).length > 1 && (
+            {!hasAllSubjects(profile) && (profile.subjects || []).length > 1 && (
               <Link
                 href="/dashboard/profile#unlock"
                 className="mt-10 flex items-center gap-3 border-l-2 pl-4"

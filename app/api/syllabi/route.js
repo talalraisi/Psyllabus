@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { cookieOptionsFor } from '@/lib/cookie-domain'
 import { TASKS } from '@/lib/syllabi-prompts'
+import { hasSyllabi } from '@/lib/access'
 
 /**
  * Syllabi: the one place in the app that talks to a model at request time.
@@ -88,6 +89,24 @@ export async function POST(request) {
   } = await supabase.auth.getUser()
   if (!user) {
     return NextResponse.json({ error: 'Sign in first.' }, { status: 401 })
+  }
+
+  // Syllabi is the thing Premium buys, so the check is here rather than only
+  // on the button: an endpoint that trusts the UI to hide it is not gated.
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('plan, is_admin, access_expires_at')
+    .eq('id', user.id)
+    .maybeSingle()
+
+  if (!hasSyllabi(profile)) {
+    return NextResponse.json(
+      {
+        error: 'Syllabi is part of Premium.',
+        code: 'upgrade_required',
+      },
+      { status: 402 }
+    )
   }
 
   const { data: usedToday } = await supabase.rpc('ai_requests_today', { p_user: user.id })

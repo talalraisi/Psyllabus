@@ -10,7 +10,7 @@ import AvatarCropper from '@/components/AvatarCropper'
 import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader, Section, PageLoading, Spinner } from '@/components/PageShell'
-import { isPremium, planLabel, FREE_SUBJECT_LIMIT } from '@/lib/access'
+import { hasAllSubjects, planLabel, FREE_SUBJECT_LIMIT } from '@/lib/access'
 
 // Only a guard against someone picking a RAW file; the cropper re-encodes
 // everything to a small square before it is uploaded.
@@ -348,7 +348,7 @@ export default function ProfilePage() {
     )
   }
 
-  const premium = isPremium(profile)
+  const premium = hasAllSubjects(profile)
   const initial = String(profile.full_name || profile.email || 'S').charAt(0).toUpperCase()
 
   return (
