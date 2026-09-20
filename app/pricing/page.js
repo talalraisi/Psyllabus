@@ -75,8 +75,7 @@ export default function PricingPage() {
         <header className="mt-6 mb-10 max-w-2xl">
           <h1 className="t-page-title mb-2">Pricing</h1>
           <p className="t-body">
-            Start free with one subject and keep it as long as you like. If your school has bought a
-            code, typing it in opens the rest and costs you nothing.
+            One subject free, for as long as you like. A school code opens the rest.
           </p>
         </header>
 
@@ -126,9 +125,7 @@ export default function PricingPage() {
           <h2 className="t-card-title mb-4">If your school buys a code</h2>
           <ol className="flex flex-col gap-3 text-sm text-[var(--text-body)]">
             <li>
-              <span className="font-medium text-[var(--text)]">1.</span> The school gets a code tied
-              to its own email domain, or a set of one-per-student codes if it would rather. Either
-              way a code that leaks is no use to anyone outside the school.
+              <span className="font-medium text-[var(--text)]">1.</span> A code tied to the school&rsquo;s email domain, or one per student. A leaked code is no use outside the school.
             </li>
             <li>
               <span className="font-medium text-[var(--text)]">2.</span> Students make a free
@@ -139,9 +136,7 @@ export default function PricingPage() {
               spot. No card, no trial that quietly ends.
             </li>
             <li>
-              <span className="font-medium text-[var(--text)]">4.</span> That is all of it. There is
-              no admin panel and no teacher account, because this is a tool students use on their
-              own.
+              <span className="font-medium text-[var(--text)]">4.</span> No admin panel, no teacher account. Students use this on their own.
             </li>
           </ol>
           <p className="t-caption mt-4">

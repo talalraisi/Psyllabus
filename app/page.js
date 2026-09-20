@@ -146,8 +146,7 @@ export default async function Home() {
               className="mt-8 max-w-xl text-[17px] leading-[1.6]"
               style={{ color: 'var(--text-body)' }}
             >
-              Your whole syllabus, subtopic by subtopic, coloured by what you have actually proved
-              in a quiz. Nothing here is filled in by rating yourself out of five.
+              Every subtopic, coloured by what you proved in a quiz. Never by rating yourself.
             </p>
 
             <div className="mt-10 flex flex-wrap items-center gap-3">
@@ -250,12 +249,10 @@ export default async function Home() {
             <div>
               <Heading>Sit one, right here</Heading>
               <p className="mt-5 text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-                A real question from the bank. Pick a wrong answer on purpose and it will tell you
-                the specific mistake that leads there, rather than just showing you the right one.
+                A real question. Pick a wrong answer on purpose — it names the mistake that leads there.
               </p>
               <p className="mt-4 text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-                Getting it right moves the subtopic by an amount that depends on how hard the
-                question was. Ten points is mastery, and you cannot get there on easy ones alone.
+                Harder questions move it further. Ten points is mastery, and easy ones will not get you there.
               </p>
             </div>
             <TryQuestion />
@@ -317,9 +314,7 @@ export default async function Home() {
           </div>
 
           <p className="mt-9 max-w-xl text-[15px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-            Mastery is worth ten points and a harder question is worth more of them. Leave a
-            subtopic alone for long enough and it fades back, because that is what actually
-            happens to it.
+            Ten points is mastery. Leave a subtopic alone and it fades back, because that is what happens to it.
           </p>
         </Section>
 
@@ -329,8 +324,7 @@ export default async function Home() {
             <div>
               <Heading>Drag time forward</Heading>
               <p className="mt-5 text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-                Something you proved in October is not something you know in May. Move the slider
-                and watch a subtopic you had mastered slip back into your plan.
+                October&rsquo;s mastery is not May&rsquo;s. Move the slider and watch it slip back into your plan.
               </p>
             </div>
             <DecayDemo />
@@ -350,8 +344,7 @@ export default async function Home() {
             <div>
               <Heading>Tell it how long you have</Heading>
               <p className="mt-5 text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-                Five minutes or five hours. The list is ordered, and every line carries the reason
-                it is on there, so you can disagree with it rather than trust it.
+                Five minutes or five hours. Every line says why it is there, so you can disagree with it.
               </p>
             </div>
             <PlanDemo />
@@ -394,8 +387,7 @@ export default async function Home() {
             <div>
               <Heading className="max-w-lg">One code opens it for the whole year group</Heading>
               <p className="mt-5 max-w-lg text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-                Students type the code in once. No cards, no seat counting, and every code has a
-                redemption limit so it cannot quietly become a public unlock.
+                Typed in once. No cards, no seat counting, and every code has a limit.
               </p>
               <a
                 href={`mailto:${OPERATOR.dpoEmail}?subject=Project%20Syllabus%20for%20our%20school`}

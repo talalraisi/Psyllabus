@@ -35,11 +35,7 @@ export default function AboutPage() {
               subtopics, and two years to hold all of it in my head at once.
             </p>
             <p className="mt-3">
-              The problem was never finding material. There is more revision content online than
-              anyone could work through in a lifetime. The problem was knowing which part of it I
-              actually needed on a given evening. I would sit down at eight o&rsquo;clock, pick
-              whichever subject felt worst, and hope that guess was right. Sometimes it was. Often I
-              was polishing something I already knew while a real gap sat untouched for weeks.
+              Finding material was never the problem — there is more of it than anyone could work through. Knowing which part I needed on a given evening was. I would sit down at eight, pick whichever subject felt worst, and hope. Often I was polishing something I already knew while a real gap sat untouched for weeks.
             </p>
           </section>
 
