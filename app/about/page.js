@@ -44,10 +44,7 @@ export default function AboutPage() {
               What I think most study tools get wrong
             </h2>
             <p>
-              Almost every tracker asks you to rate your own confidence. That is the one number a
-              student cannot supply honestly, and not because anyone is lying. You do not know what
-              you do not know. Rating yourself produces a map of how you feel, and then you revise
-              against your mood instead of against the syllabus.
+              Almost every tracker asks you to rate your own confidence — the one number a student cannot supply honestly, and not because anyone is lying. You do not know what you do not know. Rate yourself and you get a map of your mood, then revise against that instead of the syllabus.
             </p>
             <p className="mt-3">
               So Project Syllabus never asks. Every level comes from questions you either got right
@@ -59,29 +56,20 @@ export default function AboutPage() {
           <section>
             <h2 className="mb-2 text-base font-semibold text-[var(--text)]">What I am trying to build</h2>
             <p>
-              A tool that answers one question properly: what should I do right now. It maps your
-              whole course, works out where you actually stand by testing you, notices when
-              something you learned in October has started slipping, and hands you an ordered list
-              with a reason attached to every item so you can disagree with it.
+              A tool that answers one question properly: what should I do right now. It maps the course, tests you to find where you stand, notices what has started slipping, and hands you an ordered list with a reason on every line.
             </p>
             <p className="mt-3">
-              And it gives you a predicted grade out of 45 next to the one you are aiming for, along
-              with how much of your syllabus that prediction is actually based on. A number built on
-              three quizzes gets labelled as such rather than dressed up as a forecast.
+              And a predicted grade out of 45 beside the one you are aiming for, with how much of the syllabus it rests on. A number built on three quizzes says so.
             </p>
           </section>
 
           <section>
             <h2 className="mb-2 text-base font-semibold text-[var(--text)]">Where it is up to</h2>
             <p>
-              The whole IB Diploma is mapped, 2,590 subtopics across all six groups plus Theory of
-              Knowledge, the Extended Essay and CAS. The tracking, testing, planner, mistake bank,
-              decay engine, calendar and predicted grade all work today.
+              The whole IB Diploma is mapped — 6,583 subtopics across all six groups and the core. Tracking, testing, the planner, redemption, decay, the calendar and the predicted grade all work today.
             </p>
             <p className="mt-3">
-              The question bank is the part still being built. It deepens subject by subject rather
-              than arriving complete, and I would rather say that plainly than claim a number I have
-              not reached. A-Level and AP course structures come after that.
+              The question bank is the part still being built — subject by subject, not all at once. A-Level and AP come after.
             </p>
           </section>
 

@@ -147,9 +147,7 @@ export default function Signup() {
             </h1>
             <p className="mb-6 text-[14.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
               We sent a confirmation link to{' '}
-              <strong className="text-[var(--text)]">{email}</strong>. Open it and you will land
-              back here to finish setting up. It can take a minute to arrive, and it is worth
-              checking your spam folder.
+              <strong className="text-[var(--text)]">{email}</strong>. Open it to finish setting up. It can take a minute — check spam.
             </p>
 
             {resent && (
