@@ -633,6 +633,29 @@ export default function QuizRunner({
         graded.filter((g) => g.correct).map((g) => `${g.question.subject}|||${g.question.subtopic}`)
       )
 
+      /**
+       * What these subtopics were worth before this attempt.
+       *
+       * `progress` still holds the old totals here — only the upsert below
+       * moves them — so this is the last moment the difference can be known.
+       * Without it the result screen had nothing to subtract from and the
+       * Points tile read 0 after every quiz anybody has ever sat.
+       */
+      const { data: beforeRows } = await supabase
+        .from('progress')
+        .select('subject, subtopic, mastery_points')
+        .eq('user_id', userId)
+        .in(
+          'subtopic',
+          touched.map((k) => k.split('|||')[1])
+        )
+      const before = new Map(
+        (beforeRows || []).map((r) => [
+          `${r.subject}|||${r.subtopic}`,
+          Number(r.mastery_points) || 0,
+        ])
+      )
+
       const now = new Date().toISOString()
       const rows = touched.map((key) => {
         const m = meta.get(key)
@@ -660,6 +683,7 @@ export default function QuizRunner({
         subtopic: r.subtopic,
         points: r.mastery_points,
         status: r.status,
+        gained: +(r.mastery_points - (before.get(`${r.subject}|||${r.subtopic}`) || 0)).toFixed(2),
       }))
     }
 
