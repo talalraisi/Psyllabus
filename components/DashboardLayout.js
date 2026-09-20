@@ -27,8 +27,6 @@ import { planLabel, hasAllSubjects } from '@/lib/access'
 import { clearCache } from '@/lib/cache'
 import TimerPill from '@/components/TimerPill'
 import FeedbackButton from '@/components/FeedbackButton'
-import SyllabiLauncher from '@/components/SyllabiLauncher'
-import { accessibleSubjects } from '@/lib/access'
 import ThemeToggle from '@/components/ThemeToggle'
 
 const NAV_ITEMS = [
@@ -391,10 +389,6 @@ export default function DashboardLayout({ children, profile }) {
       {/* On every signed-in page, because the page somebody is looking at when
           something goes wrong is the page they should be able to say so from. */}
       <FeedbackButton />
-      {/* Syllabi follows the student around rather than living on a page of
-          its own: asking for help should not mean leaving the thing you
-          wanted help with. */}
-      <SyllabiLauncher subjects={accessibleSubjects(profile)} />
     </div>
   )
 }
