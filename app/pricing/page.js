@@ -10,8 +10,8 @@ import { PLANS, SCHOOL_PLAN } from '@/lib/plans'
  * The shape is the argument. Free is the whole product for one subject, so it
  * is worth using rather than a demo that nags; Basic is the same thing for
  * every subject you take, which is the decision most students are actually
- * making; Premium is Basic plus Syllabi for two pounds more, which is the
- * decision nobody agonises over.
+ * making; Premium is Basic plus Syllabi for four dollars more, which is
+ * the decision nobody agonises over.
  *
  * Schools are at the foot of the page. A student comparing plans is not going
  * to buy a site licence, and a fourth column that says "contact us" makes the
