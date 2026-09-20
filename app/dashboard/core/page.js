@@ -125,7 +125,7 @@ export default function CorePage() {
     return out
   }, [rows, done])
 
-  if (loading) return <PageLoading title="Diploma core" width="default" rows={3} />
+  if (loading) return <PageLoading title="Diploma core" width="default" variant="core" />
 
   return (
     <DashboardLayout profile={profile}>
@@ -145,7 +145,7 @@ export default function CorePage() {
                 key={subject}
                 onClick={() => setOpenSubject(subject)}
                 aria-pressed={open}
-                className="rounded-[12px] border p-4 text-left transition-colors duration-150"
+                className="lift rounded-[12px] border p-4 text-left"
                 style={{
                   borderColor: open ? 'var(--brand)' : 'var(--border-strong)',
                   background: open ? 'var(--brand-tint)' : 'var(--surface)',
@@ -166,7 +166,7 @@ export default function CorePage() {
                   style={{ background: 'var(--border-strong)' }}
                 >
                   <div
-                    className="h-full rounded-full transition-[width] duration-300"
+                    className="bar-fill h-full rounded-full"
                     style={{ width: `${pct}%`, background: 'var(--brand)' }}
                   />
                 </div>

@@ -354,7 +354,7 @@ export default function StudyPlanPage() {
                         style={{ background: 'var(--border-strong)' }}
                       >
                         <div
-                          className="h-full rounded-full transition-[width] duration-500"
+                          className="bar-fill h-full rounded-full"
                           style={{
                             width: `${(completedCount / session.items.length) * 100}%`,
                             background: 'var(--brand)',

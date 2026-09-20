@@ -10,6 +10,7 @@ import DashboardLayout from '@/components/DashboardLayout'
 import { displaySubtopic } from '@/lib/progress'
 import { IconChevronRight } from '@/components/Icons'
 import { Page, PageHeader, EmptyState, PageLoading } from '@/components/PageShell'
+import CountUp from '@/components/CountUp'
 import { startLoading, stopLoading } from '@/components/LoadingBar'
 
 const DAY = 24 * 60 * 60 * 1000
@@ -128,7 +129,7 @@ export default function MistakeBankPage() {
   if (loading || !profile) {
     return (
       <DashboardLayout profile={null}>
-        <PageLoading title="Redemption" width="default" rows={4} variant="mistakes" />
+        <PageLoading title="Redemption" width="default" rows={4} variant="redemption" />
       </DashboardLayout>
     )
   }
@@ -225,7 +226,7 @@ export default function MistakeBankPage() {
                     {dueInScope.length ? 'Waiting for you' : 'Nothing due'}
                   </p>
                   <p className="mt-2 text-[clamp(1.9rem,4vw,2.4rem)] font-semibold leading-none tracking-[-0.03em] tabular-nums">
-                    {dueInScope.length}
+                    <CountUp value={dueInScope.length} />
                     <span className="ml-2 text-[14px] font-medium" style={{ color: 'var(--text-muted)' }}>
                       of {inScope.length} in the bank
                     </span>
@@ -251,7 +252,7 @@ export default function MistakeBankPage() {
                   style={{ background: 'var(--border-strong)' }}
                 >
                   <span
-                    className="h-full transition-[width] duration-500"
+                    className="bar-fill h-full"
                     style={{
                       width: `${(clearing / inScope.length) * 100}%`,
                       background: 'var(--status-proficient)',

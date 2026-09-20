@@ -191,16 +191,133 @@ export function SkeletonStats({ count = 4 }) {
 }
 
 /** The wheel, as a ring. */
-export function SkeletonWheel() {
+/**
+ * The dashboard: one card, three tiles, two columns.
+ *
+ * The old one drew a circle, because the dashboard used to open with a wheel.
+ * The wheel went months ago and the skeleton kept promising it — a loading
+ * state that lies about what is coming is worse than a plain box, because the
+ * page appears to change its mind the moment it loads.
+ */
+export function SkeletonDashboard() {
   return (
-    <div className="flex flex-col items-center" aria-hidden="true">
-      <SkeletonLine width={90} height={10} />
-      <SkeletonLine width={220} height={22} className="mt-4" />
-      <SkeletonLine width={300} height={12} className="mt-3" />
+    <div aria-hidden="true">
       <div
-        className="skeleton mt-10 w-full max-w-[min(100%,520px)] rounded-full"
-        style={{ aspectRatio: '1 / 1' }}
-      />
+        className="rounded-[16px] border p-6"
+        style={{ borderColor: 'var(--border-strong)' }}
+      >
+        <SkeletonLine width={90} height={10} />
+        <SkeletonLine width="55%" height={26} className="mt-4" />
+        <SkeletonLine width="35%" height={13} className="mt-3" />
+        <SkeletonLine width={190} height={40} className="mt-7 rounded-full" />
+      </div>
+
+      <div className="mt-8 grid gap-3 sm:grid-cols-3">
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            className="rounded-[14px] border p-5"
+            style={{ borderColor: 'var(--border-strong)' }}
+          >
+            <SkeletonLine width={46} height={26} />
+            <SkeletonLine width="60%" height={12} className="mt-3" />
+            <SkeletonLine width="80%" height={11} className="mt-2" />
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-10 grid gap-x-14 gap-y-8 lg:grid-cols-2">
+        {[0, 1].map((col) => (
+          <div key={col}>
+            <SkeletonLine width={130} height={14} />
+            <div className="mt-4 flex flex-col">
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-3 border-b py-3"
+                  style={{ borderColor: 'var(--border)' }}
+                >
+                  <div className="skeleton h-1.5 w-1.5 shrink-0 rounded-full" />
+                  <SkeletonLine width={`${50 + i * 8}%`} height={13} />
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/** Redemption: the waiting card, then rows that lead with their three dots. */
+export function SkeletonRedemption({ rows = 5 }) {
+  return (
+    <div aria-hidden="true">
+      <div
+        className="rounded-[16px] border p-6"
+        style={{ borderColor: 'var(--border-strong)' }}
+      >
+        <SkeletonLine width={110} height={10} />
+        <SkeletonLine width={180} height={34} className="mt-4" />
+        <SkeletonLine width="60%" height={12} className="mt-3" />
+        <SkeletonLine height={6} className="mt-6 rounded-full" />
+      </div>
+
+      <div className="mt-9 flex flex-col">
+        {Array.from({ length: rows }).map((_, i) => (
+          <div
+            key={i}
+            className="flex items-center gap-4 border-b py-3.5"
+            style={{ borderColor: 'var(--border)' }}
+          >
+            <span className="flex shrink-0 gap-1.5">
+              {[0, 1, 2].map((d) => (
+                <span key={d} className="skeleton h-2 w-2 rounded-full" />
+              ))}
+            </span>
+            <div className="min-w-0 flex-1">
+              <SkeletonLine width="34%" height={10} />
+              <SkeletonLine width={`${55 + (i % 3) * 10}%`} height={13} className="mt-2" />
+            </div>
+            <SkeletonLine width={62} height={12} />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/** The Diploma core: three component cards, then a checklist. */
+export function SkeletonCore() {
+  return (
+    <div aria-hidden="true">
+      <div className="grid gap-3 sm:grid-cols-3">
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            className="rounded-[12px] border p-4"
+            style={{ borderColor: 'var(--border-strong)' }}
+          >
+            <SkeletonLine width="70%" height={14} />
+            <SkeletonLine width="90%" height={11} className="mt-2" />
+            <SkeletonLine width={54} height={22} className="mt-4" />
+            <SkeletonLine height={4} className="mt-3 rounded-full" />
+          </div>
+        ))}
+      </div>
+      <SkeletonLine width={200} height={15} className="mt-10" />
+      <div className="mt-4 flex flex-col">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div
+            key={i}
+            className="flex items-center gap-3 border-b py-2.5"
+            style={{ borderColor: 'var(--border)' }}
+          >
+            <div className="skeleton h-[18px] w-[18px] shrink-0 rounded-[5px]" />
+            <SkeletonLine width={`${45 + (i % 4) * 11}%`} height={13} />
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
@@ -231,16 +348,23 @@ export function SkeletonPlan({ rows = 5 }) {
   return (
     <div aria-hidden="true">
       <SkeletonLine width={220} height={34} className="mb-8 rounded-full" />
-      <SkeletonLine width={150} height={15} />
-      <SkeletonLine width={200} height={12} className="mt-2" />
-      <SkeletonLine height={64} className="mt-6" />
-      <div className="mt-6 flex flex-col">
+      <div
+        className="rounded-[16px] border p-6"
+        style={{ borderColor: 'var(--border-strong)' }}
+      >
+        <SkeletonLine width={80} height={10} />
+        <SkeletonLine width="55%" height={24} className="mt-3" />
+        <SkeletonLine width="40%" height={12} className="mt-3" />
+        <SkeletonLine height={6} className="mt-5 rounded-full" />
+      </div>
+      <div className="mt-8 flex flex-col gap-2">
         {Array.from({ length: rows }).map((_, i) => (
           <div
             key={i}
-            className="flex items-center gap-3 border-b py-3.5"
-            style={{ borderColor: 'var(--border)' }}
+            className="flex items-center gap-3 rounded-[12px] border px-4 py-3.5"
+            style={{ borderColor: 'var(--border-strong)' }}
           >
+            <SkeletonLine width={10} height={12} />
             <div className="skeleton h-5 w-5 shrink-0 rounded-[var(--r-sm)]" />
             <div className="min-w-0 flex-1">
               <SkeletonLine width="30%" height={10} />
@@ -332,21 +456,6 @@ export function SkeletonForm({ rows = 3 }) {
   )
 }
 
-/** Numbers, the subject pickers, then the grouped list. */
-export function SkeletonMistakes({ rows = 5 }) {
-  return (
-    <div aria-hidden="true">
-      <div className="mb-8 flex flex-wrap gap-2">
-        {[120, 150, 190].map((w) => (
-          <SkeletonLine key={w} width={w} height={32} className="rounded-full" />
-        ))}
-      </div>
-      <SkeletonLine width={280} height={13} className="mb-6" />
-      <SkeletonRows rows={rows} />
-    </div>
-  )
-}
-
 const LOADING_VARIANTS = {
   list: ({ rows }) => <SkeletonRows rows={rows} />,
   cards: ({ rows }) => <SkeletonCards count={rows} />,
@@ -354,8 +463,9 @@ const LOADING_VARIANTS = {
   calendar: () => <SkeletonCalendar />,
   prediction: () => <SkeletonPrediction />,
   form: ({ rows }) => <SkeletonForm rows={rows} />,
-  mistakes: ({ rows }) => <SkeletonMistakes rows={rows} />,
-  wheel: () => <SkeletonWheel />,
+  dashboard: () => <SkeletonDashboard />,
+  redemption: ({ rows }) => <SkeletonRedemption rows={rows} />,
+  core: () => <SkeletonCore />,
 }
 
 /**

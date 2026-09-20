@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader, Section, StatRow, PageLoading } from '@/components/PageShell'
+import CountUp from '@/components/CountUp'
 import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { IconChevronRight, IconArrowRight, IconCheck, IconClock } from '@/components/Icons'
 import { buildQueue, buildSession } from '@/lib/planner'
@@ -79,10 +80,11 @@ function Ring({ percent }) {
           strokeLinecap="round"
           strokeDasharray={`${circumference * filled} ${circumference}`}
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
+          style={{ transition: 'stroke-dasharray 700ms cubic-bezier(0.16, 1, 0.3, 1)' }}
         />
       </svg>
       <span className="absolute inset-0 flex items-center justify-center text-[12.5px] font-semibold tabular-nums">
-        {percent}
+        <CountUp value={percent} />
       </span>
     </div>
   )
@@ -213,7 +215,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <DashboardLayout profile={null}>
-        <PageLoading title="Dashboard" width="wide" variant="wheel" />
+        <PageLoading title="Dashboard" width="wide" variant="dashboard" />
       </DashboardLayout>
     )
   }
@@ -431,11 +433,11 @@ export default function Dashboard() {
 
             <Link
               href="/dashboard/study-plan"
-              className="rounded-[14px] border p-5 transition-colors hover:border-[var(--border-hover)]"
+              className="lift rounded-[14px] border p-5"
               style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
             >
               <p className="text-[26px] font-semibold leading-none tabular-nums">
-                {counts.weak + counts.decaying}
+                <CountUp value={counts.weak + counts.decaying} />
               </p>
               <p className="mt-2 text-[13px] font-medium">Needs attention</p>
               <p className="mt-1 text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
@@ -445,14 +447,14 @@ export default function Dashboard() {
 
             <Link
               href="/dashboard/mistakes"
-              className="rounded-[14px] border p-5 transition-colors hover:border-[var(--border-hover)]"
+              className="lift rounded-[14px] border p-5"
               style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
             >
               <p
                 className="text-[26px] font-semibold leading-none tabular-nums"
                 style={{ color: counts.due > 0 ? 'var(--brand)' : undefined }}
               >
-                {counts.due}
+                <CountUp value={counts.due} />
               </p>
               <p className="mt-2 text-[13px] font-medium">Redemption due</p>
               <p className="mt-1 text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
@@ -554,7 +556,7 @@ export default function Dashboard() {
                             style={{ background: 'var(--border-strong)' }}
                           >
                             <span
-                              className="block h-full rounded-full"
+                              className="bar-fill block h-full rounded-full"
                               style={{ width: `${pct}%`, background: 'var(--brand)' }}
                             />
                           </span>

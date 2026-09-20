@@ -69,7 +69,7 @@ function SubjectGrid({ subject, subtopics }) {
       </div>
 
       <div
-        className="flex flex-wrap gap-[5px]"
+        className="cells-in flex flex-wrap gap-[5px]"
         onMouseLeave={() => setAt(null)}
       >
         {subtopics.map((item, i) => (

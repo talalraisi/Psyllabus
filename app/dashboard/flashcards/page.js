@@ -318,7 +318,7 @@ export default function FlashcardsPage() {
   if (loading) {
     return (
       <DashboardLayout profile={null}>
-        <PageLoading title="Flashcards" width="default" rows={4} />
+        <PageLoading title="Flashcards" width="default" rows={4} variant="cards" />
       </DashboardLayout>
     )
   }
@@ -488,7 +488,7 @@ export default function FlashcardsPage() {
                       setOpenDeck(d.subject)
                       setOpenSubtopic(null)
                     }}
-                    className="flex flex-col justify-between gap-5 rounded-[12px] border p-5 text-left transition-colors duration-150 hover:border-[var(--border-hover)]"
+                    className="lift flex flex-col justify-between gap-5 rounded-[12px] border p-5 text-left"
                     style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -515,7 +515,7 @@ export default function FlashcardsPage() {
                         style={{ background: 'var(--border-strong)' }}
                       >
                         <div
-                          className="h-full rounded-full"
+                          className="bar-fill h-full rounded-full"
                           style={{
                             width: `${d.total ? (d.due / d.total) * 100 : 0}%`,
                             background: 'var(--brand)',

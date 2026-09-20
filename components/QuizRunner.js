@@ -7,6 +7,7 @@ import CopyButton from '@/components/CopyButton'
 import QuestionMenu from '@/components/QuestionMenu'
 import Calculator from '@/components/Calculator'
 import MarkScheme from '@/components/MarkScheme'
+import CountUp from '@/components/CountUp'
 import HeatBadge from '@/components/HeatBadge'
 import QuestionFigure from '@/components/QuestionFigure'
 import QuestionStimulus from '@/components/QuestionStimulus'
@@ -999,7 +1000,9 @@ export default function QuizRunner({
                   key={opt.id}
                   onClick={() => selectAnswer(q.id, opt.id, { mark: true })}
                   disabled={!!mark}
-                  className="flex items-center gap-3 rounded-xl border px-4 py-3.5 text-left text-[14.5px] leading-relaxed transition-colors duration-150 disabled:cursor-default"
+                  className={`flex items-center gap-3 rounded-xl border px-4 py-3.5 text-left text-[14.5px] leading-relaxed transition-colors duration-150 disabled:cursor-default ${
+                    mark && (isAnswer || isWrongPick) ? 'mark-pop' : ''
+                  }`}
                   style={{
                     borderColor: tone || (isPicked ? 'var(--brand)' : 'var(--border-strong)'),
                     background: tone
@@ -1269,7 +1272,7 @@ export default function QuizRunner({
                 {label}
               </dt>
               <dd className="mt-1 text-[24px] font-semibold leading-none tracking-[-0.03em] tabular-nums">
-                {value}
+                {typeof value === 'number' ? <CountUp value={value} /> : value}
               </dd>
             </div>
           ))}
@@ -1332,7 +1335,7 @@ export default function QuizRunner({
                       style={{ background: 'var(--border-strong)' }}
                     >
                       <div
-                        className={`h-full rounded-full ${STATUS_COLORS[e.status]}`}
+                        className={`bar-fill h-full rounded-full ${STATUS_COLORS[e.status]}`}
                         style={{ width: `${masteryFraction(e.points) * 100}%` }}
                       />
                     </div>
