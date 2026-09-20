@@ -239,7 +239,7 @@ function layout(topics, focus) {
         label: unitLabel(u),
         topic: t.topic,
         unit: u.unit,
-        r: Math.max(11, Math.min(20, 3 + u.items.length * 1.6)),
+        r: Math.max(13, Math.min(22, 5 + u.items.length * 1.6)),
         count: u.items.length,
         ...stat,
         ...unitPoint,
@@ -288,7 +288,7 @@ function Donut({ cx, cy, r, strong, weak, live, delay }) {
   )
 }
 
-export default function SubjectWeb({ subject, rows, onPickSubtopic }) {
+export default function SubjectWeb({ subject, rows, onPickSubtopic, fill = false }) {
   const [focus, setFocus] = useState(null)
   const [hovered, setHovered] = useState(null)
   const [ripple, setRipple] = useState(null)
@@ -371,17 +371,24 @@ export default function SubjectWeb({ subject, rows, onPickSubtopic }) {
             ? 'Click a subtopic to practise it'
             : focus
               ? 'Click a unit to open it'
-              : 'Click a theme to open it'}
+              : 'Click a theme, or a unit on the rim'}
         </span>
       </div>
 
       <div
         className="overflow-hidden rounded-[18px] border"
-        style={{ borderColor: 'var(--border-strong)', background: 'var(--surface-sunken)' }}
+        style={{
+          borderColor: 'var(--border-strong)',
+          background: 'var(--surface-sunken)',
+          // On its own page the map takes the height it can get, and the
+          // square sits centred in it. Inline it just follows the column.
+          ...(fill ? { height: 'min(72vh, 840px)' } : null),
+        }}
       >
         <svg
           viewBox={`0 0 ${SIZE} ${SIZE}`}
-          className="h-auto w-full"
+          className={fill ? 'h-full w-full' : 'h-auto w-full'}
+          preserveAspectRatio="xMidYMid meet"
           role="img"
           aria-label={`${subject} as a map of topics and subtopics`}
         >
@@ -506,7 +513,7 @@ export default function SubjectWeb({ subject, rows, onPickSubtopic }) {
                 )}
 
                 {/* How many things are in there, inside the circle it is about. */}
-                {(n.kind === 'topic' || (n.kind === 'unit' && n.r >= 16)) && (
+                {(n.kind === 'topic' || (n.kind === 'unit' && n.r >= 13)) && (
                   <text
                     x={n.x}
                     y={n.y + 4}

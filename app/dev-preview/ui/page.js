@@ -71,7 +71,7 @@ export default function UiPreview() {
       {/* Wider than the rest of the page, because the map is the one thing
           here that is about being able to read something small. */}
       <div className="mt-4" style={{ width: 'min(96vw, 900px)' }}>
-        <SubjectWeb subject="Physics SL" rows={WEB_ROWS} onPickSubtopic={() => {}} />
+        <SubjectWeb subject="Physics SL" rows={WEB_ROWS} fill onPickSubtopic={() => {}} />
       </div>
 
       <h1 className="mt-10 text-[22px] font-semibold">To-do list</h1>
