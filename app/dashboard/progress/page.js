@@ -12,6 +12,8 @@ import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { mergeSyllabusWithProgress } from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
+import SubjectWeb from '@/components/SubjectWeb'
+import { useRouter as useNav } from 'next/navigation'
 
 // Read left to right this is the ladder itself: everything tracked, then the
 // same subtopics sorted by how well they are actually held.
@@ -36,6 +38,10 @@ export default function ProgressPage() {
     decaying: 0,
   })
   const [loading, setLoading] = useState(true)
+  // Which subject has its map open. One at a time: two webs on a screen is a
+  // picture of nothing.
+  const [openWeb, setOpenWeb] = useState(null)
+  const nav = useNav()
 
   // The top bar runs for as long as this page is fetching, not just while the
   // route is in flight. A page that has arrived but has no data yet is the
@@ -137,27 +143,56 @@ export default function ProgressPage() {
 
         {bySubject.length > 0 && (
           <Section title="By subject">
-            <ul className="flex flex-col gap-4">
-              {bySubject.map(({ subject, percent }) => (
-                <li key={subject} className="flex items-center gap-5">
-                  <span className="w-56 shrink-0 truncate text-[14px]">{subject}</span>
-                  <div
-                    className="h-1 flex-1 overflow-hidden rounded-full"
-                    style={{ background: 'var(--border-strong)' }}
-                  >
-                    <div
-                      className="h-full rounded-full transition-[width] duration-500 ease-out"
-                      style={{ width: `${percent}%`, background: 'var(--brand)' }}
-                    />
-                  </div>
-                  <span
-                    className="w-11 shrink-0 text-right text-[13.5px] font-semibold tabular-nums"
-                    style={{ color: 'var(--brand)' }}
-                  >
-                    {percent}%
-                  </span>
-                </li>
-              ))}
+            <ul className="flex flex-col">
+              {bySubject.map(({ subject, percent }) => {
+                const open = openWeb === subject
+                return (
+                  <li key={subject} className="border-b last:border-b-0" style={{ borderColor: 'var(--border)' }}>
+                    <button
+                      onClick={() => setOpenWeb(open ? null : subject)}
+                      aria-expanded={open}
+                      className="flex w-full items-center gap-5 py-3.5 text-left"
+                    >
+                      <span
+                        className="shrink-0 text-[12px] transition-transform duration-200"
+                        style={{ color: 'var(--text-faint)', transform: open ? 'rotate(90deg)' : 'none' }}
+                      >
+                        ▸
+                      </span>
+                      <span className="w-52 shrink-0 truncate text-[14px]">{subject}</span>
+                      <span
+                        className="h-1 flex-1 overflow-hidden rounded-full"
+                        style={{ background: 'var(--border-strong)' }}
+                      >
+                        <span
+                          className="bar-fill block h-full rounded-full"
+                          style={{ width: `${percent}%`, background: 'var(--brand)' }}
+                        />
+                      </span>
+                      <span
+                        className="w-11 shrink-0 text-right text-[13.5px] font-semibold tabular-nums"
+                        style={{ color: 'var(--brand)' }}
+                      >
+                        {percent}%
+                      </span>
+                    </button>
+
+                    {open && (
+                      <div className="pop-enter pb-6">
+                        <SubjectWeb
+                          subject={subject}
+                          rows={heatmapItems.filter((i) => i.subject === subject)}
+                          onPickSubtopic={(row) =>
+                            nav.push(
+                              `/dashboard/quiz?subject=${encodeURIComponent(row.subject)}&topic=${encodeURIComponent(row.topic)}&subtopic=${encodeURIComponent(row.subtopic)}&count=5&review=practice&back=/dashboard/progress`
+                            )
+                          }
+                        />
+                      </div>
+                    )}
+                  </li>
+                )
+              })}
             </ul>
           </Section>
         )}

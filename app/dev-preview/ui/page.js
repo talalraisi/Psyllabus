@@ -15,6 +15,7 @@ import { notFound } from 'next/navigation'
 import Calculator from '@/components/Calculator'
 import QuestionMenu from '@/components/QuestionMenu'
 import TodoList from '@/components/TodoList'
+import SubjectWeb from '@/components/SubjectWeb'
 
 const ENABLED = process.env.NODE_ENV !== 'production'
 
@@ -28,6 +29,25 @@ const QUESTION = {
     { id: 'd', text: '14.7 m' },
   ],
 }
+
+/** A course-shaped sample: three themes, a few units each, leaves with status. */
+const STATUSES = ['mastered', 'proficient', 'confident', 'in_progress', 'decaying', 'not_started']
+const WEB_ROWS = [
+  ['A. Space, time and motion', ['A.1 Kinematics', 7], ['A.2 Forces and momentum', 8], ['A.3 Work and energy', 5]],
+  ['B. Particulate nature of matter', ['B.1 Thermal transfers', 5], ['B.3 Gas laws', 4], ['B.5 Current and circuits', 6]],
+  ['C. Wave behaviour', ['C.1 Simple harmonic motion', 4], ['C.2 Wave model', 4], ['C.3 Wave phenomena', 9]],
+].flatMap(([topic, ...units], t) =>
+  units.flatMap(([unit, n], u) =>
+    Array.from({ length: n }, (_, i) => ({
+      subject: 'Physics SL',
+      topic,
+      unit,
+      code: unit.split(' ')[0],
+      subtopic: `${unit.replace(/^[A-Z]\.\d+ /, '')} point ${i + 1}`,
+      status: STATUSES[(t + u + i) % STATUSES.length],
+    }))
+  )
+)
 
 export default function UiPreview() {
   const [calcOpen, setCalcOpen] = useState(true)
@@ -46,6 +66,11 @@ export default function UiPreview() {
       <button onClick={() => setCalcOpen((v) => !v)} className="btn btn-outline control-md mt-3">
         {calcOpen ? 'Hide' : 'Show'} calculator
       </button>
+
+      <h1 className="mt-10 text-[22px] font-semibold">Subject web</h1>
+      <div className="mt-4">
+        <SubjectWeb subject="Physics SL" rows={WEB_ROWS} onPickSubtopic={() => {}} />
+      </div>
 
       <h1 className="mt-10 text-[22px] font-semibold">To-do list</h1>
       <TodoList className="mt-4" subjects={['Physics SL', 'Economics HL']} />

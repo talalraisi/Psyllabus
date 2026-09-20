@@ -39,8 +39,8 @@ export default function AuthShell({ eyebrow, title, intro, children, footer }) {
           <Image
             src={logoMark}
             alt="Project Syllabus"
-            sizes="220px"
-            style={{ height: 56, width: 'auto' }}
+            sizes="120px"
+            style={{ height: 38, width: 'auto' }}
             priority
           />
         </Link>
