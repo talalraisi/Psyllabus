@@ -113,7 +113,7 @@ export default async function Home() {
       >
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 md:px-8">
           <Link href="/" aria-label="Project Syllabus home" className="shrink-0">
-            <Image src={logoMark} alt="Project Syllabus" sizes="110px" style={{ height: 32, width: 'auto' }} priority />
+            <Image src={logoMark} alt="Project Syllabus" sizes="110px" style={{ height: 26, width: 'auto' }} priority />
           </Link>
           <div className="flex items-center gap-2">
             <Link
