@@ -184,7 +184,7 @@ export default function ProgressPage() {
                         <LockedPanel
                           plan="Premium"
                           title="Your whole course as one picture"
-                          blurb="Every theme, unit and subtopic as a web, coloured by what you have proved. Open a theme and it re-lays itself around it."
+                          blurb="Your course as a web you can walk into: themes, then units, then the subtopics themselves, each wearing a ring of what you have proved. Click a subtopic and you are in a quiz on it."
                         />
                       </div>
                     )}

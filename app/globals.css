@@ -803,6 +803,52 @@ body {
 .press { transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1); }
 .press:active { transform: scale(0.97); }
 
+/* The subject web.
+
+   Four small motions, none of them decorative: the rings turn so the map
+   reads as one live thing rather than a printed diagram, the middle breathes
+   so the eye starts there, nodes arrive rather than appear, and a press
+   answers itself. All of it is slow enough to sit under for a while. */
+@keyframes web-drift {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.web-ring {
+  transform-origin: center;
+  animation: web-drift 90s linear infinite;
+}
+
+@keyframes web-pulse {
+  0%   { transform: scale(1);    opacity: 0.55; }
+  55%  { transform: scale(1.07); opacity: 0.12; }
+  100% { transform: scale(1);    opacity: 0.55; }
+}
+.web-pulse {
+  transform-origin: center;
+  animation: web-pulse 3.6s ease-in-out infinite;
+}
+
+@keyframes web-arrive {
+  from { transform: scale(0.55); }
+  to   { transform: scale(1); }
+}
+.web-node {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: web-arrive 460ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+
+@keyframes web-ripple {
+  from { transform: scale(1);   opacity: 0.85; }
+  to   { transform: scale(3.4); opacity: 0; }
+}
+.web-ripple {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: web-ripple 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  pointer-events: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .app-enter,
   .pop-enter,
@@ -810,7 +856,11 @@ body {
   .bar-fill,
   .mark-pop,
   .cells-in > *,
-  .note-change { animation: none; }
+  .note-change,
+  .web-ring,
+  .web-pulse,
+  .web-node,
+  .web-ripple { animation: none; }
   .press:active { transform: none; }
 }
 
