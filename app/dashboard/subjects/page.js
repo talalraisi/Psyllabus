@@ -18,7 +18,6 @@ import {
   hasAllSubjects,
   freeSubject,
   canSwitchFreeSubject,
-  freeSubjectLockUntil,
 } from '@/lib/access'
 
 /** Status keys as stored, mapped to the one palette the whole product uses. */
@@ -96,27 +95,23 @@ export default function SubjectsPage() {
     loadData()
   }, [router, supabase])
 
-  // Free accounts choose which single subject is open, and can change it.
+  /**
+   * Accounts that predate the picker have no free subject recorded, so they
+   * choose one here. Everybody else chose at the end of onboarding, and that
+   * is the whole of it — there is no switching.
+   */
   const chooseFreeSubject = async (subject) => {
     if (switching) return
-    // Held for a period after each change, so the free plan cannot be walked
-    // through every subject one quiz at a time.
-    const { allowed } = canSwitchFreeSubject(profile)
-    if (!allowed) return
+    if (!canSwitchFreeSubject(profile).allowed) return
 
     setSwitching(subject)
-    const lockedUntil = freeSubjectLockUntil()
     const { error } = await supabase
       .from('profiles')
-      .update({ free_subject: subject, free_subject_locked_until: lockedUntil })
+      .update({ free_subject: subject })
       .eq('id', profile.id)
     if (!error) {
       invalidateProfile(profile.id)
-      setProfile((p) => ({
-        ...p,
-        free_subject: subject,
-        free_subject_locked_until: lockedUntil,
-      }))
+      setProfile((p) => ({ ...p, free_subject: subject }))
     }
     setSwitching('')
   }
@@ -226,25 +221,22 @@ export default function SubjectsPage() {
         {locked ? (
           <div className="mt-auto flex flex-col gap-2">
             {/* What the lock actually is: a free account studies one subject,
-                and the hold stops it being swapped daily to read the whole
-                syllabus a subject at a time. "Locked for 30d" explained none
-                of that and read like the subject itself was expiring. */}
+                chosen once. "Locked for 30d" explained none of that and read
+                like the subject itself was expiring. */}
             <p className="text-[12.5px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
               {canSwitch.allowed
-                ? `Your free account studies one subject. Right now that is ${freeSubjectName || 'another subject'}.`
-                : `Your free subject is ${freeSubjectName || 'set'} until ${canSwitch.daysLeft} day${canSwitch.daysLeft === 1 ? '' : 's'} from now.`}
+                ? 'Your free account studies one subject. Choose which.'
+                : `Your free account studies ${freeSubjectName || 'one subject'}. Open every subject to study this one too.`}
             </p>
-            <button
-              onClick={() => chooseFreeSubject(subject)}
-              disabled={!!switching || !canSwitch.allowed}
-              className="btn btn-outline control-md w-full disabled:opacity-40"
-            >
-              {switching === subject
-                ? 'Switching'
-                : canSwitch.allowed
-                  ? 'Make this my free subject'
-                  : 'Cannot switch yet'}
-            </button>
+            {canSwitch.allowed && (
+              <button
+                onClick={() => chooseFreeSubject(subject)}
+                disabled={!!switching}
+                className="btn btn-outline control-md w-full disabled:opacity-40"
+              >
+                {switching === subject ? 'Setting up' : 'Make this my free subject'}
+              </button>
+            )}
             <Link href="/dashboard/profile#unlock" className="btn btn-quiet control-md w-full">
               Unlock every subject
             </Link>

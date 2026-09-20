@@ -6,8 +6,8 @@ import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Logo from '@/components/Logo'
+import { splitLevel, coursesOf, defaultLevel } from '@/lib/course-levels'
 import { getCurrentUser } from '@/lib/auth'
-import { freeSubjectLockUntil } from '@/lib/access'
 import { realismNote, curriculumOf } from '@/lib/curriculum'
 import {
   IB_CORE_SUBJECTS,
@@ -308,6 +308,18 @@ export default function Onboarding() {
     if (chosen >= group.required && expandedGroup === gi) setExpandedGroup(null)
   }
 
+  /**
+   * Choosing a course, then choosing its level.
+   *
+   * The list used to be "Biology HL" and "Biology SL" as two unrelated
+   * entries, so a student scanning for their subject read the same word
+   * twice and had to know which of the two they were before they could find
+   * either. Now the course is the choice, and the level is the question that
+   * follows it — including the honest answer, which for a lot of people in
+   * their first week is that nobody has told them yet.
+   */
+  const [levelFor, setLevelFor] = useState(null)
+
   const toggleSubject = (subject) => {
     if (selectedSubjects.includes(subject)) {
       setSelectedSubjects(selectedSubjects.filter(s => s !== subject))
@@ -320,6 +332,11 @@ export default function Onboarding() {
       const gi = currentCurriculum?.groups?.findIndex((g) => g.subjects.includes(subject))
       if (gi != null && gi >= 0) closeGroupIfSatisfied(currentCurriculum.groups[gi], gi, next)
     }
+  }
+
+  const pickLevel = (full) => {
+    toggleSubject(full)
+    setLevelFor(null)
   }
 
   const setGrade = (subject, grade) => {
@@ -502,13 +519,11 @@ export default function Onboarding() {
       router.push('/login')
       return
     }
-    // The hold is what stops the free plan being cycled through every subject.
+    // Chosen once. Nothing changes it back, which is what stops the free
+    // plan being cycled through every subject a quiz at a time.
     await supabase
       .from('profiles')
-      .update({
-        free_subject: freePick,
-        free_subject_locked_until: freeSubjectLockUntil(),
-      })
+      .update({ free_subject: freePick })
       .eq('id', user.id)
     router.push('/dashboard')
   }
@@ -518,7 +533,7 @@ export default function Onboarding() {
       <div className="mx-auto max-w-2xl">
         <div className="mb-12 flex justify-center">
           <Link href="/">
-            <Logo width={220} height={66} priority className="h-auto w-[170px] md:w-[200px]" />
+            <Logo width={320} height={96} priority className="h-auto w-[240px] md:w-[280px]" />
           </Link>
         </div>
         {children}
@@ -578,7 +593,7 @@ export default function Onboarding() {
       <div className="mx-auto max-w-2xl">
         <div className="mb-12 flex justify-center">
           <Link href="/">
-            <Logo width={220} height={66} priority className="h-auto w-[170px] md:w-[200px]" />
+            <Logo width={320} height={96} priority className="h-auto w-[240px] md:w-[280px]" />
           </Link>
         </div>
 
@@ -621,6 +636,9 @@ export default function Onboarding() {
           </div>
         </div>
 
+        {/* Keyed on the step, so moving between them remounts the panel and
+            the entrance plays again instead of the content swapping in place. */}
+        <div key={step} className="step-enter">
         {/* Step 1, Curriculum and year */}
         {step === 1 && (
           <div
@@ -775,29 +793,100 @@ export default function Onboarding() {
 
                   {open && (
                     <div className="pop-enter grid grid-cols-1 gap-2 px-4 pb-4 sm:grid-cols-2">
-                      {group.subjects.map((subject) => {
-                        const cov = coverageLabel(coverage[subject])
+                      {coursesOf(group.subjects).map((course) => {
+                        // Which of this course's levels, if any, is already in.
+                        const chosen = [course.only, ...Object.values(course.levels)].find(
+                          (f) => f && selectedSubjects.includes(f)
+                        )
+                        const levels = Object.keys(course.levels)
+                        // Offered at one level, or at none: there is no
+                        // question to ask, so it is a plain choice. Only the
+                        // forty courses that are genuinely both get asked.
+                        const single = course.only || (levels.length === 1 ? course.levels[levels[0]] : null)
+                        const asking = levelFor === course.base && !chosen && !single
+                        const cov = coverageLabel(
+                          coverage[chosen || course.only || course.levels[levels[0]]]
+                        )
+
                         return (
-                          <button
-                            key={subject}
-                            onClick={() => toggleSubject(subject)}
-                            aria-pressed={selectedSubjects.includes(subject)}
-                            className={`press rounded-[10px] border px-3.5 py-2.5 text-left transition-colors duration-150
-                        ${selectedSubjects.includes(subject) ? 'chip-active' : 'chip hover:border-border-strong'}`}
-                          >
-                            <span className="block text-[12.5px] font-medium">{subject}</span>
-                            {/* Said before the choice, not after it. A subject
-                                with nothing in it is still the right subject to
-                                take — it just will not do anything yet, and
-                                finding that out afterwards is what makes a
-                                product look broken rather than early. */}
-                            <span
-                              className="mt-0.5 block text-[10.5px]"
-                              style={{ color: COVERAGE_TONE[cov.tone] }}
+                          <div key={course.base} className="flex flex-col">
+                            <button
+                              onClick={() => {
+                                if (chosen) toggleSubject(chosen)
+                                else if (single) toggleSubject(single)
+                                else setLevelFor(asking ? null : course.base)
+                              }}
+                              aria-pressed={!!chosen}
+                              aria-expanded={single ? undefined : asking}
+                              className={`press rounded-[10px] border px-3.5 py-2.5 text-left transition-colors duration-150
+                        ${chosen ? 'chip-active' : 'chip hover:border-border-strong'}`}
                             >
-                              {cov.label}
-                            </span>
-                          </button>
+                              <span className="flex items-baseline gap-1.5">
+                                <span className="block text-[12.5px] font-medium">{course.base}</span>
+                                {splitLevel(chosen || single || '').level && (
+                                  <span
+                                    className="rounded-full px-1.5 text-[10px] font-semibold"
+                                    style={
+                                      chosen
+                                        ? { background: 'var(--brand)', color: '#fff' }
+                                        : { border: '1px solid var(--border-strong)', color: 'var(--text-faint)' }
+                                    }
+                                  >
+                                    {splitLevel(chosen || single).level}
+                                  </span>
+                                )}
+                              </span>
+                              {/* Said before the choice, not after it. A subject
+                                  with nothing in it is still the right subject to
+                                  take — it just will not do anything yet, and
+                                  finding that out afterwards is what makes a
+                                  product look broken rather than early. */}
+                              <span
+                                className="mt-0.5 block text-[10.5px]"
+                                style={{ color: COVERAGE_TONE[cov.tone] }}
+                              >
+                                {cov.label}
+                              </span>
+                            </button>
+
+                            {/* The level, asked only once the course is picked
+                                and only where there is a choice to make. */}
+                            {asking && (
+                              <div
+                                className="pop-enter mt-1.5 rounded-[10px] border p-2.5"
+                                style={{ borderColor: 'var(--brand)', background: 'var(--brand-tint)' }}
+                              >
+                                <p className="mb-2 text-[11px] font-medium" style={{ color: 'var(--text-body)' }}>
+                                  Are you taking it at
+                                </p>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {levels.map((lv) => (
+                                    <button
+                                      key={lv}
+                                      onClick={() => pickLevel(course.levels[lv])}
+                                      className="btn btn-outline control-sm"
+                                    >
+                                      {lv}
+                                    </button>
+                                  ))}
+                                  {/* Most people in week one have not been
+                                      told. SL is the smaller of the two and
+                                      HL contains it, so it is the guess that
+                                      cannot show you something that is not
+                                      yours. */}
+                                  <button
+                                    onClick={() => pickLevel(defaultLevel(course))}
+                                    className="btn btn-quiet control-sm"
+                                  >
+                                    Not sure yet
+                                  </button>
+                                </div>
+                                <p className="mt-2 text-[10.5px]" style={{ color: 'var(--text-faint)' }}>
+                                  Not sure starts you on SL.
+                                </p>
+                              </div>
+                            )}
+                          </div>
                         )
                       })}
                     </div>
@@ -1027,7 +1116,7 @@ export default function Onboarding() {
               Which subject do you want to start with?
             </h1>
             <p className="mb-8 mt-3 text-[14.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              One subject, completely: every topic, every quiz, its own plan. Pick the one you are actually revising — changing it later means waiting 30 days.
+              One subject, completely: every topic, every quiz, its own plan. Pick the one you are actually revising — this is the one that stays open, and it is not changed later.
             </p>
 
             <div className="flex flex-col gap-2 mb-6">
@@ -1073,6 +1162,7 @@ export default function Onboarding() {
             </p>
           </div>
         )}
+        </div>
       </div>
     </main>
   )

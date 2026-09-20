@@ -266,7 +266,7 @@ export default function PricingPage() {
               ],
               [
                 'Can I change subject on the free plan?',
-                'Yes, once every 30 days. The hold stops a free account reading the whole syllabus a subject at a time.',
+                'No — you choose it once, when you set up your account. Otherwise a free account could read the whole syllabus a subject at a time, and there would be nothing to pay for.',
               ],
               [
                 'Does my school see my results?',

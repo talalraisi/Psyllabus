@@ -50,7 +50,7 @@ function Section({ children, label, tint = false, className = '', id }) {
   return (
     <section
       id={id}
-      className={`scroll-mt-16 border-t px-5 py-20 md:px-8 md:py-28 ${className}`}
+      className={`relative isolate scroll-mt-16 border-t px-5 py-20 md:px-8 md:py-28 ${className}`}
       style={{
         borderColor: 'var(--border)',
         background: tint ? 'var(--surface-sunken)' : 'transparent',
@@ -113,7 +113,7 @@ export default async function Home() {
       >
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 md:px-8">
           <Link href="/" aria-label="Project Syllabus home" className="shrink-0">
-            <Image src={logoMark} alt="Project Syllabus" sizes="110px" style={{ height: 38, width: 'auto' }} priority />
+            <Image src={logoMark} alt="Project Syllabus" sizes="110px" style={{ height: 32, width: 'auto' }} priority />
           </Link>
           <div className="flex items-center gap-2">
             <Link
@@ -134,7 +134,13 @@ export default async function Home() {
 
       <main>
         {/* ---------------------------------------------------------- hero */}
-        <section className="ground px-5 py-24 md:px-8 md:py-36">
+        <section className="ground relative px-5 py-24 md:px-8 md:py-36">
+          {/* Two slow blobs behind the headline. Nothing on this page moved
+              unless you scrolled it, which reads as a screenshot. */}
+          <div className="aurora" aria-hidden="true">
+            <span />
+            <span />
+          </div>
           <div className="mx-auto max-w-6xl">
             <h1 className="max-w-3xl text-[clamp(2.6rem,6vw,4.6rem)] font-semibold leading-[0.98] tracking-[-0.038em]">
               Stop guessing.
@@ -306,7 +312,7 @@ export default async function Home() {
             )}
             <div className="flex-1">
               <div
-                className="cell rounded-lg border border-dashed"
+                className="cell fade-breathe rounded-lg border border-dashed"
                 style={{ height: '50px', borderColor: 'var(--status-fading)', animationDelay: '400ms' }}
               />
               <p className="mt-3 text-[12.5px] font-medium" style={{ color: 'var(--status-fading)' }}>Fading</p>
@@ -414,6 +420,10 @@ export default async function Home() {
 
         {/* ------------------------------------------------------------ cta */}
         <Section>
+          <div className="aurora" aria-hidden="true" style={{ opacity: 0.6 }}>
+            <span />
+            <span />
+          </div>
           <div className="mx-auto max-w-2xl text-center">
             <Heading>Start with one subject. It stays free.</Heading>
             <p className="mx-auto mt-5 max-w-lg text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>

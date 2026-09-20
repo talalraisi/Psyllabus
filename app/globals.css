@@ -803,51 +803,89 @@ body {
 .press { transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1); }
 .press:active { transform: scale(0.97); }
 
-/* The subject web.
+/* Idle motion.
 
-   Four small motions, none of them decorative: the rings turn so the map
-   reads as one live thing rather than a printed diagram, the middle breathes
-   so the eye starts there, nodes arrive rather than appear, and a press
-   answers itself. All of it is slow enough to sit under for a while. */
-@keyframes web-drift {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+   A page that only moves when you scroll feels like a printed sheet being
+   pulled past a window. These drift on their own — slowly enough that you
+   register the page as alive without ever catching it animating. Long,
+   co-prime-ish periods so the two never fall into step and start to read
+   as a loop. */
+@keyframes drift-a {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(7%, -5%, 0) scale(1.14); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
 }
-.web-ring {
-  transform-origin: center;
-  animation: web-drift 90s linear infinite;
-}
-
-@keyframes web-pulse {
-  0%   { transform: scale(1);    opacity: 0.55; }
-  55%  { transform: scale(1.07); opacity: 0.12; }
-  100% { transform: scale(1);    opacity: 0.55; }
-}
-.web-pulse {
-  transform-origin: center;
-  animation: web-pulse 3.6s ease-in-out infinite;
+@keyframes drift-b {
+  0%   { transform: translate3d(0, 0, 0) scale(1.1); }
+  50%  { transform: translate3d(-8%, 6%, 0) scale(1); }
+  100% { transform: translate3d(0, 0, 0) scale(1.1); }
 }
 
-@keyframes web-arrive {
-  from { transform: scale(0.55); }
-  to   { transform: scale(1); }
-}
-.web-node {
-  transform-origin: center;
-  transform-box: fill-box;
-  animation: web-arrive 460ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
-}
-
-@keyframes web-ripple {
-  from { transform: scale(1);   opacity: 0.85; }
-  to   { transform: scale(3.4); opacity: 0; }
-}
-.web-ripple {
-  transform-origin: center;
-  transform-box: fill-box;
-  animation: web-ripple 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
+.aurora {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
   pointer-events: none;
 }
+.aurora > span {
+  position: absolute;
+  display: block;
+  border-radius: 9999px;
+  filter: blur(64px);
+  will-change: transform;
+}
+.aurora > span:nth-child(1) {
+  width: 44vw;
+  height: 44vw;
+  left: -10vw;
+  top: -16vw;
+  background: radial-gradient(circle, color-mix(in oklab, var(--brand) 34%, transparent), transparent 70%);
+  animation: drift-a 29s ease-in-out infinite;
+}
+.aurora > span:nth-child(2) {
+  width: 36vw;
+  height: 36vw;
+  right: -8vw;
+  top: 4vw;
+  background: radial-gradient(circle, color-mix(in oklab, var(--status-mastered) 26%, transparent), transparent 70%);
+  animation: drift-b 41s ease-in-out infinite;
+}
+
+/* Something small that never quite settles. Used on a couple of marks that
+   would otherwise be the only still things on a moving page. */
+@keyframes bob {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-5px); }
+  100% { transform: translateY(0); }
+}
+.bob { animation: bob 6s ease-in-out infinite; }
+.bob-slow { animation: bob 9s ease-in-out infinite; }
+
+/* The faint grid behind the hero, creeping by exactly one tile a minute so
+   the loop has no seam. It is under a blur and a mask, so nobody will ever
+   point at it — they will just find the page less like a poster. */
+@keyframes grid-drift {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 72px 72px, 72px 72px; }
+}
+
+/* A thing labelled Fading that sat there at full strength. */
+@keyframes fade-breathe {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.38; }
+  100% { opacity: 1; }
+}
+.fade-breathe { animation: fade-breathe 5s ease-in-out infinite; }
+
+/* Moving between onboarding steps. The panel used to swap in place, which
+   gives no sense of having gone anywhere — so it comes in from the side it
+   came from. */
+@keyframes step-enter {
+  from { opacity: 0; transform: translate3d(14px, 0, 0); }
+  to   { opacity: 1; transform: none; }
+}
+.step-enter { animation: step-enter 320ms cubic-bezier(0.16, 1, 0.3, 1) both; }
 
 @media (prefers-reduced-motion: reduce) {
   .app-enter,
@@ -857,10 +895,12 @@ body {
   .mark-pop,
   .cells-in > *,
   .note-change,
-  .web-ring,
-  .web-pulse,
-  .web-node,
-  .web-ripple { animation: none; }
+  .aurora > span,
+  .bob,
+  .bob-slow,
+  .fade-breathe,
+  .step-enter,
+  .ground::before { animation: none; }
   .press:active { transform: none; }
 }
 
@@ -977,6 +1017,7 @@ body {
     linear-gradient(to right, var(--border) 1px, transparent 1px),
     linear-gradient(to bottom, var(--border) 1px, transparent 1px);
   background-size: 72px 72px;
+  animation: grid-drift 60s linear infinite;
   -webkit-mask-image: radial-gradient(ellipse 78% 70% at 22% 34%, #000 0%, transparent 72%);
   mask-image: radial-gradient(ellipse 78% 70% at 22% 34%, #000 0%, transparent 72%);
   opacity: 0.75;
