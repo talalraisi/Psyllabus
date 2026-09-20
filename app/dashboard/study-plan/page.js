@@ -254,8 +254,7 @@ export default function StudyPlanPage() {
             <div className="min-w-0 flex-1">
               <p className="text-[14.5px] font-medium">Turn on reminders</p>
               <p className="mt-1 text-[13px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                Alerts before tests and deadlines, and when a study block ends. They arrive while
-                Project Syllabus is open, so add it to your home screen to keep it running.
+              Alerts before tests and deadlines, and when a block ends. They need the app open.
               </p>
             </div>
             <button onClick={enableNotifications} className="btn btn-solid control-sm shrink-0 text-xs">

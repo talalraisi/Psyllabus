@@ -454,8 +454,7 @@ export default function PredictionPage() {
                     </strong>
                   </p>
                   <p className="t-caption mt-2">
-                    Shown for reference. It is not added to your predicted total, because nothing
-                    here has assessed your TOK or EE work.
+              For reference. Not added to the total — nothing here has marked that coursework.
                   </p>
                 </div>
                 )}
@@ -485,9 +484,7 @@ export default function PredictionPage() {
         </Section>
 
         <p className="t-caption">
-          Predictions come from quiz accuracy across your syllabus and are a study aid, not a
-          forecast of your final result. TOK and the Extended Essay use your target grades until
-          that coursework can be assessed.
+              From quiz accuracy across your syllabus. A study aid, not a forecast. TOK and the EE use your targets until that work is marked.
         </p>
       </Page>
     </DashboardLayout>

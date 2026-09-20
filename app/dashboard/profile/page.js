@@ -468,15 +468,12 @@ export default function ProfilePage() {
 
           {hasWork ? (
             <p className="text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              These are set now. Your levels, mistake bank and predicted grade are all filed under
-              them, so changing the list would hide that work rather than move it. Get in touch if
-              the list is wrong and it can be corrected properly.
+              Set for good — everything you prove is filed under them. Get in touch if the list is wrong.
             </p>
           ) : (
             <>
               <p className="mb-5 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                You have not answered anything yet, so there is nothing filed under these and the
-                list can still be changed. Once you sit your first quiz it is fixed.
+              Still changeable until your first quiz.
               </p>
               <Link href="/onboarding" className="btn btn-outline control-md">
                 Change my subjects
@@ -551,9 +548,7 @@ export default function ProfilePage() {
         <Section title="Your data">
           <div>
             <p className="text-[14px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              Everything Project Syllabus holds about you is yours: your name, your email, your
-              subjects and every answer you have given. You can take all of it away at any time,
-              and it is removed rather than hidden.
+              Take a copy of everything, any time. Deleting removes it rather than hiding it.
             </p>
 
             {!confirmingDelete ? (
@@ -569,9 +564,7 @@ export default function ProfilePage() {
                   This cannot be undone.
                 </p>
                 <p className="t-small mt-2">
-                  Your account, your progress, your mastery points, your mistake bank, your calendar
-                  and every quiz you have taken will be permanently deleted. There is no backup and
-                  no recovery.
+              Your account and everything in it, permanently. No backup, no recovery.
                 </p>
                 <p className="t-small mt-2">
                   Type <strong className="text-[var(--text)]">DELETE</strong> to confirm.

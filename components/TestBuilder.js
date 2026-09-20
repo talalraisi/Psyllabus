@@ -219,7 +219,7 @@ export default function TestBuilder({
       </nav>
 
       {STEPS[step].key === 'subject' && (
-        <Question title="Which subject?" hint="One paper, one subject. Everything after this is about that subject.">
+        <Question title="Which subject?" hint="One paper, one subject.">
           <div className="flex flex-col gap-2">
             {subjects.map((s) => (
               <Option key={s} on={subject === s} onClick={() => onSubject(s)} title={s} />
@@ -252,7 +252,7 @@ export default function TestBuilder({
       )}
 
       {STEPS[step].key === 'source' && (
-        <Question title="What should it draw from?" hint="The questions can come from anywhere in the subject, or only from the parts that need work.">
+        <Question title="What should it draw from?" hint="Anywhere in the subject, or only what needs work.">
           <div className="flex flex-col gap-2">
             {focusModes.map((m) => (
               <Option
@@ -268,7 +268,7 @@ export default function TestBuilder({
       )}
 
       {STEPS[step].key === 'topics' && (
-        <Question title="Which topics?" hint="Open one to pick individual subtopics. A topic with nothing ticked inside it means all of it.">
+        <Question title="Which topics?" hint="Open one to pick subtopics. Nothing ticked means all of it.">
           <div className="mb-4 flex items-center justify-between">
             <span className="text-[13px] tabular-nums" style={{ color: 'var(--text-muted)' }}>
               {selected.length} of {topics.length} selected
@@ -424,7 +424,7 @@ export default function TestBuilder({
       )}
 
       {STEPS[step].key === 'shape' && (
-        <Question title="What shape is the paper?" hint="How hard, what kind of question, what order, and how long.">
+        <Question title="What shape is the paper?" hint="Difficulty, question type, order, length.">
           <div className="flex flex-col gap-8">
             <div>
               <p className="mb-3 text-[14px] font-medium">Heat</p>
@@ -519,13 +519,13 @@ export default function TestBuilder({
       )}
 
       {STEPS[step].key === 'sit' && (
-        <Question title="How do you want to sit it?" hint="Untimed to learn, timed to rehearse the real thing.">
+        <Question title="How do you want to sit it?" hint="Untimed to learn, timed to rehearse.">
           <div className="flex flex-col gap-3">
             <Toggle
               on={timed}
               onClick={() => onTimed(!timed)}
               label="Exam conditions"
-              hint="A countdown, and live marks-per-minute pacing against what the paper needs."
+              hint="A countdown and live marks-per-minute pacing."
             />
             {timed && (
               <label className="flex flex-wrap items-center gap-2 pl-5">
@@ -553,7 +553,7 @@ export default function TestBuilder({
               on={review === 'exam'}
               onClick={() => onReview(review === 'exam' ? 'practice' : 'exam')}
               label="Exam mode"
-              hint="Nothing is marked until you finish, the way a real paper works."
+              hint="Nothing marked until you finish. No hints."
             />
 
           </div>

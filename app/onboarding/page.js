@@ -556,9 +556,7 @@ export default function Onboarding() {
           className="mx-auto mt-4 max-w-md text-[14.5px] leading-relaxed"
           style={{ color: 'var(--text-muted)' }}
         >
-          This account already has its subjects and targets. Setting them up again here
-          would write over them, so it stops. If you are somebody else on this device,
-          start a new account and you will be signed out of this one first.
+              This account is already set up, so nothing here will overwrite it. Somebody else on this device should start a new account.
         </p>
         <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
           <Link href="/dashboard" className="btn btn-solid control-md">
@@ -829,8 +827,7 @@ export default function Onboarding() {
               <div className="mb-7 border-t pt-5" style={{ borderColor: 'var(--border)' }}>
                 <p className="text-[14px] font-medium">Included automatically</p>
                 <p className="mb-4 mt-1.5 text-[12.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                  Every Diploma candidate takes the core, so we add it for you. TOK and the
-                  Extended Essay are worth up to 3 bonus points.
+              Added for you. TOK and the EE are worth up to 3 points.
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {coreSubjects.map((s) => (
@@ -1030,9 +1027,7 @@ export default function Onboarding() {
               Which subject do you want to start with?
             </h1>
             <p className="mb-8 mt-3 text-[14.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              The free plan opens one subject completely: every topic, every quiz, its own study
-              plan. Pick the one you most need to get on top of. You can change it later, though
-              not straight away, so choose the subject you are actually revising.
+              One subject, completely: every topic, every quiz, its own plan. Pick the one you are actually revising — changing it later means waiting 30 days.
             </p>
 
             <div className="flex flex-col gap-2 mb-6">
@@ -1062,8 +1057,7 @@ export default function Onboarding() {
             </div>
 
             <p className="t-caption mb-5">
-              Theory of Knowledge, the Extended Essay and CAS stay open whatever you pick, because
-              they are part of the Diploma rather than a subject you chose.
+              TOK, the EE and CAS stay open whatever you pick.
             </p>
 
             <button
