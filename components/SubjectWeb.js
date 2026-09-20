@@ -104,11 +104,19 @@ function layout(rows, focus) {
   const nodes = []
   const links = []
   let cursor = 0
+  let seq = 0
 
   for (const t of shown) {
-    // A sector proportional to how much of the course this topic is, with a
-    // small gap so neighbouring themes do not run into each other.
-    const sweep = (t.size / total) * 360
+    /**
+     * A sector part proportional, part equal.
+     *
+     * Purely proportional meant a theme of four subtopics got four degrees,
+     * which put its node hard against its neighbour's and its name on top of
+     * that neighbour's name. Blending in an equal share guarantees every
+     * theme enough of the circle to be readable, while a theme twice the size
+     * of another still looks it.
+     */
+    const sweep = 360 * (0.6 * (t.size / total) + 0.4 * (1 / shown.length))
     const start = cursor + (focus ? 0 : 3)
     const end = cursor + sweep - (focus ? 0 : 3)
     const mid = (start + end) / 2
@@ -116,7 +124,17 @@ function layout(rows, focus) {
 
     const topicPoint = at(mid, RING_TOPIC)
     const topicId = `t:${t.topic}`
-    nodes.push({ id: topicId, kind: 'topic', label: t.topic, ...topicPoint, topic: t.topic })
+    nodes.push({
+      id: topicId,
+      kind: 'topic',
+      label: t.topic,
+      // Sectors are proportional to size, so a small theme sits right up
+      // against its neighbour. The label is staggered by this so two of them
+      // never land on the same line.
+      seq: seq++,
+      ...topicPoint,
+      topic: t.topic,
+    })
     links.push({ from: { x: CENTRE, y: CENTRE }, to: topicPoint, kind: 'spine' })
 
     let leafCursor = start
@@ -306,6 +324,31 @@ export default function SubjectWeb({ subject, rows, onPickSubtopic, fill = false
             // Was 9 / 5.5 / 4 on a 760 canvas, which is why the whole thing
             // read as specks rather than a diagram.
             const r = n.kind === 'topic' ? 19 : n.kind === 'unit' ? 12 : n.r
+
+            /**
+             * Labels pushed outward along their own spoke.
+             *
+             * Sitting every label directly under its node put two topic names
+             * on top of each other wherever two sectors met near the top of
+             * the circle. Pushed out along the radius they spread the way the
+             * nodes already do, and the side of the circle they are on
+             * decides which way they run.
+             */
+            const grown = r * (isHovered ? 1.45 : 1)
+            const dx = n.x - CENTRE
+            const dy = n.y - CENTRE
+            const len = Math.hypot(dx, dy) || 1
+            // Topic names go inward, everything else outward. There are four
+            // or five topics and a hundred leaves: the inside of the circle
+            // is nearly empty and the rim is where the crowding is, so two
+            // theme names that met near twelve o'clock were landing on top of
+            // each other while there was open space behind them.
+            const pad = n.kind === 'topic' ? -(grown + 10) : grown + 11
+            const label = {
+              x: Math.round((n.x + (dx / len) * pad) * 100) / 100,
+              y: Math.round((n.y + (dy / len) * pad + 4) * 100) / 100,
+              anchor: dx / len > 0.25 ? 'start' : dx / len < -0.25 ? 'end' : 'middle',
+            }
             const fill =
               n.kind === 'leaf'
                 ? STATUS_COLOR[n.status] || 'var(--status-untested)'
@@ -345,9 +388,9 @@ export default function SubjectWeb({ subject, rows, onPickSubtopic, fill = false
                   (n.kind === 'leaf' && n.labelled) ||
                   isHovered) && (
                   <text
-                    x={n.x}
-                    y={n.y + r * (isHovered ? 1.45 : 1) + 15}
-                    textAnchor="middle"
+                    x={label.x}
+                    y={label.y}
+                    textAnchor={label.anchor}
                     style={{
                       fontSize: n.kind === 'topic' ? 14 : n.kind === 'unit' ? 12 : 11,
                       fontWeight: n.kind === 'topic' ? 600 : 500,
@@ -361,7 +404,7 @@ export default function SubjectWeb({ subject, rows, onPickSubtopic, fill = false
                       pointerEvents: 'none',
                     }}
                   >
-                    {n.label.length > 28 ? `${n.label.slice(0, 26)}…` : n.label}
+                    {n.label.length > 24 ? `${n.label.slice(0, 22)}…` : n.label}
                   </text>
                 )}
               </g>
