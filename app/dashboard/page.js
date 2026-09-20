@@ -435,7 +435,7 @@ export default function Dashboard() {
         {hasActivity && (
           <div className="stagger mb-10 grid gap-3 sm:grid-cols-3">
             <div
-              className="flex items-center gap-4 rounded-[14px] border p-5"
+              className="elev flex items-center gap-4 rounded-[14px] border p-5"
               style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
             >
               <Ring percent={overall} />
@@ -449,7 +449,7 @@ export default function Dashboard() {
 
             <Link
               href="/dashboard/study-plan"
-              className="lift rounded-[14px] border p-5"
+              className="elev lift rounded-[14px] border p-5"
               style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
             >
               <p className="text-[26px] font-semibold leading-none tabular-nums">
@@ -463,7 +463,7 @@ export default function Dashboard() {
 
             <Link
               href="/dashboard/mistakes"
-              className="lift rounded-[14px] border p-5"
+              className="elev lift rounded-[14px] border p-5"
               style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
             >
               <p

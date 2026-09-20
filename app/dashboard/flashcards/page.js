@@ -489,7 +489,7 @@ export default function FlashcardsPage() {
                       setOpenDeck(d.subject)
                       setOpenSubtopic(null)
                     }}
-                    className="lift flex flex-col justify-between gap-5 rounded-[12px] border p-5 text-left"
+                    className="elev lift flex flex-col justify-between gap-5 rounded-[12px] border p-5 text-left"
                     style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
                   >
                     <div className="flex items-start justify-between gap-3">

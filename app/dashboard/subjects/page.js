@@ -146,7 +146,7 @@ export default function SubjectsPage() {
       // of the product states mastery as a bar against a target, and a second
       // shape for the same number made the two look like different measures.
       <div
-        className="flex flex-col rounded-[12px] border p-5"
+        className="elev flex flex-col rounded-[12px] border p-5"
         style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
       >
         <h2 className="text-[15.5px] font-semibold leading-snug tracking-[-0.015em]">{subject}</h2>
@@ -219,16 +219,11 @@ export default function SubjectsPage() {
         </div>
 
         {locked ? (
-          <div className="mt-auto flex flex-col gap-2">
-            {/* What the lock actually is: a free account studies one subject,
-                chosen once. "Locked for 30d" explained none of that and read
-                like the subject itself was expiring. */}
-            <p className="text-[12.5px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
-              {canSwitch.allowed
-                ? 'Your free account studies one subject. Choose which.'
-                : `Your free account studies ${freeSubjectName || 'one subject'}. Open every subject to study this one too.`}
-            </p>
-            {canSwitch.allowed && (
+          /* The rule is explained once above the grid, not restated on every
+             card. Five cards each carrying the same sentence and the same
+             button is not five explanations, it is one explanation shouted. */
+          <div className="mt-auto">
+            {canSwitch.allowed ? (
               <button
                 onClick={() => chooseFreeSubject(subject)}
                 disabled={!!switching}
@@ -236,10 +231,11 @@ export default function SubjectsPage() {
               >
                 {switching === subject ? 'Setting up' : 'Make this my free subject'}
               </button>
+            ) : (
+              <p className="text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
+                Locked
+              </p>
             )}
-            <Link href="/dashboard/profile#unlock" className="btn btn-quiet control-md w-full">
-              Unlock every subject
-            </Link>
           </div>
         ) : (
           <Link
@@ -262,6 +258,22 @@ export default function SubjectsPage() {
         />
 
         <Section title="Subjects">
+          {/* Said once, here, rather than on each of the five locked cards. */}
+          {!hasAllSubjects(profile) && (
+            <div
+              className="elev mb-4 flex flex-wrap items-center justify-between gap-3 rounded-[12px] border px-4 py-3"
+              style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+            >
+              <p className="text-[13px]" style={{ color: 'var(--text-body)' }}>
+                {canSwitch.allowed
+                  ? 'Your free account studies one subject. Choose which below.'
+                  : `Your free account studies ${freeSubjectName || 'one subject'}. The rest open together.`}
+              </p>
+              <Link href="/dashboard/profile#unlock" className="btn btn-outline control-sm shrink-0">
+                Unlock every subject
+              </Link>
+            </div>
+          )}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {subjects.map((subject) => (
               <SubjectCard
@@ -272,21 +284,6 @@ export default function SubjectsPage() {
             ))}
           </div>
 
-          {!hasAllSubjects(profile) && subjects.length > 1 && (
-            <div className="mt-6 border-l-2 pl-4" style={{ borderColor: 'var(--border-strong)' }}>
-              <p className="text-[14px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-                You are on the free plan, which opens one subject at a time. Right now that is{' '}
-                <strong className="text-[var(--text)]">{freeSubject(profile)}</strong>. Switch to a
-                different one whenever you like, as often as you like.
-              </p>
-              <Link
-                href="/dashboard/profile#unlock"
-                className="mt-2 inline-block text-[13.5px] font-medium text-[var(--brand)] hover:underline"
-              >
-                Open all of them with a school code
-              </Link>
-            </div>
-          )}
         </Section>
 
         {/* The core is not a subject you revise, it is work with deadlines,

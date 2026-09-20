@@ -12,7 +12,7 @@ import Link from 'next/link'
 export default function LockedPanel({ title, blurb, plan = 'Basic' }) {
   return (
     <section
-      className="rounded-[16px] border p-6"
+      className="elev rounded-[16px] border p-6"
       style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
     >
       <p

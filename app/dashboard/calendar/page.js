@@ -216,7 +216,7 @@ export default function CalendarPage() {
         {draft && (
           <form
             onSubmit={saveEvent}
-            className="mb-10 rounded-[12px] border p-5"
+            className="elev mb-10 rounded-[12px] border p-5"
             style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
           >
             <div className="mb-5 flex items-center justify-between">

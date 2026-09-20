@@ -592,7 +592,7 @@ export default function TestBuilder({
           </div>
 
           {/* The paper, once there is one. Last screen rather than a sidebar. */}
-          <div className="mt-10 rounded-[14px] border p-6" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
+          <div className="elev mt-10 rounded-[14px] border p-6" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em]" style={{ color: 'var(--text-faint)' }}>
               Your paper
             </p>

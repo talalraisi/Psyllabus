@@ -308,7 +308,7 @@ export default function StudyPlanPage() {
                       it, because "how long have I got" is part of the plan
                       rather than a setting about it. */}
                   <div
-                    className="mb-8 rounded-[16px] border p-6"
+                    className="elev mb-8 rounded-[16px] border p-6"
                     style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
                   >
                     <div className="flex flex-wrap items-start justify-between gap-4">
