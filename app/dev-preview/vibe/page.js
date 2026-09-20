@@ -34,7 +34,7 @@ function Ring({ value, size, stroke, children, track = 'var(--v-track)' }) {
   const r = (size - stroke) / 2
   const c = 2 * Math.PI * r
   return (
-    <div style={{ position: 'relative', width: size, height: size }}>
+    <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
       <svg width={size} height={size} style={{ display: 'block' }}>
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={track} strokeWidth={stroke} />
         <circle
@@ -303,6 +303,7 @@ const CSS = `
   --v-faint: #7f8d86;
   --v-accent: #46b380;
   --v-on-accent: #07120d;
+  --v-wash: rgba(70,179,128,0.13);
   --v-radius: 22px;
   --v-btn-radius: 999px;
   --v-pad: 34px;
@@ -314,23 +315,56 @@ const CSS = `
 }
 .vibe-a .v-hero {
   background:
-    radial-gradient(120% 90% at 12% 0%, rgba(70,179,128,0.13), transparent 62%),
+    radial-gradient(120% 90% at 12% 0%, var(--v-wash), transparent 62%),
     var(--v-surface);
 }
+/* A disc behind the ring, so the ring sits on something rather than floating
+   on a flat white card. Barely visible; it is doing the job a shadow does in
+   dark mode, where the ring already glows against near-black. */
+.vibe-a .v-hero-row > div:first-child::before {
+  content: '';
+  position: absolute;
+  inset: -14%;
+  border-radius: 999px;
+  background: radial-gradient(circle, var(--v-wash), transparent 70%);
+  pointer-events: none;
+}
+/* Light mode was the weak half: a white card on an almost-white page with a
+   hairline and a whisper of shadow, which reads as a form rather than as
+   something in front of something. The page is dropped a long way below the
+   card so white actually lifts, the border is nearly gone because the shadow
+   should do that work, and the shadow is three layers — contact, lift and a
+   wide soft pool — which is what separates an expensive-looking card from a
+   box. The green is deeper and more saturated: the dark mode ring glows
+   against near-black and gets its drama free, while on white a pale green
+   ring is just a line. */
 :root:not([data-theme='dark']) .vibe-a {
-  --v-bg: #f4f7f5;
+  /* Warm, not beige. A cool grey-green page reads clinical — the wrong kind
+     of serious for something opened at eleven at night — but a cream one
+     reads like a recipe site. This is a neutral with just enough warmth to
+     stop it feeling like a medical form. */
+  --v-bg: #edecea;
   --v-surface: #ffffff;
-  --v-sunken: #eef2ef;
-  --v-border: #e4eae6;
-  --v-border-strong: #d3dcd7;
-  --v-track: #e6ece8;
-  --v-text: #101915;
-  --v-muted: #5a6761;
-  --v-faint: #7c8a83;
-  --v-accent: #1f7a55;
+  --v-sunken: #e4e3e0;
+  --v-border: rgba(16,22,19,0.05);
+  --v-border-strong: rgba(16,22,19,0.11);
+  --v-track: #e6e5e2;
+  --v-text: #0b100e;
+  --v-muted: #4d5651;
+  --v-faint: #717b75;
+  --v-accent: #127954;
   --v-on-accent: #ffffff;
-  --v-shadow: 0 18px 44px -30px rgba(16,25,21,0.45);
-  --v-shadow-sm: 0 6px 16px -10px rgba(16,25,21,0.3);
+  --v-wash: rgba(18,121,84,0.14);
+  /* The muted status hues were tuned against near-black. On white the clay
+     and ochre lose their chroma and go brown, so they are lifted here. */
+  --status-weak: oklch(0.58 0.16 32);
+  --status-developing: oklch(0.66 0.14 78);
+  --status-proficient: oklch(0.56 0.13 158);
+  --v-shadow:
+    0 1px 2px rgba(16,25,21,0.05),
+    0 14px 30px -14px rgba(16,25,21,0.16),
+    0 44px 80px -46px rgba(16,25,21,0.28);
+  --v-shadow-sm: 0 2px 8px -3px rgba(16,25,21,0.22);
 }
 
 /* ========================= B · instrument led ============================ */
