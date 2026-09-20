@@ -169,7 +169,27 @@ function Result({ variant }) {
 
 export default function VibePreview() {
   const [variant, setVariant] = useState('a')
+  const [theme, setTheme] = useState('system')
   if (!ENABLED) notFound()
+
+  /**
+   * A theme switch on the page itself.
+   *
+   * The real app follows the operating system, which is right for the app and
+   * useless for judging two designs side by side — nobody should have to open
+   * System Settings twice per comparison.
+   */
+  const pick = (next) => {
+    setTheme(next)
+    const resolved =
+      next === 'system'
+        ? window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light'
+        : next
+    document.documentElement.setAttribute('data-theme', resolved)
+    document.documentElement.style.colorScheme = resolved
+  }
 
   return (
     <div className={`vibe vibe-${variant}`}>
@@ -179,23 +199,25 @@ export default function VibePreview() {
         <div>
           <h1 className="v-title-md">Two directions</h1>
           <p className="v-body">
-            Same screens, same content. Light and dark follow your system setting — flip it to see
-            both.
+            Same screens, same content. Switch the theme here rather than in System Settings.
           </p>
         </div>
-        <div className="v-seg">
-          <button
-            onClick={() => setVariant('a')}
-            className={variant === 'a' ? 'v-seg-on' : ''}
-          >
-            A · Rings led
-          </button>
-          <button
-            onClick={() => setVariant('b')}
-            className={variant === 'b' ? 'v-seg-on' : ''}
-          >
-            B · Instrument led
-          </button>
+        <div className="v-controls">
+          <div className="v-seg">
+            <button onClick={() => setVariant('a')} className={variant === 'a' ? 'v-seg-on' : ''}>
+              A · Rings led
+            </button>
+            <button onClick={() => setVariant('b')} className={variant === 'b' ? 'v-seg-on' : ''}>
+              B · Instrument led
+            </button>
+          </div>
+          <div className="v-seg">
+            {['light', 'dark', 'system'].map((t) => (
+              <button key={t} onClick={() => pick(t)} className={theme === t ? 'v-seg-on' : ''}>
+                {t[0].toUpperCase() + t.slice(1)}
+              </button>
+            ))}
+          </div>
         </div>
       </header>
 
@@ -227,6 +249,7 @@ const CSS = `
   align-items: end; justify-content: space-between; gap: 16px;
 }
 .v-note { max-width: 860px; margin: 0 auto 28px; font-size: 13.5px; line-height: 1.65; color: var(--v-muted); }
+.v-controls { display: flex; flex-wrap: wrap; gap: 10px; }
 .v-seg { display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: var(--v-sunken); }
 .v-seg button {
   border: 0; background: transparent; color: var(--v-muted); cursor: pointer;
