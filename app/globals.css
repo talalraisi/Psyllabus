@@ -11,6 +11,8 @@
   --brand: #2d6a4f;          /* primary actions, mastered state, active nav */
   --brand-hover: #245a42;
   --brand-tint: #eaf2ec;     /* selected rows, active nav background */
+  --aurora-a: rgba(255, 255, 255, 0.85);
+  --aurora-b: rgba(45, 106, 79, 0.05);
   --sand: #e8d5b0;           /* accent badges only, never alongside brand */
 
   /* --- Ground, surfaces, ink. -----------------------------------------------
@@ -144,6 +146,8 @@
   --brand: #57a97f;
   --brand-hover: #6cbd92;
   --brand-tint: #19241f;
+  --aurora-a: rgba(255, 255, 255, 0.045);
+  --aurora-b: rgba(255, 255, 255, 0.022);
   --sand: #c9b48d;
 
   /* Lifted off near-black and de-greened, for the same reasons as light.
@@ -886,20 +890,28 @@ body {
   filter: blur(64px);
   will-change: transform;
 }
+/* Light, not colour.
+
+   These were a brand-green bloom and a violet one, which is how you get a
+   stain in the corner of a page rather than the impression of light falling
+   on it — and the violet was a status colour doing decorative work, which it
+   is not for. They are now the page's own light source: white on dark, a
+   warm breath on light. The only green on the page should be something that
+   means something. */
 .aurora > span:nth-child(1) {
-  width: 44vw;
-  height: 44vw;
-  left: -10vw;
-  top: -16vw;
-  background: radial-gradient(circle, color-mix(in oklab, var(--brand) 34%, transparent), transparent 70%);
+  width: 52vw;
+  height: 52vw;
+  left: -14vw;
+  top: -20vw;
+  background: radial-gradient(circle, var(--aurora-a), transparent 70%);
   animation: drift-a 29s ease-in-out infinite;
 }
 .aurora > span:nth-child(2) {
-  width: 36vw;
-  height: 36vw;
-  right: -8vw;
-  top: 4vw;
-  background: radial-gradient(circle, color-mix(in oklab, var(--status-mastered) 26%, transparent), transparent 70%);
+  width: 40vw;
+  height: 40vw;
+  right: -10vw;
+  top: 2vw;
+  background: radial-gradient(circle, var(--aurora-b), transparent 70%);
   animation: drift-b 41s ease-in-out infinite;
 }
 
@@ -1071,7 +1083,7 @@ body {
   animation: grid-drift 60s linear infinite;
   -webkit-mask-image: radial-gradient(ellipse 78% 70% at 22% 34%, #000 0%, transparent 72%);
   mask-image: radial-gradient(ellipse 78% 70% at 22% 34%, #000 0%, transparent 72%);
-  opacity: 0.75;
+  opacity: 0.45;
 }
 
 /* A single hairline under the hero, so the section ends deliberately. */

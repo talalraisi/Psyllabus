@@ -170,21 +170,26 @@ export default async function Home() {
                 true and are also on the pricing page, the terms and the footer.
                 What somebody landing here needs to know first is whether their
                 own course is in it. */}
-            <dl
-              className="mt-20 grid gap-px border-t sm:grid-cols-3"
-              style={{ borderColor: 'var(--border)', background: 'var(--border)' }}
-            >
+            {/* Real cards, sitting on the page rather than three columns
+                separated by hairlines. This is the first thing somebody
+                checks — whether their own course is in here — so it is worth
+                looking like something. */}
+            <dl className="mt-20 grid gap-3 sm:grid-cols-3">
               {[
                 ['IB Diploma', '91 subjects mapped', 'Every group, HL and SL, with the core alongside them.'],
                 ['A-Level', '44 subjects mapped', 'AS and A2 content, split the way the specifications split it.'],
                 ['AP', '38 subjects mapped', 'Course and exam description units, unit by unit.'],
               ].map(([term, count, def]) => (
-                <div key={term} className="px-0 pt-7 sm:px-6 sm:pt-8" style={{ background: 'var(--bg)' }}>
+                <div
+                  key={term}
+                  className="elev lift rounded-[14px] border p-6"
+                  style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+                >
                   <dt className="text-[15px] font-semibold tracking-[-0.015em]">{term}</dt>
-                  <dd className="mt-1 text-[13px] tabular-nums" style={{ color: 'var(--brand)' }}>
+                  <dd className="mt-1.5 text-[13px] font-medium tabular-nums" style={{ color: 'var(--brand)' }}>
                     {count}
                   </dd>
-                  <dd className="mt-2 pb-7 text-[13.5px] leading-relaxed sm:pb-8" style={{ color: 'var(--text-muted)' }}>
+                  <dd className="mt-3 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
                     {def}
                   </dd>
                 </div>
