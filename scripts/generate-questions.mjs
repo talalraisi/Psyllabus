@@ -30,6 +30,7 @@
  */
 
 import Anthropic from "@anthropic-ai/sdk";
+import { readsLikeScratchpad } from '../lib/explanation-quality.js';
 import { connect, loadEnv } from "./db.mjs";
 import { callGemini, geminiPreflight } from "./gemini.mjs";
 import { normaliseText, parseNumber, numbersMatch, looseNumericMatch } from "../lib/grading.js";
@@ -1358,6 +1359,16 @@ async function verifyBatch(questions) {
       console.log(
         `    rejected #${i}: worked answer ${first.answer}, marked ${markedAnswer(q).join("/")}`
       );
+      continue;
+    }
+
+    // The answer can be right and the prose still be the model talking to
+    // itself. Nineteen of the first 622 shipped that way, and one of them
+    // marked a correct answer wrong while explaining, to the student, that
+    // it had got the question wrong.
+    const tell = readsLikeScratchpad(q);
+    if (tell) {
+      console.log(`    rejected #${i}: explanation reads like a scratchpad ("${tell}")`);
       continue;
     }
 

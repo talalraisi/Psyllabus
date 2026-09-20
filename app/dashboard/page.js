@@ -26,6 +26,7 @@ import {
 import { buildEffectiveProgressMap, buildProgressDetailMap } from '@/lib/decay'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
 import { hasAllSubjects, isSubjectLocked, accessibleSubjects } from '@/lib/access'
+import { getCoveredSubtopics } from '@/lib/coverage'
 
 function greeting(now) {
   const hour = now.getHours()
@@ -192,12 +193,18 @@ export default function Dashboard() {
       })
       setOverall(merged.length ? Math.round((mastered / merged.length) * 100) : 0)
 
+      // What a student can actually sit today, so the one thing this page
+      // tells them to do is not a subtopic whose only button says
+      // "Questions coming soon".
+      const covered = await getCoveredSubtopics(supabase)
+
       const queue = buildQueue({
         items: merged,
         details: buildProgressDetailMap(progressRows),
         subjectMastery: stats,
         profile: profileData,
         events: eventsResult?.data || [],
+        covered,
       })
       setSession(buildSession(queue, { minutes: profileData.session_minutes || undefined }))
 

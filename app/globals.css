@@ -740,16 +740,30 @@ body {
   to   { opacity: 1; }
 }
 
+/* Why `backwards` and not `both` on everything that moves.
+
+   `both` keeps the last keyframe applied for ever. A keyframe that touched
+   `transform` therefore leaves a transform on the element permanently — an
+   identity matrix, invisible, and still enough to make that element the
+   containing block for every `position: fixed` descendant inside it. The
+   feedback button is `fixed bottom-4 right-4`; inside a finished `.app-enter`
+   it was being positioned against the whole scrolling page instead of the
+   window, and sat hundreds of pixels below the fold.
+
+   `backwards` holds the opening frame during the delay, which is the part
+   that stops a flash of unstyled content, and then lets go. Everything here
+   ends where the element already is, so there is nothing to hold on to. */
+
 /* A page arriving. */
-.app-enter { animation: app-rise 220ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.app-enter { animation: app-rise 220ms cubic-bezier(0.16, 1, 0.3, 1) backwards; }
 
 /* A panel or popover arriving, from wherever it is anchored. */
-.pop-enter { animation: app-rise 160ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.pop-enter { animation: app-rise 160ms cubic-bezier(0.16, 1, 0.3, 1) backwards; }
 
 /* A list where the rows arrive just behind each other. Capped at twelve:
    past that the last row is waiting on decoration, which is the opposite of
    the point. */
-.stagger > * { animation: app-rise 240ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.stagger > * { animation: app-rise 240ms cubic-bezier(0.16, 1, 0.3, 1) backwards; }
 .stagger > *:nth-child(1) { animation-delay: 0ms; }
 .stagger > *:nth-child(2) { animation-delay: 25ms; }
 .stagger > *:nth-child(3) { animation-delay: 50ms; }
@@ -772,7 +786,7 @@ body {
 }
 .bar-fill {
   transform-origin: left;
-  animation: bar-fill 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: bar-fill 700ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 /* An answer being marked. A short press-in, because something just happened
@@ -782,7 +796,7 @@ body {
   60%  { transform: scale(1.004); }
   100% { transform: scale(1); }
 }
-.mark-pop { animation: mark-pop 260ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.mark-pop { animation: mark-pop 260ms cubic-bezier(0.16, 1, 0.3, 1) backwards; }
 
 /* Squares of a heatmap arriving. One short fade for the whole grid rather
    than five hundred staggered ones, which would take a second and a half. */
@@ -790,7 +804,7 @@ body {
   from { opacity: 0; transform: scale(0.86); }
   to   { opacity: 1; transform: none; }
 }
-.cells-in > * { animation: cell-in 320ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.cells-in > * { animation: cell-in 320ms cubic-bezier(0.16, 1, 0.3, 1) backwards; }
 
 /* Something that has just changed value. Used on counters and status chips. */
 @keyframes app-note {
@@ -885,7 +899,7 @@ body {
   from { opacity: 0; transform: translate3d(14px, 0, 0); }
   to   { opacity: 1; transform: none; }
 }
-.step-enter { animation: step-enter 320ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+.step-enter { animation: step-enter 320ms cubic-bezier(0.16, 1, 0.3, 1) backwards; }
 
 @media (prefers-reduced-motion: reduce) {
   .app-enter,

@@ -26,6 +26,7 @@ import {
 import { buildEffectiveProgressMap, buildProgressDetailMap } from '@/lib/decay'
 import { buildQueue, buildSession, groupBySubjectRanked } from '@/lib/planner'
 import { accessibleSubjects, hasAllSubjects } from '@/lib/access'
+import { getCoveredSubtopics } from '@/lib/coverage'
 import { upcoming, relativeDay, KIND_LABEL, KIND_DOT } from '@/lib/calendar'
 import {
   notificationsSupported,
@@ -58,6 +59,7 @@ export default function StudyPlanPage() {
   const [details, setDetails] = useState({})
   const [mastery, setMastery] = useState({})
   const [events, setEvents] = useState([])
+  const [covered, setCovered] = useState(null)
   const [dueReviews, setDueReviews] = useState(0)
   const [minutes, setMinutes] = useState(40)
   const [minutesInput, setMinutesInput] = useState('40')
@@ -145,14 +147,16 @@ export default function StudyPlanPage() {
       setMastery(perSubject)
       setEvents(eventsResult?.data || [])
       setDueReviews(due || 0)
+      // Things with a quiz behind them rank above things without one.
+      setCovered(await getCoveredSubtopics(supabase))
       setLoading(false)
     }
     load()
   }, [router, supabase])
 
   const queue = useMemo(
-    () => buildQueue({ items, details, subjectMastery: mastery, profile, events }),
-    [items, details, mastery, profile, events]
+    () => buildQueue({ items, details, subjectMastery: mastery, profile, events, covered }),
+    [items, details, mastery, profile, events, covered]
   )
 
   const session = useMemo(() => buildSession(queue, { minutes }), [queue, minutes])

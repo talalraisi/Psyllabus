@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { CONSENT_TEXT } from '@/lib/consent'
-import { getCoverage, coverageLabel, COVERAGE_TONE } from '@/lib/coverage'
+import { getCoverage, coverageLabel, bestCoverage, COVERAGE_TONE } from '@/lib/coverage'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -805,12 +805,26 @@ export default function Onboarding() {
                         // forty courses that are genuinely both get asked.
                         const single = course.only || (levels.length === 1 ? course.levels[levels[0]] : null)
                         const asking = levelFor === course.base && !chosen && !single
+                        // Once a level is chosen it is that level's coverage;
+                        // before that, the best of the levels on offer, so a
+                        // course with questions at SL and none at HL does not
+                        // read as empty.
                         const cov = coverageLabel(
-                          coverage[chosen || course.only || course.levels[levels[0]]]
+                          chosen || single
+                            ? coverage[chosen || single]
+                            : bestCoverage(coverage, Object.values(course.levels))
                         )
 
                         return (
-                          <div key={course.base} className="flex flex-col">
+                          // One box per course. The level chooser lives
+                          // inside it rather than under it, because a panel
+                          // that grows the grid row leaves a hole beside it
+                          // the size of the panel.
+                          <div
+                            key={course.base}
+                            className={`rounded-[10px] border transition-colors duration-150
+                        ${chosen ? 'chip-active' : asking ? 'border-[var(--brand)]' : 'chip hover:border-border-strong'}`}
+                          >
                             <button
                               onClick={() => {
                                 if (chosen) toggleSubject(chosen)
@@ -819,8 +833,7 @@ export default function Onboarding() {
                               }}
                               aria-pressed={!!chosen}
                               aria-expanded={single ? undefined : asking}
-                              className={`press rounded-[10px] border px-3.5 py-2.5 text-left transition-colors duration-150
-                        ${chosen ? 'chip-active' : 'chip hover:border-border-strong'}`}
+                              className="press block w-full px-3.5 py-2.5 text-left"
                             >
                               <span className="flex items-baseline gap-1.5">
                                 <span className="block text-[12.5px] font-medium">{course.base}</span>
@@ -850,15 +863,15 @@ export default function Onboarding() {
                               </span>
                             </button>
 
-                            {/* The level, asked only once the course is picked
-                                and only where there is a choice to make. */}
+                            {/* Asked only once the course is picked, and only
+                                where there is a choice to make. */}
                             {asking && (
                               <div
-                                className="pop-enter mt-1.5 rounded-[10px] border p-2.5"
-                                style={{ borderColor: 'var(--brand)', background: 'var(--brand-tint)' }}
+                                className="px-3.5 pb-2.5"
+                                style={{ borderTop: '1px solid var(--border)' }}
                               >
-                                <p className="mb-2 text-[11px] font-medium" style={{ color: 'var(--text-body)' }}>
-                                  Are you taking it at
+                                <p className="mb-1.5 mt-2 text-[10.5px]" style={{ color: 'var(--text-muted)' }}>
+                                  Taking it at
                                 </p>
                                 <div className="flex flex-wrap gap-1.5">
                                   {levels.map((lv) => (
@@ -879,12 +892,9 @@ export default function Onboarding() {
                                     onClick={() => pickLevel(defaultLevel(course))}
                                     className="btn btn-quiet control-sm"
                                   >
-                                    Not sure yet
+                                    Not sure
                                   </button>
                                 </div>
-                                <p className="mt-2 text-[10.5px]" style={{ color: 'var(--text-faint)' }}>
-                                  Not sure starts you on SL.
-                                </p>
                               </div>
                             )}
                           </div>
