@@ -380,7 +380,7 @@ export default function StudyPlanPage() {
                     </div>
                   ) : (
                     <ol className="stagger flex flex-col">
-                      {session.items.map((item) => {
+                      {session.items.map((item, index) => {
                         const isDone = done.has(item.id)
                         return (
                           <li
@@ -393,6 +393,12 @@ export default function StudyPlanPage() {
                               opacity: isDone ? 0.6 : 1,
                             }}
                           >
+                            <span
+                              className="shrink-0 text-[12px] font-semibold tabular-nums"
+                              style={{ color: 'var(--text-faint)', width: 18 }}
+                            >
+                              {index + 1}
+                            </span>
                             <button
                               onClick={() => toggleDone(item.id)}
                               aria-label={isDone ? 'Mark as not done' : 'Mark as done'}
@@ -431,17 +437,20 @@ export default function StudyPlanPage() {
 
                             {!isDone && (
                               <div className="flex shrink-0 items-center gap-2">
+                                <span
+                                  className="hidden text-[12px] tabular-nums sm:block"
+                                  style={{ color: 'var(--text-faint)' }}
+                                >
+                                  ~{session.perItemMinutes} min
+                                </span>
                                 <button
                                   onClick={() => setDrawerItem(item)}
                                   className="btn btn-quiet control-sm"
                                 >
                                   Resources
                                 </button>
-                                <Link
-                                  href={quizHref(item)}
-                                  className="btn btn-outline control-sm"
-                                >
-                                  Practise
+                                <Link href={quizHref(item)} className="btn btn-solid control-sm">
+                                  Start
                                 </Link>
                               </div>
                             )}
@@ -464,10 +473,10 @@ export default function StudyPlanPage() {
                   >
                     <div className="min-w-0 flex-1">
                       <p className="text-[15px] font-semibold tracking-[-0.012em]">
-                        {dueReviews} past mistake{dueReviews === 1 ? '' : 's'} due for review
+                        {dueReviews} to redeem
                       </p>
                       <p className="mt-1 text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
-                        Spaced repetition on questions you have already got wrong.
+                        Questions you got wrong. Three in a row clears one.
                       </p>
                     </div>
                     <IconArrowRight width={18} height={18} className="shrink-0 text-[var(--brand)]" />

@@ -40,6 +40,43 @@ function relativeDue(nextReviewAt, now = Date.now()) {
   return days === 1 ? 'Tomorrow' : days <= 7 ? `In ${days} days` : `In ${Math.round(days / 7)} weeks`
 }
 
+/**
+ * Three correct reviews, as three lights.
+ *
+ * The number that matters here is not how many questions are in the bank, it
+ * is how close each one is to leaving it — and "1/3" is a fraction to parse
+ * while three lights is a glance. A filled one glows; the empty ones sit
+ * there waiting, which is the whole feeling of the page.
+ */
+function ClearDots({ count = 0, size = 8 }) {
+  return (
+    <span
+      className="flex shrink-0 items-center gap-1.5"
+      title={`${count} of ${REVIEWS_TO_CLEAR} correct reviews`}
+      aria-label={`${count} of ${REVIEWS_TO_CLEAR} correct reviews`}
+    >
+      {Array.from({ length: REVIEWS_TO_CLEAR }).map((_, i) => {
+        const lit = i < count
+        return (
+          <span
+            key={i}
+            className="rounded-full transition-all duration-300"
+            style={{
+              width: size,
+              height: size,
+              background: lit ? 'var(--status-proficient)' : 'transparent',
+              border: lit ? 'none' : '1.5px solid var(--border-strong)',
+              boxShadow: lit
+                ? '0 0 0 3px color-mix(in oklab, var(--status-proficient) 18%, transparent)'
+                : 'none',
+            }}
+          />
+        )
+      })}
+    </span>
+  )
+}
+
 export default function MistakeBankPage() {
   const [profile, setProfile] = useState(null)
   const [picked, setPicked] = useState([])
@@ -110,6 +147,9 @@ export default function MistakeBankPage() {
   // the page should not make you choose before it shows you anything.
   const scope = picked.length ? picked : subjects
   const inScope = mistakes.filter((m) => scope.includes(m.questions.subject || 'Other'))
+  // Questions with at least one correct review behind them: the part of the
+  // bank that is on its way out rather than sitting still.
+  const clearing = inScope.filter((m) => (m.review_count || 0) > 0).length
   const dueInScope = inScope.filter((m) => new Date(m.next_review_at).getTime() <= now)
 
   const toggle = (subject) =>
@@ -125,17 +165,7 @@ export default function MistakeBankPage() {
   return (
     <DashboardLayout profile={profile}>
       <Page width="default">
-        <PageHeader
-          title="Redemption"
-          subtitle="Questions you got wrong come back until you have them three times running"
-          action={
-            dueInScope.length > 0 ? (
-              <Link href={reviewHref} className="btn btn-solid control-md">
-                Redeem {dueInScope.length}
-              </Link>
-            ) : null
-          }
-        />
+        <PageHeader title="Redemption" />
 
         {mistakes.length === 0 ? (
           <EmptyState
@@ -178,40 +208,58 @@ export default function MistakeBankPage() {
               </div>
             )}
 
-            {/* The three numbers used to take a screen on their own. Same
-                figures, one line, above the thing you came here to do. */}
-            <p
-              className="mb-3 flex flex-wrap gap-x-6 gap-y-1 text-[13.5px] tabular-nums"
-              style={{ color: 'var(--text-muted)' }}
+            {/* What is waiting, and the one thing to do about it. */}
+            <section
+              className="mb-9 rounded-[16px] border p-6"
+              style={{
+                borderColor: dueInScope.length ? 'var(--brand)' : 'var(--border-strong)',
+                background: dueInScope.length ? 'var(--brand-tint)' : 'var(--surface)',
+              }}
             >
-              <span>
-                <strong
-                  className="font-semibold"
-                  style={{ color: dueInScope.length ? 'var(--status-fading)' : 'var(--text)' }}
-                >
-                  {dueInScope.length}
-                </strong>{' '}
-                due now
-              </span>
-              <span>
-                <strong className="font-semibold" style={{ color: 'var(--text)' }}>
-                  {inScope.length}
-                </strong>{' '}
-                in the bank
-              </span>
-              <span>
-                <strong className="font-semibold" style={{ color: 'var(--status-proficient)' }}>
-                  {inScope.filter((m) => m.review_count > 0).length}
-                </strong>{' '}
-                on their way out
-              </span>
-            </p>
+              <div className="flex flex-wrap items-end justify-between gap-5">
+                <div className="min-w-0">
+                  <p
+                    className="text-[10.5px] font-semibold uppercase tracking-[0.16em]"
+                    style={{ color: 'var(--text-faint)' }}
+                  >
+                    {dueInScope.length ? 'Waiting for you' : 'Nothing due'}
+                  </p>
+                  <p className="mt-2 text-[clamp(1.9rem,4vw,2.4rem)] font-semibold leading-none tracking-[-0.03em] tabular-nums">
+                    {dueInScope.length}
+                    <span className="ml-2 text-[14px] font-medium" style={{ color: 'var(--text-muted)' }}>
+                      of {inScope.length} in the bank
+                    </span>
+                  </p>
+                  <p className="mt-2.5 text-[13px]" style={{ color: 'var(--text-muted)' }}>
+                    {clearing > 0
+                      ? `${clearing} on their way out. Three in a row clears one for good.`
+                      : 'Three correct in a row clears a question for good.'}
+                  </p>
+                </div>
 
-            {dueInScope.length === 0 && (
-              <p className="mb-8 text-[14px]" style={{ color: 'var(--text-faint)' }}>
-                Nothing due here right now. The next one unlocks on its own.
-              </p>
-            )}
+                {dueInScope.length > 0 && (
+                  <Link href={reviewHref} className="btn btn-solid control-lg shrink-0">
+                    Redeem {dueInScope.length}
+                  </Link>
+                )}
+              </div>
+
+              {/* How much of the bank is part-cleared, as one bar. */}
+              {inScope.length > 0 && (
+                <div
+                  className="mt-6 flex h-1.5 overflow-hidden rounded-full"
+                  style={{ background: 'var(--border-strong)' }}
+                >
+                  <span
+                    className="h-full transition-[width] duration-500"
+                    style={{
+                      width: `${(clearing / inScope.length) * 100}%`,
+                      background: 'var(--status-proficient)',
+                    }}
+                  />
+                </div>
+              )}
+            </section>
 
             <div className="flex flex-col">
               {BUCKETS.map(({ key, label, hint }) => {
@@ -258,13 +306,15 @@ export default function MistakeBankPage() {
                     </button>
 
                     {isOpen && (
-                      <ul className="flex flex-col pb-2 pl-6">
+                      <ul className="stagger flex flex-col pb-2 pl-6">
                         {items.map((m) => (
                           <li
                             key={m.id}
-                            className="flex items-center gap-4 border-t py-3"
+                            className="flex items-center gap-4 border-t py-3.5"
                             style={{ borderColor: 'var(--border)' }}
                           >
+                            <ClearDots count={m.review_count || 0} />
+
                             <div className="min-w-0 flex-1">
                               <p className="truncate text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
                                 {m.questions.subject} · {displaySubtopic(m.questions.subtopic)}
@@ -276,27 +326,6 @@ export default function MistakeBankPage() {
                                 {m.questions.stem}
                               </p>
                             </div>
-
-                            {/* Three correct reviews clears it, so the count is
-                                three marks rather than a fraction to parse. */}
-                            <span
-                              className="flex shrink-0 items-center gap-1"
-                              title={`${m.review_count || 0} of ${REVIEWS_TO_CLEAR} correct reviews`}
-                              aria-label={`${m.review_count || 0} of ${REVIEWS_TO_CLEAR} correct reviews`}
-                            >
-                              {Array.from({ length: REVIEWS_TO_CLEAR }).map((_, i) => (
-                                <span
-                                  key={i}
-                                  className="h-1.5 w-1.5 rounded-full"
-                                  style={{
-                                    background:
-                                      i < (m.review_count || 0)
-                                        ? 'var(--status-proficient)'
-                                        : 'var(--border-strong)',
-                                  }}
-                                />
-                              ))}
-                            </span>
 
                             <span
                               className="w-[74px] shrink-0 text-right text-[12.5px] font-medium tabular-nums"
