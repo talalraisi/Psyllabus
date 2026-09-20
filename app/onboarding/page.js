@@ -295,6 +295,19 @@ export default function Onboarding() {
     ? selectedSubjects.length === 6
     : selectedSubjects.length > 0
 
+  /**
+   * Picking the last subject a group needs closes it.
+   *
+   * Six groups open one at a time, and the student had to notice they were
+   * finished and press the header again. The accordion can see that for
+   * itself.
+   */
+  const closeGroupIfSatisfied = (group, gi, nextSelected) => {
+    if (!group || !group.required) return
+    const chosen = nextSelected.filter((s) => group.subjects.includes(s)).length
+    if (chosen >= group.required && expandedGroup === gi) setExpandedGroup(null)
+  }
+
   const toggleSubject = (subject) => {
     if (selectedSubjects.includes(subject)) {
       setSelectedSubjects(selectedSubjects.filter(s => s !== subject))
@@ -302,7 +315,10 @@ export default function Onboarding() {
       delete newGrades[subject]
       setTargetGrades(newGrades)
     } else if (!currentCurriculum || selectedSubjects.length < currentCurriculum.maxSubjects) {
-      setSelectedSubjects([...selectedSubjects, subject])
+      const next = [...selectedSubjects, subject]
+      setSelectedSubjects(next)
+      const gi = currentCurriculum?.groups?.findIndex((g) => g.subjects.includes(subject))
+      if (gi != null && gi >= 0) closeGroupIfSatisfied(currentCurriculum.groups[gi], gi, next)
     }
   }
 
@@ -677,56 +693,98 @@ export default function Onboarding() {
               {curriculum === 'AP' && 'Select the AP courses you are taking.'}
               {curriculum === 'A-Level' && 'Most students take 3-4 A-Level subjects.'}
             </p>
-            {/* Said before the choice, not after it. Everything earned is
-                filed under a subject, so changing the list later would hide
-                that work rather than move it — which is why it cannot be
-                changed, and why that has to be clear now. */}
-            <p
-              className="mt-6 border-l-2 pl-4 text-[13.5px] leading-relaxed"
-              style={{ borderColor: 'var(--brand)', color: 'var(--text-body)' }}
-            >
-              <strong className="font-semibold">Choose carefully.</strong> Your subjects are set
-              once and cannot be changed afterwards. Everything you go on to prove — your levels,
-              your mistake bank, your predicted grade — is filed under the subjects you pick here.
-            </p>
-            <p className="mb-8 mt-6 text-[12.5px] font-semibold tabular-nums" style={{ color: 'var(--brand)' }}>
-              {selectedSubjects.length}/{currentCurriculum.maxSubjects} selected
+            {/* Said before the choice, not after it — but once, in a line.
+                Two paragraphs of warning before anybody has chosen anything
+                is a wall, and a wall is what people click past. */}
+            <p className="mt-4 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+              <strong className="font-semibold">This one is permanent.</strong> Everything you
+              prove later is filed under these subjects, so they cannot be changed afterwards.
             </p>
 
-            <div className="space-y-3 mb-8 max-h-96 overflow-y-auto pr-1">
-              {currentCurriculum.groups.map((group, gi) => (
-                <div key={gi} className="overflow-hidden rounded-xl border border-border">
+            {/* The count, as a row of slots that fill up. A student can see
+                how many are left without reading a fraction. */}
+            <div className="mb-8 mt-6 flex items-center gap-3">
+              <div className="flex gap-1.5">
+                {Array.from({ length: currentCurriculum.maxSubjects }, (_, i) => (
+                  <span
+                    key={i}
+                    className="h-1.5 w-7 rounded-full transition-colors duration-300"
+                    style={{
+                      background:
+                        i < selectedSubjects.length ? 'var(--brand)' : 'var(--border-strong)',
+                    }}
+                  />
+                ))}
+              </div>
+              <span className="text-[12.5px] font-semibold tabular-nums" style={{ color: 'var(--brand)' }}>
+                {selectedSubjects.length} of {currentCurriculum.maxSubjects}
+              </span>
+            </div>
+
+            <div className="stagger mb-8 flex flex-col gap-2">
+              {currentCurriculum.groups.map((group, gi) => {
+                const chosenHere = selectedSubjects.filter((s) => group.subjects.includes(s))
+                const satisfied = chosenHere.length >= (group.required || 0)
+                const open = expandedGroup === gi
+                return (
+                <div
+                  key={gi}
+                  className="overflow-hidden rounded-[12px] border transition-colors duration-200"
+                  style={{
+                    borderColor: open
+                      ? 'var(--brand)'
+                      : chosenHere.length
+                        ? 'var(--border-hover)'
+                        : 'var(--border)',
+                    background: chosenHere.length ? 'var(--surface)' : 'transparent',
+                  }}
+                >
                   <button
-                    onClick={() => setExpandedGroup(expandedGroup === gi ? null : gi)}
-                    className="w-full px-4 py-3 flex items-center justify-between
-                    text-left hover:bg-bg-subtle transition-colors">
-                    <div>
-                      <span className="text-text font-semibold text-sm">{group.name}</span>
-                      {group.required > 0 && (
-                        <span className="ml-2 text-text-muted text-xs">
-                          Required: {group.required}
-                        </span>
-                      )}
-                      {selectedSubjects.filter(s => group.subjects.includes(s)).length > 0 && (
-                        <span className="ml-2 text-solid text-xs">
-                          {selectedSubjects.filter(s => group.subjects.includes(s)).length} selected
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-text-faint text-sm">
-                      {expandedGroup === gi ? '▲' : '▼'}
+                    onClick={() => setExpandedGroup(open ? null : gi)}
+                    aria-expanded={open}
+                    className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-[var(--surface-sunken)]"
+                  >
+                    {/* Done, or how many this group still wants. */}
+                    <span
+                      className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-semibold"
+                      style={{
+                        borderColor: satisfied && chosenHere.length ? 'var(--brand)' : 'var(--border-strong)',
+                        background: satisfied && chosenHere.length ? 'var(--brand)' : 'transparent',
+                        color: satisfied && chosenHere.length ? '#fff' : 'var(--text-faint)',
+                      }}
+                    >
+                      {satisfied && chosenHere.length ? '✓' : (group.required || 0) - chosenHere.length || ''}
+                    </span>
+
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[14px] font-medium">{group.name}</span>
+                      <span className="mt-0.5 block text-[12px]" style={{ color: 'var(--text-faint)' }}>
+                        {chosenHere.length
+                          ? chosenHere.join(' · ')
+                          : group.required > 0
+                            ? `Pick ${group.required}`
+                            : 'Optional'}
+                      </span>
+                    </span>
+
+                    <span
+                      className="shrink-0 text-[12px] transition-transform duration-200"
+                      style={{ color: 'var(--text-faint)', transform: open ? 'rotate(180deg)' : 'none' }}
+                    >
+                      ▾
                     </span>
                   </button>
-                  
-                  {expandedGroup === gi && (
-                    <div className="px-4 pb-4 grid grid-cols-2 gap-2">
+
+                  {open && (
+                    <div className="pop-enter grid grid-cols-1 gap-2 px-4 pb-4 sm:grid-cols-2">
                       {group.subjects.map((subject) => {
                         const cov = coverageLabel(coverage[subject])
                         return (
                           <button
                             key={subject}
                             onClick={() => toggleSubject(subject)}
-                            className={`rounded-[10px] border px-3.5 py-2.5 text-left transition-colors duration-150
+                            aria-pressed={selectedSubjects.includes(subject)}
+                            className={`press rounded-[10px] border px-3.5 py-2.5 text-left transition-colors duration-150
                         ${selectedSubjects.includes(subject) ? 'chip-active' : 'chip hover:border-border-strong'}`}
                           >
                             <span className="block text-[12.5px] font-medium">{subject}</span>
@@ -747,7 +805,8 @@ export default function Onboarding() {
                     </div>
                   )}
                 </div>
-              ))}
+                )
+              })}
             </div>
 
             {selectedSubjects.length > 0 && (
@@ -804,26 +863,27 @@ export default function Onboarding() {
             <h1 className="text-[clamp(1.5rem,3vw,1.9rem)] font-semibold leading-[1.15] tracking-[-0.03em]">
               Set your target grades
             </h1>
-            <p className="mt-3 text-[14.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              What are you aiming for in each one? Everything on your dashboard is measured
-              against these, so set them where you honestly intend to land.
-            </p>
-            <p
-              className="mb-9 mt-5 border-l-2 pl-4 text-[14px] leading-relaxed"
-              style={{ borderColor: 'var(--border-strong)', color: 'var(--text-body)' }}
-            >
-              {realismNote({ curriculum })} You can raise them whenever you get there.
+            <p className="mb-8 mt-3 text-[14.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+              Where you honestly intend to land. Raise them whenever you get there.
             </p>
 
-            <div className="space-y-4 mb-6 max-h-80 overflow-y-auto pr-1">
-              {selectedSubjects.map(subject => (
-                <div key={subject} className="border-b pb-4" style={{ borderColor: 'var(--border)' }}>
-                  <p className="mb-3 text-[14px] font-medium">{subject}</p>
-                  <div className="flex gap-2 flex-wrap">
-                    {currentCurriculum.grades.map(grade => (
-                      <button key={grade} onClick={() => setGrade(subject, grade)}
-                      className={`h-10 w-10 rounded-full border text-[13.5px] font-semibold transition-colors duration-150
-                      ${targetGrades[subject] === grade ? 'chip-active' : 'chip hover:border-border-strong'}`}>
+            <div className="stagger mb-6 flex flex-col">
+              {selectedSubjects.map((subject) => (
+                <div
+                  key={subject}
+                  className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b py-3"
+                  style={{ borderColor: 'var(--border)' }}
+                >
+                  <p className="min-w-[10rem] flex-1 text-[14px] font-medium">{subject}</p>
+                  <div className="flex gap-1.5">
+                    {currentCurriculum.grades.map((grade) => (
+                      <button
+                        key={grade}
+                        onClick={() => setGrade(subject, grade)}
+                        aria-pressed={targetGrades[subject] === grade}
+                        className={`press h-9 w-9 rounded-full border text-[13px] font-semibold transition-colors duration-150
+                      ${targetGrades[subject] === grade ? 'chip-active' : 'chip hover:border-border-strong'}`}
+                      >
                         {grade}
                       </button>
                     ))}
@@ -832,23 +892,34 @@ export default function Onboarding() {
               ))}
 
               {/* TOK and EE are graded A-E and combine for up to 3 bonus points. */}
-              {isIB && ['Theory of Knowledge', 'Extended Essay'].map(component => (
-                <div key={component} className="border-b pb-4" style={{ borderColor: 'var(--border)' }}>
-                  <p className="text-[14px] font-medium">{component}</p>
-                  <p className="mb-3 mt-1 text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
-                    Graded A to E
-                  </p>
-                  <div className="flex gap-2 flex-wrap">
-                    {CORE_GRADES.map(grade => (
-                      <button key={grade} onClick={() => setGrade(component, grade)}
-                      className={`h-10 w-10 rounded-full border text-[13.5px] font-semibold transition-colors duration-150
-                      ${targetGrades[component] === grade ? 'chip-active' : 'chip hover:border-border-strong'}`}>
-                        {grade}
-                      </button>
-                    ))}
+              {isIB &&
+                ['Theory of Knowledge', 'Extended Essay'].map((component) => (
+                  <div
+                    key={component}
+                    className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b py-3"
+                    style={{ borderColor: 'var(--border)' }}
+                  >
+                    <p className="min-w-[10rem] flex-1 text-[14px] font-medium">
+                      {component}
+                      <span className="ml-2 text-[12px] font-normal" style={{ color: 'var(--text-faint)' }}>
+                        A–E
+                      </span>
+                    </p>
+                    <div className="flex gap-1.5">
+                      {CORE_GRADES.map((grade) => (
+                        <button
+                          key={grade}
+                          onClick={() => setGrade(component, grade)}
+                          aria-pressed={targetGrades[component] === grade}
+                          className={`press h-9 w-9 rounded-full border text-[13px] font-semibold transition-colors duration-150
+                      ${targetGrades[component] === grade ? 'chip-active' : 'chip hover:border-border-strong'}`}
+                        >
+                          {grade}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
 
             {/* Live Diploma total */}
@@ -872,15 +943,21 @@ export default function Onboarding() {
                   {typeof ibTotal.bonus === 'number'
                     ? ` plus ${ibTotal.bonus} core bonus point${ibTotal.bonus === 1 ? '' : 's'}`
                     : ibTotal.failing
-                      ? '. A grade of E in TOK or the Extended Essay is a failing condition.'
-                      : '. Set TOK and Extended Essay grades to see your bonus points.'}
+                      ? '. An E in TOK or the EE fails the Diploma.'
+                      : '. Set TOK and EE to see your bonus points.'}
                 </p>
-                <p className="mt-2 text-[12.5px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
-                  This is what you are aiming for, not a prediction. Your dashboard predicts the{' '}
-                  {MAX_SUBJECT_POINTS} points from your six subjects, because those are the ones it
-                  can measure. The TOK and Extended Essay points arrive when that coursework is
-                  marked.
-                </p>
+                {/* The two caveats worth making, and only when they apply:
+                    one about aiming high, one about what this number is. */}
+                <details className="mt-3">
+                  <summary className="cursor-pointer text-[12px]" style={{ color: 'var(--text-faint)' }}>
+                    What this number is
+                  </summary>
+                  <p className="mt-2 text-[12.5px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
+                    A target, not a prediction. Your dashboard predicts the {MAX_SUBJECT_POINTS}
+                    {' '}points it can measure from quizzes; TOK and the EE arrive when that
+                    coursework is marked. {realismNote({ curriculum })}
+                  </p>
+                </details>
               </div>
             )}
 

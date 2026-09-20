@@ -21,16 +21,31 @@ import logoMark from '@/public/logo-mark.png'
  *
  * One centred column now. The eye goes logo, greeting, form, in that order,
  * down the middle, which is the whole job of this screen.
+ *
+ * It arrives in that order too. Three short entrances, 60ms apart, so the
+ * screen assembles itself rather than appearing all at once — the only place
+ * in the app where a little ceremony is right, because it is the first thing
+ * anybody sees and the slowest thing they will do.
  */
 export default function AuthShell({ eyebrow, title, intro, children, footer }) {
   return (
     <main className="ground min-h-screen px-5 py-10 md:px-8 md:py-14">
       <div className="mx-auto flex max-w-[26rem] flex-col items-center">
-        <Link href="/" aria-label="Project Syllabus home" className="inline-block">
-          <Image src={logoMark} alt="Project Syllabus" sizes="110px" style={{ height: 34, width: 'auto' }} priority />
+        <Link
+          href="/"
+          aria-label="Project Syllabus home"
+          className="app-enter press inline-block"
+        >
+          <Image
+            src={logoMark}
+            alt="Project Syllabus"
+            sizes="220px"
+            style={{ height: 56, width: 'auto' }}
+            priority
+          />
         </Link>
 
-        <div className="mt-14 w-full text-center md:mt-20">
+        <div className="app-enter mt-12 w-full text-center md:mt-16" style={{ animationDelay: '60ms' }}>
           <p
             className="mb-4 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
             style={{ color: 'var(--text-faint)' }}
@@ -50,9 +65,9 @@ export default function AuthShell({ eyebrow, title, intro, children, footer }) {
           )}
         </div>
 
-        <div className="mt-10 w-full">
+        <div className="app-enter mt-10 w-full" style={{ animationDelay: '120ms' }}>
           <div
-            className="rounded-[12px] border p-6 md:p-7"
+            className="rounded-[14px] border p-6 md:p-7"
             style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
           >
             {children}
