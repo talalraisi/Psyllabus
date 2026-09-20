@@ -88,10 +88,11 @@ const CURRICULUMS = {
           'Chemistry HL', 'Chemistry SL',
           'Physics HL', 'Physics SL',
           'Computer Science HL', 'Computer Science SL',
-          'Environmental Systems & Societies SL',
-          'Sports Exercise & Health Science HL', 'Sports Exercise & Health Science SL',
           'Design Technology HL', 'Design Technology SL',
-        
+          // One spelling each. The ampersand versions were still listed
+          // beside these after the remap, so the group offered the same two
+          // courses twice and which one a student clicked decided which of
+          // two identical syllabuses their work was filed under.
           'Environmental Systems and Societies HL',
           'Environmental Systems and Societies SL',
           'Sports, Exercise, and Health Science HL',

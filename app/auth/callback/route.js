@@ -8,11 +8,11 @@ import { cookieOptionsFor } from '@/lib/cookie-domain'
  *
  * Session cookies are written onto the response rather than through
  * next/headers cookies(). A route handler that returns a redirect cannot
- * reliably set cookies that way, and middleware used to cover this path and
+ * reliably set cookies that way, and the proxy used to cover this path and
  * quietly do it instead. Once the matcher was narrowed to /dashboard and
  * /onboarding, nothing was persisting the session and every Google sign-in
  * failed. The response owns its cookies now, so it does not depend on
- * middleware running here at all.
+ * the proxy running here at all.
  */
 export async function GET(request) {
   const requestUrl = new URL(request.url)

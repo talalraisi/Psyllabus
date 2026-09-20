@@ -2,7 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import { cookieOptionsFor } from '@/lib/cookie-domain'
 
-export async function middleware(request) {
+export async function proxy(request) {
   let supabaseResponse = NextResponse.next({ request })
 
   const cookieOptions = cookieOptionsFor(request.nextUrl.hostname)
