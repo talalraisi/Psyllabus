@@ -223,7 +223,7 @@ export default function VibePreview() {
 
       <p className="v-note">
         {variant === 'a'
-          ? 'Mine. The ring is the subject of the screen, colour is only ever something you earned, and the end of a quiz is a moment rather than a summary. Warmer and more layered than today, but still dark-first.'
+          ? 'Rings led, in the instrument palette. The ring is the subject of the screen and the only green on it — no wash behind the card, no glow behind the ring. Warm neutral greys rather than green-tinted ones, and the card lifts by elevation instead of by colour.'
           : 'Yours. Structure carries it — hairlines, a real grid, generous spacing. Warmer and lighter than today so it is not bland. Cards have weight, and the rings are an accent on each row rather than the headline.'}
       </p>
 
@@ -315,18 +315,22 @@ const CSS = `
    surface rather than a slightly different flat. Colour is only ever the
    accent, and the accent only ever means "earned". */
 .vibe-a {
-  --v-bg: #0d1211;
-  --v-surface: #151b19;
-  --v-sunken: #111715;
-  --v-border: #222b28;
-  --v-border-strong: #2e3a36;
-  --v-track: #232c29;
-  --v-text: #eef3f0;
-  --v-muted: #a3afa9;
-  --v-faint: #7f8d86;
-  --v-accent: #46b380;
-  --v-on-accent: #07120d;
-  --v-wash: rgba(70,179,128,0.13);
+  /* The warmer, more neutral charcoal from the instrument direction. The
+     green-tinted greys made the whole frame feel washed in brand colour,
+     which is the opposite of restraint — the accent should be the only
+     green on the screen. */
+  --v-bg: #141614;
+  --v-surface: #1b1e1c;
+  --v-sunken: #191c1a;
+  --v-border: #2a2f2c;
+  --v-border-strong: #3a423d;
+  --v-track: #2b302d;
+  --v-text: #f0f1ee;
+  --v-muted: #a8aea9;
+  --v-faint: #868d88;
+  --v-accent: #57a97f;
+  --v-on-accent: #0b110e;
+  --v-lift: rgba(255,255,255,0.028);
   --v-radius: 22px;
   --v-btn-radius: 999px;
   --v-pad: 34px;
@@ -336,21 +340,16 @@ const CSS = `
   --v-result-align: center;
   --v-result-justify: center;
 }
+/* No green wash behind the hero and no disc behind the ring.
+   A brand-coloured glow sitting in the corner of a card reads as a smudge
+   rather than as light, and on a light background it goes distinctly murky.
+   The card lifts by elevation instead — a plain top highlight and a real
+   shadow — and the only green on the screen is the ring itself, which is
+   the whole point of this direction. */
 .vibe-a .v-hero {
   background:
-    radial-gradient(120% 90% at 12% 0%, var(--v-wash), transparent 62%),
+    linear-gradient(180deg, var(--v-lift), transparent 140px),
     var(--v-surface);
-}
-/* A disc behind the ring, so the ring sits on something rather than floating
-   on a flat white card. Barely visible; it is doing the job a shadow does in
-   dark mode, where the ring already glows against near-black. */
-.vibe-a .v-hero-row > div:first-child::before {
-  content: '';
-  position: absolute;
-  inset: -14%;
-  border-radius: 999px;
-  background: radial-gradient(circle, var(--v-wash), transparent 70%);
-  pointer-events: none;
 }
 /* Light mode was the weak half: a white card on an almost-white page with a
    hairline and a whisper of shadow, which reads as a form rather than as
@@ -366,18 +365,18 @@ const CSS = `
      of serious for something opened at eleven at night — but a cream one
      reads like a recipe site. This is a neutral with just enough warmth to
      stop it feeling like a medical form. */
-  --v-bg: #edecea;
+  --v-bg: #eeebe5;
   --v-surface: #ffffff;
-  --v-sunken: #e4e3e0;
-  --v-border: rgba(16,22,19,0.05);
-  --v-border-strong: rgba(16,22,19,0.11);
-  --v-track: #e6e5e2;
-  --v-text: #0b100e;
-  --v-muted: #4d5651;
-  --v-faint: #717b75;
-  --v-accent: #127954;
+  --v-sunken: #e6e2da;
+  --v-border: rgba(23,26,23,0.055);
+  --v-border-strong: rgba(23,26,23,0.12);
+  --v-track: #e9e5dd;
+  --v-text: #171a17;
+  --v-muted: #575d58;
+  --v-faint: #7b827c;
+  --v-accent: #2d6a4f;
   --v-on-accent: #ffffff;
-  --v-wash: rgba(18,121,84,0.14);
+  --v-lift: rgba(23,26,23,0.012);
   /* The muted status hues were tuned against near-black. On white the clay
      and ochre lose their chroma and go brown, so they are lifted here. */
   --status-weak: oklch(0.58 0.16 32);
