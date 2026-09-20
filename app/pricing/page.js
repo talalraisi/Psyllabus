@@ -34,7 +34,7 @@ export default function PricingPage() {
 
         <header className="app-enter mt-8 mb-12 max-w-2xl">
           <h1 className="text-[clamp(2rem,5vw,2.8rem)] font-semibold leading-[1.08] tracking-[-0.032em]">
-            One subject free. All of them for the price of a coffee.
+            One subject free. All six for less than a textbook.
           </h1>
           <p className="mt-4 text-[15px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
             No trial running out, no card to start.
@@ -71,6 +71,12 @@ export default function PricingPage() {
                   {plan.cadence}
                 </span>
               </p>
+
+              {plan.annual && (
+                <p className="mt-1.5 text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
+                  or {plan.annual} — two months off
+                </p>
+              )}
 
               <p className="mt-3 text-[13.5px] font-medium">{plan.tagline}</p>
 
