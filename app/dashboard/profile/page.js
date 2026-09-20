@@ -118,9 +118,12 @@ export default function ProfilePage() {
     if (!file || !profile?.id) return
 
     setError('')
+    setPhotoError('')
     if (!file.type.startsWith('image/')) return setError('Please choose an image file.')
     if (file.size > MAX_AVATAR_MB * 1024 * 1024)
-      return setError(`That image is over ${MAX_AVATAR_MB}MB. Most photos are well under.`)
+      return setError(
+        `That image is over ${MAX_AVATAR_MB}MB, which is bigger than this can handle. Most photos are well under.`
+      )
 
     setPendingPhoto(file)
   }
@@ -145,6 +148,22 @@ export default function ProfilePage() {
 
     setUploading(true)
     const path = `${profile.id}/avatar-${Date.now()}.jpg`
+
+    /**
+     * A session that expired while the page was open.
+     *
+     * Storage checks the token, not the cookie, and a tab left open overnight
+     * has a token that stopped working hours ago. The upload then fails with
+     * a bare 401 — which is what "it just doesn't upload" looks like from the
+     * outside. Refreshing first turns that into either a working upload or a
+     * sentence telling them to sign in again.
+     */
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+    if (sessionError || !sessionData?.session) {
+      setPhotoError('Your session has expired. Sign in again and the photo will upload.')
+      setUploading(false)
+      return
+    }
 
     /**
      * Never hang.
@@ -174,9 +193,11 @@ export default function ProfilePage() {
         setPhotoError(
           uploadError.message.includes('Bucket not found')
             ? 'Photo storage is not set up on the server yet.'
-            : /exceeded|too large|size/i.test(uploadError.message)
-              ? 'That photo is too large. Try a smaller one.'
-              : `The upload was refused: ${uploadError.message}`
+            : /exceeded|too large|size|maximum/i.test(uploadError.message)
+              ? 'That photo is too large for the server. Tell Talal — the crop should have prevented this.'
+              : /jwt|token|unauthor|401/i.test(uploadError.message)
+                ? 'Your session has expired. Sign in again and the photo will upload.'
+                : `The upload was refused: ${uploadError.message}`
         )
         return
       }
