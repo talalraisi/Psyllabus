@@ -273,7 +273,7 @@ export default function Dashboard() {
             first thing. It has one now — the next subtopic to sit, or the
             first one if nothing has been sat yet — and everything else is
             reference underneath it. */}
-        {nextUp ? (
+        {!hasActivity ? (
           <section
             className="mb-8 rounded-[16px] border p-6 sm:p-7"
             style={{ borderColor: 'var(--brand)', background: 'var(--brand-tint)' }}
@@ -282,7 +282,70 @@ export default function Dashboard() {
               className="text-[10.5px] font-semibold uppercase tracking-[0.16em]"
               style={{ color: 'var(--text-faint)' }}
             >
-              {hasActivity ? 'Next up' : 'Start here'}
+              First time here
+            </p>
+            <h2 className="mt-3 text-[clamp(1.35rem,2.8vw,1.8rem)] font-semibold leading-tight tracking-[-0.028em]">
+              Nothing here is guessed. You prove it.
+            </h2>
+            <p className="mt-2.5 max-w-lg text-[14px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+              Every colour on this dashboard comes from a quiz you have sat. Three steps and it
+              starts filling in.
+            </p>
+
+            <ol className="stagger mt-6 flex flex-col gap-3">
+              {[
+                [
+                  '1',
+                  'Open your syllabus',
+                  firstSubject
+                    ? `${firstSubject}, broken into topics, units and subtopics.`
+                    : 'Your subjects, broken into topics and subtopics.',
+                ],
+                ['2', 'Sit a Quick 5', 'Five questions on one subtopic, marked as you answer.'],
+                ['3', 'Watch it colour in', 'Right answers earn points. Points set the level. Nothing else does.'],
+              ].map(([n, title, detail]) => (
+                <li key={n} className="flex items-start gap-3">
+                  <span
+                    className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold"
+                    style={{ background: 'var(--brand)', color: '#fff' }}
+                  >
+                    {n}
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-[14px] font-medium">{title}</span>
+                    <span className="mt-0.5 block text-[13px]" style={{ color: 'var(--text-muted)' }}>
+                      {detail}
+                    </span>
+                  </span>
+                </li>
+              ))}
+            </ol>
+
+            <div className="mt-7 flex flex-wrap items-center gap-3">
+              <Link href={startHref} className="btn btn-solid control-lg">
+                Open {firstSubject || 'my subjects'}
+                <IconArrowRight width={16} height={16} />
+              </Link>
+              {nextUp && (
+                <Link
+                  href={`/dashboard/quiz?subject=${encodeURIComponent(nextUp.subject)}&topic=${encodeURIComponent(nextUp.topic)}&subtopic=${encodeURIComponent(nextUp.subtopic)}&count=5&review=practice&back=/dashboard`}
+                  className="btn btn-outline control-md"
+                >
+                  Or start with {displaySubtopic(nextUp.subtopic)}
+                </Link>
+              )}
+            </div>
+          </section>
+        ) : nextUp ? (
+          <section
+            className="mb-8 rounded-[16px] border p-6 sm:p-7"
+            style={{ borderColor: 'var(--brand)', background: 'var(--brand-tint)' }}
+          >
+            <p
+              className="text-[10.5px] font-semibold uppercase tracking-[0.16em]"
+              style={{ color: 'var(--text-faint)' }}
+            >
+              Next up
             </p>
 
             <h2 className="mt-3 text-[clamp(1.35rem,2.8vw,1.8rem)] font-semibold leading-tight tracking-[-0.028em]">
@@ -310,7 +373,7 @@ export default function Dashboard() {
                 href={`/dashboard/quiz?subject=${encodeURIComponent(nextUp.subject)}&topic=${encodeURIComponent(nextUp.topic)}&subtopic=${encodeURIComponent(nextUp.subtopic)}&back=/dashboard`}
                 className="btn btn-solid control-lg"
               >
-                {hasActivity ? 'Sit this one' : 'Take your first quiz'}
+                Sit this one
                 <IconArrowRight width={16} height={16} />
               </Link>
               {counts.due > 0 && (

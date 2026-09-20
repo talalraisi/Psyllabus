@@ -280,7 +280,7 @@ export default function Calculator({ open, onClose }) {
 
   return (
     <div
-      className="pop-enter fixed bottom-4 right-4 z-40 w-[360px] max-w-[calc(100vw-2rem)] rounded-[16px] border shadow-xl"
+      className="pop-enter fixed bottom-[76px] right-4 z-40 w-[360px] max-w-[calc(100vw-2rem)] rounded-[16px] border shadow-xl"
       style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
       role="dialog"
       aria-label="Calculator"
