@@ -25,7 +25,7 @@ import {
 } from '@/lib/progress'
 import { buildEffectiveProgressMap, buildProgressDetailMap } from '@/lib/decay'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
-import { hasAllSubjects, isSubjectLocked } from '@/lib/access'
+import { hasAllSubjects, isSubjectLocked, accessibleSubjects } from '@/lib/access'
 
 function greeting(now) {
   const hour = now.getHours()
@@ -255,7 +255,16 @@ export default function Dashboard() {
       ]
         .filter(Boolean)
         .join(' · ')
-  const firstSubject = subjects[0]
+  /**
+   * The subject the first-run panel sends them to.
+   *
+   * This was subjects[0], which on a free account is whichever subject
+   * happens to be first in the list — usually a locked one. So the panel
+   * said "Open English A" under a heading about proving things, and the
+   * link went to a padlock. It is the subject they can actually open.
+   */
+  const firstSubject =
+    accessibleSubjects(profile).find((s) => !IB_CORE_SUBJECTS.includes(s)) || subjects[0]
   const startHref = firstSubject
     ? `/dashboard/syllabus/${getSlugForSubject(firstSubject)}`
     : '/dashboard/subjects'
