@@ -20,7 +20,7 @@ import {
   HEAT_RANGES,
 } from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
-import { accessibleSubjects, hasAllSubjects } from '@/lib/access'
+import { accessibleSubjects, hasAllSubjects, canUse } from '@/lib/access'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
 
 // Five is there because most revision is not an hour of it. Five questions is
@@ -111,7 +111,11 @@ export default function TestBuilderPage() {
   // becomes a settings page.
   const hintsAllowed = review !== 'exam'
   const [length, setLength] = useState(20)
-  const [timed, setTimed] = useState(true)
+  // Exam conditions are part of Basic, so a free account builds untimed papers
+  // and is told why rather than finding the switch dead.
+  const [timedWanted, setTimedWanted] = useState(true)
+  const canTime = canUse('timedPapers', profile)
+  const timed = canTime && timedWanted
   const [qtype, setQtype] = useState('all')
   const [order, setOrder] = useState('mixed')
   // A length you typed, and a limit you chose. Both are optional: leaving them
@@ -500,7 +504,8 @@ export default function TestBuilderPage() {
           customLength={customLength}
           onCustomLength={setCustomLength}
           timed={timed}
-          onTimed={setTimed}
+          canTime={canTime}
+          onTimed={setTimedWanted}
           customMinutes={customMinutes}
           onCustomMinutes={setCustomMinutes}
           budgetMinutes={budgetMinutes}

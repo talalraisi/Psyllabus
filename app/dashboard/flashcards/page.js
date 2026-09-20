@@ -11,10 +11,11 @@ import { Page, PageHeader, PageLoading, EmptyState } from '@/components/PageShel
 import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { IconClose, IconArrowRight, IconArrowLeft, IconCards } from '@/components/Icons'
 import { displaySubtopic } from '@/lib/progress'
-import { accessibleSubjects } from '@/lib/access'
+import { accessibleSubjects, canUse } from '@/lib/access'
 import { scheduleAfter, isDue, dueLabel } from '@/lib/flashcards'
 import FlashcardReview from '@/components/FlashcardReview'
 import NoteImport from '@/components/NoteImport'
+import LockedPanel from '@/components/LockedPanel'
 
 /**
  * Flashcards.
@@ -533,7 +534,16 @@ export default function FlashcardsPage() {
                 one nobody does at eleven at night. A ready-made deck per
                 subtopic is the version that actually gets used, and taking one
                 copies it into your own cards so the scheduling is yours. */}
-            {availablePresets.length > 0 && (
+            {!canUse('presetDecks', profile) && (
+              <div className="mb-10">
+                <LockedPanel
+                  title="Decks somebody already wrote"
+                  blurb="Checked cards for every subtopic of your subjects, ready to study. Writing your own stays free."
+                />
+              </div>
+            )}
+
+            {canUse('presetDecks', profile) && availablePresets.length > 0 && (
               <div className="mb-10 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
                 <div className="mb-1 flex flex-wrap items-baseline justify-between gap-3">
                   <h2 className="text-[15px] font-semibold tracking-[-0.012em]">Decks on offer</h2>

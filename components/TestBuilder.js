@@ -143,6 +143,32 @@ function Question({ title, hint, children }) {
   )
 }
 
+/**
+ * A feature this account does not have, shown rather than hidden.
+ *
+ * Hiding it means a student never learns the app can do it; a row with a lock
+ * and a price is an honest advert and takes the same space.
+ */
+function UpgradeRow({ label, hint }) {
+  return (
+    <div className="flex items-start gap-3 py-2 opacity-70">
+      <span className="mt-0.5 text-[13px]" style={{ color: 'var(--text-faint)' }}>
+        🔒
+      </span>
+      <div className="min-w-0">
+        <p className="text-[14px] font-medium">{label}</p>
+        <p className="mt-0.5 text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
+          {hint}{' '}
+          <a href="/pricing" className="underline underline-offset-2">
+            On Basic and above
+          </a>
+          .
+        </p>
+      </div>
+    </div>
+  )
+}
+
 export default function TestBuilder({
   subject, subjects, onSubject, freeNote,
   levels, level, onLevel, showLevel, hlCount,
@@ -156,7 +182,7 @@ export default function TestBuilder({
   lengthMetric, onLengthMetric, lengthPresets, lengthUnit,
   length, onLength, customLength, onCustomLength,
   timed, onTimed, customMinutes, onCustomMinutes, budgetMinutes,
-  review, onReview,
+  review, onReview, canTime = true,
   paper, onStart,
 }) {
   const [step, setStep] = useState(0)
@@ -521,12 +547,19 @@ export default function TestBuilder({
       {STEPS[step].key === 'sit' && (
         <Question title="How do you want to sit it?" hint="Untimed to learn, timed to rehearse.">
           <div className="flex flex-col gap-3">
-            <Toggle
-              on={timed}
-              onClick={() => onTimed(!timed)}
-              label="Exam conditions"
-              hint="A countdown and live marks-per-minute pacing."
-            />
+            {canTime ? (
+              <Toggle
+                on={timed}
+                onClick={() => onTimed(!timed)}
+                label="Exam conditions"
+                hint="A countdown and live marks-per-minute pacing."
+              />
+            ) : (
+              <UpgradeRow
+                label="Exam conditions"
+                hint="A countdown and live marks-per-minute pacing, the way the real paper runs."
+              />
+            )}
             {timed && (
               <label className="flex flex-wrap items-center gap-2 pl-5">
                 <span className="text-[13px]" style={{ color: 'var(--text-muted)' }}>

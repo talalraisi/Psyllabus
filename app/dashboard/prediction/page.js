@@ -11,6 +11,8 @@ import { Page, PageHeader, Section, EmptyState, PageLoading, Spinner } from '@/c
 import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { getSlugForSubject } from '@/lib/subject-map'
 import { buildEffectiveProgressMap } from '@/lib/decay'
+import { canUse } from '@/lib/access'
+import LockedPanel from '@/components/LockedPanel'
 import { predictDiploma, CONFIDENCE_COPY } from '@/lib/prediction'
 import { CORE_GRADES, coreBonusPoints, IB_CORE_SUBJECTS, MAX_TOTAL_POINTS } from '@/lib/ib-points'
 import { curriculumOf } from '@/lib/curriculum'
@@ -113,6 +115,20 @@ export default function PredictionPage() {
     ? coreBonusPoints(targets['Theory of Knowledge'], targets['Extended Essay'])
     : null
   const hasData = prediction.testedSubjects > 0
+
+  if (!canUse('prediction', profile)) {
+    return (
+      <DashboardLayout profile={profile}>
+        <Page width="default">
+          <PageHeader title="Predicted Grade" />
+          <LockedPanel
+            title="A predicted grade out of 45"
+            blurb="Worked out from your quiz results across every subject, next to the grades you are aiming for. It needs all six subjects to mean anything, which is what Basic opens."
+          />
+        </Page>
+      </DashboardLayout>
+    )
+  }
 
   return (
     <DashboardLayout profile={profile}>

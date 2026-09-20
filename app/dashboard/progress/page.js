@@ -13,6 +13,8 @@ import { mergeSyllabusWithProgress } from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
 import SubjectWeb from '@/components/SubjectWeb'
+import LockedPanel from '@/components/LockedPanel'
+import { canUse } from '@/lib/access'
 import { useRouter as useNav } from 'next/navigation'
 
 // Read left to right this is the ladder itself: everything tracked, then the
@@ -177,7 +179,17 @@ export default function ProgressPage() {
                       </span>
                     </button>
 
-                    {open && (
+                    {open && !canUse('subjectMap', profile) && (
+                      <div className="pop-enter pb-6">
+                        <LockedPanel
+                          plan="Premium"
+                          title="Your whole course as one picture"
+                          blurb="Every theme, unit and subtopic as a web, coloured by what you have proved. Open a theme and it re-lays itself around it."
+                        />
+                      </div>
+                    )}
+
+                    {open && canUse('subjectMap', profile) && (
                       <div className="pop-enter pb-6">
                         <SubjectWeb
                           subject={subject}
