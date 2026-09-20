@@ -135,12 +135,11 @@ export default async function Home() {
       <main>
         {/* ---------------------------------------------------------- hero */}
         <section className="ground relative px-5 py-24 md:px-8 md:py-36">
-          {/* Two slow blobs behind the headline. Nothing on this page moved
-              unless you scrolled it, which reads as a screenshot. */}
-          <div className="aurora" aria-hidden="true">
-            <span />
-            <span />
-          </div>
+          {/* No wash behind the headline. Two slow blooms lived here and they
+              read as coloured spots on the page rather than as light — twice
+              noticed, twice disliked, so they are gone rather than tuned. The
+              page still moves while you sit on it: the grid behind this
+              creeps one tile a minute. */}
           <div className="mx-auto max-w-6xl">
             <h1 className="max-w-3xl text-[clamp(2.6rem,6vw,4.6rem)] font-semibold leading-[0.98] tracking-[-0.038em]">
               Stop guessing.
@@ -425,10 +424,6 @@ export default async function Home() {
 
         {/* ------------------------------------------------------------ cta */}
         <Section>
-          <div className="aurora" aria-hidden="true" style={{ opacity: 0.6 }}>
-            <span />
-            <span />
-          </div>
           <div className="mx-auto max-w-2xl text-center">
             <Heading>Start with one subject. It stays free.</Heading>
             <p className="mx-auto mt-5 max-w-lg text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
