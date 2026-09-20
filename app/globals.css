@@ -10,21 +10,32 @@
   /* --- Brand palette. Five colors, each with a defined job. ---------------- */
   --brand: #2d6a4f;          /* primary actions, mastered state, active nav */
   --brand-hover: #245a42;
-  --brand-tint: #f0fdf4;     /* selected rows, active nav background */
+  --brand-tint: #eaf2ec;     /* selected rows, active nav background */
   --sand: #e8d5b0;           /* accent badges only, never alongside brand */
 
-  --bg: #f8f6f1;             /* page canvas */
+  /* --- Ground, surfaces, ink. -----------------------------------------------
+     Three levels, far enough apart to read as levels. The page used to sit
+     four points off the card with a hairline between them, so nothing was
+     ever in front of anything and every screen read as one flat sheet. The
+     page drops well below white now and the shadow does the lifting.
+
+     Neutral and faintly warm, never green. The greys were tinted toward the
+     brand, which washed the whole frame in it — the accent should be the only
+     green on a screen, and a green-grey page steals that job. Warm rather
+     than cool because a cool grey page reads clinical, which is the wrong
+     kind of serious for something opened late at night before a mock. */
+  --bg: #eeebe5;             /* page canvas */
   --surface: #ffffff;        /* cards */
-  --surface-sunken: #f9fafb; /* table headers, inset panels */
+  --surface-sunken: #e6e2da; /* table headers, inset panels */
 
-  --text: #1a2e1e;           /* headings */
-  --text-body: #374151;      /* body copy */
-  --text-muted: #656b78; /* 5.1:1 on white, 4.9:1 on the tinted sections; #6b7280 sat at 4.48 */     /* supporting copy */
-  --text-faint: #656a72; /* 5.2:1 on white and 4.8:1 on the tinted sections; #9ca3af was 2.54 */     /* labels, metadata */
+  --text: #171a17;           /* headings */
+  --text-body: #3c413c;      /* body copy */
+  --text-muted: #5c625c;     /* supporting copy — measured in contrast-test.mjs */
+  --text-faint: #5c625c;     /* labels, metadata */
 
-  --border: #f0f0f0;         /* card edges */
-  --border-strong: #e5e7eb;  /* inputs, controls */
-  --border-hover: #d1d5db;
+  --border: #e4e0d8;         /* card edges */
+  --border-strong: #d6d1c6;  /* inputs, controls */
+  --border-hover: #c2bcae;
 
   /* --- Status. Five levels of knowledge, plus untested. --------------------
      Rebuilt in OKLCH, where equal numbers look equally light to the eye. These
@@ -41,11 +52,11 @@
      purple rather than the brand green so that "the best state" is not the
      same colour as every button on the page. ------------------------------- */
   --status-fading: oklch(0.60 0.07 240);      /* was mastered, slipping */
-  --status-weak: oklch(0.56 0.13 35);        /* proven wrong */
-  --status-developing: oklch(0.62 0.11 75);  /* getting there */
-  --status-proficient: oklch(0.56 0.11 155);  /* reliable */
+  --status-weak: oklch(0.56 0.16 32);        /* proven wrong */
+  --status-developing: oklch(0.62 0.14 78);  /* getting there */
+  --status-proficient: oklch(0.56 0.13 158);  /* reliable */
   --status-mastered: oklch(0.52 0.11 285);    /* solid and recent */
-  --status-untested: #e5e7eb;
+  --status-untested: #ded9cf;
 
   /* Declared explicitly, because the dark block declares its own.
      Without this the browser keeps its dark UA defaults whenever the operating
@@ -90,8 +101,15 @@
   --r-lg: 12px;  /* cards, panels, drawers */
 
   /* --- Elevation. Two levels. Never tinted, never stacked. ----------------- */
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-raised: 0 4px 12px rgba(0, 0, 0, 0.08);
+  /* Three layers, not one: a contact shadow to seat the edge, a lift, and a
+     wide soft pool. One flat blur is what makes a card look like a box. */
+  --shadow-card:
+    0 1px 2px rgba(23, 26, 23, 0.05),
+    0 8px 18px -10px rgba(23, 26, 23, 0.12);
+  --shadow-raised:
+    0 1px 2px rgba(23, 26, 23, 0.05),
+    0 14px 30px -14px rgba(23, 26, 23, 0.16),
+    0 44px 80px -46px rgba(23, 26, 23, 0.26);
 
   /* --- Motion. One duration, one easing. ---------------------------------- */
   --ease: cubic-bezier(0.2, 0, 0.2, 1);
@@ -123,30 +141,32 @@
    =========================================================================== */
 
 [data-theme='dark'] {
-  --brand: #4c9c74;
-  --brand-hover: #5fb287;
-  --brand-tint: #16261e;
+  --brand: #57a97f;
+  --brand-hover: #6cbd92;
+  --brand-tint: #19241f;
   --sand: #c9b48d;
 
-  --bg: #0f1412;
-  --surface: #171d1a;
-  --surface-sunken: #1d2521;
+  /* Lifted off near-black and de-greened, for the same reasons as light.
+     #0f1412 was dark enough that the card above it had nowhere left to go. */
+  --bg: #141614;
+  --surface: #1b1e1c;
+  --surface-sunken: #191c1a;
 
-  --text: #e9efeb;
-  --text-body: #c2ccc6;
-  --text-muted: #98a49d;
-  --text-faint: #85958c; /* 5.44:1 on the dark surface; #6f7c75 was 3.92 */
+  --text: #f0f1ee;
+  --text-body: #c9cdc8;
+  --text-muted: #a0a6a1;
+  --text-faint: #8c928c;
 
-  --border: #232b27;
-  --border-strong: #2f3833;
-  --border-hover: #414d46;
+  --border: #2a2f2c;
+  --border-strong: #3a423d;
+  --border-hover: #4a534d;
 
   --status-fading: oklch(0.64 0.08 240);
   --status-weak: oklch(0.62 0.14 35);
   --status-developing: oklch(0.68 0.12 75);
   --status-proficient: oklch(0.66 0.13 155);
   --status-mastered: oklch(0.62 0.14 285);
-  --status-untested: #2f3833;
+  --status-untested: #333a35;
 
   /* White text on #4c9c74 is 3.33:1, so the primary call to action failed on
      every dark-mode screen. This green carries white at 4.9:1 while --brand
@@ -172,8 +192,15 @@
 
   /* Shadows do almost nothing on a dark ground, so the borders carry the
      separation instead and these stay subtle rather than muddy. */
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-raised: 0 4px 16px rgba(0, 0, 0, 0.55);
+  /* A top highlight as well as a shadow: on a dark ground an edge catching
+     the light is what says "in front", where a darker shadow says nothing. */
+  --shadow-card:
+    inset 0 1px 0 rgba(255, 255, 255, 0.028),
+    0 2px 6px rgba(0, 0, 0, 0.45);
+  --shadow-raised:
+    inset 0 1px 0 rgba(255, 255, 255, 0.045),
+    0 18px 34px -18px rgba(0, 0, 0, 0.75),
+    0 40px 70px -40px rgba(0, 0, 0, 0.9);
 
   color-scheme: dark;
 }
@@ -501,7 +528,17 @@ body {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
+    box-shadow: var(--shadow-card);
   }
+
+  /* Elevation you can point at.
+
+     Most cards in this app are a rounded div with an inline background, so
+     there is nothing for a stylesheet to hook. These two exist to be put on
+     the ones that matter: `elev` for anything that is a surface, `elev-lg`
+     for the one thing on a page that should look like it is in front. */
+  .elev { box-shadow: var(--shadow-card); }
+  .elev-lg { box-shadow: var(--shadow-raised); }
 
   .card-pad { padding: 32px; }
 

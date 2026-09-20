@@ -293,7 +293,7 @@ export default function Dashboard() {
             reference underneath it. */}
         {!hasActivity ? (
           <section
-            className="mb-8 rounded-[16px] border p-6 sm:p-7"
+            className="elev-lg mb-8 rounded-[16px] border p-6 sm:p-7"
             style={{ borderColor: 'var(--brand)', background: 'var(--brand-tint)' }}
           >
             <p
@@ -356,7 +356,7 @@ export default function Dashboard() {
           </section>
         ) : nextUp ? (
           <section
-            className="mb-8 rounded-[16px] border p-6 sm:p-7"
+            className="elev-lg mb-8 rounded-[16px] border p-6 sm:p-7"
             style={{ borderColor: 'var(--brand)', background: 'var(--brand-tint)' }}
           >
             <p
@@ -406,7 +406,7 @@ export default function Dashboard() {
           </section>
         ) : (
           <section
-            className="mb-8 rounded-[16px] border p-6 sm:p-7"
+            className="elev-lg mb-8 rounded-[16px] border p-6 sm:p-7"
             style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
           >
             <h2 className="text-[clamp(1.35rem,2.8vw,1.8rem)] font-semibold tracking-[-0.028em]">

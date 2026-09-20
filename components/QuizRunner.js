@@ -157,6 +157,9 @@ export default function QuizRunner({
   // Which of this quiz's questions are here because you got them wrong before.
   const [redemptionIds, setRedemptionIds] = useState(() => new Set())
   const [calcOpen, setCalcOpen] = useState(false)
+  // Drawn once the result screen is on the page, so the ring closes in front
+  // of the student rather than being already closed when they arrive.
+  const [ringLive, setRingLive] = useState(false)
   // The ones you got right, folded away until asked for.
   const [showRight, setShowRight] = useState(false)
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -424,6 +427,15 @@ export default function QuizRunner({
     load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subject, topic, subtopic, mode, count, topics?.join('|'), subtopics?.join('|'), subjects?.join('|'), focus, difficulty, level, paper, qtype, order])
+
+  useEffect(() => {
+    if (phase !== PHASE.results) return
+    const id = requestAnimationFrame(() => setRingLive(true))
+    return () => {
+      cancelAnimationFrame(id)
+      setRingLive(false)
+    }
+  }, [phase])
 
   const startQuiz = () => {
     questionTimesRef.current = {}
@@ -1273,17 +1285,92 @@ export default function QuizRunner({
       </li>
     )
 
+    /**
+     * The ring, closing.
+     *
+     * This is the only moment the product has. Everything else is a student
+     * doing work; this is the half second where the work turns into a number
+     * that went up. It was a heading and a row of static figures, which is a
+     * receipt. Now the score draws itself round, and anything that changed
+     * level says so above the verdict.
+     */
+    /**
+     * Only the levels worth announcing.
+     *
+     * Going from untested to Weak is a real move, and saying "is now weak"
+     * under a five-out-of-five reads as an insult. The mastery bar below
+     * already shows where it sits; this line is for the moments that are
+     * genuinely worth looking up from the screen for.
+     */
+    const WORTH_SAYING = new Set(['confident', 'proficient', 'mastered'])
+    const levelled = (results.earned || []).filter(
+      (e) => e.gained > 0 && WORTH_SAYING.has(e.status)
+    )
+    const RING = 118
+    const RING_STROKE = 11
+    const ringR = (RING - RING_STROKE) / 2
+    const ringC = 2 * Math.PI * ringR
+
     return (
       <div>
-        <p
-          className="mb-3 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
-          style={{ color: 'var(--text-faint)' }}
-        >
-          Result
-        </p>
-        <h1 className="text-[clamp(1.9rem,4.4vw,2.6rem)] font-semibold leading-[1.1] tracking-[-0.03em]">
-          {verdict}
-        </h1>
+        <div className="mb-7 flex flex-wrap items-center gap-6">
+          <div style={{ position: 'relative', width: RING, height: RING, flexShrink: 0 }}>
+            <svg width={RING} height={RING} style={{ display: 'block' }} aria-hidden="true">
+              <circle
+                cx={RING / 2}
+                cy={RING / 2}
+                r={ringR}
+                fill="none"
+                stroke="var(--border-strong)"
+                strokeWidth={RING_STROKE}
+              />
+              <circle
+                cx={RING / 2}
+                cy={RING / 2}
+                r={ringR}
+                fill="none"
+                stroke={pct >= 60 ? 'var(--brand)' : 'var(--status-weak)'}
+                strokeWidth={RING_STROKE}
+                strokeLinecap="round"
+                strokeDasharray={ringC}
+                strokeDashoffset={ringLive ? ringC * (1 - results.accuracy) : ringC}
+                transform={`rotate(-90 ${RING / 2} ${RING / 2})`}
+                style={{ transition: 'stroke-dashoffset 1100ms cubic-bezier(0.16,1,0.3,1) 120ms' }}
+              />
+            </svg>
+            <div className="absolute inset-0 grid place-items-center text-center">
+              <div>
+                <p className="text-[24px] font-semibold leading-none tracking-[-0.03em] tabular-nums">
+                  {results.score}/{results.total}
+                </p>
+                {pointsEarned > 0 && (
+                  <p className="mt-1 text-[11.5px] font-medium" style={{ color: 'var(--brand)' }}>
+                    +{pointsEarned.toFixed(2)}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <p
+              className="mb-3 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
+              style={{ color: 'var(--text-faint)' }}
+            >
+              Result
+            </p>
+            {levelled.length > 0 && (
+              <p className="mb-2 text-[13.5px] font-medium" style={{ color: 'var(--brand)' }}>
+                {levelled.length === 1
+                  ? `${displaySubtopic(levelled[0].subtopic)} is now ${(STATUS_LABELS[levelled[0].status] || '').toLowerCase()}.`
+                  : `${levelled.length} subtopics moved up.`}
+              </p>
+            )}
+            <h1 className="text-[clamp(1.6rem,3.6vw,2.2rem)] font-semibold leading-[1.12] tracking-[-0.03em]">
+              {verdict}
+            </h1>
+          </div>
+        </div>
 
         {/* The numbers, once, in a row. Not a column of sentences about them. */}
         <dl

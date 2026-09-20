@@ -115,7 +115,7 @@ export function StatRow({ stats, className = '' }) {
 export function Card({ children, className = '', interactive = false, flush = false }) {
   return (
     <div
-      className={`rounded-[12px] border ${interactive ? 'surface-interactive' : ''} ${flush ? '' : 'p-5'} ${className}`}
+      className={`elev rounded-[12px] border ${interactive ? 'surface-interactive' : ''} ${flush ? '' : 'p-5'} ${className}`}
       style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
     >
       {children}
