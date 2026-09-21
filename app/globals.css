@@ -27,18 +27,29 @@
      green on a screen, and a green-grey page steals that job. Warm rather
      than cool because a cool grey page reads clinical, which is the wrong
      kind of serious for something opened late at night before a mock. */
-  --bg: #f3f3f1;             /* page canvas */
-  --surface: #ffffff;        /* cards */
-  --surface-sunken: #eaeae7; /* table headers, inset panels */
+  /* Panels are recessed, not raised.
 
-  --text: #16191a;           /* headings */
-  --text-body: #3b403f;      /* body copy */
-  --text-muted: #5b615f;     /* supporting copy — measured in contrast-test.mjs */
-  --text-faint: #5b615f;     /* labels, metadata */
+     Cards used to be white on a grey page — lighter than the thing they sit
+     on, which is the usual convention and reads as plastic laid on top. The
+     page is the brightest surface here and a panel is a step down into it,
+     so a card looks set into the page rather than stuck to it. The same rule
+     runs in dark, where it also means a card never glows.
 
-  --border: #e6e6e2;         /* card edges */
-  --border-strong: #d9d9d4;  /* inputs, controls */
-  --border-hover: #c4c4be;
+     Neutral, and neutral all the way. No green in the greys: the accent is
+     the only green on a screen, and a page tinted toward the brand steals
+     that job and looks washed. */
+  --bg: #ffffff;             /* page canvas — the brightest thing */
+  --surface: #f7f7f6;        /* cards, set into the page */
+  --surface-sunken: #f0f0ee; /* table headers, inset panels */
+
+  --text: #17191a;           /* headings */
+  --text-body: #3d4042;      /* body copy */
+  --text-muted: #5c6063;     /* supporting copy — measured in contrast-test.mjs */
+  --text-faint: #5c6063;     /* labels, metadata */
+
+  --border: #e8e8e6;         /* card edges */
+  --border-strong: #dadad7;  /* inputs, controls */
+  --border-hover: #c5c5c1;
 
   /* --- Status. Five levels of knowledge, plus untested. --------------------
      Rebuilt in OKLCH, where equal numbers look equally light to the eye. These
@@ -59,7 +70,7 @@
   --status-developing: oklch(0.62 0.14 78);  /* getting there */
   --status-proficient: oklch(0.56 0.13 158);  /* reliable */
   --status-mastered: oklch(0.52 0.11 285);    /* solid and recent */
-  --status-untested: #e2e2de;
+  --status-untested: #e4e4e1;
 
   /* Declared explicitly, because the dark block declares its own.
      Without this the browser keeps its dark UA defaults whenever the operating
@@ -104,11 +115,12 @@
   --r-lg: 12px;  /* cards, panels, drawers */
 
   /* --- Elevation. Two levels. Never tinted, never stacked. ----------------- */
-  /* Three layers, not one: a contact shadow to seat the edge, a lift, and a
-     wide soft pool. One flat blur is what makes a card look like a box. */
-  --shadow-card:
-    0 1px 2px rgba(23, 26, 23, 0.05),
-    0 8px 18px -10px rgba(23, 26, 23, 0.12);
+  /* A panel is set into the page, so it does not cast anything — a drop
+     shadow under a recessed surface is the one combination that reads as a
+     mistake. A hairline of shade along the top edge deepens the recess and
+     that is all it needs. --shadow-raised is still a real shadow, kept for
+     the things that genuinely float: modals, popovers, the corner buttons. */
+  --shadow-card: inset 0 1px 2px rgba(23, 25, 26, 0.045);
   --shadow-raised:
     0 1px 2px rgba(23, 26, 23, 0.05),
     0 14px 30px -14px rgba(23, 26, 23, 0.16),
@@ -155,25 +167,29 @@
 
   /* Lifted off near-black and de-greened, for the same reasons as light.
      #0f1412 was dark enough that the card above it had nowhere left to go. */
-  --bg: #141614;
-  --surface: #1b1e1c;
-  --surface-sunken: #191c1a;
+  /* Same rule as light: the page is the brightest surface and a panel is a
+     step down into it. Cards were lighter than the ground, which made every
+     one of them glow slightly. And the greys are neutral now — the old ones
+     leaned green, which tinted the whole frame toward the brand. */
+  --bg: #191919;
+  --surface: #141414;
+  --surface-sunken: #101010;
 
-  --text: #f0f1ee;
-  --text-body: #c9cdc8;
-  --text-muted: #a0a6a1;
-  --text-faint: #8c928c;
+  --text: #f0f0f0;
+  --text-body: #c9c9c9;
+  --text-muted: #a1a1a1;
+  --text-faint: #8d8d8d;
 
-  --border: #2a2f2c;
-  --border-strong: #3a423d;
-  --border-hover: #4a534d;
+  --border: #2b2b2b;
+  --border-strong: #3a3a3a;
+  --border-hover: #4a4a4a;
 
   --status-fading: oklch(0.64 0.08 240);
   --status-weak: oklch(0.62 0.14 35);
   --status-developing: oklch(0.68 0.12 75);
   --status-proficient: oklch(0.66 0.13 155);
   --status-mastered: oklch(0.62 0.14 285);
-  --status-untested: #333a35;
+  --status-untested: #343434;
 
   /* White text on #4c9c74 is 3.33:1, so the primary call to action failed on
      every dark-mode screen. This green carries white at 4.9:1 while --brand
@@ -199,11 +215,7 @@
 
   /* Shadows do almost nothing on a dark ground, so the borders carry the
      separation instead and these stay subtle rather than muddy. */
-  /* A top highlight as well as a shadow: on a dark ground an edge catching
-     the light is what says "in front", where a darker shadow says nothing. */
-  --shadow-card:
-    inset 0 1px 0 rgba(255, 255, 255, 0.028),
-    0 2px 6px rgba(0, 0, 0, 0.45);
+  --shadow-card: inset 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-raised:
     inset 0 1px 0 rgba(255, 255, 255, 0.045),
     0 18px 34px -18px rgba(0, 0, 0, 0.75),
