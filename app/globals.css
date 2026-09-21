@@ -10,7 +10,7 @@
   /* --- Brand palette. Five colors, each with a defined job. ---------------- */
   --brand: #2d6a4f;          /* primary actions, mastered state, active nav */
   --brand-hover: #245a42;
-  --brand-tint: #eaf2ec;     /* selected rows, active nav background */
+  --brand-tint: #f0fdf4;     /* selected rows, active nav background */
   --sand: #e8d5b0;           /* accent badges only, never alongside brand */
 
   /* --- Ground, surfaces, ink. -----------------------------------------------
@@ -141,9 +141,13 @@
    =========================================================================== */
 
 [data-theme='dark'] {
-  --brand: #57a97f;
-  --brand-hover: #6cbd92;
-  --brand-tint: #19241f;
+  /* Back to the original greens. The repaint brightened and saturated these
+     and it turned every button, link, active nav row and ring a louder
+     green — which is how a change meant to take green OUT of the interface
+     ended up putting more of it in. The greys around them stay neutral. */
+  --brand: #4c9c74;
+  --brand-hover: #5fb287;
+  --brand-tint: #16261e;
   --sand: #c9b48d;
 
   /* Lifted off near-black and de-greened, for the same reasons as light.

@@ -1167,7 +1167,7 @@ export default function QuizRunner({
         {!calcOpen && (
           <button
             onClick={() => setCalcOpen(true)}
-            className="elev press fixed bottom-[76px] right-5 z-30 flex h-12 w-12 items-center justify-center rounded-full border shadow-lg"
+            className="elev-lg press fixed bottom-4 right-[124px] z-40 flex h-12 w-12 items-center justify-center rounded-full border"
             style={{
               borderColor: 'var(--border-strong)',
               background: 'var(--surface)',

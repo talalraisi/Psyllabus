@@ -13,6 +13,13 @@ import { readTimer, subscribeTimer, pauseTimer } from '@/lib/session-timer'
  * the clock has to stay on screen once you leave the study plan. It hides
  * itself on the study plan, where the full timer is already showing.
  */
+/*
+ * The floating controls share one corner, so their places are fixed here
+ * rather than each deciding for itself: feedback at the bottom, the running
+ * timer directly above it, the calculator beside it. This pill and the
+ * feedback button were both at bottom-4 right-4 with the same z-index, so a
+ * running session sat exactly on top of it.
+ */
 export default function TimerPill() {
   const [timer, setTimer] = useState(null)
   const pathname = usePathname()
@@ -32,7 +39,7 @@ export default function TimerPill() {
   if (pathname === '/dashboard/study-plan') return null
 
   return (
-    <div className="fixed bottom-4 right-4 z-40 flex items-center gap-3 rounded-full border border-[var(--border-strong)] bg-[var(--surface)] py-2 pl-4 pr-2 shadow-[var(--shadow-raised)]">
+    <div className="fixed bottom-[76px] right-4 z-40 flex items-center gap-3 rounded-full border border-[var(--border-strong)] bg-[var(--surface)] py-2 pl-4 pr-2 shadow-[var(--shadow-raised)]">
       <Link
         href="/dashboard/study-plan"
         className="flex items-center gap-2 text-sm font-semibold tabular-nums text-[var(--text)]"

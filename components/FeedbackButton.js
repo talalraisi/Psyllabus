@@ -94,7 +94,13 @@ export default function FeedbackButton() {
       <button
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="fixed bottom-4 right-4 z-40 rounded-full border px-4 py-2.5 text-[12.5px] font-medium shadow-sm transition-colors duration-150"
+        /* elev-lg, not Tailwind's shadow-sm. This floats over whatever the
+           page happens to be showing, and its background is --surface — so
+           over a card, which is also --surface, it was a surface-coloured
+           pill on a surface-coloured card with a hairline and almost no
+           shadow, and it disappeared. Over the page ground it looked fine.
+           That is the "sometimes I see it, sometimes I don't". */
+        className="elev-lg fixed bottom-4 right-4 z-40 rounded-full border px-4 py-2.5 text-[12.5px] font-medium transition-colors duration-150"
         style={{
           borderColor: 'var(--border-strong)',
           background: 'var(--surface)',
