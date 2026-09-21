@@ -10,7 +10,10 @@
   /* --- Brand palette. Five colors, each with a defined job. ---------------- */
   --brand: #2d6a4f;          /* primary actions, mastered state, active nav */
   --brand-hover: #245a42;
-  --brand-tint: #f0fdf4;     /* selected rows, active nav background */
+  /* A tint that belongs to the same room as the page. #f0fdf4 is a cool
+     mint; against a warm ground the hero card and the page were visibly
+     different temperatures and the card looked stuck on. */
+  --brand-tint: #eef4f0;     /* selected rows, active nav background */
   --sand: #e8d5b0;           /* accent badges only, never alongside brand */
 
   /* --- Ground, surfaces, ink. -----------------------------------------------
@@ -24,18 +27,18 @@
      green on a screen, and a green-grey page steals that job. Warm rather
      than cool because a cool grey page reads clinical, which is the wrong
      kind of serious for something opened late at night before a mock. */
-  --bg: #eeebe5;             /* page canvas */
+  --bg: #f3f3f1;             /* page canvas */
   --surface: #ffffff;        /* cards */
-  --surface-sunken: #e6e2da; /* table headers, inset panels */
+  --surface-sunken: #eaeae7; /* table headers, inset panels */
 
-  --text: #171a17;           /* headings */
-  --text-body: #3c413c;      /* body copy */
-  --text-muted: #5c625c;     /* supporting copy — measured in contrast-test.mjs */
-  --text-faint: #5c625c;     /* labels, metadata */
+  --text: #16191a;           /* headings */
+  --text-body: #3b403f;      /* body copy */
+  --text-muted: #5b615f;     /* supporting copy — measured in contrast-test.mjs */
+  --text-faint: #5b615f;     /* labels, metadata */
 
-  --border: #e4e0d8;         /* card edges */
-  --border-strong: #d6d1c6;  /* inputs, controls */
-  --border-hover: #c2bcae;
+  --border: #e6e6e2;         /* card edges */
+  --border-strong: #d9d9d4;  /* inputs, controls */
+  --border-hover: #c4c4be;
 
   /* --- Status. Five levels of knowledge, plus untested. --------------------
      Rebuilt in OKLCH, where equal numbers look equally light to the eye. These
@@ -56,7 +59,7 @@
   --status-developing: oklch(0.62 0.14 78);  /* getting there */
   --status-proficient: oklch(0.56 0.13 158);  /* reliable */
   --status-mastered: oklch(0.52 0.11 285);    /* solid and recent */
-  --status-untested: #ded9cf;
+  --status-untested: #e2e2de;
 
   /* Declared explicitly, because the dark block declares its own.
      Without this the browser keeps its dark UA defaults whenever the operating

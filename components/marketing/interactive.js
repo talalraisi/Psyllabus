@@ -165,19 +165,38 @@ export function Heatmap({ cols = 12, rows = 8, subject = 'Physics SL' }) {
 
 /* ------------------------------------------------------------- try a question */
 
+/**
+ * The demo question.
+ *
+ * It used to be centripetal force, which asked a visitor to remember a
+ * formula before the page could show them anything — and most of them do not
+ * take physics. This one needs no subject at all, and it still does the job
+ * the widget exists for: every wrong answer here is a specific, nameable
+ * mistake rather than "not that one", which is the whole argument for
+ * marking against a bank instead of a key.
+ */
 const DEMO = {
-  stem: 'A 2.0 kg mass moves in a circle of radius 0.50 m at a constant speed of 3.0 m/s. Calculate the centripetal force.',
-  heat: 'Hot',
-  points: 1,
+  subject: 'Economics HL · Elasticity and percentage change',
+  stem: 'A shop raises the price of a jacket from $40 to $50. What is the percentage increase?',
+  heat: 'Low',
+  points: 0.5,
   options: [
-    { id: 'a', text: '12 N', why: 'Used v instead of v², so the speed was never squared.' },
-    { id: 'b', text: '18 N', why: 'Used the diameter, 1.0 m, where the formula wants the radius.' },
-    { id: 'c', text: '36 N', why: null },
-    { id: 'd', text: '72 N', why: 'Doubled it. F = mv²/r has no factor of two in it.' },
+    { id: 'a', text: '10%', why: 'That is the rise in dollars, not as a percentage.' },
+    {
+      id: 'b',
+      text: '20%',
+      why: 'Divided by the new price. A percentage change is always over what you started with.',
+    },
+    { id: 'c', text: '25%', why: null },
+    {
+      id: 'd',
+      text: '125%',
+      why: 'That is the new price as a percentage of the old one, not the increase.',
+    },
   ],
   correct: 'c',
-  working: 'F = mv²/r = 2.0 × 3.0² ÷ 0.50 = 36 N',
-  hint: 'Start from F = mv²/r, and check which length the question gives you.',
+  working: '10 ÷ 40 × 100 = 25%',
+  hint: 'Work out the change first, then ask what fraction it is of the price you started with.',
 }
 
 /**
@@ -208,7 +227,7 @@ export function TryQuestion() {
           {DEMO.heat} · {DEMO.points} point
         </span>
         <span className="text-[12px]" style={{ color: 'var(--text-muted)' }}>
-          Physics SL · Circular motion
+          {DEMO.subject}
         </span>
       </div>
 
