@@ -159,8 +159,10 @@ const MODEL = arg("claude-model", "claude-opus-5");
  * console is the authority.
  */
 const PRICES = {
+  // Checked against claude.com/pricing, September 2026. Sonnet had been
+  // sitting here at 3/15 since before it moved.
   "claude-opus-5": { input: 15, output: 75 },
-  "claude-sonnet-5": { input: 3, output: 15 },
+  "claude-sonnet-5": { input: 2, output: 10 },
   "claude-haiku-4-5-20251001": { input: 1, output: 5 },
 };
 
