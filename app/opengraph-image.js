@@ -14,7 +14,7 @@ export default function OpengraphImage() {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          background: '#f8f6f1',
+          background: '#fdfbf3',
           padding: 80,
           fontFamily: 'system-ui, sans-serif',
         }}
@@ -36,7 +36,7 @@ export default function OpengraphImage() {
           >
             P
           </div>
-          <div style={{ fontSize: 28, fontWeight: 600, color: '#1a2e1e' }}>Project Syllabus</div>
+          <div style={{ fontSize: 28, fontWeight: 600, color: '#1d1a13' }}>Project Syllabus</div>
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -44,7 +44,7 @@ export default function OpengraphImage() {
             style={{
               fontSize: 68,
               fontWeight: 700,
-              color: '#1a2e1e',
+              color: '#1d1a13',
               lineHeight: 1.1,
               letterSpacing: -1.5,
               maxWidth: 900,
@@ -52,7 +52,7 @@ export default function OpengraphImage() {
           >
             Know exactly what to study next.
           </div>
-          <div style={{ fontSize: 30, color: '#6b7280', marginTop: 24, maxWidth: 860 }}>
+          <div style={{ fontSize: 30, color: '#635c4a', marginTop: 24, maxWidth: 860 }}>
             Syllabus-mapped progress for IB, A-Level, and AP. Verified by testing, not
             self-rating.
           </div>
@@ -60,14 +60,17 @@ export default function OpengraphImage() {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
           {[
-            ['#2d6a4f', 'Mastered'],
-            ['#f59e0b', 'Decaying'],
-            ['#ef4444', 'Weak'],
-            ['#e5e7eb', 'Untested'],
+            // The status colours, as the app actually renders them. These
+            // were Tailwind defaults and had drifted a long way from the
+            //five-level scale the product uses.
+            ['#7b5cd6', 'Mastered'],
+            ['#5a7fb8', 'Fading'],
+            ['#b5553a', 'Weak'],
+            ['#e8e0cb', 'Untested'],
           ].map(([color, label]) => (
             <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
               <div style={{ width: 14, height: 14, borderRadius: 7, background: color }} />
-              <div style={{ fontSize: 22, color: '#6b7280' }}>{label}</div>
+              <div style={{ fontSize: 22, color: '#635c4a' }}>{label}</div>
             </div>
           ))}
         </div>

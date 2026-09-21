@@ -319,7 +319,10 @@ export default function Dashboard() {
                     ? `${firstSubject}, broken into topics, units and subtopics.`
                     : 'Your subjects, broken into topics and subtopics.',
                 ],
-                ['2', 'Sit a Quick 5', 'Five questions on one subtopic, marked as you answer.'],
+                // Not "five questions": a subtopic with three questions in
+                // the bank gives you three, and promising five and handing
+                // over two is a small lie the student notices immediately.
+                ['2', 'Sit a Quick 5', 'A short set on one subtopic, marked as you answer.'],
                 ['3', 'Watch it colour in', 'Right answers earn points. Points set the level. Nothing else does.'],
               ].map(([n, title, detail]) => (
                 <li key={n} className="flex items-start gap-3">

@@ -9,9 +9,12 @@ const inter = Inter({
 })
 
 export const viewport = {
+  // The browser's own chrome on a phone. It has to be the page colour or the
+  // address bar sits in a different palette from the app under it, and these
+  // cannot read the CSS variables — so when --bg moves, they move.
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#f8f6f1' },
-    { media: '(prefers-color-scheme: dark)', color: '#0f1412' },
+    { media: '(prefers-color-scheme: light)', color: '#fdfbf3' },
+    { media: '(prefers-color-scheme: dark)', color: '#191919' },
   ],
 }
 

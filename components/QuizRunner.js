@@ -513,8 +513,16 @@ export default function QuizRunner({
    * out why is where the learning actually happens, and in exam mode that gap
    * is the whole paper long.
    */
-  const revealOne = (question) => {
-    const given = answersRef.current[question.id]
+  /**
+   * Mark one typed answer.
+   *
+   * `given` can be passed in by the caller. The ref behind it is written
+   * inside a state updater, which React runs when it processes the update
+   * rather than when the keystroke happens — so on Enter it could still be
+   * holding the value from before the last character. Reading straight off
+   * the input removes the race instead of narrowing it.
+   */
+  const revealOne = (question, given = answersRef.current[question.id]) => {
     if (given == null || String(given).trim() === '') return
     const graded = gradeAnswer(question, given)
     setRevealed((prev) => ({ ...prev, [question.id]: graded }))
@@ -1005,9 +1013,11 @@ export default function QuizRunner({
               // Typed answers cannot mark on every keystroke, so they mark on
               // Enter or on leaving the box — still no button to press.
               onKeyDown={(e) => {
-                if (e.key === 'Enter') revealOne(q)
+                if (e.key !== 'Enter') return
+                e.preventDefault()
+                revealOne(q, e.currentTarget.value)
               }}
-              onBlur={() => revealOne(q)}
+              onBlur={(e) => revealOne(q, e.currentTarget.value)}
               disabled={review === 'practice' && !!revealed[q.id]}
               placeholder={q.answer_kind === 'numeric' ? 'e.g. 9.81' : 'Type your answer'}
               className="input mt-2"
