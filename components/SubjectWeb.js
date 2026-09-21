@@ -248,9 +248,11 @@ export default function SubjectWeb({ subject, rows, onPickSubtopic, fill = false
         style={{
           borderColor: 'var(--border-strong)',
           background: 'var(--surface-sunken)',
-          // On its own page the map takes the height it can get, and the
-          // square sits centred in it. Inline it just follows the column.
-          ...(fill ? { height: 'min(72vh, 840px)' } : null),
+          // Square, capped by the window. A fixed 72vh box is right on a
+          // desktop and wrong on a phone, where the map is only as wide as
+          // the screen and the leftover height shows up as two empty bands
+          // above and below it.
+          ...(fill ? { aspectRatio: '1 / 1', maxHeight: 'min(78vh, 840px)' } : null),
         }}
       >
         <svg

@@ -19,7 +19,15 @@ const WIDTHS = {
 
 export function Page({ children, width = 'default' }) {
   return (
-    <div className={`app-enter mx-auto px-5 py-8 md:px-12 md:py-10 ${WIDTHS[width]}`}>{children}</div>
+    // The bottom padding is clearance for the floating buttons. On a desktop
+    // they sit in dead space at the corner of a wide page; on a phone they
+    // are directly over the last row of whatever you were reading, and the
+    // page has to end above them rather than behind them.
+    <div
+      className={`app-enter mx-auto px-5 pt-8 pb-24 md:px-12 md:pt-10 md:pb-16 ${WIDTHS[width]}`}
+    >
+      {children}
+    </div>
   )
 }
 
