@@ -13,7 +13,7 @@
   /* A tint that belongs to the same room as the page. #f0fdf4 is a cool
      mint; against a warm ground the hero card and the page were visibly
      different temperatures and the card looked stuck on. */
-  --brand-tint: #eef3e9;     /* selected rows, active nav background */
+  --brand-tint: #eef2e2;     /* selected rows, active nav background */
   --sand: #e8d5b0;           /* accent badges only, never alongside brand */
 
   /* --- Ground, surfaces, ink. -----------------------------------------------
@@ -45,18 +45,18 @@
      up at paper-white and lets a few points of warmth do the work, so it
      reads as good stationery rather than as a cream background. Every value
      below holds a hint of yellow rather than a wash of it. */
-  --bg: #fdfcf8;             /* page canvas — the brightest thing */
-  --surface: #f7f4ed;        /* cards, set into the page */
-  --surface-sunken: #f1ede3; /* table headers, inset panels */
+  --bg: #fdfbf3;             /* page canvas — the brightest thing */
+  --surface: #f8f2e5;        /* cards, set into the page */
+  --surface-sunken: #f2ead8; /* table headers, inset panels */
 
-  --text: #1a1917;           /* headings */
-  --text-body: #403e39;      /* body copy */
-  --text-muted: #5f5c54;     /* supporting copy — measured in contrast-test.mjs */
-  --text-faint: #5f5c54;     /* labels, metadata */
+  --text: #1d1a13;           /* headings */
+  --text-body: #443f33;      /* body copy */
+  --text-muted: #635c4a;     /* supporting copy — measured in contrast-test.mjs */
+  --text-faint: #635c4a;     /* labels, metadata */
 
-  --border: #eae6da;         /* card edges */
-  --border-strong: #dcd7c8;  /* inputs, controls */
-  --border-hover: #c7c1ae;
+  --border: #ece3cd;         /* card edges */
+  --border-strong: #ded2b6;  /* inputs, controls */
+  --border-hover: #c8b993;
 
   /* --- Status. Five levels of knowledge, plus untested. --------------------
      Rebuilt in OKLCH, where equal numbers look equally light to the eye. These
@@ -77,7 +77,7 @@
   --status-developing: oklch(0.62 0.14 78);  /* getting there */
   --status-proficient: oklch(0.56 0.13 158);  /* reliable */
   --status-mastered: oklch(0.52 0.11 285);    /* solid and recent */
-  --status-untested: #e6e2d6;
+  --status-untested: #e8e0cb;
 
   /* Declared explicitly, because the dark block declares its own.
      Without this the browser keeps its dark UA defaults whenever the operating
