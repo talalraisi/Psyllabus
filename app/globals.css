@@ -13,7 +13,7 @@
   /* A tint that belongs to the same room as the page. #f0fdf4 is a cool
      mint; against a warm ground the hero card and the page were visibly
      different temperatures and the card looked stuck on. */
-  --brand-tint: #eef4f0;     /* selected rows, active nav background */
+  --brand-tint: #eef3e9;     /* selected rows, active nav background */
   --sand: #e8d5b0;           /* accent badges only, never alongside brand */
 
   /* --- Ground, surfaces, ink. -----------------------------------------------
@@ -38,18 +38,25 @@
      Neutral, and neutral all the way. No green in the greys: the accent is
      the only green on a screen, and a page tinted toward the brand steals
      that job and looks washed. */
-  --bg: #ffffff;             /* page canvas — the brightest thing */
-  --surface: #f7f7f6;        /* cards, set into the page */
-  --surface-sunken: #f0f0ee; /* table headers, inset panels */
+  /* Warm, and only just.
 
-  --text: #17191a;           /* headings */
-  --text-body: #3d4042;      /* body copy */
-  --text-muted: #5c6063;     /* supporting copy — measured in contrast-test.mjs */
-  --text-faint: #5c6063;     /* labels, metadata */
+     Pure white is clinical and the earlier beige was sepia — the difference
+     between the two is not really the hue, it is the brightness. This stays
+     up at paper-white and lets a few points of warmth do the work, so it
+     reads as good stationery rather than as a cream background. Every value
+     below holds a hint of yellow rather than a wash of it. */
+  --bg: #fdfcf8;             /* page canvas — the brightest thing */
+  --surface: #f7f4ed;        /* cards, set into the page */
+  --surface-sunken: #f1ede3; /* table headers, inset panels */
 
-  --border: #e8e8e6;         /* card edges */
-  --border-strong: #dadad7;  /* inputs, controls */
-  --border-hover: #c5c5c1;
+  --text: #1a1917;           /* headings */
+  --text-body: #403e39;      /* body copy */
+  --text-muted: #5f5c54;     /* supporting copy — measured in contrast-test.mjs */
+  --text-faint: #5f5c54;     /* labels, metadata */
+
+  --border: #eae6da;         /* card edges */
+  --border-strong: #dcd7c8;  /* inputs, controls */
+  --border-hover: #c7c1ae;
 
   /* --- Status. Five levels of knowledge, plus untested. --------------------
      Rebuilt in OKLCH, where equal numbers look equally light to the eye. These
@@ -70,7 +77,7 @@
   --status-developing: oklch(0.62 0.14 78);  /* getting there */
   --status-proficient: oklch(0.56 0.13 158);  /* reliable */
   --status-mastered: oklch(0.52 0.11 285);    /* solid and recent */
-  --status-untested: #e4e4e1;
+  --status-untested: #e6e2d6;
 
   /* Declared explicitly, because the dark block declares its own.
      Without this the browser keeps its dark UA defaults whenever the operating
@@ -101,7 +108,10 @@
   --status-decaying: var(--status-fading);
   --status-shaky: var(--status-developing);
 
-  --danger: #dc2626;
+  /* Darkened a step when the page warmed: #dc2626 fell to 4.40:1 against the
+     new card colour, and an error message is the last thing that should be
+     hard to read. */
+  --danger: #c81e1e;
   --danger-bg: #fef2f2;
   --danger-border: #fecaca;
   --warning-text: #d97706;
