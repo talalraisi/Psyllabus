@@ -85,6 +85,16 @@ export default function MistakeBankPage() {
   // contents the first time you arrive.
   const [openBuckets, setOpenBuckets] = useState({})
   const [mistakes, setMistakes] = useState([])
+  /**
+   * The clock, read once when the data arrives rather than on every render.
+   *
+   * `Date.now()` in the body of a component is a different answer each time
+   * it runs, which is the definition of an impure render: the server and the
+   * browser disagree about which reviews are due, and React calls that a
+   * hydration mismatch. Read alongside the rows it is used to filter, so
+   * "due" means due as of the moment this page loaded.
+   */
+  const [loadedAt, setLoadedAt] = useState(null)
   const [loading, setLoading] = useState(true)
 
   // The top bar runs for as long as this page is fetching, not just while the
@@ -121,6 +131,7 @@ export default function MistakeBankPage() {
         .order('next_review_at', { ascending: true })
 
       setMistakes((rows || []).filter((r) => r.questions))
+      setLoadedAt(Date.now())
       setLoading(false)
     }
     loadData()
@@ -134,7 +145,7 @@ export default function MistakeBankPage() {
     )
   }
 
-  const now = Date.now()
+  const now = loadedAt ?? 0
   const due = mistakes.filter((m) => new Date(m.next_review_at).getTime() <= now)
 
   const bySubject = mistakes.reduce((acc, m) => {
