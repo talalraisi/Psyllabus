@@ -438,6 +438,61 @@ export default function QuizRunner({
     }
   }, [phase])
 
+  /**
+   * The quiz, from the keyboard.
+   *
+   * A student sits dozens of these in a session and every one was a mouse
+   * journey: read, reach, click an option, reach again, click Next. Anyone
+   * who has used a revision tool for an hour expects to answer with the
+   * number keys and move on with Enter, and the flashcard review already
+   * works that way — this is the screen where it matters more.
+   *
+   * Nothing fires while the answer box has focus, because there the digits
+   * are the answer.
+   */
+  useEffect(() => {
+    if (phase !== PHASE.quiz) return
+    const onKey = (e) => {
+      const el = document.activeElement
+      const typing =
+        el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)
+      if (e.metaKey || e.ctrlKey || e.altKey) return
+
+      const q = questions[currentIndex]
+      if (!q) return
+      const given = answersRef.current[q.id]
+      const answered = given != null && String(given).trim() !== ''
+      const last = currentIndex === questions.length - 1
+
+      if (!typing && q.options?.length) {
+        // 1-4 and a-d both, because both are what people reach for.
+        const byNumber = /^[1-9]$/.test(e.key) ? Number(e.key) - 1 : -1
+        const byLetter = /^[a-z]$/i.test(e.key) ? e.key.toLowerCase().charCodeAt(0) - 97 : -1
+        const idx = byNumber >= 0 ? byNumber : byLetter
+        const opt = idx >= 0 ? q.options[idx] : null
+        if (opt) {
+          e.preventDefault()
+          selectAnswer(q.id, opt.id, { mark: true })
+          return
+        }
+      }
+
+      if (e.key === 'ArrowRight' || (e.key === 'Enter' && !typing)) {
+        if (!answered) return
+        e.preventDefault()
+        if (last) finishQuiz()
+        else goTo(currentIndex + 1)
+        return
+      }
+      if (e.key === 'ArrowLeft' && !typing && currentIndex > 0) {
+        e.preventDefault()
+        goTo(currentIndex - 1)
+      }
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  })
+
   const startQuiz = () => {
     questionTimesRef.current = {}
     lastSwitchRef.current = Date.now()
@@ -1157,6 +1212,15 @@ export default function QuizRunner({
             Back
           </button>
           <div className="flex-1" />
+          {/* Said once, quietly, on the desktop where the keys exist. A
+              shortcut nobody is told about is a shortcut nobody uses. */}
+          <p
+            className="hidden text-[11.5px] md:block"
+            style={{ color: 'var(--text-faint)' }}
+          >
+            {q.options?.length ? '1–4 to answer · ' : ''}
+            Enter for next
+          </p>
           {currentIndex < questions.length - 1 ? (
             <button
               onClick={() => goTo(currentIndex + 1)}
