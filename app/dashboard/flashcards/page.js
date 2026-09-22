@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
+import MathText from '@/components/MathText'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
@@ -416,8 +417,8 @@ export default function FlashcardsPage() {
                 >
                   <div className="flex items-start gap-4 px-1 py-3.5">
                     <div className="min-w-0 flex-1">
-                      <p className="text-[14.5px] font-medium">{c.front}</p>
-                      <p className="mt-1 line-clamp-2 text-[13.5px]" style={{ color: 'var(--text-muted)' }}>{c.back}</p>
+                      <p className="text-[14.5px] font-medium"><MathText>{c.front}</MathText></p>
+                      <p className="mt-1 line-clamp-2 text-[13.5px]" style={{ color: 'var(--text-muted)' }}><MathText>{c.back}</MathText></p>
                       <p className="t-caption mt-2">
                         {c.subtopic ? `${displaySubtopic(c.subtopic)} · ` : ''}
                         <span className={isDue(c) ? 'text-[var(--brand)]' : ''}>{dueLabel(c)}</span>

@@ -1104,7 +1104,11 @@ ${angles}
 Requirements:
 - Mix of difficulties: about 30% easy (recall or one step), 45% medium (two steps), 25% hard (multi-step, exam standard).
 - marks: 1 for one step, 2 for two steps, 3 for multi-step. time_budget_seconds: roughly 45s per mark.
-- Plain text maths only (x^2, 3/4, sqrt(x)); never LaTeX.
+- Maths notation: write powers and indices plainly (x^2, v_1, m s^-1, CO_2) — these
+  are set as real superscripts by the app. For anything plain text cannot say
+  honestly, wrap LaTeX in single dollars: $\\frac{dy}{dx}$, $\\sqrt{2}$, $\\theta$,
+  $\\int$, $\\Delta$, $\\leq$. Never put a currency amount inside dollars — write
+  "costs $40" as ordinary text, never $40$.
 - Work the problem out before writing the answer, and make the explanation show the key step.
 - Vary the surface: different quantities, contexts and phrasings, not the same sentence with new numbers.
 

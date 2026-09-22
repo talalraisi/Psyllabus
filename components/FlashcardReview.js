@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import MathText from '@/components/MathText'
 import { IconCheck, IconClose, IconArrowLeft, IconArrowRight } from '@/components/Icons'
 import { displaySubtopic } from '@/lib/progress'
 
@@ -138,7 +139,7 @@ export default function FlashcardReview({ cards, onMark, onExit, stats }) {
               </p>
               <div className="flex flex-1 items-center">
                 <p className="whitespace-pre-wrap text-2xl leading-relaxed text-[var(--text)] md:text-3xl">
-                  {card.front}
+                  <MathText>{card.front}</MathText>
                 </p>
               </div>
               <p className="t-caption mt-4">Tap the card, or press space, to turn it over</p>
@@ -149,7 +150,7 @@ export default function FlashcardReview({ cards, onMark, onExit, stats }) {
               <p className="t-overline mb-4">Answer</p>
               <div className="flex flex-1 items-center">
                 <p className="whitespace-pre-wrap text-xl leading-relaxed text-[var(--text-body)] md:text-2xl">
-                  {card.back}
+                  <MathText>{card.back}</MathText>
                 </p>
               </div>
             </div>

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import CopyButton from '@/components/CopyButton'
 import QuestionMenu from '@/components/QuestionMenu'
+import MathText from '@/components/MathText'
 import Calculator from '@/components/Calculator'
 import MarkScheme from '@/components/MarkScheme'
 import CountUp from '@/components/CountUp'
@@ -990,7 +991,9 @@ export default function QuizRunner({
                 Redemption · you got this one wrong before
               </p>
             )}
-            <p className="text-[17px] font-medium leading-relaxed">{q.stem}</p>
+            <p className="text-[17px] font-medium leading-relaxed">
+              <MathText>{q.stem}</MathText>
+            </p>
           </div>
           <QuestionMenu question={q} />
         </div>
@@ -1077,7 +1080,9 @@ export default function QuizRunner({
                       opt.id
                     )}
                   </span>
-                  <span className="flex-1">{opt.text}</span>
+                  <span className="flex-1">
+                    <MathText>{opt.text}</MathText>
+                  </span>
                 </button>
               )
             })}
@@ -1092,7 +1097,7 @@ export default function QuizRunner({
             {hintsShown[q.id] ? (
               <p className="text-[13.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
                 <span className="font-semibold">Hint. </span>
-                {q.hint}
+                <MathText>{q.hint}</MathText>
               </p>
             ) : (
               <button
@@ -1133,7 +1138,7 @@ export default function QuizRunner({
             )}
             {q.explanation && (
               <p className="mt-1.5 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                {q.explanation}
+                <MathText>{q.explanation}</MathText>
               </p>
             )}
             <MarkScheme question={q} />
@@ -1261,7 +1266,7 @@ export default function QuizRunner({
               className={`text-[14.5px] leading-relaxed ${expanded ? '' : 'truncate'}`}
               style={{ color: expanded ? 'var(--text)' : 'var(--text-muted)' }}
             >
-              {g.question.stem}
+              <MathText>{g.question.stem}</MathText>
             </p>
 
             {expanded && (
@@ -1282,7 +1287,7 @@ export default function QuizRunner({
                     className="mt-2 text-[13.5px] leading-relaxed"
                     style={{ color: 'var(--text-muted)' }}
                   >
-                    {g.question.explanation}
+                    <MathText>{g.question.explanation}</MathText>
                   </p>
                 )}
                 <MarkScheme question={g.question} />

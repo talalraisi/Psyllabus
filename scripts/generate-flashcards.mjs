@@ -359,7 +359,11 @@ Rules:
 - Only this subtopic. Not the topic around it, not the subject in general.
 - No card that depends on a diagram, a graph, or a specific textbook.
 - Definitions, conditions, formulas, units, causes, consequences and common misconceptions all make good cards. Fifteen cards all starting "What is" do not.
-- The back must be checkable: a specific answer rather than a discussion.`,
+- The back must be checkable: a specific answer rather than a discussion.
+- Maths notation: powers and indices plainly (x^2, v_1, CO_2), which the app sets
+  as real superscripts. Wrap LaTeX in single dollars only for what plain text
+  cannot say: $\\frac{a}{b}$, $\\sqrt{x}$, $\\theta$, $\\Delta$. Never put a currency
+  amount inside dollars.`,
         CARDS_SCHEMA,
         0.4
       );
