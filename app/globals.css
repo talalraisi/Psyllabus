@@ -917,6 +917,46 @@ body {
   border-top: 1px solid currentColor;
 }
 
+/* A card answering back.
+
+   Getting one right and getting one wrong were the same event on screen: a
+   colour changed somewhere. These are the two moments the mode exists for, so
+   they are the two moments worth spending motion on — a short lift for right,
+   a shake for wrong, both over in under half a second because they happen
+   dozens of times a session and anything longer becomes a wait. */
+@keyframes card-right {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.025); }
+  100% { transform: scale(1); }
+}
+.card-right { animation: card-right 420ms cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+
+@keyframes card-wrong {
+  0%, 100% { transform: translateX(0); }
+  15%      { transform: translateX(-7px); }
+  35%      { transform: translateX(6px); }
+  55%      { transform: translateX(-4px); }
+  75%      { transform: translateX(2px); }
+}
+.card-wrong { animation: card-wrong 420ms cubic-bezier(0.36, 0.07, 0.19, 0.97) backwards; }
+
+/* The verdict arriving under it. */
+@keyframes verdict-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+.verdict-in { animation: verdict-in 280ms cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+
+/* A sheet of paper, which is what a flashcard is pretending to be. Used by
+   every mode so that writing an answer and flipping a card happen on the
+   same object rather than on a card and then on a form. */
+.flashcard {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 18px;
+  box-shadow: var(--shadow-raised);
+}
+
 /* A button that answers the press. */
 .press { transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1); }
 .press:active { transform: scale(0.97); }
@@ -974,6 +1014,9 @@ body {
   .bob,
   .bob-slow,
   .fade-breathe,
+  .card-right,
+  .card-wrong,
+  .verdict-in,
   .step-enter,
   .ground::before { animation: none; }
   .press:active { transform: none; }

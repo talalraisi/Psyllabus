@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import MathText from '@/components/MathText'
 import { IconCheck, IconClose, IconArrowLeft, IconArrowRight } from '@/components/Icons'
 import { displaySubtopic } from '@/lib/progress'
+import { SNOOZE_CHOICES } from '@/lib/flashcards'
+import CardMenu from '@/components/CardMenu'
 
 /**
  * Full-screen flashcard review.
@@ -16,20 +18,23 @@ import { displaySubtopic } from '@/lib/progress'
  * Keyboard throughout, since this is the one screen somebody will sit on for
  * twenty minutes: space or up to flip, arrows to move, 1 and 2 to mark.
  */
-export default function FlashcardReview({ cards, onMark, onExit, stats }) {
+export default function FlashcardReview({ cards, onMark, onSnooze, onEdit, onDelete, onExit, stats }) {
   const [index, setIndex] = useState(0)
   const [flipped, setFlipped] = useState(false)
+  // A missed card waits here until it is told when to come back.
+  const [missed, setMissed] = useState(null)
+  const [queue, setQueue] = useState(cards)
   const [direction, setDirection] = useState('next')
   const containerRef = useRef(null)
 
-  const card = cards[index]
+  const card = queue[index]
   const atStart = index === 0
-  const atEnd = index >= cards.length - 1
+  const atEnd = index >= queue.length - 1
 
   const go = useCallback(
     (delta) => {
       setIndex((i) => {
-        const next = Math.min(cards.length - 1, Math.max(0, i + delta))
+        const next = Math.min(queue.length - 1, Math.max(0, i + delta))
         if (next !== i) {
           setDirection(delta > 0 ? 'next' : 'prev')
           setFlipped(false)
@@ -37,29 +42,55 @@ export default function FlashcardReview({ cards, onMark, onExit, stats }) {
         return next
       })
     },
-    [cards.length]
+    [queue.length]
   )
+
+  const advance = useCallback(() => {
+    if (!atEnd) {
+      setDirection('next')
+      setFlipped(false)
+      setIndex((i) => i + 1)
+    } else {
+      onExit({ finished: true })
+    }
+  }, [atEnd, onExit])
 
   const mark = useCallback(
     (correct) => {
       if (!card) return
       onMark(card, correct)
-      // Marking is also a decision to move on, which is what makes the session
-      // flow without a separate "next" press on every card.
-      if (!atEnd) {
-        setDirection('next')
-        setFlipped(false)
-        setIndex((i) => i + 1)
-      } else {
-        onExit({ finished: true })
-      }
+      // Getting it right is also a decision to move on, which is what makes
+      // the session flow without a separate "next" press on every card.
+      // Getting it wrong stops to ask when it should come back.
+      if (correct) advance()
+      else setMissed(card)
     },
-    [card, atEnd, onMark, onExit]
+    [card, onMark, advance]
+  )
+
+  /** A missed card chooses its own interval; short ones rejoin the queue. */
+  const snooze = useCallback(
+    (minutes) => {
+      onSnooze?.(missed, minutes)
+      if (minutes <= 10 && missed) setQueue((q) => [...q, missed])
+      setMissed(null)
+      advance()
+    },
+    [missed, onSnooze, advance]
   )
 
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === 'Escape') return onExit({ finished: false })
+      if (missed) {
+        // Waiting on "when should this come back?" — 1 to 4 answer it.
+        const n = Number(e.key)
+        if (n >= 1 && n <= SNOOZE_CHOICES.length) {
+          e.preventDefault()
+          snooze(SNOOZE_CHOICES[n - 1].minutes)
+        }
+        return
+      }
       if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'ArrowDown') {
         e.preventDefault()
         return setFlipped((f) => !f)
@@ -71,7 +102,7 @@ export default function FlashcardReview({ cards, onMark, onExit, stats }) {
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [go, mark, flipped, onExit])
+  }, [go, mark, flipped, onExit, missed, snooze])
 
   // Keep the page behind from scrolling under the overlay.
   useEffect(() => {
@@ -127,16 +158,21 @@ export default function FlashcardReview({ cards, onMark, onExit, stats }) {
             key={card.id}
             onClick={() => setFlipped((f) => !f)}
             className={`card-flip ${flipped ? 'is-flipped' : ''} ${
-              direction === 'next' ? 'card-enter-next' : 'card-enter-prev'
+              missed ? 'card-wrong' : direction === 'next' ? 'card-enter-next' : 'card-enter-prev'
             } cursor-pointer`}
             style={{ height: 'min(72vh, 640px)' }}
           >
             {/* Front */}
             <div className="card-face surface p-7 md:p-12">
-              <p className="t-caption mb-4">
-                {card.subject}
-                {card.subtopic ? ` · ${displaySubtopic(card.subtopic)}` : ''}
-              </p>
+              <div className="mb-4 flex items-start justify-between gap-3">
+                <p className="t-caption">
+                  {card.subject}
+                  {card.subtopic ? ` · ${displaySubtopic(card.subtopic)}` : ''}
+                </p>
+                <div onClick={(e) => e.stopPropagation()}>
+                  <CardMenu card={card} onEdit={onEdit} onDelete={onDelete} />
+                </div>
+              </div>
               <div className="flex flex-1 items-center">
                 <p className="whitespace-pre-wrap text-2xl leading-relaxed text-[var(--text)] md:text-3xl">
                   <MathText>{card.front}</MathText>
@@ -170,7 +206,25 @@ export default function FlashcardReview({ cards, onMark, onExit, stats }) {
             <IconArrowLeft width={18} height={18} />
           </button>
 
-          {flipped ? (
+          {missed ? (
+            <div className="verdict-in flex flex-1 flex-wrap items-center gap-2">
+              <span className="text-[12.5px]" style={{ color: 'var(--text-body)' }}>
+                Come back
+              </span>
+              {SNOOZE_CHOICES.map((c, i) => (
+                <button
+                  key={c.minutes}
+                  onClick={() => snooze(c.minutes)}
+                  className="btn btn-outline control-md"
+                >
+                  {c.label}
+                  <span className="ml-1 text-[10.5px]" style={{ color: 'var(--text-faint)' }}>
+                    {i + 1}
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : flipped ? (
             <>
               <button
                 onClick={() => mark(false)}
@@ -201,7 +255,9 @@ export default function FlashcardReview({ cards, onMark, onExit, stats }) {
         </div>
 
         <p className="t-caption mt-3 hidden text-center md:block">
-          Space to flip · arrows to move · 1 missed, 2 got it · Esc to leave
+          {missed
+            ? 'Press 1 to 4 to choose when it comes back'
+            : 'Space to flip · arrows to move · 1 missed, 2 got it · Esc to leave'}
         </p>
       </div>
     </div>

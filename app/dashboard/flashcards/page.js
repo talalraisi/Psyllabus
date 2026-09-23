@@ -13,10 +13,11 @@ import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { IconClose, IconArrowRight, IconArrowLeft, IconCards } from '@/components/Icons'
 import { displaySubtopic } from '@/lib/progress'
 import { accessibleSubjects, canUse } from '@/lib/access'
-import { scheduleAfter, isDue, dueLabel } from '@/lib/flashcards'
+import { scheduleAfter, snoozeAfter, isDue, dueLabel } from '@/lib/flashcards'
 import FlashcardReview from '@/components/FlashcardReview'
 import FlashcardWrite from '@/components/FlashcardWrite'
 import FlashcardTest from '@/components/FlashcardTest'
+import StudyMenu from '@/components/StudyMenu'
 import NoteImport from '@/components/NoteImport'
 import LockedPanel from '@/components/LockedPanel'
 
@@ -297,6 +298,21 @@ export default function FlashcardsPage() {
     setDraft((d) => ({ ...d, front: '', back: '' }))
   }
 
+  /**
+   * "Ask me again in five minutes."
+   *
+   * Only the due date moves. The box is what `scheduleAfter` already decided
+   * and it is about the weeks after this session; this is about the next ten
+   * minutes, and conflating the two would undo the spacing every time a card
+   * was missed.
+   */
+  const snoozeCard = async (card, minutes) => {
+    if (!card?.id || card.preset) return
+    const patch = snoozeAfter(card, minutes)
+    setCards((prev) => prev.map((c) => (c.id === card.id ? { ...c, ...patch } : c)))
+    await supabase.from('flashcards').update(patch).eq('id', card.id)
+  }
+
   const deleteCard = async (card) => {
     setCards((prev) => prev.filter((c) => c.id !== card.id))
     const { error: err } = await supabase.from('flashcards').delete().eq('id', card.id)
@@ -342,6 +358,8 @@ export default function FlashcardsPage() {
             cards={reviewing.cards}
             stats={sessionStats}
             onMark={markCard}
+            onSnooze={snoozeCard}
+            onDelete={deleteCard}
             onExit={() => setReviewing(null)}
           />
         ) : reviewing.mode === 'test' ? (
@@ -355,6 +373,8 @@ export default function FlashcardsPage() {
             cards={reviewing.cards}
             mode={reviewing.mode}
             onMark={markCard}
+            onSnooze={snoozeCard}
+            onDelete={deleteCard}
             onExit={() => setReviewing(null)}
           />
         )}
@@ -388,40 +408,18 @@ export default function FlashcardsPage() {
               }`}
               action={
                 inScope.length > 0 ? (
-                  <div className="flex flex-wrap items-center gap-2">
-                    {dueInScope.length > 0 ? (
-                      <button onClick={() => review(dueInScope)} className="btn btn-solid control-md">
-                        Review {dueInScope.length}
-                        <IconArrowRight width={16} height={16} />
-                      </button>
-                    ) : (
-                      <button onClick={() => review(inScope, true)} className="btn btn-outline control-md">
-                        Flip through {inScope.length}
-                      </button>
-                    )}
-                    {/* The two modes that ask for recall rather than
-                        recognition. Named for what they make you do. */}
-                    <button
-                      onClick={() => review(dueInScope.length ? dueInScope : inScope, !dueInScope.length, 'write')}
-                      className="btn btn-outline control-md"
-                    >
-                      Write it
-                    </button>
-                    <button
-                      onClick={() => review(dueInScope.length ? dueInScope : inScope, !dueInScope.length, 'blank')}
-                      className="btn btn-outline control-md"
-                    >
-                      Fill the blank
-                    </button>
-                    {inScope.length >= 4 && (
-                      <button
-                        onClick={() => review(inScope, true, 'test')}
-                        className="btn btn-outline control-md"
-                      >
-                        Test me
-                      </button>
-                    )}
-                  </div>
+                  <StudyMenu
+                    count={inScope.length}
+                    primary={dueInScope.length ? 'flip' : 'write'}
+                    label={dueInScope.length ? `Review ${dueInScope.length}` : `Study ${inScope.length}`}
+                    onStart={(mode) =>
+                      review(
+                        dueInScope.length && mode === 'flip' ? dueInScope : inScope,
+                        !dueInScope.length || mode !== 'flip',
+                        mode
+                      )
+                    }
+                  />
                 ) : null
               }
             />
