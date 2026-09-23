@@ -15,6 +15,8 @@ import { displaySubtopic } from '@/lib/progress'
 import { accessibleSubjects, canUse } from '@/lib/access'
 import { scheduleAfter, isDue, dueLabel } from '@/lib/flashcards'
 import FlashcardReview from '@/components/FlashcardReview'
+import FlashcardWrite from '@/components/FlashcardWrite'
+import FlashcardTest from '@/components/FlashcardTest'
 import NoteImport from '@/components/NoteImport'
 import LockedPanel from '@/components/LockedPanel'
 
@@ -209,10 +211,17 @@ export default function FlashcardsPage() {
 
   /* ----------------------------------------------------------------- review */
 
-  const review = (pool, cramming = false) => {
+  /**
+   * Start a session in one of the modes.
+   *
+   * Flip is the old behaviour and stays the default: it is the right thing
+   * for a card you have never seen. Write and blank are for a deck you think
+   * you know, which is where flipping stops telling you anything true.
+   */
+  const review = (pool, cramming = false, mode = 'flip') => {
     if (!pool.length) return
     setSessionStats({ right: 0, wrong: 0 })
-    setReviewing({ cards: [...pool].sort(() => Math.random() - 0.5), cramming })
+    setReviewing({ cards: [...pool].sort(() => Math.random() - 0.5), cramming, mode })
   }
 
   const markCard = async (card, correct) => {
@@ -328,12 +337,27 @@ export default function FlashcardsPage() {
   if (reviewing) {
     return (
       <DashboardLayout profile={profile}>
-        <FlashcardReview
-          cards={reviewing.cards}
-          stats={sessionStats}
-          onMark={markCard}
-          onExit={() => setReviewing(null)}
-        />
+        {reviewing.mode === 'flip' ? (
+          <FlashcardReview
+            cards={reviewing.cards}
+            stats={sessionStats}
+            onMark={markCard}
+            onExit={() => setReviewing(null)}
+          />
+        ) : reviewing.mode === 'test' ? (
+          <FlashcardTest
+            cards={reviewing.cards}
+            onMark={markCard}
+            onExit={() => setReviewing(null)}
+          />
+        ) : (
+          <FlashcardWrite
+            cards={reviewing.cards}
+            mode={reviewing.mode}
+            onMark={markCard}
+            onExit={() => setReviewing(null)}
+          />
+        )}
       </DashboardLayout>
     )
   }
@@ -363,15 +387,41 @@ export default function FlashcardsPage() {
                 dueInScope.length ? ` · ${dueInScope.length} due now` : ' · nothing due yet'
               }`}
               action={
-                dueInScope.length > 0 ? (
-                  <button onClick={() => review(dueInScope)} className="btn btn-solid control-md">
-                    Review {dueInScope.length}
-                    <IconArrowRight width={16} height={16} />
-                  </button>
-                ) : inScope.length > 0 ? (
-                  <button onClick={() => review(inScope, true)} className="btn btn-outline control-md">
-                    Practise all {inScope.length}
-                  </button>
+                inScope.length > 0 ? (
+                  <div className="flex flex-wrap items-center gap-2">
+                    {dueInScope.length > 0 ? (
+                      <button onClick={() => review(dueInScope)} className="btn btn-solid control-md">
+                        Review {dueInScope.length}
+                        <IconArrowRight width={16} height={16} />
+                      </button>
+                    ) : (
+                      <button onClick={() => review(inScope, true)} className="btn btn-outline control-md">
+                        Flip through {inScope.length}
+                      </button>
+                    )}
+                    {/* The two modes that ask for recall rather than
+                        recognition. Named for what they make you do. */}
+                    <button
+                      onClick={() => review(dueInScope.length ? dueInScope : inScope, !dueInScope.length, 'write')}
+                      className="btn btn-outline control-md"
+                    >
+                      Write it
+                    </button>
+                    <button
+                      onClick={() => review(dueInScope.length ? dueInScope : inScope, !dueInScope.length, 'blank')}
+                      className="btn btn-outline control-md"
+                    >
+                      Fill the blank
+                    </button>
+                    {inScope.length >= 4 && (
+                      <button
+                        onClick={() => review(inScope, true, 'test')}
+                        className="btn btn-outline control-md"
+                      >
+                        Test me
+                      </button>
+                    )}
+                  </div>
                 ) : null
               }
             />
