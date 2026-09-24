@@ -346,6 +346,16 @@ export default async function Home() {
 
           <FeatureModules />
 
+          {/* Eight slides is enough to decide whether to keep reading and not
+              enough to decide whether to sign up. The long version is its own
+              page rather than another twenty screens of this one. */}
+          <div className="mt-14 flex justify-center">
+            <Link href="/features" className="btn btn-outline control-lg">
+              Learn more about every feature
+              <IconArrowRight width={16} height={16} />
+            </Link>
+          </div>
+
         </Section>
 
         {/* ---------------------------------------------------- why it works */}

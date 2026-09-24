@@ -991,6 +991,15 @@ body {
    is read as a state. It sits on a pseudo-element so the text never moves —
    `text-decoration` on hover shifts the baseline by a pixel and the whole bar
    twitches as you run along it. */
+/* The bar's words, dropped onto the wordmark.
+
+   The logo is a graduation cap sitting above and left of "PSYLLABUS", so the
+   vertical middle of the image file is up in the empty space beside the cap
+   rather than on the lettering. Anything centred against the image is
+   therefore centred against nothing, and reads as floating above the name.
+   Four pixels puts the words on the word. */
+.nav-drop { transform: translateY(4px); }
+
 .nav-word {
   position: relative;
   /* Symmetric, not bottom-only.

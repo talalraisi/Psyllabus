@@ -611,8 +611,14 @@ function Stage({ items }) {
         )}
       </div>
 
-      {/* One pill per feature, the one you are on stretched out. It is the
-          position and the control at once, and it counts without a counter. */}
+      {/* One pill per feature, the one you are on stretched out and filling.
+
+          Stretched alone, it said which of the eight you were on and nothing
+          about when it would move, so the slideshow looked static right up
+          until it jumped. The fill runs the length of the wait, which is the
+          one thing a reader wants to know: whether to keep reading this or
+          wait for the next. It is linear because it is a clock, and it holds
+          wherever it is if you put the keyboard into the stage. */}
       <div className="mt-9 flex items-center justify-center gap-4">
         {items.length > 1 && (
           <Step onClick={() => go(-1)} label="Previous feature" back className="md:hidden" />
@@ -624,12 +630,22 @@ function Stage({ items }) {
               onClick={() => setAt(i)}
               aria-label={`Show ${slide.title}`}
               aria-current={i === at}
-              className="h-1.5 rounded-full transition-all duration-500"
-              style={{
-                width: i === at ? 30 : 6,
-                background: i === at ? 'var(--brand)' : 'var(--border-strong)',
-              }}
-            />
+              className="h-1.5 overflow-hidden rounded-full transition-all duration-500"
+              style={{ width: i === at ? 34 : 6, background: 'var(--border-strong)' }}
+            >
+              <span
+                className="block h-full w-full rounded-full"
+                style={{
+                  background: 'var(--brand)',
+                  transformOrigin: 'left',
+                  transform: i === at ? 'scaleX(1)' : 'scaleX(0)',
+                  transition:
+                    i === at && seen && !paused && !reduced
+                      ? `transform ${SLIDE_MS}ms linear`
+                      : 'transform 220ms ease',
+                }}
+              />
+            </button>
           ))}
         </div>
         {items.length > 1 && <Step onClick={() => go(1)} label="Next feature" className="md:hidden" />}

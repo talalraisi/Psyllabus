@@ -109,3 +109,107 @@ export const ANSWERS = [
     us: 'One subject free with no time limit. One price for the rest. If your school has a code, all of it is free.',
   },
 ]
+
+/**
+ * Each feature, at length.
+ *
+ * The front page shows eight of these one slide at a time, which is the right
+ * amount to decide whether to keep reading and the wrong amount to decide
+ * whether to sign up. Somebody who followed "Learn more" has already decided
+ * they are interested; what they want then is how the thing actually works,
+ * and — the part most product pages leave out — where it stops.
+ *
+ * So every entry carries three things: what it is, the mechanism in enough
+ * detail to argue with, and the limit. The limits are real. A page that lists
+ * only capabilities is a page you cannot trust about capabilities.
+ */
+export const FEATURE_DETAIL = [
+  {
+    label: 'The map',
+    title: 'A heatmap you cannot fake',
+    lede: 'Every subtopic of your course, coloured by what you proved.',
+    how: [
+      'Pick your subjects and the full official outline appears, broken into topics and subtopics. Nothing is coloured at first, because untested is not a level — it is the absence of one, and it stays grey to say so.',
+      'Each subtopic sits at one of five levels: Weak, Developing, Proficient, Mastered, or Fading. The level is a function of how many questions you got right on that subtopic and how hard they were, so an easy run cannot carry you to the top.',
+      'There is no confidence slider anywhere in this product. Asking students to rate themselves produces a map of their mood, and the students furthest from understanding a topic are the ones most likely to overrate it.',
+    ],
+    limit: 'A subtopic you have never been tested on is grey, not green. The map will not flatter you by assuming the parts you skipped are fine.',
+  },
+  {
+    label: 'Decay',
+    title: 'Topics that fade on their own',
+    lede: 'Prove something, leave it, and it quietly goes back on the list.',
+    how: [
+      'Anything you proved starts fading after about two weeks untouched, and drops back into your plan for a short retest rather than a full one.',
+      'Fading is its own level with its own colour, so you can tell the difference between a topic you never learned and a topic you learned in October and have not seen since.',
+      'Nothing else takes a green tick away from you. Only time does, and only after you have actually stopped touching it.',
+    ],
+    limit: 'It cannot know you revised something on paper. If you worked on a topic away from here, test it here and the fade clears.',
+  },
+  {
+    label: 'Review',
+    title: 'A mistake bank that schedules itself',
+    lede: 'Your own wrong answers, on a widening schedule.',
+    how: [
+      'Every question you get wrong goes into the bank and comes back straight away, then after a day, then five, then a week.',
+      'Get it right each time and the gap widens until it leaves the bank for good. Get it wrong and the schedule restarts from the beginning.',
+      'You end up drilling the questions you personally failed rather than a deck somebody else wrote for a student who is not you.',
+    ],
+    limit: 'It only holds questions you have actually attempted. It is a record of your mistakes, not a prediction of which ones you would make.',
+  },
+  {
+    label: 'Papers',
+    title: 'Timed papers with real pacing',
+    lede: 'Sit a paper the way your subject examines it, against a clock that tells you the truth.',
+    how: [
+      'Build a paper from any mix of topics, or sit Paper 1 and Paper 2 as your subject actually sets them, with the same structure and the same timing.',
+      'A live marks-per-minute figure runs beside the clock and compares where you are against the pace the paper needs. You find out you are behind while there is still time to do something about it, rather than at the end.',
+      'Results feed the same map as everything else, so a paper counts as evidence rather than as a separate score in a separate place.',
+    ],
+    limit: 'A generated paper is built to the shape of the real one. It is not a past paper, and nothing here is scraped from one.',
+  },
+  {
+    label: 'Calendar',
+    title: 'Deadlines that change the plan',
+    lede: 'Put a test in and the plan reorders itself as it gets close.',
+    how: [
+      'Add your tests, mocks and internal assessment deadlines. Each one is attached to a subject, and to specific topics if you know which.',
+      'As a date approaches the planner moves that subject up on its own. The week before a mock reorders itself without you sitting down to decide what to prioritise.',
+      'Every item in the plan says why it is there, so when a topic jumps the queue you can see whether you agree with the reason.',
+    ],
+    limit: 'It does not read your school calendar. What is in it is what you put in it.',
+  },
+  {
+    label: 'Sessions',
+    title: 'A timer that follows you around',
+    lede: 'One number for whether tonight actually happened.',
+    how: [
+      'Start a study block and it keeps running while you move between quizzes, notes, the plan and the map. It does not reset when you change page.',
+      'Blocks are recorded against the subjects you worked on, so the week adds up to something you can look at rather than a feeling about how much you did.',
+      'It is the one number in the product that measures effort rather than result, which is why it is deliberately kept separate from the map.',
+    ],
+    limit: 'Time in a session is not evidence of anything. It never moves a subtopic up a level — only questions do that.',
+  },
+  {
+    label: 'Resources',
+    title: 'Something to read for the exact gap',
+    lede: 'A wrong answer leads somewhere, not into a search box.',
+    how: [
+      'Every subtopic carries hand-picked lessons, videos and notes for that one thing, so getting a question wrong ends with something to read rather than a query to type.',
+      'Links open on the creator’s own site. Nothing is rehosted, nothing is mirrored, and nothing is resold.',
+      'Coverage is deeper in some subjects than others, and the app says which rather than presenting a thin list as a complete one.',
+    ],
+    limit: 'These are other people’s materials, credited and linked. If a creator wants a link removed it comes down.',
+  },
+  {
+    label: 'Prediction',
+    title: 'A grade you can check the maths on',
+    lede: 'A running total built only from results, stated with its own confidence.',
+    how: [
+      'A running prediction sits next to the grades you told us you want, built from quiz results and nothing else.',
+      'It states how much of your syllabus it is based on. A prediction from three quizzes is labelled low confidence instead of presented as a forecast.',
+      'The scale follows your curriculum: out of 45 with the core for the IB, and the right scale for A-Level and AP rather than a number you can never get.',
+    ],
+    limit: 'It predicts from what you have been tested on here. It is a measurement of your evidence so far, not a forecast of results day.',
+  },
+]
