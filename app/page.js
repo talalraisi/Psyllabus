@@ -363,7 +363,7 @@ export default async function Home() {
 
         {/* ------------------------------------------------------- features */}
         <Section label="Features" tint>
-          <Heading className="max-w-2xl">Eight things, all of them working today</Heading>
+          <Heading className="max-w-2xl">Three questions, and what answers each</Heading>
           <p className="mt-4 max-w-lg text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
             Shown rather than described, because a list of feature names tells you nothing about
             whether any of it is any good.

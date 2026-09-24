@@ -388,19 +388,46 @@ const FEATURE_MODULES = [
 const SLIDE_MS = 7000
 
 /**
- * One carousel of features, advancing on its own.
+ * The features, in groups of what they are for.
  *
- * Eight of these stacked vertically is eight screens of scrolling before the
- * page gets to the point, and nobody reaches the eighth. Four at a time, each
- * holding for seven seconds, means the whole set is seen in under a minute
- * without anybody having to do anything — and the bar filling along the top
- * says how long is left, so it reads as a thing playing rather than a thing
- * that moved while you were reading it.
- *
- * It stops the moment you touch it. An animation that keeps moving under
- * somebody who has started reading is worse than no animation.
+ * Eight modules in one run put the heatmap next to the session timer, which
+ * are not the same kind of thing and do not belong in the same sentence. A
+ * reader working out what the product does needs the three questions it
+ * answers — where do I stand, what do I practise, when do I do it — and then
+ * the features underneath each one.
  */
-function FeatureCarousel({ items, offset = 0 }) {
+const GROUPS = [
+  {
+    heading: 'Know where you stand',
+    blurb: 'Measured from what you proved, never from what you said about yourself.',
+    keys: ['The map', 'Decay', 'Prediction'],
+  },
+  {
+    heading: 'Practise until it holds',
+    blurb: 'The same subtopic, until getting it right stops being luck.',
+    keys: ['Papers', 'Review', 'Resources'],
+  },
+  {
+    heading: 'Spend the time you actually have',
+    blurb: 'Tonight is forty minutes, not a term. The plan is built for tonight.',
+    keys: ['Calendar', 'Sessions'],
+  },
+]
+
+/**
+ * One group, as a carousel.
+ *
+ * It waits until it is on screen before it starts, because a carousel that
+ * runs while it is two screens below you has already shown you everything by
+ * the time you arrive. It stops the moment you touch it, and it can be walked
+ * both ways — an auto-advancing panel with no way back is a panel that has
+ * taken something away from you.
+ *
+ * Tall rather than wide: the text above the graphic reads as one column at any
+ * width, where side by side becomes two thin columns on a laptop.
+ */
+function FeatureCarousel({ items }) {
+  const [ref, seen] = useInView({ threshold: 0.3 })
   const [at, setAt] = useState(0)
   const [paused, setPaused] = useState(false)
   const [reduced, setReduced] = useState(false)
@@ -414,23 +441,25 @@ function FeatureCarousel({ items, offset = 0 }) {
   }, [])
 
   useEffect(() => {
-    if (paused || reduced) return
+    if (!seen || paused || reduced || items.length < 2) return
     const id = setTimeout(() => setAt((i) => (i + 1) % items.length), SLIDE_MS)
     return () => clearTimeout(id)
-  }, [at, paused, reduced, items.length])
+  }, [at, seen, paused, reduced, items.length])
 
+  const go = (delta) => setAt((i) => (i + delta + items.length) % items.length)
   const current = items[at]
+  if (!current) return null
 
   return (
     <div
-      className="elev mt-8 overflow-hidden rounded-[16px] border"
+      ref={ref}
+      className="elev overflow-hidden rounded-[16px] border"
       style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={() => setPaused(false)}
     >
-      {/* One bar per slide, the live one filling. */}
       <div className="flex gap-1 p-1">
         {items.map((item, i) => (
           <button
@@ -445,11 +474,10 @@ function FeatureCarousel({ items, offset = 0 }) {
               className="block h-full rounded-full"
               style={{
                 background: 'var(--brand)',
-                width: i < at ? '100%' : i === at ? '100%' : '0%',
                 transformOrigin: 'left',
                 transform: i === at ? 'scaleX(1)' : 'scaleX(0)',
                 transition:
-                  i === at && !paused && !reduced
+                  i === at && seen && !paused && !reduced
                     ? `transform ${SLIDE_MS}ms linear`
                     : 'transform 200ms ease',
               }}
@@ -458,33 +486,60 @@ function FeatureCarousel({ items, offset = 0 }) {
         ))}
       </div>
 
-      <article key={current.title} className="pop-enter grid gap-8 p-6 md:grid-cols-[0.9fr_1.1fr] md:gap-12 md:p-9">
-        <div>
-          <p
-            className="mb-3 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
-            style={{ color: 'var(--text-faint)' }}
-          >
-            {String(offset + at + 1).padStart(2, '0')} · {current.label}
-          </p>
-          <h3 className="text-[20px] font-semibold leading-snug tracking-[-0.02em]">{current.title}</h3>
-          <p className="mt-3 text-[14.5px] leading-[1.7]" style={{ color: 'var(--text-body)' }}>
-            {current.body}
-          </p>
-        </div>
-        <div className="min-w-0">
+      <div key={current.title} className="pop-enter p-6 md:p-8">
+        <p
+          className="mb-2.5 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
+          style={{ color: 'var(--text-faint)' }}
+        >
+          {current.label}
+        </p>
+        <h4 className="text-[19px] font-semibold leading-snug tracking-[-0.02em]">{current.title}</h4>
+        <p className="mt-3 text-[14.5px] leading-[1.7]" style={{ color: 'var(--text-body)' }}>
+          {current.body}
+        </p>
+        <div className="mt-7 min-w-0">
           <current.Graphic />
         </div>
-      </article>
+      </div>
+
+      {items.length > 1 && (
+        <div
+          className="flex items-center gap-2 border-t px-4 py-3"
+          style={{ borderColor: 'var(--border)' }}
+        >
+          <button onClick={() => go(-1)} aria-label="Previous" className="btn btn-quiet control-sm px-3">
+            ←
+          </button>
+          <button onClick={() => go(1)} aria-label="Next" className="btn btn-quiet control-sm px-3">
+            →
+          </button>
+          <div className="flex-1" />
+          <span className="text-[11.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
+            {at + 1} of {items.length}
+          </span>
+        </div>
+      )}
     </div>
   )
 }
 
 export function FeatureModules() {
-  const half = Math.ceil(FEATURE_MODULES.length / 2)
+  const byLabel = new Map(FEATURE_MODULES.map((m) => [m.label, m]))
   return (
-    <div className="mt-10">
-      <FeatureCarousel items={FEATURE_MODULES.slice(0, half)} offset={0} />
-      <FeatureCarousel items={FEATURE_MODULES.slice(half)} offset={half} />
+    <div className="mt-12 flex flex-col gap-14">
+      {GROUPS.map((group) => (
+        <section key={group.heading} className="grid gap-7 md:grid-cols-[0.8fr_1fr] md:gap-12">
+          <div>
+            <h3 className="text-[21px] font-semibold leading-snug tracking-[-0.022em]">
+              {group.heading}
+            </h3>
+            <p className="mt-3 text-[14.5px] leading-[1.7]" style={{ color: 'var(--text-muted)' }}>
+              {group.blurb}
+            </p>
+          </div>
+          <FeatureCarousel items={group.keys.map((k) => byLabel.get(k)).filter(Boolean)} />
+        </section>
+      ))}
     </div>
   )
 }
