@@ -460,30 +460,50 @@ function FeatureCarousel({ items }) {
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={() => setPaused(false)}
     >
-      <div className="flex gap-1 p-1">
-        {items.map((item, i) => (
-          <button
-            key={item.title}
-            onClick={() => setAt(i)}
-            aria-label={`Show ${item.title}`}
-            aria-current={i === at}
-            className="h-1 flex-1 overflow-hidden rounded-full"
-            style={{ background: 'var(--border-strong)' }}
-          >
-            <span
-              className="block h-full rounded-full"
-              style={{
-                background: 'var(--brand)',
-                transformOrigin: 'left',
-                transform: i === at ? 'scaleX(1)' : 'scaleX(0)',
-                transition:
-                  i === at && seen && !paused && !reduced
-                    ? `transform ${SLIDE_MS}ms linear`
-                    : 'transform 200ms ease',
-              }}
-            />
-          </button>
-        ))}
+      {/* One control row, at the top, where the eye already is when the
+          slide changes under it. The bars double as the position. */}
+      <div
+        className="flex items-center gap-3 border-b px-3 py-2.5"
+        style={{ borderColor: 'var(--border)' }}
+      >
+        {items.length > 1 && (
+          <div className="flex shrink-0 gap-1">
+            <button onClick={() => go(-1)} aria-label="Previous" className="btn btn-quiet control-sm px-2.5">
+              ←
+            </button>
+            <button onClick={() => go(1)} aria-label="Next" className="btn btn-quiet control-sm px-2.5">
+              →
+            </button>
+          </div>
+        )}
+        <div className="flex flex-1 gap-1">
+          {items.map((item, i) => (
+            <button
+              key={item.title}
+              onClick={() => setAt(i)}
+              aria-label={`Show ${item.title}`}
+              aria-current={i === at}
+              className="h-1 flex-1 overflow-hidden rounded-full"
+              style={{ background: 'var(--border-strong)' }}
+            >
+              <span
+                className="block h-full rounded-full"
+                style={{
+                  background: 'var(--brand)',
+                  transformOrigin: 'left',
+                  transform: i === at ? 'scaleX(1)' : 'scaleX(0)',
+                  transition:
+                    i === at && seen && !paused && !reduced
+                      ? `transform ${SLIDE_MS}ms linear`
+                      : 'transform 200ms ease',
+                }}
+              />
+            </button>
+          ))}
+        </div>
+        <span className="shrink-0 text-[11.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
+          {at + 1}/{items.length}
+        </span>
       </div>
 
       <div key={current.title} className="pop-enter p-6 md:p-8">
@@ -502,44 +522,64 @@ function FeatureCarousel({ items }) {
         </div>
       </div>
 
-      {items.length > 1 && (
-        <div
-          className="flex items-center gap-2 border-t px-4 py-3"
-          style={{ borderColor: 'var(--border)' }}
-        >
-          <button onClick={() => go(-1)} aria-label="Previous" className="btn btn-quiet control-sm px-3">
-            ←
-          </button>
-          <button onClick={() => go(1)} aria-label="Next" className="btn btn-quiet control-sm px-3">
-            →
-          </button>
-          <div className="flex-1" />
-          <span className="text-[11.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
-            {at + 1} of {items.length}
-          </span>
-        </div>
-      )}
     </div>
   )
 }
 
+/**
+ * Three groups, three shapes.
+ *
+ * Laid out identically they read as the same block pasted three times, and a
+ * page with a rhythm is read further down than a page with a pattern. The
+ * first is the widest because it is the argument the whole product rests on;
+ * the second mirrors it so the eye has to move; the third is narrow and
+ * centred because it is two items and a wide frame around two items looks
+ * like something failed to load.
+ */
 export function FeatureModules() {
   const byLabel = new Map(FEATURE_MODULES.map((m) => [m.label, m]))
+  const groups = GROUPS.map((g) => ({ ...g, items: g.keys.map((k) => byLabel.get(k)).filter(Boolean) }))
+  const [first, second, third] = groups
+
+  const Heading = ({ group, className = '' }) => (
+    <div className={className}>
+      <h3 className="text-[21px] font-semibold leading-snug tracking-[-0.022em]">{group.heading}</h3>
+      <p className="mt-3 text-[14.5px] leading-[1.7]" style={{ color: 'var(--text-muted)' }}>
+        {group.blurb}
+      </p>
+    </div>
+  )
+
   return (
-    <div className="mt-12 flex flex-col gap-14">
-      {GROUPS.map((group) => (
-        <section key={group.heading} className="grid gap-7 md:grid-cols-[0.8fr_1fr] md:gap-12">
-          <div>
-            <h3 className="text-[21px] font-semibold leading-snug tracking-[-0.022em]">
-              {group.heading}
-            </h3>
-            <p className="mt-3 text-[14.5px] leading-[1.7]" style={{ color: 'var(--text-muted)' }}>
-              {group.blurb}
-            </p>
+    <div className="mt-12 flex flex-col gap-16">
+      {/* One: stated across the top, shown wide underneath. */}
+      {first && (
+        <section>
+          <Heading group={first} className="max-w-xl" />
+          <div className="mt-7">
+            <FeatureCarousel items={first.items} />
           </div>
-          <FeatureCarousel items={group.keys.map((k) => byLabel.get(k)).filter(Boolean)} />
         </section>
-      ))}
+      )}
+
+      {/* Two: mirrored, so the eye has to move to follow it. */}
+      {second && (
+        <section className="grid gap-7 md:grid-cols-[1fr_0.75fr] md:items-center md:gap-12">
+          <FeatureCarousel items={second.items} />
+          <Heading group={second} className="md:order-2" />
+        </section>
+      )}
+
+      {/* Three: narrow and centred, because two items in a wide frame looks
+          like a third one failed to load. */}
+      {third && (
+        <section className="mx-auto w-full max-w-2xl text-center">
+          <Heading group={third} className="mx-auto max-w-lg" />
+          <div className="mt-7 text-left">
+            <FeatureCarousel items={third.items} />
+          </div>
+        </section>
+      )}
     </div>
   )
 }
