@@ -83,29 +83,46 @@ export default function SiteNav() {
 
   return (
     <div ref={ref} className="flex flex-1 items-center justify-end gap-2">
-      {/* Desktop: one menu, then the two things people came for. */}
-      <div className="relative mr-auto hidden md:block">
-        <button
-          onClick={() => setOpen((v) => !v)}
-          aria-haspopup="menu"
-          aria-expanded={open}
-          className="btn btn-quiet control-sm"
+      {/* Words, not buttons. A bar of pills competes with the one button
+          that matters; plain words let "Get started" be the only thing on
+          the bar that looks pressable. */}
+      <nav className="mr-auto hidden items-center gap-7 md:flex">
+        <div className="relative">
+          <button
+            onClick={() => setOpen((v) => !v)}
+            aria-haspopup="menu"
+            aria-expanded={open}
+            className="nav-word text-[13.5px] font-medium"
+            style={{ color: 'var(--text-body)' }}
+          >
+            What it does
+          </button>
+          {open && item}
+        </div>
+        <Link
+          href="/pricing"
+          className="nav-word text-[13.5px] font-medium"
+          style={{ color: 'var(--text-body)' }}
         >
-          What it does
-          <span aria-hidden="true" className="ml-0.5 text-[10px]">
-            ▾
-          </span>
-        </button>
-        {open && item}
-      </div>
+          Pricing
+        </Link>
+        <Link
+          href="/about"
+          className="nav-word text-[13.5px] font-medium"
+          style={{ color: 'var(--text-body)' }}
+        >
+          About
+        </Link>
+      </nav>
 
-      <Link href="/pricing" className="btn btn-quiet control-sm hidden md:inline-flex">
-        Pricing
-      </Link>
-      <Link href="/login" className="btn btn-quiet control-sm hidden sm:inline-flex">
+      <Link
+        href="/login"
+        className="nav-word hidden text-[13.5px] font-medium sm:inline-block"
+        style={{ color: 'var(--text-body)' }}
+      >
         Log in
       </Link>
-      <Link href="/signup" className="btn btn-solid control-sm">
+      <Link href="/signup" className="btn btn-solid control-sm ml-3">
         Get started
       </Link>
 

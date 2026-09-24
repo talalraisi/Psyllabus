@@ -979,6 +979,40 @@ body {
 .hero-in > *:nth-child(3) { animation-delay: 270ms; }
 .hero-in > *:nth-child(4) { animation-delay: 370ms; }
 
+/* A word that underlines itself.
+
+   The rule grows from the middle out rather than fading in, because a line
+   that draws is read as a response to the pointer where a line that appears
+   is read as a state. It sits on a pseudo-element so the text never moves —
+   `text-decoration` on hover shifts the baseline by a pixel and the whole bar
+   twitches as you run along it. */
+.nav-word {
+  position: relative;
+  padding-bottom: 3px;
+}
+.nav-word::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1.5px;
+  border-radius: 2px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.nav-word:hover::after,
+.nav-word:focus-visible::after,
+.nav-word[aria-expanded='true']::after {
+  transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-word::after { transition: none; }
+}
+
 /* A button that answers the press. */
 .press { transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1); }
 .press:active { transform: scale(0.97); }
