@@ -435,44 +435,46 @@ const GROUPS = [
 ]
 
 /**
- * One group, as a carousel.
+ * One step of the tour.
  *
- * It waits until it is on screen before it starts, because a carousel that
- * runs while it is two screens below you has already shown you everything by
- * the time you arrive. It stops the moment you touch it, and it can be walked
- * both ways — an auto-advancing panel with no way back is a panel that has
- * taken something away from you.
- *
- * Tall rather than wide: the text above the graphic reads as one column at any
- * width, where side by side becomes two thin columns on a laptop.
+ * Out at the edge of the frame rather than tucked into a control strip, and
+ * round, because it is sitting over an illustration rather than in a bar. It
+ * keeps a filled backing so it stays legible whatever it happens to be over.
  */
-/**
- * One step of the carousel.
- *
- * A bordered quiet button either side was two more boxes on a panel that is
- * already a box inside a box. This is the chevron and nothing else until you
- * reach for it.
- */
-function Step({ onClick, label, back = false, disabled = false }) {
-  if (disabled) return <span className="h-7 w-7 shrink-0" aria-hidden="true" />
+function Step({ onClick, label, back = false, className = '', style }) {
   return (
     <button
       onClick={onClick}
       aria-label={label}
-      className="press flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors duration-150 hover:bg-[var(--surface-sunken)]"
-      style={{ color: 'var(--text-muted)' }}
+      className={`press elev flex h-10 w-10 items-center justify-center rounded-full border transition-colors duration-150 hover:bg-[var(--surface-sunken)] md:h-11 md:w-11 ${className}`}
+      style={{
+        borderColor: 'var(--border-strong)',
+        background: 'var(--surface)',
+        color: 'var(--text-body)',
+        ...style,
+      }}
     >
-      <IconChevronRight
-        width={15}
-        height={15}
-        style={back ? { transform: 'rotate(180deg)' } : undefined}
-      />
+      <IconChevronRight width={17} height={17} style={back ? { transform: 'rotate(180deg)' } : undefined} />
     </button>
   )
 }
 
-function FeatureCarousel({ items }) {
-  const [ref, seen] = useInView({ threshold: 0.3 })
+/**
+ * One stage, and the slides either side of it showing through.
+ *
+ * The three panels this replaced were honest about their content and said
+ * nothing about it: a bordered box with a strip of controls on top, three
+ * times down the page. What a feature tour has to do is make the next thing
+ * look worth waiting for, and a panel with a hard edge cannot, because there
+ * is visibly nothing past it.
+ *
+ * So the slides sit in a row that runs off both sides of the frame, blurred
+ * and stepped back, and the one you are on is the one in focus. Same eight
+ * features, same illustrations. The difference is that you can see there are
+ * more of them.
+ */
+function Stage({ items }) {
+  const [ref, seen] = useInView({ threshold: 0.25 })
   const [at, setAt] = useState(0)
   const [paused, setPaused] = useState(false)
   const [reduced, setReduced] = useState(false)
@@ -491,165 +493,160 @@ function FeatureCarousel({ items }) {
     return () => clearTimeout(id)
   }, [at, seen, paused, reduced, items.length])
 
-  const go = (delta) => setAt((i) => (i + delta + items.length) % items.length)
+  const go = (d) => setAt((i) => (i + d + items.length) % items.length)
   if (!items.length) return null
+
+  /** Where a slide sits relative to the one in focus, wrapping the short way
+   *  round so stepping back from the first goes left rather than flying the
+   *  whole row across. */
+  const offset = (i) => {
+    const raw = i - at
+    const half = items.length / 2
+    if (raw > half) return raw - items.length
+    if (raw < -half) return raw + items.length
+    return raw
+  }
 
   return (
     <div
       ref={ref}
-      className="elev overflow-hidden rounded-[16px] border"
-      style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+      className="relative mt-14"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={() => setPaused(false)}
     >
-      {/* One control row, at the top, where the eye already is when the
-          slide changes under it.
-
-          Back on the left, forward on the right, and the bars between them —
-          both arrows and a counter bunched at one end was three things
-          competing for the same corner, and it is the arrangement that got
-          called badly organised. The bars are the position, so the "2/3"
-          alongside them was saying it twice; it is gone. */}
-      <div
-        className="flex items-center gap-4 border-b px-3 py-2.5"
-        style={{ borderColor: 'var(--border)' }}
-      >
-        <Step onClick={() => go(-1)} label="Previous" back disabled={items.length < 2} />
-        <div className="flex flex-1 gap-1.5">
-          {items.map((item, i) => (
-            <button
-              key={item.title}
-              onClick={() => setAt(i)}
-              aria-label={`Show ${item.title}`}
-              aria-current={i === at}
-              className="group flex h-4 flex-1 items-center"
-            >
-              <span
-                className="block h-[3px] w-full overflow-hidden rounded-full transition-colors"
-                style={{ background: 'var(--border-strong)' }}
-              >
-                <span
-                  className="block h-full rounded-full"
-                  style={{
-                    background: 'var(--brand)',
-                    transformOrigin: 'left',
-                    transform: i === at ? 'scaleX(1)' : 'scaleX(0)',
-                    transition:
-                      i === at && seen && !paused && !reduced
-                        ? `transform ${SLIDE_MS}ms linear`
-                        : 'transform 200ms ease',
-                  }}
-                />
-              </span>
-            </button>
-          ))}
-        </div>
-        <Step onClick={() => go(1)} label="Next" disabled={items.length < 2} />
-      </div>
-
-      {/* Every slide occupies the same cell, so the panel is as tall as its
-          tallest slide and stays that height for good.
-
-          It used to render one slide at a time, which meant the frame grew and
-          shrank by up to 340px on each advance and dragged the rest of the page
-          up and down with it while you were reading further along. A carousel
-          that changes the height of the document every seven seconds is not a
-          carousel, it is a fault. This also stops the graphics being rebuilt on
-          every turn: they are mounted once and simply faded between. */}
-      <div className="grid">
+      {/* The words change with the slide and are stacked in one cell, so the
+          stage below does not jump when a two-line title follows a one-line
+          one. */}
+      <div className="mx-auto grid max-w-2xl text-center">
         {items.map((slide, i) => (
           <div
             key={slide.title}
             aria-hidden={i !== at}
-            className="col-start-1 row-start-1 grid items-center gap-7 p-6 transition-opacity duration-500 md:grid-cols-[1fr_minmax(0,24rem)] md:gap-12 md:p-8"
-            style={{
-              opacity: i === at ? 1 : 0,
-              visibility: i === at ? 'visible' : 'hidden',
-              pointerEvents: i === at ? undefined : 'none',
-            }}
+            className="col-start-1 row-start-1 px-4 transition-opacity duration-500"
+            style={{ opacity: i === at ? 1 : 0, visibility: i === at ? 'visible' : 'hidden' }}
           >
-            {/* Text one side, illustration the other, and the illustration
-                capped at 24rem.
-
-                Stacked, the graphic inherited the panel's full width, and
-                these are diagrams drawn at around 450px — a six-column
-                heatmap stretched to 900 is six 145px tiles, which looks like
-                a mistake rather than a map. Side by side the panel is also
-                half the height, so a group fits on a screen instead of being
-                scrolled past in pieces. */}
-            <div className="min-w-0">
-              <p
-                className="mb-2.5 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
-                style={{ color: 'var(--text-faint)' }}
-              >
-                {slide.label}
-              </p>
-              <h4 className="text-[19px] font-semibold leading-snug tracking-[-0.02em]">{slide.title}</h4>
-              <p className="mt-3 text-[14.5px] leading-[1.7]" style={{ color: 'var(--text-body)' }}>
-                {slide.body}
-              </p>
-            </div>
-            <div className="min-w-0">
-              <slide.Graphic shown={seen} />
-            </div>
+            <p
+              className="text-[10.5px] font-semibold uppercase tracking-[0.16em]"
+              style={{ color: 'var(--brand)' }}
+            >
+              {slide.group}
+            </p>
+            <h3 className="mt-3 text-[clamp(1.55rem,3vw,2.05rem)] font-semibold leading-tight tracking-[-0.03em]">
+              {slide.title}
+            </h3>
+            <p
+              className="mx-auto mt-4 max-w-lg text-[14.5px] leading-[1.7]"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              {slide.body}
+            </p>
           </div>
         ))}
       </div>
 
+      {/* The row runs wider than the frame and is clipped, which is what puts
+          the next slide at the edge of your eye rather than out of the room. */}
+      <div className="relative mt-11 overflow-hidden py-3">
+        <div className="mx-auto grid w-full max-w-lg">
+          {items.map((slide, i) => {
+            const d = offset(i)
+            const near = Math.abs(d) <= 1
+            return (
+              <div
+                key={slide.title}
+                aria-hidden={i !== at}
+                className="col-start-1 row-start-1 transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                style={{
+                  transform: `translateX(${d * 76}%) scale(${d === 0 ? 1 : 0.84})`,
+                  opacity: d === 0 ? 1 : near ? 0.32 : 0,
+                  filter: d === 0 ? 'none' : 'blur(3px)',
+                  pointerEvents: d === 0 ? undefined : 'none',
+                  visibility: near ? 'visible' : 'hidden',
+                  zIndex: d === 0 ? 2 : 1,
+                }}
+              >
+                <div
+                  className="elev-lg flex min-h-[15rem] items-center rounded-[16px] border p-6 md:p-8"
+                  style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+                >
+                  <div className="w-full min-w-0">
+                    <slide.Graphic shown={seen} />
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Floating either side of the card, but only where there is room
+            beside it. On a phone the card is the full width of the page, so a
+            button floated over its edge sits on the content; those go next to
+            the pills instead. */}
+        {items.length > 1 && (
+          <div className="hidden md:block">
+            <Step
+              onClick={() => go(-1)}
+              label="Previous feature"
+              back
+              className="absolute top-1/2 z-10 -translate-y-1/2"
+              style={{ left: 'max(0.5rem, 2%)' }}
+            />
+            <Step
+              onClick={() => go(1)}
+              label="Next feature"
+              className="absolute top-1/2 z-10 -translate-y-1/2"
+              style={{ right: 'max(0.5rem, 2%)' }}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* One pill per feature, the one you are on stretched out. It is the
+          position and the control at once, and it counts without a counter. */}
+      <div className="mt-9 flex items-center justify-center gap-4">
+        {items.length > 1 && (
+          <Step onClick={() => go(-1)} label="Previous feature" back className="md:hidden" />
+        )}
+        <div className="flex items-center gap-2">
+          {items.map((slide, i) => (
+            <button
+              key={slide.title}
+              onClick={() => setAt(i)}
+              aria-label={`Show ${slide.title}`}
+              aria-current={i === at}
+              className="h-1.5 rounded-full transition-all duration-500"
+              style={{
+                width: i === at ? 30 : 6,
+                background: i === at ? 'var(--brand)' : 'var(--border-strong)',
+              }}
+            />
+          ))}
+        </div>
+        {items.length > 1 && <Step onClick={() => go(1)} label="Next feature" className="md:hidden" />}
+      </div>
     </div>
   )
 }
 
 /**
- * Three groups, one size.
+ * Eight features, one after another.
  *
- * They were three different shapes on purpose — a wide one, a mirrored one and
- * a narrow centred one — so that the section would not read as the same block
- * pasted three times. It did not read as rhythm. It read as three panels that
- * could not agree how wide they were: 960px, then 521px, then 672px, so the
- * same illustration came out a different size depending on which heading it
- * happened to sit under, and the eye spent the section re-measuring instead of
- * reading.
- *
- * They are one width now, stated the same way each time. What separates them
- * is the number and the question in the heading, which is the thing that
- * actually differs between them.
+ * They were three separate carousels under three headings, which is three
+ * sets of controls to work out and three places to be part-way through. The
+ * grouping still does its job — it is the line above each title — but there
+ * is one thing to operate.
  */
 export function FeatureModules() {
   const byLabel = new Map(FEATURE_MODULES.map((m) => [m.label, m]))
-  const groups = GROUPS.map((g) => ({ ...g, items: g.keys.map((k) => byLabel.get(k)).filter(Boolean) }))
-
-  return (
-    <div className="mt-14 flex flex-col gap-14">
-      {groups.map((group, i) =>
-        group.items.length ? (
-          <section key={group.heading}>
-            {/* The number is what tells you there are three of these and which
-                one you are on — the job the differing widths were doing badly. */}
-            <div className="mb-6 flex items-baseline gap-4">
-              <span
-                className="text-[11px] font-semibold tabular-nums tracking-[0.16em]"
-                style={{ color: 'var(--brand)' }}
-              >
-                {String(i + 1).padStart(2, '0')}
-              </span>
-              <div className="min-w-0">
-                <h3 className="text-[21px] font-semibold leading-snug tracking-[-0.022em]">
-                  {group.heading}
-                </h3>
-                <p className="mt-2 max-w-xl text-[14.5px] leading-[1.7]" style={{ color: 'var(--text-muted)' }}>
-                  {group.blurb}
-                </p>
-              </div>
-            </div>
-            <FeatureCarousel items={group.items} />
-          </section>
-        ) : null
-      )}
-    </div>
+  const slides = GROUPS.flatMap((g) =>
+    g.keys
+      .map((k) => byLabel.get(k))
+      .filter(Boolean)
+      .map((m) => ({ ...m, group: g.heading }))
   )
+  return <Stage items={slides} />
 }
 
 export { Label }

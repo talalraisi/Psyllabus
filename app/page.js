@@ -5,7 +5,7 @@ import { IconCheck, IconArrowRight, IconClose } from '@/components/Icons'
 import ThemeToggle from '@/components/ThemeToggle'
 import { operatorLine, OPERATOR } from '@/lib/legal'
 import { HOW_IT_WORKS, FEATURES, WHY, FAQ, ANSWERS } from '@/components/marketing/content'
-import { Heatmap, TryQuestion, DecayDemo, PlanDemo, Faq } from '@/components/marketing/interactive'
+import { Heatmap, DecayDemo, PlanDemo, Faq } from '@/components/marketing/interactive'
 import { Reveal, ScrollBar, CountUp, ForgettingCurve } from '@/components/marketing/scroll'
 import SiteNav from '@/components/marketing/SiteNav'
 import { FeatureModules } from '@/components/marketing/features'
@@ -112,10 +112,10 @@ export default async function Home() {
           background: 'color-mix(in oklab, var(--bg) 82%, transparent)',
         }}
       >
-        <div className="mx-auto flex max-w-6xl px-5 py-3.5 md:px-8">
+        <div className="mx-auto flex max-w-6xl px-5 py-3 md:px-8">
           <SiteNav>
             <Link href="/" aria-label="Project Syllabus home" className="shrink-0">
-              <Image src={logoMark} alt="Project Syllabus" sizes="110px" style={{ height: 30, width: 'auto' }} priority />
+              <Image src={logoMark} alt="Project Syllabus" sizes="150px" style={{ height: 38, width: 'auto' }} priority />
             </Link>
           </SiteNav>
         </div>
@@ -243,21 +243,6 @@ export default async function Home() {
         </Section>
 
         {/* ----------------------------------------------------------- try it */}
-        <Section label="Try it" id="try-it">
-          <div className="grid gap-10 md:grid-cols-[1fr_1.15fr] md:gap-14">
-            <div>
-              <Heading>Sit one, right here</Heading>
-              <p className="mt-5 text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-                A real question. Pick a wrong answer on purpose — it names the mistake that leads there.
-              </p>
-              <p className="mt-4 text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-                Harder questions move it further. Ten points is mastery, and easy ones will not get you there.
-              </p>
-            </div>
-            <TryQuestion />
-          </div>
-        </Section>
-
         {/* ------------------------------------------------------ objections */}
         <Section tint>
           <Heading className="max-w-2xl">What students say goes wrong with tools like this</Heading>
