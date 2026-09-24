@@ -82,20 +82,30 @@ export default function SiteNav() {
   )
 
   return (
-    <div ref={ref} className="flex flex-1 items-center justify-end gap-2">
+    /* One rhythm across the whole bar.
+       The left links sat on a 28px gap and the right pair on 8px plus a
+       nudge, which is what made it look assembled rather than laid out. */
+    <div ref={ref} className="flex flex-1 items-center gap-7">
       {/* Words, not buttons. A bar of pills competes with the one button
           that matters; plain words let "Get started" be the only thing on
           the bar that looks pressable. */}
-      <nav className="mr-auto hidden items-center gap-7 md:flex">
+      <nav className="hidden items-center gap-7 md:flex">
         <div className="relative">
           <button
             onClick={() => setOpen((v) => !v)}
             aria-haspopup="menu"
             aria-expanded={open}
-            className="nav-word text-[13.5px] font-medium"
+            className="nav-word inline-flex items-center gap-1.5 text-[13.5px] font-medium"
             style={{ color: 'var(--text-body)' }}
           >
             What it does
+            <span
+              aria-hidden="true"
+              className="text-[9px] transition-transform duration-200"
+              style={{ transform: open ? 'rotate(180deg)' : 'none' }}
+            >
+              ▼
+            </span>
           </button>
           {open && item}
         </div>
@@ -115,6 +125,10 @@ export default function SiteNav() {
         </Link>
       </nav>
 
+      {/* Everything above is navigation; everything below is the account.
+          The spacer is what separates the two jobs. */}
+      <div className="flex-1" />
+
       <Link
         href="/login"
         className="nav-word hidden text-[13.5px] font-medium sm:inline-block"
@@ -122,7 +136,7 @@ export default function SiteNav() {
       >
         Log in
       </Link>
-      <Link href="/signup" className="btn btn-solid control-sm ml-3">
+      <Link href="/signup" className="btn btn-solid control-sm">
         Get started
       </Link>
 
