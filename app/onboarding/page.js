@@ -600,15 +600,24 @@ export default function Onboarding() {
 
         {/* Whose account this is, said out loud before any of it is filled in. */}
         {account?.email && (
-          <p
-            className="mb-8 text-center text-[12.5px]"
-            style={{ color: 'var(--text-faint)' }}
+          /* This was 12.5px of grey, centred, and it got missed — which is
+             how somebody signed up a second account, was sent here because
+             the new one had no profile, and filled in their subjects again
+             believing they were on their first account. Whose account this
+             is has to be readable from across the room, because everything
+             below gets filed under it. */
+          <div
+            className="elev mb-8 flex flex-wrap items-center justify-between gap-3 rounded-[12px] border px-4 py-3"
+            style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
           >
-            Setting up {account.email} ·{' '}
-            <button onClick={startOver} className="underline underline-offset-2">
-              not you?
+            <p className="text-[13.5px]">
+              <span style={{ color: 'var(--text-muted)' }}>Setting up </span>
+              <span className="font-semibold">{account.email}</span>
+            </p>
+            <button onClick={startOver} className="btn btn-outline control-sm">
+              Not you? Sign out
             </button>
-          </p>
+          </div>
         )}
 
         {/* Where you are. A rail rather than four discs: the numbers were

@@ -1,9 +1,9 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { getAuthCallbackUrl } from '@/lib/auth'
+import { getAuthCallbackUrl, getCurrentUser } from '@/lib/auth'
 import Image from 'next/image'
 import logoMark from '@/public/logo-mark.png'
 import PasswordField from '@/components/PasswordField'
@@ -26,8 +26,32 @@ export default function Signup() {
   const [awaitingConfirmation, setAwaitingConfirmation] = useState(false)
   const [resending, setResending] = useState(false)
   const [resent, setResent] = useState(false)
+  /**
+   * Whoever is already signed in on this device.
+   *
+   * Signing up replaces the session without saying so, and the page that
+   * follows looks identical whichever account you are in — so somebody who
+   * makes a second account while logged in carries on believing they are on
+   * their first one. Then the dashboard finds no profile for the new account,
+   * sends them to onboarding, and they fill in their subjects again on an
+   * account they did not mean to be using. That is exactly what happened
+   * here: an account created at 09:11 had a full set of subjects by 09:17.
+   *
+   * Nothing is blocked. It just has to be said out loud first.
+   */
+  const [signedInAs, setSignedInAs] = useState(null)
   const router = useRouter()
   const supabase = createClient()
+
+  useEffect(() => {
+    let cancelled = false
+    getCurrentUser(createClient()).then((user) => {
+      if (!cancelled && user?.email) setSignedInAs(user.email)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const handleSignup = async (e) => {
     e.preventDefault()
@@ -205,6 +229,34 @@ export default function Signup() {
       <GoogleButton onClick={handleGoogleSignup} disabled={loading} label="Continue with Google" />
 
       <OrRule />
+
+          {/* Said before the form, not after the damage. */}
+          {signedInAs && (
+            <div
+              className="elev mb-5 rounded-[12px] border p-4"
+              style={{ borderColor: 'var(--status-developing)', background: 'var(--surface)' }}
+            >
+              <p className="text-[13.5px] font-medium">
+                You are already signed in as {signedInAs}.
+              </p>
+              <p className="mt-1.5 text-[13px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                Making another account will sign you out of that one on this device. Your work
+                stays on it — but the next screens will be the new account, not that one.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Link href="/dashboard" className="btn btn-solid control-sm">
+                  Back to my account
+                </Link>
+                <button
+                  onClick={() => setSignedInAs(null)}
+                  className="btn btn-outline control-sm"
+                  type="button"
+                >
+                  Make a new one anyway
+                </button>
+              </div>
+            </div>
+          )}
 
           <form onSubmit={handleSignup} className="flex flex-col gap-4">
             <div>
