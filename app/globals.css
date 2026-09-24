@@ -957,6 +957,23 @@ body {
   box-shadow: var(--shadow-raised);
 }
 
+/* Arriving at the front page.
+
+   The hero appeared fully formed, which is fine and says nothing. This lifts
+   the headline, the line under it and the buttons in that order, each a beat
+   behind the last, so the page assembles itself in about half a second. It
+   runs once on load rather than on scroll, because it is about opening the
+   site rather than about reaching a section. */
+@keyframes hero-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+.hero-in > * { animation: hero-in 620ms cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+.hero-in > *:nth-child(1) { animation-delay: 60ms; }
+.hero-in > *:nth-child(2) { animation-delay: 170ms; }
+.hero-in > *:nth-child(3) { animation-delay: 270ms; }
+.hero-in > *:nth-child(4) { animation-delay: 370ms; }
+
 /* A button that answers the press. */
 .press { transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1); }
 .press:active { transform: scale(0.97); }
@@ -1014,6 +1031,7 @@ body {
   .bob,
   .bob-slow,
   .fade-breathe,
+  .hero-in > *,
   .card-right,
   .card-wrong,
   .verdict-in,

@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useInView } from './scroll'
 
 /**
@@ -384,32 +385,106 @@ const FEATURE_MODULES = [
  * the fix, and it keeps the graphics private to this file, which they should
  * be anyway.
  */
-export function FeatureModules() {
+const SLIDE_MS = 7000
+
+/**
+ * One carousel of features, advancing on its own.
+ *
+ * Eight of these stacked vertically is eight screens of scrolling before the
+ * page gets to the point, and nobody reaches the eighth. Four at a time, each
+ * holding for seven seconds, means the whole set is seen in under a minute
+ * without anybody having to do anything — and the bar filling along the top
+ * says how long is left, so it reads as a thing playing rather than a thing
+ * that moved while you were reading it.
+ *
+ * It stops the moment you touch it. An animation that keeps moving under
+ * somebody who has started reading is worse than no animation.
+ */
+function FeatureCarousel({ items, offset = 0 }) {
+  const [at, setAt] = useState(0)
+  const [paused, setPaused] = useState(false)
+  const [reduced, setReduced] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const read = () => setReduced(mq.matches)
+    read()
+    mq.addEventListener('change', read)
+    return () => mq.removeEventListener('change', read)
+  }, [])
+
+  useEffect(() => {
+    if (paused || reduced) return
+    const id = setTimeout(() => setAt((i) => (i + 1) % items.length), SLIDE_MS)
+    return () => clearTimeout(id)
+  }, [at, paused, reduced, items.length])
+
+  const current = items[at]
+
   return (
-    <div className="mt-14 flex flex-col">
-      {FEATURE_MODULES.map(({ label, title, body, Graphic }, i) => (
-        <article
-          key={title}
-          className="rv-reveal grid gap-8 border-t py-10 md:grid-cols-[0.9fr_1.1fr] md:gap-14 md:py-12"
-          style={{ borderColor: 'var(--border)' }}
-        >
-          <div className={i % 2 === 1 ? 'md:order-2' : undefined}>
-            <p
-              className="mb-3 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
-              style={{ color: 'var(--text-faint)' }}
-            >
-              {String(i + 1).padStart(2, '0')} · {label}
-            </p>
-            <h3 className="text-[20px] font-semibold leading-snug tracking-[-0.02em]">{title}</h3>
-            <p className="mt-3 text-[14.5px] leading-[1.7]" style={{ color: 'var(--text-body)' }}>
-              {body}
-            </p>
-          </div>
-          <div className={i % 2 === 1 ? 'md:order-1' : undefined}>
-            <Graphic />
-          </div>
-        </article>
-      ))}
+    <div
+      className="elev mt-8 overflow-hidden rounded-[16px] border"
+      style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={() => setPaused(false)}
+    >
+      {/* One bar per slide, the live one filling. */}
+      <div className="flex gap-1 p-1">
+        {items.map((item, i) => (
+          <button
+            key={item.title}
+            onClick={() => setAt(i)}
+            aria-label={`Show ${item.title}`}
+            aria-current={i === at}
+            className="h-1 flex-1 overflow-hidden rounded-full"
+            style={{ background: 'var(--border-strong)' }}
+          >
+            <span
+              className="block h-full rounded-full"
+              style={{
+                background: 'var(--brand)',
+                width: i < at ? '100%' : i === at ? '100%' : '0%',
+                transformOrigin: 'left',
+                transform: i === at ? 'scaleX(1)' : 'scaleX(0)',
+                transition:
+                  i === at && !paused && !reduced
+                    ? `transform ${SLIDE_MS}ms linear`
+                    : 'transform 200ms ease',
+              }}
+            />
+          </button>
+        ))}
+      </div>
+
+      <article key={current.title} className="pop-enter grid gap-8 p-6 md:grid-cols-[0.9fr_1.1fr] md:gap-12 md:p-9">
+        <div>
+          <p
+            className="mb-3 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
+            style={{ color: 'var(--text-faint)' }}
+          >
+            {String(offset + at + 1).padStart(2, '0')} · {current.label}
+          </p>
+          <h3 className="text-[20px] font-semibold leading-snug tracking-[-0.02em]">{current.title}</h3>
+          <p className="mt-3 text-[14.5px] leading-[1.7]" style={{ color: 'var(--text-body)' }}>
+            {current.body}
+          </p>
+        </div>
+        <div className="min-w-0">
+          <current.Graphic />
+        </div>
+      </article>
+    </div>
+  )
+}
+
+export function FeatureModules() {
+  const half = Math.ceil(FEATURE_MODULES.length / 2)
+  return (
+    <div className="mt-10">
+      <FeatureCarousel items={FEATURE_MODULES.slice(0, half)} offset={0} />
+      <FeatureCarousel items={FEATURE_MODULES.slice(half)} offset={half} />
     </div>
   )
 }

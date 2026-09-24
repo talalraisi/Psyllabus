@@ -140,7 +140,7 @@ export default async function Home() {
               noticed, twice disliked, so they are gone rather than tuned. The
               page still moves while you sit on it: the grid behind this
               creeps one tile a minute. */}
-          <div className="mx-auto max-w-6xl">
+          <div className="hero-in mx-auto max-w-6xl">
             <h1 className="max-w-3xl text-[clamp(2.6rem,6vw,4.6rem)] font-semibold leading-[0.98] tracking-[-0.038em]">
               Stop guessing.
               <br />
@@ -408,10 +408,36 @@ export default async function Home() {
                 <IconArrowRight width={16} height={16} />
               </a>
             </div>
-            <Reveal className="rounded-[12px] border p-6" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
-              <Heatmap cols={8} rows={5} subject="Physics SL · Class of 2028" />
-              <p className="mt-4 text-[12.5px]" style={{ color: 'var(--text-muted)' }}>
-                A teacher sees the same map for a class, without seeing anybody&rsquo;s individual answers.
+            {/* This used to show a class heatmap captioned "a teacher sees
+                the same map for a class", which is a feature that does not
+                exist and that the pricing page, the plans and the about page
+                all promise will never exist. It was the one place on the site
+                selling the opposite of the product. */}
+            <Reveal
+              className="elev rounded-[12px] border p-6"
+              style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+            >
+              <p className="t-overline mb-4">What the school gets</p>
+              <ul className="flex flex-col gap-3.5">
+                {[
+                  ['One code', 'Tied to your email domain. Students type it in once.'],
+                  ['Every subject, for everyone', 'The whole year group, on the full product.'],
+                  ['No seat counting', 'No licences to assign and nothing to administer.'],
+                ].map(([term, detail]) => (
+                  <li key={term}>
+                    <p className="text-[14px] font-medium">{term}</p>
+                    <p className="mt-0.5 text-[13px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                      {detail}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+              <p
+                className="mt-5 border-t pt-4 text-[12.5px] leading-relaxed"
+                style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}
+              >
+                And what it does not get: there is no teacher account and no class dashboard.
+                Nobody at the school sees anybody&rsquo;s results. That is the deal, on every plan.
               </p>
             </Reveal>
           </div>

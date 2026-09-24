@@ -296,6 +296,12 @@ export function ForgettingCurve() {
 
   return (
     <div ref={ref}>
+      {/* The chart was unlabelled, so it asked the reader to work out what
+          they were looking at from two coloured lines and a percentage. */}
+      <p className="t-overline mb-1">How much you still know</p>
+      <h3 className="mb-5 text-[17px] font-semibold tracking-[-0.015em]">
+        Everything fades. Retesting is what changes the slope.
+      </h3>
       <svg
         viewBox={`0 0 ${W} ${H}`}
         className="w-full"
@@ -305,9 +311,9 @@ export function ForgettingCurve() {
         {[0, 0.5, 1].map((v) => (
           <line key={v} x1={pad.l} x2={W - pad.r} y1={y(v)} y2={y(v)} stroke="var(--border)" />
         ))}
-        <text x={pad.l - 8} y={y(1) + 4} textAnchor="end" fontSize="10" fill="var(--text-faint)">100%</text>
-        <text x={pad.l - 8} y={y(0.5) + 4} textAnchor="end" fontSize="10" fill="var(--text-faint)">50%</text>
-        <text x={pad.l - 8} y={y(0) + 4} textAnchor="end" fontSize="10" fill="var(--text-faint)">0</text>
+        <text x={pad.l - 8} y={y(1) + 3} textAnchor="end" fontSize="8.5" fill="var(--text-faint)">100%</text>
+        <text x={pad.l - 8} y={y(0.5) + 3} textAnchor="end" fontSize="8.5" fill="var(--text-faint)">50%</text>
+        <text x={pad.l - 8} y={y(0) + 3} textAnchor="end" fontSize="8.5" fill="var(--text-faint)">0</text>
 
         {/* Never revisited. */}
         <path
@@ -369,8 +375,8 @@ export function ForgettingCurve() {
           />
         ))}
 
-        <text x={pad.l} y={H - 12} fontSize="10" fill="var(--text-faint)">the day you learn it</text>
-        <text x={W - pad.r} y={H - 12} fontSize="10" fill="var(--text-faint)" textAnchor="end">the exam</text>
+        <text x={pad.l} y={H - 13} fontSize="8.5" fill="var(--text-faint)">the day you learn it</text>
+        <text x={W - pad.r} y={H - 13} fontSize="8.5" fill="var(--text-faint)" textAnchor="end">the exam</text>
       </svg>
 
       <div className="mt-5 flex flex-wrap gap-x-7 gap-y-2">
