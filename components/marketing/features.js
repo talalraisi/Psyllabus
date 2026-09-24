@@ -24,6 +24,25 @@ import { IconChevronRight } from '@/components/Icons'
  * the page stops moving when you stop scrolling.
  */
 
+/**
+ * Draw when the carousel arrives, not when the slide does.
+ *
+ * Every graphic watched its own position and started from nothing when it
+ * first saw the viewport. Inside a carousel that is wrong twice over: the
+ * slide is rebuilt on each advance, so the graphic reset to blank and redrew
+ * every seven seconds; and if the observer had not reported by the time the
+ * slide appeared, it drew nothing at all and left a hole in the panel.
+ *
+ * Given `shown`, it uses that instead — which is the carousel's own arrival,
+ * settled once and true from then on. The first slide draws itself in; the
+ * ones after it are already drawn when they fade up, which is what you want
+ * from something that changes under you while you are reading something else.
+ */
+function useDraw(shown) {
+  const [ref, seen] = useInView({ threshold: 0.35 })
+  return [ref, shown === undefined ? seen : shown]
+}
+
 function Label({ children }) {
   return (
     <p
@@ -54,8 +73,8 @@ function Frame({ children, className = '' }) {
 }
 
 /* 1. Heatmap ---------------------------------------------------------------- */
-function GraphicHeatmap() {
-  const [ref, seen] = useInView({ threshold: 0.4 })
+function GraphicHeatmap({ shown }) {
+  const [ref, seen] = useDraw(shown)
   const tones = [
     'mastered','proficient','proficient','developing','untested','untested',
     'proficient','developing','weak','untested','untested','untested',
@@ -82,8 +101,8 @@ function GraphicHeatmap() {
 }
 
 /* 2. Fading ---------------------------------------------------------------- */
-function GraphicFade() {
-  const [ref, seen] = useInView({ threshold: 0.5 })
+function GraphicFade({ shown }) {
+  const [ref, seen] = useDraw(shown)
   return (
     <Frame>
       <div ref={ref} className="flex flex-col gap-2.5">
@@ -113,8 +132,8 @@ function GraphicFade() {
 }
 
 /* 3. Mistake bank ---------------------------------------------------------- */
-function GraphicMistakes() {
-  const [ref, seen] = useInView({ threshold: 0.5 })
+function GraphicMistakes({ shown }) {
+  const [ref, seen] = useDraw(shown)
   return (
     <Frame>
       <div ref={ref} className="flex flex-col gap-2">
@@ -152,8 +171,8 @@ function GraphicMistakes() {
 }
 
 /* 4. Timed papers ---------------------------------------------------------- */
-function GraphicPacing() {
-  const [ref, seen] = useInView({ threshold: 0.5 })
+function GraphicPacing({ shown }) {
+  const [ref, seen] = useDraw(shown)
   return (
     <Frame>
       <div ref={ref}>
@@ -183,8 +202,8 @@ function GraphicPacing() {
 }
 
 /* 5. Calendar -------------------------------------------------------------- */
-function GraphicCalendar() {
-  const [ref, seen] = useInView({ threshold: 0.5 })
+function GraphicCalendar({ shown }) {
+  const [ref, seen] = useDraw(shown)
   const marks = { 4: 'developing', 11: 'weak', 18: 'proficient', 19: 'weak' }
   return (
     <Frame>
@@ -225,8 +244,8 @@ function GraphicCalendar() {
 }
 
 /* 6. Session timer --------------------------------------------------------- */
-function GraphicTimer() {
-  const [ref, seen] = useInView({ threshold: 0.5 })
+function GraphicTimer({ shown }) {
+  const [ref, seen] = useDraw(shown)
   const r = 30
   const c = 2 * Math.PI * r
   return (
@@ -255,8 +274,8 @@ function GraphicTimer() {
 }
 
 /* 7. Resources ------------------------------------------------------------- */
-function GraphicResources() {
-  const [ref, seen] = useInView({ threshold: 0.5 })
+function GraphicResources({ shown }) {
+  const [ref, seen] = useDraw(shown)
   return (
     <Frame>
       <div ref={ref} className="flex flex-col gap-2">
@@ -292,8 +311,8 @@ function GraphicResources() {
 }
 
 /* 8. Predicted grade ------------------------------------------------------- */
-function GraphicPrediction() {
-  const [ref, seen] = useInView({ threshold: 0.5 })
+function GraphicPrediction({ shown }) {
+  const [ref, seen] = useDraw(shown)
   return (
     <Frame>
       <div ref={ref}>
@@ -473,8 +492,7 @@ function FeatureCarousel({ items }) {
   }, [at, seen, paused, reduced, items.length])
 
   const go = (delta) => setAt((i) => (i + delta + items.length) % items.length)
-  const current = items[at]
-  if (!current) return null
+  if (!items.length) return null
 
   return (
     <div
@@ -531,20 +549,53 @@ function FeatureCarousel({ items }) {
         <Step onClick={() => go(1)} label="Next" disabled={items.length < 2} />
       </div>
 
-      <div key={current.title} className="pop-enter p-6 md:p-8">
-        <p
-          className="mb-2.5 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
-          style={{ color: 'var(--text-faint)' }}
-        >
-          {current.label}
-        </p>
-        <h4 className="text-[19px] font-semibold leading-snug tracking-[-0.02em]">{current.title}</h4>
-        <p className="mt-3 text-[14.5px] leading-[1.7]" style={{ color: 'var(--text-body)' }}>
-          {current.body}
-        </p>
-        <div className="mt-7 min-w-0">
-          <current.Graphic />
-        </div>
+      {/* Every slide occupies the same cell, so the panel is as tall as its
+          tallest slide and stays that height for good.
+
+          It used to render one slide at a time, which meant the frame grew and
+          shrank by up to 340px on each advance and dragged the rest of the page
+          up and down with it while you were reading further along. A carousel
+          that changes the height of the document every seven seconds is not a
+          carousel, it is a fault. This also stops the graphics being rebuilt on
+          every turn: they are mounted once and simply faded between. */}
+      <div className="grid">
+        {items.map((slide, i) => (
+          <div
+            key={slide.title}
+            aria-hidden={i !== at}
+            className="col-start-1 row-start-1 grid items-center gap-7 p-6 transition-opacity duration-500 md:grid-cols-[1fr_minmax(0,24rem)] md:gap-12 md:p-8"
+            style={{
+              opacity: i === at ? 1 : 0,
+              visibility: i === at ? 'visible' : 'hidden',
+              pointerEvents: i === at ? undefined : 'none',
+            }}
+          >
+            {/* Text one side, illustration the other, and the illustration
+                capped at 24rem.
+
+                Stacked, the graphic inherited the panel's full width, and
+                these are diagrams drawn at around 450px — a six-column
+                heatmap stretched to 900 is six 145px tiles, which looks like
+                a mistake rather than a map. Side by side the panel is also
+                half the height, so a group fits on a screen instead of being
+                scrolled past in pieces. */}
+            <div className="min-w-0">
+              <p
+                className="mb-2.5 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
+                style={{ color: 'var(--text-faint)' }}
+              >
+                {slide.label}
+              </p>
+              <h4 className="text-[19px] font-semibold leading-snug tracking-[-0.02em]">{slide.title}</h4>
+              <p className="mt-3 text-[14.5px] leading-[1.7]" style={{ color: 'var(--text-body)' }}>
+                {slide.body}
+              </p>
+            </div>
+            <div className="min-w-0">
+              <slide.Graphic shown={seen} />
+            </div>
+          </div>
+        ))}
       </div>
 
     </div>
@@ -552,67 +603,50 @@ function FeatureCarousel({ items }) {
 }
 
 /**
- * Three groups, three shapes.
+ * Three groups, one size.
  *
- * Laid out identically they read as the same block pasted three times, and a
- * page with a rhythm is read further down than a page with a pattern. The
- * first is the widest because it is the argument the whole product rests on;
- * the second mirrors it so the eye has to move; the third is narrow and
- * centred because it is two items and a wide frame around two items looks
- * like something failed to load.
+ * They were three different shapes on purpose — a wide one, a mirrored one and
+ * a narrow centred one — so that the section would not read as the same block
+ * pasted three times. It did not read as rhythm. It read as three panels that
+ * could not agree how wide they were: 960px, then 521px, then 672px, so the
+ * same illustration came out a different size depending on which heading it
+ * happened to sit under, and the eye spent the section re-measuring instead of
+ * reading.
+ *
+ * They are one width now, stated the same way each time. What separates them
+ * is the number and the question in the heading, which is the thing that
+ * actually differs between them.
  */
 export function FeatureModules() {
   const byLabel = new Map(FEATURE_MODULES.map((m) => [m.label, m]))
   const groups = GROUPS.map((g) => ({ ...g, items: g.keys.map((k) => byLabel.get(k)).filter(Boolean) }))
-  const [first, second, third] = groups
-
-  const Heading = ({ group, className = '' }) => (
-    <div className={className}>
-      <h3 className="text-[21px] font-semibold leading-snug tracking-[-0.022em]">{group.heading}</h3>
-      <p className="mt-3 text-[14.5px] leading-[1.7]" style={{ color: 'var(--text-muted)' }}>
-        {group.blurb}
-      </p>
-    </div>
-  )
 
   return (
-    <div className="mt-12 flex flex-col gap-16">
-      {/* One: stated across the top, shown wide underneath. */}
-      {first && (
-        <section>
-          <Heading group={first} className="max-w-xl" />
-          <div className="mt-7">
-            <FeatureCarousel items={first.items} />
-          </div>
-        </section>
-      )}
-
-      {/* Two: mirrored, so the eye has to move to follow it.
-
-          The heading comes first in the source and is moved to the right on a
-          wide screen, rather than the carousel coming first and the heading
-          being moved down. Those look identical on a desktop and are not the
-          same thing anywhere else: written the other way round, a phone and a
-          screen reader both got three unexplained slides and then, eventually,
-          the sentence saying what they were. */}
-      {second && (
-        <section className="grid gap-7 md:grid-cols-[1fr_0.75fr] md:items-center md:gap-12">
-          <Heading group={second} className="md:order-2" />
-          <div className="md:order-1">
-            <FeatureCarousel items={second.items} />
-          </div>
-        </section>
-      )}
-
-      {/* Three: narrow and centred, because two items in a wide frame looks
-          like a third one failed to load. */}
-      {third && (
-        <section className="mx-auto w-full max-w-2xl text-center">
-          <Heading group={third} className="mx-auto max-w-lg" />
-          <div className="mt-7 text-left">
-            <FeatureCarousel items={third.items} />
-          </div>
-        </section>
+    <div className="mt-14 flex flex-col gap-14">
+      {groups.map((group, i) =>
+        group.items.length ? (
+          <section key={group.heading}>
+            {/* The number is what tells you there are three of these and which
+                one you are on — the job the differing widths were doing badly. */}
+            <div className="mb-6 flex items-baseline gap-4">
+              <span
+                className="text-[11px] font-semibold tabular-nums tracking-[0.16em]"
+                style={{ color: 'var(--brand)' }}
+              >
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <div className="min-w-0">
+                <h3 className="text-[21px] font-semibold leading-snug tracking-[-0.022em]">
+                  {group.heading}
+                </h3>
+                <p className="mt-2 max-w-xl text-[14.5px] leading-[1.7]" style={{ color: 'var(--text-muted)' }}>
+                  {group.blurb}
+                </p>
+              </div>
+            </div>
+            <FeatureCarousel items={group.items} />
+          </section>
+        ) : null
       )}
     </div>
   )

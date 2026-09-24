@@ -51,7 +51,7 @@ function Caret({ open }) {
   )
 }
 
-export default function SiteNav() {
+export default function SiteNav({ children }) {
   const [open, setOpen] = useState(false)
   const [mobile, setMobile] = useState(false)
   const ref = useRef(null)
@@ -107,14 +107,21 @@ export default function SiteNav() {
   )
 
   return (
-    /* One rhythm across the whole bar.
-       The left links sat on a 28px gap and the right pair on 8px plus a
-       nudge, which is what made it look assembled rather than laid out. */
-    <div ref={ref} className="flex flex-1 items-center gap-7">
+    /* Three columns, so the words sit on the middle of the page.
+       Pushed along by a spacer they were centred in whatever was left after
+       the logo, which is not the centre of anything. The outer columns are
+       both 1fr and the nav is auto, so the middle column's centre is the
+       page's centre whatever the logo and the buttons happen to measure. */
+    <div ref={ref} className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-5">
+      {/* The logo is passed in and rendered here rather than beside this
+          component, because a logo sitting outside the grid means the middle
+          column is centred on what is left over instead of on the page. */}
+      <div className="flex min-w-0 justify-start">{children}</div>
+
       {/* Words, not buttons. A bar of pills competes with the one button
           that matters; plain words let "Get started" be the only thing on
           the bar that looks pressable. */}
-      <nav className="hidden items-center gap-7 md:flex">
+      <nav className="hidden items-center justify-center gap-7 md:flex">
         <div className="relative">
           {/* The underline belongs to the word, not to the word plus its
               caret — a rule that runs on under the arrow reads as a mistake. */}
@@ -148,23 +155,22 @@ export default function SiteNav() {
         </Link>
       </nav>
 
-      {/* Everything above is navigation; everything below is the account.
-          The spacer is what separates the two jobs. */}
-      <div className="flex-1" />
+      {/* Everything above is navigation; everything here is the account.
+          They are separate columns because they are separate jobs. */}
+      <div className="col-start-3 flex items-center justify-end gap-6">
+        <Link
+          href="/login"
+          className="nav-word hidden text-[13.5px] font-medium sm:inline-block"
+          style={{ color: 'var(--text-body)' }}
+        >
+          Log in
+        </Link>
+        <Link href="/signup" className="btn btn-solid control-sm">
+          Get started
+        </Link>
 
-      <Link
-        href="/login"
-        className="nav-word hidden text-[13.5px] font-medium sm:inline-block"
-        style={{ color: 'var(--text-body)' }}
-      >
-        Log in
-      </Link>
-      <Link href="/signup" className="btn btn-solid control-sm">
-        Get started
-      </Link>
-
-      {/* Phone: the same list behind one button, since the bar has no room. */}
-      <div className="relative md:hidden">
+        {/* Phone: the same list behind one button, since the bar has no room. */}
+        <div className="relative md:hidden">
         <button
           onClick={() => setMobile((v) => !v)}
           aria-haspopup="menu"
@@ -213,9 +219,10 @@ export default function SiteNav() {
               style={{ borderColor: 'var(--border)' }}
             >
               Log in
-            </Link>
-          </div>
-        )}
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

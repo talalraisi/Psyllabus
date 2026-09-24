@@ -112,14 +112,12 @@ export default async function Home() {
           background: 'color-mix(in oklab, var(--bg) 82%, transparent)',
         }}
       >
-        {/* The gap to the nav is wider than the gaps within it, so the logo
-              reads as the mark and the words read as one group, rather than the
-              first word looking like part of the logo. */}
-        <div className="mx-auto flex max-w-6xl items-center gap-5 px-5 py-3.5 md:gap-11 md:px-8">
-          <Link href="/" aria-label="Project Syllabus home" className="shrink-0">
-            <Image src={logoMark} alt="Project Syllabus" sizes="110px" style={{ height: 30, width: 'auto' }} priority />
-          </Link>
-          <SiteNav />
+        <div className="mx-auto flex max-w-6xl px-5 py-3.5 md:px-8">
+          <SiteNav>
+            <Link href="/" aria-label="Project Syllabus home" className="shrink-0">
+              <Image src={logoMark} alt="Project Syllabus" sizes="110px" style={{ height: 30, width: 'auto' }} priority />
+            </Link>
+          </SiteNav>
         </div>
       </header>
 
