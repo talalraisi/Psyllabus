@@ -5,8 +5,8 @@ import { IconCheck, IconArrowRight, IconClose } from '@/components/Icons'
 import ThemeToggle from '@/components/ThemeToggle'
 import { operatorLine, OPERATOR } from '@/lib/legal'
 import { coursesIn } from '@/lib/catalogue'
-import { HOW_IT_WORKS, FEATURES, WHY, FAQ, ANSWERS } from '@/components/marketing/content'
-import { Heatmap, DecayDemo, PlanDemo, Faq } from '@/components/marketing/interactive'
+import { HOW_IT_WORKS, FEATURES, WHY, ANSWERS } from '@/components/marketing/content'
+import { Heatmap, DecayDemo, PlanDemo } from '@/components/marketing/interactive'
 import { Reveal, ScrollBar, CountUp, ForgettingCurve } from '@/components/marketing/scroll'
 import SiteNav from '@/components/marketing/SiteNav'
 import { FeatureModules } from '@/components/marketing/features'
@@ -88,22 +88,6 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
-      {/* Lets search engines answer these questions directly. */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'FAQPage',
-            mainEntity: FAQ.map(({ q, a }) => ({
-              '@type': 'Question',
-              name: q,
-              acceptedAnswer: { '@type': 'Answer', text: a },
-            })),
-          }),
-        }}
-      />
-
       <ScrollBar />
 
       <header
@@ -377,61 +361,29 @@ export default async function Home() {
         </Section>
 
         {/* -------------------------------------------------------- schools */}
+        {/* A line and a door, not the whole case.
+
+            The panel that used to be here — what a school gets, what it does
+            not get, how a rollout goes — is the schools page now. Saying it
+            twice means a head of year reads it here, follows the link, and is
+            told it again, which makes the second page look like it has
+            nothing of its own. */}
         <Section tint id="schools">
-          <div className="grid items-center gap-10 md:grid-cols-[1.1fr_1fr]">
-            <div>
-              <Heading className="max-w-lg">One code opens it for the whole year group</Heading>
-              <p className="mt-5 max-w-lg text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-                Typed in once. No cards, no seat counting, and every code has a limit.
+          <div className="flex flex-wrap items-end justify-between gap-8">
+            <div className="max-w-xl">
+              <Heading>One code opens it for the whole year group</Heading>
+              <p className="mt-5 text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                Typed in once at sign-up. No cards, no seat counting, every code has a limit — and
+                no teacher dashboard, on any plan.
               </p>
-              <a
-                href={`mailto:${OPERATOR.dpoEmail}?subject=Project%20Syllabus%20for%20our%20school`}
-                className="mt-8 inline-flex items-center gap-2 rounded-full border px-5 py-3.5 text-[14.5px] font-medium"
-                style={{ borderColor: 'var(--border-strong)', color: 'var(--text-body)' }}
-              >
-                Talk to us about your school
-                <IconArrowRight width={16} height={16} />
-              </a>
             </div>
-            {/* This used to show a class heatmap captioned "a teacher sees
-                the same map for a class", which is a feature that does not
-                exist and that the pricing page, the plans and the about page
-                all promise will never exist. It was the one place on the site
-                selling the opposite of the product. */}
-            <Reveal
-              className="elev rounded-[12px] border p-6"
-              style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
-            >
-              <p className="t-overline mb-4">What the school gets</p>
-              <ul className="flex flex-col gap-3.5">
-                {[
-                  ['One code', 'Tied to your email domain. Students type it in once.'],
-                  ['Every subject, for everyone', 'The whole year group, on the full product.'],
-                  ['No seat counting', 'No licences to assign and nothing to administer.'],
-                ].map(([term, detail]) => (
-                  <li key={term}>
-                    <p className="text-[14px] font-medium">{term}</p>
-                    <p className="mt-0.5 text-[13px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                      {detail}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-              <p
-                className="mt-5 border-t pt-4 text-[12.5px] leading-relaxed"
-                style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}
-              >
-                And what it does not get: there is no teacher account and no class dashboard.
-                Nobody at the school sees anybody&rsquo;s results. That is the deal, on every plan.
-              </p>
-            </Reveal>
+            <Link href="/schools" className="btn btn-outline control-lg">
+              How it works for schools
+              <IconArrowRight width={16} height={16} />
+            </Link>
           </div>
         </Section>
 
-        {/* ------------------------------------------------------------ faq */}
-        <Section label="Questions people ask" id="faq">
-          <Faq items={FAQ} />
-        </Section>
 
         {/* ------------------------------------------------------------ cta */}
         <Section>

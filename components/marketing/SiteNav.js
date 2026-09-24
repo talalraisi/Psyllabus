@@ -34,7 +34,7 @@ const MORE = [
   {
     heading: 'The product',
     items: [
-      ['What it does', '/features', 'Every feature, one at a time, in detail.'],
+      ['Features', '/features', 'All eight, one at a time, and where each one stops.'],
       ['Questions', '/faq', 'The ones people ask before signing up.'],
     ],
   },

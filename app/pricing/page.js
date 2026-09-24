@@ -2,6 +2,7 @@
 
 import { Fragment } from 'react'
 import Link from 'next/link'
+import PageShell from '@/components/marketing/PageShell'
 import { IconCheck, IconArrowRight, IconClose } from '@/components/Icons'
 import { PLANS, SCHOOL_PLAN, COMPARISON } from '@/lib/plans'
 
@@ -22,18 +23,14 @@ import { PLANS, SCHOOL_PLAN, COMPARISON } from '@/lib/plans'
  */
 export default function PricingPage() {
   return (
-    <main className="ground min-h-screen">
-      <div className="mx-auto max-w-5xl px-5 py-12 md:py-16">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 text-[13px] font-medium"
-          style={{ color: 'var(--brand)' }}
-        >
-          <span aria-hidden="true">&larr;</span>
-          Back to Project Syllabus
-        </Link>
-
-        <header className="app-enter mt-8 mb-12 max-w-2xl">
+    /* A page, not a window.
+       This opened with "← Back to Project Syllabus" and no bar, which says
+       you have stepped out of the site into a dialogue that has one way home.
+       It is a page on the site, so it has the site's bar and the site's
+       footer, and you leave it by going somewhere rather than by going back. */
+    <PageShell>
+      <div className="ground mx-auto max-w-5xl px-5 py-12 md:py-16">
+        <header className="app-enter mb-12 max-w-2xl">
           <h1 className="text-[clamp(2rem,5vw,2.8rem)] font-semibold leading-[1.08] tracking-[-0.032em]">
             One subject free. All six for less than a textbook.
           </h1>
@@ -283,6 +280,6 @@ export default function PricingPage() {
           </dl>
         </section>
       </div>
-    </main>
+    </PageShell>
   )
 }

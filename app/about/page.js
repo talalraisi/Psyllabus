@@ -1,6 +1,5 @@
-import { Suspense } from 'react'
 import Link from 'next/link'
-import BackLink from '@/components/BackLink'
+import PageShell from '@/components/marketing/PageShell'
 import { IconArrowRight } from '@/components/Icons'
 
 export const metadata = {
@@ -11,13 +10,12 @@ export const metadata = {
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-[var(--bg)]">
+    /* A page, not a window. See the note on pricing: this had a back link and
+       no bar, which reads as a dialogue you have to dismiss rather than
+       somewhere you arrived. */
+    <PageShell>
       <div className="mx-auto max-w-3xl px-5 py-12 md:py-16">
-        <Suspense fallback={<span className="text-sm text-[var(--brand)]">&larr; Back</span>}>
-          <BackLink />
-        </Suspense>
-
-        <header className="mt-6 mb-10">
+        <header className="mb-10">
           <h1 className="t-page-title mb-3">About Project Syllabus</h1>
           <p className="text-lg leading-relaxed text-[var(--text-body)]">
             I am Talal Al-Raisi, a Diploma Programme student at ABA Oman International School in
@@ -116,6 +114,6 @@ export default function AboutPage() {
 
         <p className="t-caption mt-10">Built in Muscat, Oman.</p>
       </div>
-    </main>
+    </PageShell>
   )
 }
