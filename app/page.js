@@ -4,6 +4,7 @@ import logoMark from '@/public/logo-mark.png'
 import { IconCheck, IconArrowRight, IconClose } from '@/components/Icons'
 import ThemeToggle from '@/components/ThemeToggle'
 import { operatorLine, OPERATOR } from '@/lib/legal'
+import { coursesIn } from '@/lib/catalogue'
 import { HOW_IT_WORKS, FEATURES, WHY, FAQ, ANSWERS } from '@/components/marketing/content'
 import { Heatmap, DecayDemo, PlanDemo, Faq } from '@/components/marketing/interactive'
 import { Reveal, ScrollBar, CountUp, ForgettingCurve } from '@/components/marketing/scroll'
@@ -115,7 +116,7 @@ export default async function Home() {
         <div className="mx-auto flex max-w-6xl px-5 py-3 md:px-8">
           <SiteNav>
             <Link href="/" aria-label="Project Syllabus home" className="shrink-0">
-              <Image src={logoMark} alt="Project Syllabus" sizes="150px" style={{ height: 38, width: 'auto' }} priority />
+              <Image src={logoMark} alt="Project Syllabus" sizes="140px" style={{ height: 34, width: 'auto' }} priority />
             </Link>
           </SiteNav>
         </div>
@@ -164,9 +165,9 @@ export default async function Home() {
                 looking like something. */}
             <dl className="mt-20 grid gap-3 sm:grid-cols-3">
               {[
-                ['IB Diploma', '91 subjects mapped', 'Every group, HL and SL, with the core alongside them.'],
-                ['A-Level', '44 subjects mapped', 'AS and A2 content, split the way the specifications split it.'],
-                ['AP', '38 subjects mapped', 'Course and exam description units, unit by unit.'],
+                ['IB Diploma', `${coursesIn('IB')} courses mapped`, 'Every group, HL and SL, with the core alongside them.'],
+                ['A-Level', `${coursesIn('A-Level')} courses mapped`, 'AS and A2 content, split the way the specifications split it.'],
+                ['AP', `${coursesIn('AP')} courses mapped`, 'Course and exam description units, unit by unit.'],
               ].map(([term, count, def]) => (
                 <div
                   key={term}

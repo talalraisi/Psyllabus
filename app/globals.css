@@ -45,17 +45,22 @@
      up at paper-white and lets a few points of warmth do the work, so it
      reads as good stationery rather than as a cream background. Every value
      below holds a hint of yellow rather than a wash of it. */
+  /* The canvas stays as it is — the near-white is right. What was too
+     yellow was everything set into it: each step down added more of it, so
+     by the time you reached a control's edge the warmth had stacked up four
+     deep and the whole page read as cream. Same hue, about half as much of
+     it, and the light-to-dark ladder between them is unchanged. */
   --bg: #fdfbf3;             /* page canvas — the brightest thing */
-  --surface: #f8f2e5;        /* cards, set into the page */
-  --surface-sunken: #f2ead8; /* table headers, inset panels */
+  --surface: #f7f4ec;        /* cards, set into the page */
+  --surface-sunken: #f1eee4; /* table headers, inset panels */
 
   --text: #1d1a13;           /* headings */
   --text-body: #443f33;      /* body copy */
   --text-muted: #635c4a;     /* supporting copy — measured in contrast-test.mjs */
   --text-faint: #635c4a;     /* labels, metadata */
 
-  --border: #ece3cd;         /* card edges */
-  --border-strong: #ded2b6;  /* inputs, controls */
+  --border: #eae5da;         /* card edges */
+  --border-strong: #dcd4c6;  /* inputs, controls */
   --border-hover: #c8b993;
 
   /* --- Status. Five levels of knowledge, plus untested. --------------------

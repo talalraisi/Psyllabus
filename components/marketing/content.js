@@ -79,7 +79,7 @@ export const FAQ = [
   },
   {
     q: 'Which subjects are covered?',
-    a: 'The syllabus is mapped for IB, A-Level and AP across 173 subjects. Question coverage is still being built and is deeper in some subjects than others, which the app tells you rather than hides.',
+    a: 'The syllabus is mapped for IB, A-Level and AP across 128 courses — 46 IB, 44 A-Level and 38 AP, listed in full on the Subjects page. Question coverage is still being built and is deeper in some subjects than others, which the app tells you rather than hides.',
   },
   {
     q: 'How do school codes work, and what stops one leaking?',

@@ -405,7 +405,7 @@ const FEATURE_MODULES = [
  * the fix, and it keeps the graphics private to this file, which they should
  * be anyway.
  */
-const SLIDE_MS = 7000
+const SLIDE_MS = 5200
 
 /**
  * The features, in groups of what they are for.
@@ -508,11 +508,19 @@ function Stage({ items }) {
   }
 
   return (
+    /* It pauses when something in it has keyboard focus, and not when the
+       pointer is merely over it.
+
+       Hovering the whole stage used to stop the slideshow, and the stage is
+       most of the screen when you are reading it — so resting the cursor
+       anywhere near the middle of the page, which is where a cursor sits,
+       froze the thing on whichever slide it happened to be on. It looked
+       broken rather than paused. Focus still stops it, because a person
+       tabbing through the pills is working with it and should not have it
+       move underneath them. */
     <div
       ref={ref}
       className="relative mt-14"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={() => setPaused(false)}
     >

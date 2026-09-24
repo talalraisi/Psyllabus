@@ -21,13 +21,18 @@ import { IconMenu } from '@/components/Icons'
  * They sit next to the mark rather than in the middle of the bar, because the
  * mark and the navigation are one group: who this is, and what it has. The
  * account is the other group, and it is at the far end.
+ *
+ * All five go to pages of their own. Three of them used to be anchors into the
+ * front page, which meant pressing "For schools" from the pricing page sent
+ * you home and then jumped you down it — and gave anyone arriving from a
+ * search engine no page to arrive at.
  */
 const LINKS = [
-  ['What it does', '/#features'],
-  ['How it works', '/#how-it-works'],
+  ['What it does', '/features'],
+  ['Subjects', '/subjects'],
   ['Pricing', '/pricing'],
-  ['For schools', '/#schools'],
-  ['Questions', '/#faq'],
+  ['For schools', '/schools'],
+  ['Questions', '/faq'],
 ]
 
 export default function SiteNav({ children }) {
