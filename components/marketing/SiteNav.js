@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { IconChevronRight, IconMenu } from '@/components/Icons'
 
 /**
  * The top of the front page, with somewhere to go.
@@ -17,14 +18,38 @@ import Link from 'next/link'
  * those stay visible.
  */
 
+/**
+ * Four, not six.
+ *
+ * "How it works" came out because the hero already has a button to it, and a
+ * menu that repeats the button underneath it is a menu you stop reading. "The
+ * five levels" came out because it is part of what the product does rather
+ * than a destination of its own, and an item called "What it does" inside a
+ * menu called "What it does" was never going to help anybody.
+ *
+ * What is left is four things somebody might actually have come for.
+ */
 const SECTIONS = [
-  ['How it works', '/#how-it-works', 'Three steps, and the second one is the point.'],
+  ['Every feature', '/#features', 'Eight of them, grouped by the question they answer.'],
   ['Try a question', '/#try-it', 'A real one, marked the way the app marks it.'],
-  ['The five levels', '/#mastery', 'What moves you up, and what quietly moves you down.'],
-  ['What it does', '/#features', 'Eight things, grouped by the question they answer.'],
   ['For schools', '/#schools', 'One code for a year group. No teacher dashboard.'],
   ['Questions', '/#faq', 'The ones people actually ask before signing up.'],
 ]
+
+/** Down, and up when the menu is open. A rotated chevron, not a ▼ glyph —
+ *  the glyph is a font's idea of an arrow and it never matches the text
+ *  beside it in weight or size. */
+function Caret({ open }) {
+  return (
+    <IconChevronRight
+      aria-hidden="true"
+      width={13}
+      height={13}
+      className="transition-transform duration-200"
+      style={{ transform: open ? 'rotate(-90deg)' : 'rotate(90deg)', opacity: 0.6 }}
+    />
+  )
+}
 
 export default function SiteNav() {
   const [open, setOpen] = useState(false)
@@ -61,7 +86,7 @@ export default function SiteNav() {
   const item = (
     <div
       role="menu"
-      className="elev-lg pop-enter absolute left-0 top-11 z-50 w-[19rem] overflow-hidden rounded-[12px] border"
+      className="elev-lg pop-enter absolute left-0 top-10 z-50 w-[19rem] overflow-hidden rounded-[12px] border"
       style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
     >
       {SECTIONS.map(([label, href, hint]) => (
@@ -91,21 +116,19 @@ export default function SiteNav() {
           the bar that looks pressable. */}
       <nav className="hidden items-center gap-7 md:flex">
         <div className="relative">
+          {/* The underline belongs to the word, not to the word plus its
+              caret — a rule that runs on under the arrow reads as a mistake. */}
           <button
             onClick={() => setOpen((v) => !v)}
             aria-haspopup="menu"
             aria-expanded={open}
-            className="nav-word inline-flex items-center gap-1.5 text-[13.5px] font-medium"
+            className="flex items-center gap-1.5 text-[13.5px] font-medium"
             style={{ color: 'var(--text-body)' }}
           >
-            What it does
-            <span
-              aria-hidden="true"
-              className="text-[9px] transition-transform duration-200"
-              style={{ transform: open ? 'rotate(180deg)' : 'none' }}
-            >
-              ▼
+            <span className="nav-word" data-open={open || undefined}>
+              What it does
             </span>
+            <Caret open={open} />
           </button>
           {open && item}
         </div>
@@ -149,7 +172,7 @@ export default function SiteNav() {
           aria-label="Menu"
           className="btn btn-quiet control-sm px-2.5"
         >
-          ☰
+          <IconMenu width={16} height={16} />
         </button>
         {mobile && (
           <div
@@ -177,9 +200,17 @@ export default function SiteNav() {
               Pricing
             </Link>
             <Link
-              href="/login"
+              href="/about"
               onClick={close}
               className="block px-4 py-3 text-[13.5px] font-medium"
+            >
+              About
+            </Link>
+            <Link
+              href="/login"
+              onClick={close}
+              className="block border-t px-4 py-3 text-[13.5px] font-medium"
+              style={{ borderColor: 'var(--border)' }}
             >
               Log in
             </Link>

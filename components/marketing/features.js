@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useInView } from './scroll'
+import { IconChevronRight } from '@/components/Icons'
 
 /**
  * One module per feature, each with a purpose-built graphic.
@@ -426,6 +427,31 @@ const GROUPS = [
  * Tall rather than wide: the text above the graphic reads as one column at any
  * width, where side by side becomes two thin columns on a laptop.
  */
+/**
+ * One step of the carousel.
+ *
+ * A bordered quiet button either side was two more boxes on a panel that is
+ * already a box inside a box. This is the chevron and nothing else until you
+ * reach for it.
+ */
+function Step({ onClick, label, back = false, disabled = false }) {
+  if (disabled) return <span className="h-7 w-7 shrink-0" aria-hidden="true" />
+  return (
+    <button
+      onClick={onClick}
+      aria-label={label}
+      className="press flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors duration-150 hover:bg-[var(--surface-sunken)]"
+      style={{ color: 'var(--text-muted)' }}
+    >
+      <IconChevronRight
+        width={15}
+        height={15}
+        style={back ? { transform: 'rotate(180deg)' } : undefined}
+      />
+    </button>
+  )
+}
+
 function FeatureCarousel({ items }) {
   const [ref, seen] = useInView({ threshold: 0.3 })
   const [at, setAt] = useState(0)
@@ -461,49 +487,48 @@ function FeatureCarousel({ items }) {
       onBlurCapture={() => setPaused(false)}
     >
       {/* One control row, at the top, where the eye already is when the
-          slide changes under it. The bars double as the position. */}
+          slide changes under it.
+
+          Back on the left, forward on the right, and the bars between them —
+          both arrows and a counter bunched at one end was three things
+          competing for the same corner, and it is the arrangement that got
+          called badly organised. The bars are the position, so the "2/3"
+          alongside them was saying it twice; it is gone. */}
       <div
-        className="flex items-center gap-3 border-b px-3 py-2.5"
+        className="flex items-center gap-4 border-b px-3 py-2.5"
         style={{ borderColor: 'var(--border)' }}
       >
-        {items.length > 1 && (
-          <div className="flex shrink-0 gap-1">
-            <button onClick={() => go(-1)} aria-label="Previous" className="btn btn-quiet control-sm px-2.5">
-              ←
-            </button>
-            <button onClick={() => go(1)} aria-label="Next" className="btn btn-quiet control-sm px-2.5">
-              →
-            </button>
-          </div>
-        )}
-        <div className="flex flex-1 gap-1">
+        <Step onClick={() => go(-1)} label="Previous" back disabled={items.length < 2} />
+        <div className="flex flex-1 gap-1.5">
           {items.map((item, i) => (
             <button
               key={item.title}
               onClick={() => setAt(i)}
               aria-label={`Show ${item.title}`}
               aria-current={i === at}
-              className="h-1 flex-1 overflow-hidden rounded-full"
-              style={{ background: 'var(--border-strong)' }}
+              className="group flex h-4 flex-1 items-center"
             >
               <span
-                className="block h-full rounded-full"
-                style={{
-                  background: 'var(--brand)',
-                  transformOrigin: 'left',
-                  transform: i === at ? 'scaleX(1)' : 'scaleX(0)',
-                  transition:
-                    i === at && seen && !paused && !reduced
-                      ? `transform ${SLIDE_MS}ms linear`
-                      : 'transform 200ms ease',
-                }}
-              />
+                className="block h-[3px] w-full overflow-hidden rounded-full transition-colors"
+                style={{ background: 'var(--border-strong)' }}
+              >
+                <span
+                  className="block h-full rounded-full"
+                  style={{
+                    background: 'var(--brand)',
+                    transformOrigin: 'left',
+                    transform: i === at ? 'scaleX(1)' : 'scaleX(0)',
+                    transition:
+                      i === at && seen && !paused && !reduced
+                        ? `transform ${SLIDE_MS}ms linear`
+                        : 'transform 200ms ease',
+                  }}
+                />
+              </span>
             </button>
           ))}
         </div>
-        <span className="shrink-0 text-[11.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
-          {at + 1}/{items.length}
-        </span>
+        <Step onClick={() => go(1)} label="Next" disabled={items.length < 2} />
       </div>
 
       <div key={current.title} className="pop-enter p-6 md:p-8">
@@ -562,11 +587,20 @@ export function FeatureModules() {
         </section>
       )}
 
-      {/* Two: mirrored, so the eye has to move to follow it. */}
+      {/* Two: mirrored, so the eye has to move to follow it.
+
+          The heading comes first in the source and is moved to the right on a
+          wide screen, rather than the carousel coming first and the heading
+          being moved down. Those look identical on a desktop and are not the
+          same thing anywhere else: written the other way round, a phone and a
+          screen reader both got three unexplained slides and then, eventually,
+          the sentence saying what they were. */}
       {second && (
         <section className="grid gap-7 md:grid-cols-[1fr_0.75fr] md:items-center md:gap-12">
-          <FeatureCarousel items={second.items} />
           <Heading group={second} className="md:order-2" />
+          <div className="md:order-1">
+            <FeatureCarousel items={second.items} />
+          </div>
         </section>
       )}
 

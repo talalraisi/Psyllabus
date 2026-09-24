@@ -988,7 +988,11 @@ body {
    twitches as you run along it. */
 .nav-word {
   position: relative;
-  padding-bottom: 3px;
+  /* Symmetric, not bottom-only.
+     The underline needs room beneath the word, but padding on one side alone
+     shifts the text up inside its own box — which is why the bar looked like
+     the words were floating above the logo rather than sitting beside it. */
+  padding-block: 3px;
 }
 .nav-word::after {
   content: '';
@@ -1005,7 +1009,13 @@ body {
 }
 .nav-word:hover::after,
 .nav-word:focus-visible::after,
-.nav-word[aria-expanded='true']::after {
+.nav-word[data-open]::after,
+/* The dropdown's word is a span inside the button, so that the rule stops at
+   the word and does not run on under the caret. That puts the pointer on the
+   button rather than on the word, and the underline has to follow the press
+   target, not the text node. */
+:is(a, button):hover > .nav-word::after,
+:is(a, button):focus-visible > .nav-word::after {
   transform: scaleX(1);
 }
 

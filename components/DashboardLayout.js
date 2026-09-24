@@ -191,12 +191,16 @@ export default function DashboardLayout({ children, profile }) {
           compact ? 'flex-col items-center gap-4 px-2' : 'items-center justify-between px-4'
         }`}
       >
-        {/* The logo is a mark plus a wordmark and there is no mark-only
+        {/* Signed in, the logo goes to the dashboard. Every other app sends
+            you to your own home from the mark in the corner, and a student who
+            is mid-revision does not want the sales page.
+
+            The logo is a mark plus a wordmark and there is no mark-only
             version of it, so cropping it to 64px shows a sliver of letters.
             Collapsing is a request for space; the logo comes back with the
             labels, one click away. */}
         {!compact && (
-          <Link href="/" className="inline-block" aria-label="Project Syllabus home">
+          <Link href="/dashboard" className="inline-block" aria-label="Dashboard">
             <Image src={logoMark} alt="Project Syllabus" sizes="68px" style={{ height: 26, width: 'auto' }} />
           </Link>
         )}
@@ -348,7 +352,7 @@ export default function DashboardLayout({ children, profile }) {
         >
           <IconMenu />
         </button>
-        <Link href="/" className="inline-block" aria-label="Project Syllabus home">
+        <Link href="/dashboard" className="inline-block" aria-label="Dashboard">
           <Image src={logoMark} alt="Project Syllabus" sizes="70px" style={{ height: 28, width: 'auto' }} />
         </Link>
       </header>
