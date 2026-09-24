@@ -7,6 +7,7 @@ import { operatorLine, OPERATOR } from '@/lib/legal'
 import { HOW_IT_WORKS, FEATURES, WHY, FAQ, ANSWERS } from '@/components/marketing/content'
 import { Heatmap, TryQuestion, DecayDemo, PlanDemo, Faq } from '@/components/marketing/interactive'
 import { Reveal, ScrollBar, CountUp, ForgettingCurve } from '@/components/marketing/scroll'
+import SiteNav from '@/components/marketing/SiteNav'
 import { FeatureModules } from '@/components/marketing/features'
 
 export const metadata = {
@@ -111,24 +112,11 @@ export default async function Home() {
           background: 'color-mix(in oklab, var(--bg) 82%, transparent)',
         }}
       >
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 md:px-8">
+        <div className="mx-auto flex max-w-6xl items-center gap-4 px-5 py-3.5 md:px-8">
           <Link href="/" aria-label="Project Syllabus home" className="shrink-0">
             <Image src={logoMark} alt="Project Syllabus" sizes="110px" style={{ height: 30, width: 'auto' }} priority />
           </Link>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/login"
-              className="btn btn-quiet control-sm hidden sm:inline-flex"
-            >
-              Log in
-            </Link>
-            <Link
-              href="/signup"
-              className="btn btn-solid control-sm"
-            >
-              Get started
-            </Link>
-          </div>
+          <SiteNav />
         </div>
       </header>
 
@@ -254,7 +242,7 @@ export default async function Home() {
         </Section>
 
         {/* ----------------------------------------------------------- try it */}
-        <Section label="Try it">
+        <Section label="Try it" id="try-it">
           <div className="grid gap-10 md:grid-cols-[1fr_1.15fr] md:gap-14">
             <div>
               <Heading>Sit one, right here</Heading>
@@ -299,7 +287,7 @@ export default async function Home() {
         </Section>
 
         {/* --------------------------------------------------------- levels */}
-        <Section label="The ladder">
+        <Section label="The ladder" id="mastery">
           <Heading>Five levels, and only a quiz moves you</Heading>
 
           <div className="mt-12 flex items-end gap-2 md:gap-3">
@@ -362,7 +350,7 @@ export default async function Home() {
         </Section>
 
         {/* ------------------------------------------------------- features */}
-        <Section label="Features" tint>
+        <Section label="Features" tint id="features">
           <Heading className="max-w-2xl">Three questions, and what answers each</Heading>
           <p className="mt-4 max-w-lg text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
             Shown rather than described, because a list of feature names tells you nothing about
@@ -392,7 +380,7 @@ export default async function Home() {
         </Section>
 
         {/* -------------------------------------------------------- schools */}
-        <Section tint>
+        <Section tint id="schools">
           <div className="grid items-center gap-10 md:grid-cols-[1.1fr_1fr]">
             <div>
               <Heading className="max-w-lg">One code opens it for the whole year group</Heading>
@@ -444,7 +432,7 @@ export default async function Home() {
         </Section>
 
         {/* ------------------------------------------------------------ faq */}
-        <Section label="Questions people ask">
+        <Section label="Questions people ask" id="faq">
           <Faq items={FAQ} />
         </Section>
 

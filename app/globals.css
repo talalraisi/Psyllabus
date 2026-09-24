@@ -677,9 +677,14 @@ body {
    button, which is how the Open syllabus and Review buttons ended up looking
    broken. Winning here means the combination is merely redundant, never wrong.
    --------------------------------------------------------------------------- */
-.btn.btn { display: inline-flex; }
-.btn.btn.w-full,
-.btn.btn.flex-1 { display: flex; }
+/* `:not(.hidden)`, because this rule has specificity (0,2,0) and Tailwind's
+   .hidden has (0,1,0) — so without the exclusion this quietly wins over it
+   and `hidden` can never hide a button anywhere in the app. That was true
+   for as long as this rule has existed; the responsive links in the site
+   nav were the first place anything tried to use it. */
+.btn.btn:not(.hidden) { display: inline-flex; }
+.btn.btn.w-full:not(.hidden),
+.btn.btn.flex-1:not(.hidden) { display: flex; }
 
 /* ---------------------------------------------------------------------------
    Legal documents
