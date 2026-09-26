@@ -1,7 +1,7 @@
 import PageShell, { PageHead, Band } from '@/components/marketing/PageShell'
 import { CURRICULUMS, coursesIn, entriesIn, groupsOf } from '@/lib/catalogue'
 import Link from 'next/link'
-import { CourseFinder, CoverageBar, StatRow } from '@/components/marketing/visuals'
+import { CourseFinder, CoverageBar, StatRow, SyllabusTree } from '@/components/marketing/visuals'
 import { IconArrowRight } from '@/components/Icons'
 
 export const metadata = {
@@ -70,8 +70,27 @@ export default function SubjectsPage() {
         </div>
       </PageHead>
 
+      {/* "Mapped topic by topic" is four words everybody nods at without
+          picturing. This is the picture. */}
+      <Band tint>
+        <div className="grid items-center gap-10 md:grid-cols-[1fr_1.1fr] md:gap-14">
+          <div>
+            <h2 className="text-[clamp(1.5rem,3vw,2rem)] font-semibold leading-tight tracking-[-0.03em]">
+              What “mapped” means
+            </h2>
+            <p className="mt-5 text-[15px] leading-[1.7]" style={{ color: 'var(--text-body)' }}>
+              A course opens into topics, and a topic opens into the things you are actually
+              examined on. The colour goes on that bottom level, because a subtopic is the size of
+              thing a question can prove — anything larger and a green tick would be hiding
+              something.
+            </p>
+          </div>
+          <SyllabusTree />
+        </div>
+      </Band>
+
       {curricula.map((id, n) => (
-        <Band key={id} tint={n % 2 === 1} className="scroll-mt-20">
+        <Band key={id} tint={n % 2 === 0} className="scroll-mt-20">
           <div id={id.toLowerCase()} className="scroll-mt-24">
             <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
               <h2 className="text-[clamp(1.5rem,3vw,2rem)] font-semibold leading-tight tracking-[-0.03em]">

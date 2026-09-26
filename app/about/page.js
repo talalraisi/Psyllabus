@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import PageShell, { PageHead, Band } from '@/components/marketing/PageShell'
-import { SubjectLoad, PickOrPlan, StatRow, Panel, Eyebrow } from '@/components/marketing/visuals'
+import { SubjectLoad, PickOrPlan, StatRow, SessionBar, Panel, Eyebrow } from '@/components/marketing/visuals'
 import { coursesIn } from '@/lib/catalogue'
 import { IconArrowRight } from '@/components/Icons'
 
@@ -33,8 +33,8 @@ export default function AboutPage() {
     <PageShell>
       <PageHead
         eyebrow="About"
-        title="I built the thing I needed at eight o’clock"
-        intro="I am Talal Al-Raisi, a Diploma student at ABA Oman International School in Muscat. Six subjects, two years, and no way of telling which part of them actually needed me tonight."
+        title="I needed this, so I am building it"
+        intro="I am Talal Al-Raisi, a Diploma student at ABA Oman International School in Muscat. Six subjects, two years, hundreds of subtopics — and no way of telling which part of them actually needed me on a given evening."
       >
         <div className="mt-10 max-w-lg">
           <SubjectLoad subjects={MY_SUBJECTS} />
@@ -43,7 +43,7 @@ export default function AboutPage() {
 
       <Band tint>
         <h2 className="max-w-xl text-[clamp(1.5rem,3vw,2rem)] font-semibold leading-tight tracking-[-0.03em]">
-          The problem was never finding material
+          Finding material was never the problem
         </h2>
         <p className="mt-4 max-w-xl text-[15px] leading-[1.7]" style={{ color: 'var(--text-body)' }}>
           There is more of it than anyone could work through. Knowing which part I needed on a given
@@ -56,6 +56,22 @@ export default function AboutPage() {
       </Band>
 
       <Band>
+        <div className="grid items-center gap-10 md:grid-cols-[1fr_1fr] md:gap-14">
+          <div>
+            <h2 className="text-[clamp(1.5rem,3vw,2rem)] font-semibold leading-tight tracking-[-0.03em]">
+              So it answers one question properly
+            </h2>
+            <p className="mt-5 text-[15px] leading-[1.7]" style={{ color: 'var(--text-body)' }}>
+              What should I do right now. Tell it how long you have — forty minutes, not a term —
+              and it cuts that time up, worst thing first, with a reason attached to every block so
+              you can disagree with it.
+            </p>
+          </div>
+          <SessionBar minutes={40} />
+        </div>
+      </Band>
+
+      <Band tint>
         <div className="grid gap-10 md:grid-cols-[1fr_1fr] md:gap-14">
           <div>
             <h2 className="text-[clamp(1.5rem,3vw,2rem)] font-semibold leading-tight tracking-[-0.03em]">
@@ -91,7 +107,7 @@ export default function AboutPage() {
         </div>
       </Band>
 
-      <Band tint>
+      <Band>
         <h2 className="max-w-xl text-[clamp(1.5rem,3vw,2rem)] font-semibold leading-tight tracking-[-0.03em]">
           Where it is up to
         </h2>
