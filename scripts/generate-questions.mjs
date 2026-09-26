@@ -160,9 +160,12 @@ const MODEL = arg("claude-model", "claude-opus-5");
  */
 const PRICES = {
   // Checked against claude.com/pricing, September 2026. Sonnet had been
-  // sitting here at 3/15 since before it moved.
-  "claude-opus-5": { input: 15, output: 75 },
+  // sitting here at 3/15 since before it moved, and Opus at 15/75 — which is
+  // three times its real price and is most of the reason we talked ourselves
+  // out of using the best model for a run that turns out to cost about $50.
+  "claude-opus-5": { input: 5, output: 25 },
   "claude-sonnet-5": { input: 2, output: 10 },
+  "claude-haiku-4-5": { input: 1, output: 5 },
   "claude-haiku-4-5-20251001": { input: 1, output: 5 },
 };
 
