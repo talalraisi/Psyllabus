@@ -601,7 +601,7 @@ export default function FlashcardsPage() {
                   </span>
                 </div>
                 <p className="mb-4 text-[13px]" style={{ color: 'var(--text-muted)' }}>
-                  Checked before anybody sees them. Study one now — a card becomes yours, with its
+                  Checked before anybody sees them. Study one now. A card becomes yours, with its
                   own schedule, the first time you answer it.
                 </p>
 

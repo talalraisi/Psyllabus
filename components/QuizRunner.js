@@ -1545,7 +1545,7 @@ export default function QuizRunner({
                 className="mt-2 text-[12.5px] leading-relaxed"
                 style={{ color: 'var(--text-faint)' }}
               >
-                A question pays by heat — Low 0.5 up to Burning 1.5 — and only when you get it
+                A question pays by heat, from Low 0.5 up to Burning 1.5, and only when you get it
                 right. Each question pays once, so the same easy one cannot be farmed.
                 {MASTERY_TARGET} points is Mastered.
               </p>

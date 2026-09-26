@@ -120,7 +120,7 @@ export default function PaperPicker({ open, onClose, subject, curriculum, backHr
         <div className="flex-1 overflow-y-auto p-5">
           {papers.length === 0 ? (
             <p className="t-small">
-              Assessed by coursework — no written paper. Practise by subtopic.
+              Assessed by coursework, with no written paper. Practise by subtopic.
             </p>
           ) : pool === null ? (
             <p className="t-small">Checking what we can field…</p>
@@ -158,7 +158,7 @@ export default function PaperPicker({ open, onClose, subject, curriculum, backHr
                         </p>
                         {short && (
                           <p className="t-caption mt-1 text-[var(--warning-text)]">
-                            Shorter than the real {p.name} — the bank is not deep enough yet.
+                            Shorter than the real {p.name}, because the bank is not deep enough yet.
                           </p>
                         )}
                         <button

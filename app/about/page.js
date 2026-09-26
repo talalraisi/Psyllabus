@@ -34,7 +34,7 @@ export default function AboutPage() {
       <PageHead
         eyebrow="About"
         title="I needed this, so I am building it"
-        intro="I am Talal Al-Raisi, a Diploma student at ABA Oman International School in Muscat. Six subjects, two years, hundreds of subtopics — and no way of telling which part of them actually needed me on a given evening."
+        intro="I am Talal Al-Raisi, a Diploma student at ABA Oman International School in Muscat. Six subjects, two years, hundreds of subtopics, and no way of telling which part of them actually needed me on a given evening."
       >
         <div className="mt-10 max-w-lg">
           <SubjectLoad subjects={MY_SUBJECTS} />
@@ -48,7 +48,7 @@ export default function AboutPage() {
         <p className="mt-4 max-w-xl text-[15px] leading-[1.7]" style={{ color: 'var(--text-body)' }}>
           There is more of it than anyone could work through. Knowing which part I needed on a given
           evening was the problem. I would sit down at eight, pick whichever subject felt worst, and
-          hope — often polishing something I already knew while a real gap sat untouched for weeks.
+          hope. Often I was polishing something I already knew while a real gap sat untouched for weeks.
         </p>
         <div className="mt-10">
           <PickOrPlan />
@@ -62,7 +62,7 @@ export default function AboutPage() {
               So it answers one question properly
             </h2>
             <p className="mt-5 text-[15px] leading-[1.7]" style={{ color: 'var(--text-body)' }}>
-              What should I do right now. Tell it how long you have — forty minutes, not a term —
+              What should I do right now. Tell it how long you have, forty minutes rather than a term,
               and it cuts that time up, worst thing first, with a reason attached to every block so
               you can disagree with it.
             </p>
@@ -78,7 +78,7 @@ export default function AboutPage() {
               What I think study tools get wrong
             </h2>
             <p className="mt-5 text-[15px] leading-[1.7]" style={{ color: 'var(--text-body)' }}>
-              Almost every tracker asks you to rate your own confidence — the one number a student
+              Almost every tracker asks you to rate your own confidence, which is the one number a student
               cannot supply honestly, and not because anyone is lying. You do not know what you do
               not know. Rate yourself and you get a map of your mood, then revise against that
               instead of the syllabus.
@@ -135,7 +135,7 @@ export default function AboutPage() {
             </h2>
             <p className="mt-4 text-[15px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
               A student with something that would make this better, or a school wanting it for a
-              year group — I would like to hear from you at{' '}
+              year group: I would like to hear from you at{' '}
               <a
                 href="mailto:talalraisi1@gmail.com?subject=Project%20Syllabus"
                 className="underline"

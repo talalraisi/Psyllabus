@@ -373,8 +373,8 @@ export default async function Home() {
             <div className="max-w-xl">
               <Heading>One code opens it for the whole year group</Heading>
               <p className="mt-5 text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-                Typed in once at sign-up. No cards, no seat counting, every code has a limit — and
-                no teacher dashboard, on any plan.
+                Typed in once at sign-up. No cards, no seat counting, every code has a limit, and
+                no teacher dashboard on any plan.
               </p>
             </div>
             <Link href="/schools" className="btn btn-outline control-lg">

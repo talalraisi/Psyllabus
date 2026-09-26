@@ -171,7 +171,7 @@ export default function Signup() {
             </h1>
             <p className="mb-6 text-[14.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
               We sent a confirmation link to{' '}
-              <strong className="text-[var(--text)]">{email}</strong>. Open it to finish setting up. It can take a minute — check spam.
+              <strong className="text-[var(--text)]">{email}</strong>. Open it to finish setting up. It can take a minute, so check spam.
             </p>
 
             {resent && (
@@ -241,7 +241,7 @@ export default function Signup() {
               </p>
               <p className="mt-1.5 text-[13px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
                 Making another account will sign you out of that one on this device. Your work
-                stays on it — but the next screens will be the new account, not that one.
+                stays on it, but the next screens will be the new account, not that one.
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <Link href="/dashboard" className="btn btn-solid control-sm">

@@ -172,7 +172,7 @@ export default function FlashcardWrite({ cards, mode = 'write', onMark, onSnooze
                   ) : (
                     <IconCheck width={15} height={15} style={{ color: 'var(--status-proficient)' }} />
                   )}
-                  {result.correct ? 'Right' : result.close ? 'Nearly — spelling' : 'Not quite'}
+                  {result.correct ? 'Right' : result.close ? 'Nearly: spelling' : 'Not quite'}
                 </p>
                 <p
                   className="mt-1.5 whitespace-pre-wrap text-[14.5px] leading-relaxed"

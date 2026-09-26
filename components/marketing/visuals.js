@@ -266,7 +266,7 @@ export function CourseFinder({ curricula }) {
         type="search"
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        placeholder="Find your course — try physics, history, spanish…"
+        placeholder="Find your course: try physics, history, spanish…"
         className="input w-full"
         autoComplete="off"
       />
@@ -524,7 +524,7 @@ export function SyllabusTree() {
   const [ref, seen] = useSeen(0.4)
   const rows = [
     { depth: 0, text: 'Physics HL', note: '11 topics' },
-    { depth: 1, text: 'Topic 6 — Circular motion and gravitation', note: '4 subtopics' },
+    { depth: 1, text: 'Topic 6: Circular motion and gravitation', note: '4 subtopics' },
     { depth: 2, text: '6.1  Circular motion', tone: 'proficient' },
     { depth: 2, text: '6.2  Newton’s law of gravitation', tone: 'weak' },
     { depth: 2, text: '6.3  Orbital motion', tone: 'untested' },
@@ -594,7 +594,7 @@ export function SyllabusTree() {
  * them. Each rung says what it takes to get there and what takes it away.
  */
 const LEVELS = [
-  ['Untested', 'untested', 'No questions yet. Grey, not green — the absence of a level.'],
+  ['Untested', 'untested', 'No questions yet. Grey rather than green, because it is the absence of a level.'],
   ['Weak', 'weak', 'You got more wrong than right. Top of tonight’s plan.'],
   ['Developing', 'developing', 'Getting there. Still comes round often.'],
   ['Proficient', 'proficient', 'Right more often than not, across more than one sitting.'],
@@ -663,7 +663,7 @@ export function MarkingWalk() {
   const steps = [
     { k: 'Question', v: 'A satellite’s orbital radius doubles. Its speed…', tone: null },
     { k: 'You answer', v: 'halves', tone: 'weak' },
-    { k: 'Marked', v: 'No — it falls by √2. You used v ∝ 1/r rather than v ∝ 1/√r.', tone: null },
+    { k: 'Marked', v: 'No. It falls by √2. You used v ∝ 1/r rather than v ∝ 1/√r.', tone: null },
     { k: 'Subtopic moves', v: '6.3 Orbital motion → Weak, and into the mistake bank', tone: 'weak' },
   ]
   return (

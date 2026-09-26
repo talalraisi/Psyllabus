@@ -340,7 +340,7 @@ export default function TodoList({
           const value = e.target.value.trim()
           if (value !== (todo.note || '')) patch(todo, { note: value || null })
         }}
-        placeholder="Notes — what it needs, where it is, who asked for it"
+        placeholder="Notes: what it needs, where it is, who asked for it"
         className="input mt-2 w-full resize-y text-[13px]"
         style={{ height: 'auto', padding: '8px 12px' }}
       />

@@ -147,7 +147,7 @@ export function Heatmap({ cols = 12, rows = 8, subject = 'Physics SL' }) {
               onMouseEnter={() => setAt(i)}
               onFocus={() => setAt(i)}
               onBlur={() => setAt(null)}
-              title={`${m.ref} ${m.name} — ${STATUS_LABEL[c.status]}`}
+              title={`${m.ref} ${m.name}: ${STATUS_LABEL[c.status]}`}
               aria-label={`${m.ref} ${m.name}, ${STATUS_LABEL[c.status]}`}
               className="aspect-square rounded-[3px] transition-transform duration-100 hover:scale-[1.2]"
               style={{

@@ -897,7 +897,7 @@ export default function Onboarding() {
               Which subject do you want to start with?
             </h1>
             <p className="mb-8 mt-3 text-[14.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              One subject, completely: every topic, every quiz, its own plan. Pick the one you are actually revising — this is the one that stays open, and it is not changed later.
+              One subject, completely: every topic, every quiz, its own plan. Pick the one you are actually revising. This is the one that stays open, and it is not changed later.
             </p>
 
             <div className="flex flex-col gap-2 mb-6">

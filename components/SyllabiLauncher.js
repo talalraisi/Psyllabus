@@ -38,7 +38,7 @@ const TASKS = [
     key: 'study_advice',
     label: 'How do I study this?',
     hint: 'What to do this week, from what your quizzes show.',
-    placeholder: 'Anything else worth knowing — a test date, what you find hard.',
+    placeholder: 'Anything else worth knowing: a test date, what you find hard.',
     rows: 3,
     minWords: 0,
   },

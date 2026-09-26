@@ -142,7 +142,7 @@ export default function ProfilePage() {
     // message for it is a TypeError nobody would read as "you have no
     // internet". Say it plainly, before trying.
     if (typeof navigator !== 'undefined' && navigator.onLine === false) {
-      setPhotoError('You are offline. Reconnect and press Save again — your crop is still here.')
+      setPhotoError('You are offline. Reconnect and press Save again. Your crop is still here.')
       return
     }
 
@@ -194,7 +194,7 @@ export default function ProfilePage() {
           uploadError.message.includes('Bucket not found')
             ? 'Photo storage is not set up on the server yet.'
             : /exceeded|too large|size|maximum/i.test(uploadError.message)
-              ? 'That photo is too large for the server. Tell Talal — the crop should have prevented this.'
+              ? 'That photo is too large for the server. Tell Talal, because the crop should have prevented this.'
               : /jwt|token|unauthor|401/i.test(uploadError.message)
                 ? 'Your session has expired. Sign in again and the photo will upload.'
                 : `The upload was refused: ${uploadError.message}`
@@ -224,7 +224,7 @@ export default function ProfilePage() {
     } catch (e) {
       setPhotoError(
         e?.message === 'timeout'
-          ? 'The upload is taking too long — your connection may have dropped. Try again.'
+          ? 'The upload is taking too long. Your connection may have dropped. Try again.'
           : typeof navigator !== 'undefined' && navigator.onLine === false
             ? 'You went offline during the upload. Reconnect and press Save again.'
             : 'The upload could not reach the server. Check your connection and try again.'
@@ -468,7 +468,7 @@ export default function ProfilePage() {
 
           {hasWork ? (
             <p className="text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              Set for good — everything you prove is filed under them. Get in touch if the list is wrong.
+              Set for good, because everything you prove is filed under them. Get in touch if the list is wrong.
             </p>
           ) : (
             <>

@@ -368,7 +368,7 @@ export default function TestBuilder({
                         <span className="min-w-0 flex-1 truncate text-[14.5px]">{topic}</span>
                       </button>
                       <span className="shrink-0 text-[12.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
-                        {picked.length ? `${picked.length}/${names.length}` : n > 0 ? n : '—'}
+                        {picked.length ? `${picked.length}/${names.length}` : n > 0 ? n : '·'}
                       </span>
                       {names.length > 0 && (
                         <button
@@ -528,7 +528,7 @@ export default function TestBuilder({
                       inputMode="numeric"
                       value={customLength}
                       aria-label={`Or type a number of ${lengthMetric}`}
-                      placeholder="—"
+                      placeholder="·"
                       onChange={(e) => onCustomLength(e.target.value.replace(/[^0-9]/g, ''))}
                       className="w-9 border-0 bg-transparent p-0 text-center text-[12.5px] tabular-nums outline-none"
                       style={{ color: 'var(--text)' }}

@@ -78,7 +78,7 @@ export default function PricingPage() {
                 </p>
                 {plan.annual && (
                   <p className="mt-1.5 text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
-                    or {plan.annual} — two months off
+                    or {plan.annual}, two months off
                   </p>
                 )}
               </div>
@@ -152,7 +152,7 @@ export default function PricingPage() {
 
         {/* Said once, plainly, rather than printed on three buttons. */}
         <p className="mt-5 text-[13px]" style={{ color: 'var(--text-muted)' }}>
-          Paid plans are not live yet — sign up free and you will be the first to be offered one.
+          Paid plans are not live yet. Sign up free and you will be the first to be offered one.
         </p>
 
         {/* Row by row, where the eye can travel across. */}
@@ -240,7 +240,7 @@ export default function PricingPage() {
                                 style={{ color: 'var(--brand)' }}
                               />
                             ) : (
-                              <span style={{ color: 'var(--text-faint)' }}>—</span>
+                              <span style={{ color: 'var(--text-faint)' }}>·</span>
                             )}
                           </td>
                         ))}
@@ -287,7 +287,7 @@ export default function PricingPage() {
               ],
               [
                 'Can I change subject on the free plan?',
-                'No — you choose it once, when you set up your account. Otherwise a free account could read the whole syllabus a subject at a time, and there would be nothing to pay for.',
+                'No. You choose it once, when you set up your account. Otherwise a free account could read the whole syllabus a subject at a time, and there would be nothing to pay for.',
               ],
               [
                 'Does my school see my results?',

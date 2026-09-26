@@ -145,7 +145,7 @@ export default function PredictionPage() {
         {!hasData ? (
           <EmptyState
             title="No prediction yet"
-            description="Take a quiz and a predicted grade appears here. Quiz results only — never self-rating."
+            description="Take a quiz and a predicted grade appears here. Quiz results only, never self-rating."
             action={
               <Link href="/dashboard/subjects" className="btn btn-solid control-md">
                 Open a subject
@@ -470,7 +470,7 @@ export default function PredictionPage() {
                     </strong>
                   </p>
                   <p className="t-caption mt-2">
-              For reference. Not added to the total — nothing here has marked that coursework.
+              For reference. Not added to the total, because nothing here has marked that coursework.
                   </p>
                 </div>
                 )}

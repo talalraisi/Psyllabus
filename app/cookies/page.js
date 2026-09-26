@@ -43,14 +43,14 @@ function Cookies() {
           <li>
             <strong>sb-…-auth-token</strong>{' '}
             {ar
-              ? '— رمز الجلسة الذي يُبقيك مسجّل الدخول. يضعه مزوّد المصادقة لدينا (Supabase). ينتهي عند تسجيل الخروج.'
-              : '— the session token that keeps you signed in, set by our authentication provider (Supabase). Cleared when you sign out.'}
+              ? 'رمز الجلسة الذي يُبقيك مسجّل الدخول. يضعه مزوّد المصادقة لدينا (Supabase). ينتهي عند تسجيل الخروج.'
+              : 'the session token that keeps you signed in, set by our authentication provider (Supabase). Cleared when you sign out.'}
           </li>
           <li>
             <strong>sb-…-auth-token-code-verifier</strong>{' '}
             {ar
-              ? '— ملف مؤقت يُستخدم أثناء تسجيل الدخول عبر Google فقط، ويُحذف فور اكتمال العملية.'
-              : '— a short-lived value used only while a Google sign-in is in progress, and discarded as soon as it completes.'}
+              ? 'ملف مؤقت يُستخدم أثناء تسجيل الدخول عبر Google فقط، ويُحذف فور اكتمال العملية.'
+              : 'a short-lived value used only while a Google sign-in is in progress, and discarded as soon as it completes.'}
           </li>
         </ul>
         <p>
@@ -62,14 +62,14 @@ function Cookies() {
           <li>
             <strong>psyllabus:theme</strong>{' '}
             {ar
-              ? '— تفضيلك للوضع الفاتح أو الداكن.'
-              : '— whether you prefer the light or dark theme.'}
+              ? 'تفضيلك للوضع الفاتح أو الداكن.'
+              : 'whether you prefer the light or dark theme.'}
           </li>
           <li>
             <strong>psy:…</strong>{' '}
             {ar
-              ? '— نسخة مؤقتة من ملفك الشخصي والمنهج لتسريع التصفح. تُمحى عند إغلاق التبويب.'
-              : '— a short-lived copy of your profile and syllabus so pages open quickly. Erased when you close the tab.'}
+              ? 'نسخة مؤقتة من ملفك الشخصي والمنهج لتسريع التصفح. تُمحى عند إغلاق التبويب.'
+              : 'a short-lived copy of your profile and syllabus so pages open quickly. Erased when you close the tab.'}
           </li>
         </ul>
       </Clause>

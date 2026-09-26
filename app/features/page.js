@@ -16,7 +16,7 @@ export default function FeaturesPage() {
       <PageHead
         eyebrow="Features"
         title="All eight, in detail"
-        intro="The front page shows these one at a time, which is the right amount to decide whether to keep reading and the wrong amount to decide whether to sign up. This is how each one actually works — and where it stops."
+        intro="The front page shows these one at a time, which is the right amount to decide whether to keep reading and the wrong amount to decide whether to sign up. This is how each one actually works, and where it stops."
       />
 
       {/* Nothing here is on the front page and nothing on the front page is

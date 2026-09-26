@@ -223,8 +223,8 @@ export default function VibePreview() {
 
       <p className="v-note">
         {variant === 'a'
-          ? 'Rings led, in the instrument palette. The ring is the subject of the screen and the only green on it — no wash behind the card, no glow behind the ring. Warm neutral greys rather than green-tinted ones, and the card lifts by elevation instead of by colour.'
-          : 'Yours. Structure carries it — hairlines, a real grid, generous spacing. Warmer and lighter than today so it is not bland. Cards have weight, and the rings are an accent on each row rather than the headline.'}
+          ? 'Rings led, in the instrument palette. The ring is the subject of the screen and the only green on it, with no wash behind the card, no glow behind the ring. Warm neutral greys rather than green-tinted ones, and the card lifts by elevation instead of by colour.'
+          : 'Yours. Structure carries it: hairlines, a real grid, generous spacing. Warmer and lighter than today so it is not bland. Cards have weight, and the rings are an accent on each row rather than the headline.'}
       </p>
 
       <div className="v-stack">

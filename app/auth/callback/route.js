@@ -78,7 +78,7 @@ export async function GET(request) {
       const cleared = NextResponse.redirect(
         new URL(
           `/login?error=${encodeURIComponent(
-            'That sign-in could not be matched to this browser. Old sign-in cookies have been cleared — press Continue with Google once more.'
+            'That sign-in could not be matched to this browser. Old sign-in cookies have been cleared. Press Continue with Google once more.'
           )}`,
           requestUrl.origin
         )

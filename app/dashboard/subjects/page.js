@@ -165,7 +165,7 @@ export default function SubjectsPage() {
               className="text-[26px] font-semibold leading-none tracking-[-0.028em] tabular-nums"
               style={{ color: locked ? 'var(--text-faint)' : 'var(--text)' }}
             >
-              {locked ? '—' : masteredCount}
+              {locked ? '·' : masteredCount}
             </span>
             <span className="text-[13px]" style={{ color: 'var(--text-faint)' }}>
               {locked ? 'locked' : `of ${count} mastered`}

@@ -144,7 +144,7 @@ export default function QuestionMenu({ question, align = 'right' }) {
               height={12}
               style={{ opacity: saved ? 1 : 0.25, color: saved ? 'var(--brand)' : 'currentColor' }}
             />
-            {saved ? 'Saved — tap to unsave' : 'Save this question'}
+            {saved ? 'Saved, tap to unsave' : 'Save this question'}
           </button>
           <button
             role="menuitem"

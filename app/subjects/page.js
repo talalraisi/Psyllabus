@@ -38,7 +38,7 @@ export default function SubjectsPage() {
       <PageHead
         eyebrow="Coverage"
         title={`${total} courses, mapped topic by topic`}
-        intro="Every one is broken into topics and subtopics from the official outline. Question coverage is still being built and runs deeper in some than others — the app tells you which, rather than hiding it."
+        intro="Every one is broken into topics and subtopics from the official outline. Question coverage is still being built and runs deeper in some than others. The app tells you which, rather than hiding it."
       >
         {/* Twenty boxes of course names is a page you scan with a finger.
             Everybody arrives with the same question — is mine in here — and a
@@ -81,7 +81,7 @@ export default function SubjectsPage() {
             <p className="mt-5 text-[15px] leading-[1.7]" style={{ color: 'var(--text-body)' }}>
               A course opens into topics, and a topic opens into the things you are actually
               examined on. The colour goes on that bottom level, because a subtopic is the size of
-              thing a question can prove — anything larger and a green tick would be hiding
+              thing a question can prove. Anything larger and a green tick would be hiding
               something.
             </p>
           </div>

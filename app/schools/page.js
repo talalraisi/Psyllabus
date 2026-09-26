@@ -8,7 +8,7 @@ import Link from 'next/link'
 export const metadata = {
   title: 'For schools',
   description:
-    'One code opens Project Syllabus for a whole year group. No cards, no seat counting, and no teacher dashboard — nobody at the school sees anybody’s results.',
+    'One code opens Project Syllabus for a whole year group. No cards, no seat counting, and no teacher dashboard, so nobody at the school sees anybody’s results.',
 }
 
 const GETS = [

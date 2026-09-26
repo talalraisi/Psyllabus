@@ -79,7 +79,7 @@ export const FAQ = [
   },
   {
     q: 'Which subjects are covered?',
-    a: 'The syllabus is mapped for IB, A-Level and AP across 128 courses — 46 IB, 44 A-Level and 38 AP, listed in full on the Subjects page. Question coverage is still being built and is deeper in some subjects than others, which the app tells you rather than hides.',
+    a: 'The syllabus is mapped for IB, A-Level and AP across 128 courses: 46 IB, 44 A-Level and 38 AP, listed in full on the Subjects page. Question coverage is still being built and is deeper in some subjects than others, which the app tells you rather than hides.',
   },
   {
     q: 'How do school codes work, and what stops one leaking?',
@@ -129,7 +129,7 @@ export const FEATURE_DETAIL = [
     title: 'A heatmap you cannot fake',
     lede: 'Every subtopic of your course, coloured by what you proved.',
     how: [
-      'Pick your subjects and the full official outline appears, broken into topics and subtopics. Nothing is coloured at first, because untested is not a level — it is the absence of one, and it stays grey to say so.',
+      'Pick your subjects and the full official outline appears, broken into topics and subtopics. Nothing is coloured at first, because untested is not a level but the absence of one, and it stays grey to say so.',
       'Each subtopic sits at one of five levels: Weak, Developing, Proficient, Mastered, or Fading. The level is a function of how many questions you got right on that subtopic and how hard they were, so an easy run cannot carry you to the top.',
       'There is no confidence slider anywhere in this product. Asking students to rate themselves produces a map of their mood, and the students furthest from understanding a topic are the ones most likely to overrate it.',
     ],
@@ -188,7 +188,7 @@ export const FEATURE_DETAIL = [
       'Blocks are recorded against the subjects you worked on, so the week adds up to something you can look at rather than a feeling about how much you did.',
       'It is the one number in the product that measures effort rather than result, which is why it is deliberately kept separate from the map.',
     ],
-    limit: 'Time in a session is not evidence of anything. It never moves a subtopic up a level — only questions do that.',
+    limit: 'Time in a session is not evidence of anything. It never moves a subtopic up a level. Only questions do that.',
   },
   {
     label: 'Resources',

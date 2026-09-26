@@ -116,7 +116,7 @@ function Privacy() {
           {OPERATOR.processors.map((p) => (
             <li key={p.name}>
               <strong>{p.name}</strong>
-              {' — '}
+              {': '}
               {p.role}. {p.region}.
             </li>
           ))}
