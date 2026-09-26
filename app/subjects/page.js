@@ -1,6 +1,7 @@
 import PageShell, { PageHead, Band } from '@/components/marketing/PageShell'
 import { CURRICULUMS, coursesIn, entriesIn, groupsOf } from '@/lib/catalogue'
 import Link from 'next/link'
+import { CourseFinder, CoverageBar, StatRow } from '@/components/marketing/visuals'
 import { IconArrowRight } from '@/components/Icons'
 
 export const metadata = {
@@ -37,22 +38,35 @@ export default function SubjectsPage() {
       <PageHead
         eyebrow="Coverage"
         title={`${total} courses, mapped topic by topic`}
-        intro="Every one of these is broken into topics and subtopics from the official outline. Question coverage is still being built and runs deeper in some than others — the app tells you which, rather than hiding it."
+        intro="Every one is broken into topics and subtopics from the official outline. Question coverage is still being built and runs deeper in some than others — the app tells you which, rather than hiding it."
       >
-        <div className="mt-10 flex flex-wrap gap-3">
-          {curricula.map((id) => (
-            <a
-              key={id}
-              href={`#${id.toLowerCase()}`}
-              className="elev rounded-[12px] border px-5 py-4"
-              style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
-            >
-              <span className="block text-[14.5px] font-semibold tracking-[-0.015em]">{id}</span>
-              <span className="mt-1 block text-[12.5px] font-medium tabular-nums" style={{ color: 'var(--brand)' }}>
-                {coursesIn(id)} courses
-              </span>
-            </a>
-          ))}
+        {/* Twenty boxes of course names is a page you scan with a finger.
+            Everybody arrives with the same question — is mine in here — and a
+            field that filters as you type answers it in about a second. The
+            full list stays underneath for browsing. */}
+        <div className="mt-10 max-w-xl">
+          <CourseFinder curricula={curricula.map((id) => ({ id, groups: groupsOf(id) }))} />
+        </div>
+
+        <div className="mt-12 max-w-2xl">
+          <CoverageBar
+            parts={[
+              { label: 'IB', value: coursesIn('IB'), tone: 'var(--status-mastered)' },
+              { label: 'A-Level', value: coursesIn('A-Level'), tone: 'var(--status-proficient)' },
+              { label: 'AP', value: coursesIn('AP'), tone: 'var(--status-developing)' },
+            ]}
+          />
+        </div>
+
+        <div className="mt-12">
+          <StatRow
+            stats={[
+              { value: total, label: 'courses, listed in full below' },
+              { value: entriesIn('IB') + entriesIn('A-Level') + entriesIn('AP'), label: 'entries once levels are counted separately' },
+              { value: 6583, label: 'subtopics mapped from official outlines' },
+              { value: 3, label: 'curricula, with more asked for than built' },
+            ]}
+          />
         </div>
       </PageHead>
 

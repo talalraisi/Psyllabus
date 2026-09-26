@@ -19,9 +19,8 @@ import { IconMenu, IconChevronRight } from '@/components/Icons'
  * More, which is what a drawer is for: the pages you need to be able to find
  * rather than the pages you are looking for.
  *
- * They sit next to the mark rather than in the middle of the bar, because the
- * mark and the navigation are one group: who this is, and what it has. The
- * account is the other group, and it is at the far end.
+ * Mark on the left, words on the centre line of the page, account on the
+ * right.
  */
 const LINKS = [
   ['About', '/about'],
@@ -107,9 +106,13 @@ export default function SiteNav({ children }) {
   }
 
   return (
-    <div ref={ref} className="flex w-full items-center gap-8 lg:gap-11">
-      {/* The mark, hard against the left edge of the page. */}
-      <div className="flex shrink-0 items-center">{children}</div>
+    /* Three columns, so the words sit on the middle of the page.
+       Pushed along by a spacer they were centred in whatever was left over
+       after the logo, which is not the centre of anything. The outer columns
+       are both 1fr and the nav is auto, so the middle column's centre is the
+       page's centre whatever the mark and the buttons happen to measure. */
+    <div ref={ref} className="grid w-full grid-cols-[1fr_auto_1fr] items-center gap-4">
+      <div className="flex min-w-0 items-center justify-start">{children}</div>
 
       {/* Words, not buttons. A bar of pills competes with the one button that
           matters; plain words let "Get started" be the only thing up here that
@@ -119,7 +122,7 @@ export default function SiteNav({ children }) {
           above a wordmark, so the middle of the image is up in the empty space
           beside the cap rather than on the lettering — words centred against
           the image read as floating above the name. */}
-      <nav className="nav-drop hidden items-center gap-7 md:flex lg:gap-8">
+      <nav className="nav-drop hidden items-center justify-center gap-7 md:flex lg:gap-8">
         {LINKS.map(([label, href]) => (
           <Link
             key={href}
@@ -187,11 +190,9 @@ export default function SiteNav({ children }) {
         </div>
       </nav>
 
-      {/* Everything left of this is navigation; everything right of it is the
-          account. The spacer is what separates the two jobs. */}
-      <div className="flex-1" />
-
-      <div className="nav-drop flex shrink-0 items-center gap-6">
+      {/* Everything left of this is navigation; everything here is the
+          account. They are separate columns because they are separate jobs. */}
+      <div className="nav-drop col-start-3 flex shrink-0 items-center justify-end gap-6">
         <Link
           href="/login"
           className="nav-word hidden whitespace-nowrap text-[13.5px] font-medium sm:inline-block"

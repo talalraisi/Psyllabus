@@ -3,6 +3,7 @@
 import { Fragment } from 'react'
 import Link from 'next/link'
 import PageShell from '@/components/marketing/PageShell'
+import { PriceCompare } from '@/components/marketing/visuals'
 import { IconCheck, IconArrowRight, IconClose } from '@/components/Icons'
 import { PLANS, SCHOOL_PLAN, COMPARISON } from '@/lib/plans'
 
@@ -155,6 +156,29 @@ export default function PricingPage() {
         </p>
 
         {/* Row by row, where the eye can travel across. */}
+        <section className="mt-20">
+          {/* A price is only a number until it is next to something. Three
+              bars say what a year of this costs against things a student
+              already buys without thinking about it, which is the actual
+              question behind "is £20 a month a lot". */}
+          <h2 className="text-[clamp(1.4rem,2.6vw,1.8rem)] font-semibold leading-tight tracking-[-0.028em]">
+            What a year costs
+          </h2>
+          <p className="mt-3 max-w-lg text-[14.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+            Premium for a year, against things you are already buying for the same two years.
+          </p>
+          <div className="mt-8 max-w-3xl">
+            <PriceCompare
+              items={[
+                { label: 'Project Syllabus', value: 169, note: 'a year, every subject', ours: true },
+                { label: 'One IB textbook', value: 55, note: 'one subject, one edition' },
+                { label: 'Six textbooks', value: 330, note: 'the set, once' },
+                { label: 'A term of tutoring', value: 600, note: 'one subject, one hour a week' },
+              ]}
+            />
+          </div>
+        </section>
+
         <section className="mt-16">
           <h2 className="mb-5 text-[15px] font-semibold tracking-[-0.012em]">
             What each plan gets

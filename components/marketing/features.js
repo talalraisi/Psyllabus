@@ -673,4 +673,22 @@ export function FeatureModules() {
   return <Stage items={slides} />
 }
 
+/**
+ * The drawing for one feature, looked up by label.
+ *
+ * A component rather than the map it wraps, and for the same reason the note
+ * on FeatureModules gives: everything this file exports crosses the client
+ * boundary as a reference, so a server component that imports a lookup table
+ * from here receives an opaque handle and gets undefined out of every key.
+ * The lookup has to happen on this side. It did not, the first time, and the
+ * features page rendered eight articles with a hole where each picture should
+ * have been.
+ */
+export function FeatureGraphic({ label }) {
+  const found = FEATURE_MODULES.find((m) => m.label === label)
+  if (!found) return null
+  const Graphic = found.Graphic
+  return <Graphic />
+}
+
 export { Label }

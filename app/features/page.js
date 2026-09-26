@@ -1,5 +1,6 @@
 import PageShell, { PageHead, Band } from '@/components/marketing/PageShell'
 import { FEATURE_DETAIL } from '@/components/marketing/content'
+import { FeatureGraphic } from '@/components/marketing/features'
 import Link from 'next/link'
 import { IconArrowRight, IconCheck } from '@/components/Icons'
 
@@ -30,7 +31,7 @@ export default function FeaturesPage() {
               className="elev rounded-[16px] border p-6 md:p-8"
               style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
             >
-              <div className="grid gap-6 md:grid-cols-[minmax(0,17rem)_1fr] md:gap-12">
+              <div className="grid gap-6 md:grid-cols-[minmax(0,19rem)_1fr] md:gap-12">
                 <div>
                   <p
                     className="text-[11px] font-semibold tabular-nums tracking-[0.16em]"
@@ -44,6 +45,18 @@ export default function FeaturesPage() {
                   <p className="mt-2.5 text-[14px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
                     {f.lede}
                   </p>
+
+                  {/* The drawing of the thing being explained.
+
+                      Eight screens of prose about mechanisms that are easier
+                      to draw than to describe is the wrong way round, and
+                      these already exist. They are the same illustrations the
+                      front page cycles through — an illustration sitting
+                      beside its own explanation is not the page repeating
+                      itself, it is the page finally showing its work. */}
+                  <div className="mt-6">
+                    <FeatureGraphic label={f.label} />
+                  </div>
                 </div>
 
                 <div>

@@ -2,6 +2,8 @@ import PageShell, { PageHead, Band } from '@/components/marketing/PageShell'
 import { OPERATOR } from '@/lib/legal'
 import { coursesIn } from '@/lib/catalogue'
 import { IconArrowRight, IconCheck, IconClose } from '@/components/Icons'
+import { CodeFanout, NoDashboard, RolloutTrack, CoverageBar, Eyebrow } from '@/components/marketing/visuals'
+import Link from 'next/link'
 
 export const metadata = {
   title: 'For schools',
@@ -40,13 +42,22 @@ export default function SchoolsPage() {
         </a>
       </PageHead>
 
+      {/* The two halves of the offer, drawn rather than listed. What a school
+          gets is a code reaching a year group; what it does not get is a class
+          dashboard, and the fastest way to say a thing does not exist is to
+          show it not existing. */}
       <Band>
-        <div className="grid gap-10 md:grid-cols-2 md:gap-14">
+        <div className="grid gap-4 md:grid-cols-2">
+          <CodeFanout seats={24} />
+          <NoDashboard />
+        </div>
+
+        <div className="mt-12 grid gap-8 md:grid-cols-2 md:gap-14">
           <div>
             <h2 className="text-[clamp(1.4rem,2.6vw,1.8rem)] font-semibold leading-tight tracking-[-0.028em]">
               What the school gets
             </h2>
-            <ul className="mt-7 flex flex-col gap-5">
+            <ul className="mt-6 flex flex-col gap-4">
               {GETS.map(([term, detail]) => (
                 <li key={term} className="flex gap-3">
                   <IconCheck
@@ -66,13 +77,7 @@ export default function SchoolsPage() {
             </ul>
           </div>
 
-          {/* Said as plainly as what it does get, because it is the part that
-              decides whether a school wants this, and hiding it until after
-              the invoice would be the wrong way round. */}
-          <div
-            className="elev rounded-[14px] border p-6 md:p-7"
-            style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
-          >
+          <div>
             <h2 className="text-[clamp(1.4rem,2.6vw,1.8rem)] font-semibold leading-tight tracking-[-0.028em]">
               And what it does not
             </h2>
@@ -92,61 +97,51 @@ export default function SchoolsPage() {
               ))}
             </ul>
             <p
-              className="mt-6 border-t pt-5 text-[13px] leading-relaxed"
+              className="mt-5 border-t pt-4 text-[13px] leading-relaxed"
               style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}
             >
-              That is the deal on every plan. A student who knows a teacher is watching their
-              weak topics stops recording weak topics, and then the map is worth nothing to
-              anybody.
+              A student who knows a teacher is watching their weak topics stops recording weak
+              topics, and then the map is worth nothing to anybody.
             </p>
           </div>
         </div>
       </Band>
 
       <Band tint>
-        <div className="grid gap-10 md:grid-cols-[1fr_1fr] md:gap-14">
+        <h2 className="text-[clamp(1.4rem,2.6vw,1.8rem)] font-semibold leading-tight tracking-[-0.028em]">
+          How a rollout goes
+        </h2>
+        <div className="mt-8">
+          <RolloutTrack
+            steps={[
+              ['Tell us the year group', 'How many students, which curriculum, and the email domain they use.'],
+              ['You get a code', 'One string, with a redemption limit set to the size of the group.'],
+              ['Students type it in', 'At sign-up, or later from their account. Everything opens immediately.'],
+            ]}
+          />
+        </div>
+
+        <div className="mt-12 grid items-center gap-8 md:grid-cols-[1.2fr_1fr] md:gap-14">
           <div>
-            <h2 className="text-[clamp(1.4rem,2.6vw,1.8rem)] font-semibold leading-tight tracking-[-0.028em]">
-              How a rollout goes
-            </h2>
-            <ol className="mt-7 flex flex-col gap-5">
-              {[
-                ['Tell us the year group', 'How many students, which curriculum, and the email domain they use.'],
-                ['You get a code', 'One string, with a redemption limit set to the size of the group.'],
-                ['Students type it in', 'At sign-up, or later from their account. Everything opens immediately.'],
-              ].map(([term, detail], i) => (
-                <li key={term} className="flex gap-4">
-                  <span
-                    className="shrink-0 pt-0.5 text-[11px] font-semibold tabular-nums tracking-[0.14em]"
-                    style={{ color: 'var(--brand)' }}
-                  >
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <div>
-                    <p className="text-[14.5px] font-medium">{term}</p>
-                    <p className="mt-1 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                      {detail}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-          <div
-            className="elev flex flex-col justify-center rounded-[14px] border p-7"
-            style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
-          >
-            <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em]" style={{ color: 'var(--text-faint)' }}>
-              Coverage
+            <Eyebrow>What opens</Eyebrow>
+            <p className="mt-4 text-[clamp(2rem,4vw,2.8rem)] font-semibold leading-none tracking-[-0.03em] tabular-nums">
+              {total} courses
             </p>
-            <p className="mt-3 text-[34px] font-semibold tabular-nums leading-none">{total}</p>
-            <p className="mt-2 text-[14px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              courses mapped across IB, A-Level and AP, topic by topic from the official outlines.
+            <p className="mt-3 max-w-md text-[14.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+              Across IB, A-Level and AP, mapped topic by topic from the official outlines. The whole
+              year group gets the full product, not a stripped-down school tier.
             </p>
-            <a href="/subjects" className="btn btn-outline control-md mt-6 self-start">
+            <Link href="/subjects" className="btn btn-outline control-md mt-6">
               See the full list
-            </a>
+            </Link>
           </div>
+          <CoverageBar
+            parts={[
+              { label: 'IB', value: coursesIn('IB'), tone: 'var(--status-mastered)' },
+              { label: 'A-Level', value: coursesIn('A-Level'), tone: 'var(--status-proficient)' },
+              { label: 'AP', value: coursesIn('AP'), tone: 'var(--status-developing)' },
+            ]}
+          />
         </div>
       </Band>
     </PageShell>
