@@ -1,0 +1,273 @@
+# Biology HL
+
+IB · 5 topics · 251 subtopics · 45 HL only
+
+This is what Project Syllabus has mapped for this subject, exactly as
+it sits in the database. Hold it next to the official guide and mark
+anything missing, renamed or no longer examined.
+
+## A. Unity and diversity
+
+- `A1.1` Polarity and hydrogen bonding in water
+- `A1.1` Cohesion, adhesion and surface tension
+- `A1.1` Water as a solvent and medium for metabolism
+- `A1.1` Thermal properties of water and their consequences
+- `A1.1` Adaptations of organisms to water as a habitat
+- `A1.1` The search for extraterrestrial life and water
+- `A1.2` DNA and RNA as information-carrying molecules
+- `A1.2` Nucleotide structure and the sugar-phosphate backbone
+- `A1.2` Complementary base pairing and the double helix
+- `A1.2` Directionality of nucleic acids and antiparallel strands  _(HL extension)_
+- `A1.2` Evidence for the structure of DNA  _(HL extension)_
+- `A1.2` Diversity of possible DNA base sequences
+- `A2.1` Conditions on early Earth and the origin of carbon compounds  _(HL only)_
+- `A2.1` Spontaneous formation of vesicles and membranes  _(HL only)_
+- `A2.1` RNA as a self-replicating molecule  _(HL only)_
+- `A2.1` The last universal common ancestor  _(HL only)_
+- `A2.1` Evidence from deep-sea vents and hydrothermal systems  _(HL only)_
+- `A2.2` The cell theory and characteristics of life
+- `A2.2` Microscopy, magnification and scale
+- `A2.2` Prokaryotic cell structure
+- `A2.2` Eukaryotic cell structure
+- `A2.2` Differences between plant and animal cells
+- `A2.2` Atypical cells: aseptate fungi, skeletal muscle, red blood cells
+- `A2.2` Origin of eukaryotic cells by endosymbiosis  _(HL extension)_
+- `A2.3` Structural features common to viruses  _(HL only)_
+- `A2.3` Diversity of viral structure and genetic material  _(HL only)_
+- `A2.3` The lytic cycle  _(HL only)_
+- `A2.3` The lysogenic cycle  _(HL only)_
+- `A2.3` Rapid evolution of viruses and emergent diseases  _(HL only)_
+- `A3.1` Variation between and within species
+- `A3.1` The biological species concept and hybrids
+- `A3.1` Chromosome number as a shared trait within a species
+- `A3.1` Karyotyping and karyograms
+- `A3.1` Unity and diversity of genomes within a species
+- `A3.1` Difficulties applying the species concept: asexual and ring species  _(HL extension)_
+- `A3.2` Binomial nomenclature and the taxonomic hierarchy  _(HL only)_
+- `A3.2` Advantages of a natural classification  _(HL only)_
+- `A3.2` Clades and evidence from base and amino acid sequences  _(HL only)_
+- `A3.2` Constructing and interpreting cladograms  _(HL only)_
+- `A3.2` Molecular clocks and reclassification  _(HL only)_
+- `A4.1` Evolution as change in heritable characteristics
+- `A4.1` Evidence from base sequences and amino acid sequences
+- `A4.1` Evidence from selective breeding and artificial selection
+- `A4.1` Homologous structures and the fossil record
+- `A4.1` Speciation by splitting of gene pools
+- `A4.1` Reproductive isolation and the tempo of speciation  _(HL extension)_
+- `A4.2` Biodiversity as the variety of life at several levels
+- `A4.2` Estimating the number of species on Earth
+- `A4.2` Causes of anthropogenic species extinction
+- `A4.2` Evidence for a sixth mass extinction
+- `A4.2` Conservation approaches: in situ and ex situ
+- `A4.2` The EDGE of Existence approach to prioritising species
+
+## B. Form and function
+
+- `B1.1` Carbon compounds and the versatility of carbon
+- `B1.1` Monosaccharides, disaccharides and polysaccharides
+- `B1.1` Condensation and hydrolysis reactions
+- `B1.1` Structure and function of cellulose, starch and glycogen
+- `B1.1` Triglycerides, phospholipids and steroids
+- `B1.1` Saturated and unsaturated fatty acids and health claims
+- `B1.1` Energy storage in lipids compared with carbohydrates
+- `B1.2` Amino acid structure and the peptide bond
+- `B1.2` Diversity of possible polypeptide sequences
+- `B1.2` Primary, secondary, tertiary and quaternary structure  _(HL extension)_
+- `B1.2` Effects of pH and temperature on protein conformation
+- `B1.2` Functional diversity of proteins
+- `B1.2` Protein structure and function relationships  _(HL extension)_
+- `B2.1` The phospholipid bilayer and amphipathic molecules
+- `B2.1` Simple diffusion and facilitated diffusion
+- `B2.1` Osmosis and water movement across membranes
+- `B2.1` Active transport and pump proteins
+- `B2.1` Endocytosis, exocytosis and vesicle transport
+- `B2.1` The fluid mosaic model and evidence for it
+- `B2.1` Glycoproteins, cell adhesion and membrane fluidity  _(HL extension)_
+- `B2.2` Functions of the nucleus, ribosomes and endoplasmic reticulum
+- `B2.2` Golgi apparatus, vesicles and lysosomes
+- `B2.2` Mitochondria and chloroplasts
+- `B2.2` Advantages of compartmentalization in cells
+- `B2.2` The cytoskeleton and cell shape  _(HL extension)_
+- `B2.3` Stem cells and their properties
+- `B2.3` Differentiation and gene expression
+- `B2.3` Surface area to volume ratio and cell size
+- `B2.3` Adaptations of specialized cells
+- `B2.3` Stem cell niches and therapeutic use  _(HL extension)_
+- `B3.1` Properties of gas exchange surfaces
+- `B3.1` Ventilation and maintaining concentration gradients
+- `B3.1` Alveoli and the human respiratory system
+- `B3.1` Measuring lung volumes and ventilation rate
+- `B3.1` Gas exchange in leaves and stomatal control
+- `B3.1` Gas exchange in fish and adaptations to habitat  _(HL extension)_
+- `B3.1` Haemoglobin, oxygen dissociation and the Bohr shift  _(HL extension)_
+- `B3.2` Arteries, capillaries and veins
+- `B3.2` Structure of the heart and the cardiac cycle
+- `B3.2` Control of heart rate
+- `B3.2` Blood composition and function
+- `B3.2` Transpiration and water transport in xylem
+- `B3.2` Translocation of sugars in phloem
+- `B3.2` Adaptations of plants to water availability  _(HL extension)_
+- `B3.3` Sarcomere structure and skeletal muscle  _(HL only)_
+- `B3.3` The sliding filament model of contraction  _(HL only)_
+- `B3.3` Roles of ATP, calcium ions and troponin  _(HL only)_
+- `B3.3` Antagonistic muscle pairs and joints  _(HL only)_
+- `B3.3` Motility in unicellular organisms: cilia and flagella  _(HL only)_
+- `B4.1` Habitat as the place where a species lives
+- `B4.1` Abiotic factors and limits of tolerance
+- `B4.1` Adaptations of plants and animals to extreme habitats
+- `B4.1` Biomes and their distribution
+- `B4.1` Adaptations to abiotic conditions within a biome
+- `B4.2` The niche concept and the role of a species
+- `B4.2` Obligate and facultative anaerobes and autotrophs
+- `B4.2` Modes of nutrition: holozoic, saprotrophic, parasitic, mixotrophic
+- `B4.2` Adaptations for obtaining food and nutrients
+- `B4.2` Competitive exclusion and the fundamental versus realized niche
+
+## C. Interaction and interdependence
+
+- `C1.1` Enzymes as catalysts and the active site
+- `C1.1` Enzyme-substrate specificity and induced fit
+- `C1.1` Effects of temperature, pH and substrate concentration
+- `C1.1` Denaturation and enzyme activity experiments
+- `C1.1` Anabolic and catabolic reactions in metabolism
+- `C1.1` Competitive and non-competitive inhibition  _(HL extension)_
+- `C1.1` End-product inhibition and control of metabolic pathways  _(HL extension)_
+- `C1.2` ATP as the energy currency of the cell
+- `C1.2` Anaerobic respiration in humans and yeast
+- `C1.2` Aerobic respiration and its yield
+- `C1.2` Variables affecting the rate of respiration
+- `C1.2` Glycolysis and the link reaction  _(HL only)_
+- `C1.2` The Krebs cycle  _(HL only)_
+- `C1.2` Oxidative phosphorylation and chemiosmosis  _(HL only)_
+- `C1.2` Respiration of lipids and proteins  _(HL only)_
+- `C1.3` Photosynthesis as energy conversion
+- `C1.3` Absorption spectra and action spectra
+- `C1.3` Limiting factors and rates of photosynthesis
+- `C1.3` Carbon fixation and the products of photosynthesis
+- `C1.3` Light-dependent reactions and photosystems  _(HL only)_
+- `C1.3` The Calvin cycle  _(HL only)_
+- `C1.3` Chloroplast structure and its adaptations  _(HL only)_
+- `C2.1` Hormones, signalling molecules and receptors  _(HL only)_
+- `C2.1` Transmembrane receptors and intracellular receptors  _(HL only)_
+- `C2.1` Signal transduction and second messengers  _(HL only)_
+- `C2.1` Quorum sensing and cell-to-cell signalling  _(HL only)_
+- `C2.1` Feedback control of hormone secretion  _(HL only)_
+- `C2.2` Neuron structure and the nerve impulse
+- `C2.2` Resting potential and action potential
+- `C2.2` Saltatory conduction and myelination
+- `C2.2` Synaptic transmission and neurotransmitters
+- `C2.2` Effects of drugs and toxins on synapses  _(HL extension)_
+- `C2.2` Summation, inhibition and decision-making in the brain  _(HL extension)_
+- `C3.1` Systems as interacting components
+- `C3.1` The nervous system and the brain
+- `C3.1` Reflex arcs and involuntary responses
+- `C3.1` Endocrine control and comparison with nervous control
+- `C3.1` Feedback control in the body
+- `C3.1` Epinephrine, the fight-or-flight response and integration  _(HL extension)_
+- `C3.1` Plant responses: tropisms and auxin  _(HL extension)_
+- `C3.2` Pathogens and transmission of infectious disease
+- `C3.2` Skin and mucous membranes as primary defence
+- `C3.2` Blood clotting and the inflammatory response
+- `C3.2` Phagocytes and the innate immune response
+- `C3.2` Antibody production and the adaptive immune response
+- `C3.2` Vaccination and herd immunity
+- `C3.2` Antibiotics, resistance and zoonotic disease  _(HL extension)_
+- `C4.1` Populations, carrying capacity and limiting factors
+- `C4.1` Estimating population size: quadrats and capture-mark-release
+- `C4.1` Sigmoid population growth curves
+- `C4.1` Competition, herbivory, predation and disease
+- `C4.1` Mutualism, parasitism and symbiosis
+- `C4.1` Keystone species and community interactions  _(HL extension)_
+- `C4.2` Ecosystems as open systems of energy and matter
+- `C4.2` Autotrophs, heterotrophs and trophic levels
+- `C4.2` Food chains, food webs and energy loss
+- `C4.2` Pyramids of energy and biomass
+- `C4.2` Carbon cycling and the role of decomposers
+- `C4.2` Gross and net primary production  _(HL extension)_
+- `C4.2` Recycling of nutrients and the nitrogen cycle  _(HL extension)_
+
+## D. Continuity and change
+
+- `D1.1` Semi-conservative replication and complementary base pairing
+- `D1.1` Helicase, DNA polymerase and the replication fork
+- `D1.1` The polymerase chain reaction and DNA profiling
+- `D1.1` Leading and lagging strands and Okazaki fragments  _(HL only)_
+- `D1.1` Proofreading and repair of replication errors  _(HL only)_
+- `D1.2` Transcription and messenger RNA
+- `D1.2` The genetic code and codons
+- `D1.2` Translation, ribosomes and transfer RNA
+- `D1.2` Effect of the sequence of a gene on the protein
+- `D1.2` Promoters, transcription factors and initiation  _(HL only)_
+- `D1.2` Splicing of introns and alternative splicing  _(HL only)_
+- `D1.2` Polysomes and free versus bound ribosomes  _(HL only)_
+- `D1.3` Gene mutations as changes to base sequence
+- `D1.3` Substitution, insertion and deletion mutations
+- `D1.3` Consequences of mutation in germ and somatic cells
+- `D1.3` Mutagens, radiation and cancer
+- `D1.3` Gene knockout and CRISPR gene editing  _(HL extension)_
+- `D2.1` The cell cycle and interphase
+- `D2.1` Mitosis and its phases
+- `D2.1` Cytokinesis in plant and animal cells
+- `D2.1` Meiosis, crossing over and independent assortment
+- `D2.1` Non-disjunction and chromosome abnormalities
+- `D2.1` Cyclins, checkpoints and control of the cell cycle  _(HL extension)_
+- `D2.1` Tumours, oncogenes and metastasis  _(HL extension)_
+- `D2.2` Regulation of transcription by proteins  _(HL only)_
+- `D2.2` Epigenetic changes: methylation and acetylation  _(HL only)_
+- `D2.2` Environmental influence on gene expression  _(HL only)_
+- `D2.2` Differential gene expression and cell differentiation  _(HL only)_
+- `D2.2` Reversibility of epigenetic change  _(HL only)_
+- `D2.3` Solvation and solute concentration
+- `D2.3` Water movement by osmosis in tissues
+- `D2.3` Solute potential and pressure potential  _(HL extension)_
+- `D2.3` Effects of hypotonic, isotonic and hypertonic solutions
+- `D2.3` Turgor, plasmolysis and cytolysis  _(HL extension)_
+- `D3.1` Sexual and asexual reproduction compared
+- `D3.1` Male and female reproductive systems
+- `D3.1` Gametogenesis and fertilization in humans
+- `D3.1` Hormonal control of the menstrual cycle
+- `D3.1` Pregnancy, the placenta and birth
+- `D3.1` Reproduction in flowering plants and pollination  _(HL extension)_
+- `D3.1` IVF, contraception and reproductive technology  _(HL extension)_
+- `D3.2` Genes, alleles and the genome
+- `D3.2` Dominance, codominance and multiple alleles
+- `D3.2` Monohybrid crosses and Punnett grids
+- `D3.2` Sex determination and sex linkage
+- `D3.2` Pedigree charts and genetic disorders
+- `D3.2` Dihybrid crosses and independent assortment  _(HL only)_
+- `D3.2` Linkage, recombination and the chi-squared test  _(HL only)_
+- `D3.2` Continuous variation and polygenic inheritance  _(HL only)_
+- `D3.3` Homeostasis and negative feedback
+- `D3.3` Thermoregulation in humans
+- `D3.3` Blood glucose regulation and diabetes
+- `D3.3` The kidney, osmoregulation and urine production  _(HL extension)_
+- `D3.3` ADH, the loop of Henle and water conservation  _(HL extension)_
+- `D4.1` Variation as a necessity for natural selection
+- `D4.1` Overproduction, competition and differential survival
+- `D4.1` Adaptation and change in allele frequency
+- `D4.1` Sexual selection and selective breeding
+- `D4.1` Antibiotic resistance as evidence of selection
+- `D4.1` Stabilizing, directional and disruptive selection  _(HL extension)_
+- `D4.2` Ecosystem stability and requirements for it
+- `D4.2` Keystone species and tipping points
+- `D4.2` Deforestation, soil erosion and ecosystem collapse
+- `D4.2` Rewilding and restoration of ecosystems
+- `D4.2` Assessing sustainability of resource harvesting  _(HL extension)_
+- `D4.3` The greenhouse effect and greenhouse gases
+- `D4.3` Human causes of rising carbon dioxide concentration
+- `D4.3` Evidence for anthropogenic climate change
+- `D4.3` Effects on ecosystems, species distribution and phenology
+- `D4.3` Ocean acidification and coral reefs
+- `D4.3` Mitigation, carbon sequestration and policy
+
+## Tools and inquiry
+
+- `T.1` Microscopy and preparing temporary mounts
+- `T.1` Sampling techniques in the field
+- `T.1` Chromatography, colorimetry and biological assays
+- `T.1` Safety, ethics and the use of organisms in research
+- `T.2` Processing data, tables and graphs
+- `T.2` Error bars, standard deviation and uncertainty
+- `T.2` Correlation, causation and statistical tests
+- `T.2` Designing an investigation and evaluating a method
+- `T.2` The scientific investigation report
