@@ -27,6 +27,7 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [pendingPhoto, setPendingPhoto] = useState(null)
+  const [exporting, setExporting] = useState(false)
   // Shown inside the crop dialog, which covers the page while it is open.
   const [photoError, setPhotoError] = useState('')
   const [confirmingDelete, setConfirmingDelete] = useState(false)
@@ -239,6 +240,43 @@ export default function ProfilePage() {
    * auth.users row, and removing only the profile would leave an account that
    * can still sign in to nothing.
    */
+  /**
+   * Right of access, which the section below has been promising since it was
+   * written: "take a copy of everything, any time", under a panel whose only
+   * button deleted the account. Erasure has worked since the PDPL migration
+   * and access never has, which is the wrong way round — a student could
+   * destroy their record and not read it.
+   *
+   * One RPC returns the lot as JSON and the browser saves it. No storage
+   * bucket, no signed URL, nothing that outlives the click.
+   */
+  const exportData = async () => {
+    if (exporting) return
+    setExporting(true)
+    setError('')
+
+    const { data, error: rpcError } = await supabase.rpc('export_my_data')
+
+    if (rpcError || !data?.ok) {
+      setError(rpcError?.message || data?.error || 'Could not prepare your data. Please email us.')
+      setExporting(false)
+      return
+    }
+
+    const stamp = new Date().toISOString().slice(0, 10)
+    const url = URL.createObjectURL(
+      new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    )
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `project-syllabus-${stamp}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+
+    setExporting(false)
+    flash('Your data has been downloaded')
+  }
+
   const deleteAccount = async () => {
     if (deleting) return
     setDeleting(true)
@@ -539,10 +577,17 @@ export default function ProfilePage() {
               Take a copy of everything, any time. Deleting removes it rather than hiding it.
             </p>
 
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button onClick={exportData} disabled={exporting} className="btn btn-outline control-md">
+                {exporting && <Spinner />}
+                {exporting ? 'Preparing' : 'Download my data'}
+              </button>
+            </div>
+
             {!confirmingDelete ? (
               <button
                 onClick={() => setConfirmingDelete(true)}
-                className="btn btn-quiet control-md mt-4 border-[var(--danger-border)] text-[var(--danger)]"
+                className="btn btn-quiet control-md mt-3 border-[var(--danger-border)] text-[var(--danger)]"
               >
                 Delete my account and data
               </button>
