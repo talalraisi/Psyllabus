@@ -310,18 +310,6 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <DashboardLayout profile={null}>
-      {pendingPhoto && (
-        <AvatarCropper
-          file={pendingPhoto}
-          saving={uploading}
-          error={photoError}
-          onCancel={() => {
-            setPendingPhoto(null)
-            setPhotoError('')
-          }}
-          onCropped={onCropped}
-        />
-      )}
         <PageLoading title="Profile" width="narrow" rows={3} variant="form" />
       </DashboardLayout>
     )
@@ -611,6 +599,26 @@ export default function ProfilePage() {
           </div>
         </Section>
       </Page>
+
+      {/* The cropper belongs to the page you are looking at.
+          It was rendered inside the `if (loading)` early return, which is the
+          branch that runs *before* the profile arrives — so by the time anyone
+          could press "Change photo", that block no longer executed and the
+          cropper never mounted. Picking a file set pendingPhoto and then
+          nothing happened: no crop, no blob, no request, no error. Storage went
+          four weeks without receiving a single upload. */}
+      {pendingPhoto && (
+        <AvatarCropper
+          file={pendingPhoto}
+          saving={uploading}
+          error={photoError}
+          onCancel={() => {
+            setPendingPhoto(null)
+            setPhotoError('')
+          }}
+          onCropped={onCropped}
+        />
+      )}
     </DashboardLayout>
   )
 }
