@@ -31,7 +31,7 @@ export default function PageShell({ children }) {
                 src={logoMark}
                 alt="Project Syllabus"
                 sizes="140px"
-                style={{ height: 34, width: 'auto' }}
+                style={{ height: 34, width: 'auto', aspectRatio: '1472 / 613' }}
                 priority
               />
             </Link>

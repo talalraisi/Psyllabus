@@ -19,7 +19,7 @@ export default function Logo({ width = 300, height = 90, className = '', priorit
       priority={priority}
       sizes={`${height}px`}
       className={className}
-      style={{ height: `${height}px`, width: 'auto', maxWidth: 'none' }}
+      style={{ height: `${height}px`, width: 'auto', maxWidth: 'none', aspectRatio: '1 / 1' }}
     />
   )
 }

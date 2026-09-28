@@ -40,7 +40,7 @@ export default function AuthShell({ eyebrow, title, intro, children, footer }) {
             src={logoMark}
             alt="Project Syllabus"
             sizes="120px"
-            style={{ height: 38, width: 'auto' }}
+            style={{ height: 38, width: 'auto', aspectRatio: '1472 / 613' }}
             priority
           />
         </Link>

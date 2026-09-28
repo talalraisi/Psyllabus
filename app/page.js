@@ -100,7 +100,7 @@ export default async function Home() {
         <div className="mx-auto flex max-w-6xl px-5 py-3 md:px-8">
           <SiteNav>
             <Link href="/" aria-label="Project Syllabus home" className="shrink-0">
-              <Image src={logoMark} alt="Project Syllabus" sizes="140px" style={{ height: 34, width: 'auto' }} priority />
+              <Image src={logoMark} alt="Project Syllabus" sizes="140px" style={{ height: 34, width: 'auto', aspectRatio: '1472 / 613' }} priority />
             </Link>
           </SiteNav>
         </div>

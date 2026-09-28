@@ -191,7 +191,13 @@ export default function DashboardLayout({ children, profile }) {
           compact ? 'flex-col items-center gap-4 px-2' : 'items-center justify-between px-4'
         }`}
       >
-        {/* Signed in, the logo goes to the dashboard. Every other app sends
+        {/* Above the fold on every page, so it loads eagerly with its aspect
+            ratio declared. next/image lazy-loads by default, and a lazy image
+            with width:auto gives the browser nothing to reserve a box with
+            until the bytes land — which is a visible shift and the reason
+            Chrome flags it.
+
+            Signed in, the logo goes to the dashboard. Every other app sends
             you to your own home from the mark in the corner, and a student who
             is mid-revision does not want the sales page.
 
@@ -201,7 +207,7 @@ export default function DashboardLayout({ children, profile }) {
             labels, one click away. */}
         {!compact && (
           <Link href="/dashboard" className="inline-block" aria-label="Dashboard">
-            <Image src={logoMark} alt="Project Syllabus" sizes="68px" style={{ height: 26, width: 'auto' }} />
+            <Image src={logoMark} alt="Project Syllabus" sizes="68px" style={{ height: 26, width: 'auto', aspectRatio: '1472 / 613' }} priority />
           </Link>
         )}
         <button
@@ -353,7 +359,7 @@ export default function DashboardLayout({ children, profile }) {
           <IconMenu />
         </button>
         <Link href="/dashboard" className="inline-block" aria-label="Dashboard">
-          <Image src={logoMark} alt="Project Syllabus" sizes="70px" style={{ height: 28, width: 'auto' }} />
+          <Image src={logoMark} alt="Project Syllabus" sizes="70px" style={{ height: 28, width: 'auto', aspectRatio: '1472 / 613' }} priority />
         </Link>
       </header>
 

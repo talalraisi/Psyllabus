@@ -155,7 +155,7 @@ export default function Signup() {
         <div className="mx-auto max-w-md">
           <div className="mb-10 flex justify-center">
             <Link href="/" aria-label="Project Syllabus home">
-              <Image src={logoMark} alt="Project Syllabus" sizes="120px" style={{ height: 38, width: 'auto' }} priority />
+              <Image src={logoMark} alt="Project Syllabus" sizes="120px" style={{ height: 38, width: 'auto', aspectRatio: '1472 / 613' }} priority />
             </Link>
           </div>
 
