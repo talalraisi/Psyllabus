@@ -137,16 +137,61 @@ export default function AvatarCropper({ file, onCancel, onCropped, saving, error
 
     const x = fx, y = fy, size = fsize
 
-    /* Everything outside the crop, darkened. Four rectangles rather than one
-       fill with a hole punched in it, because a composite operation here
-       leaves a hairline seam on fractional pixel positions. */
-    ctx.fillStyle = 'rgba(0,0,0,0.55)'
+    /* Two washes, both in the panel's own colour, read as one idea: the
+       further something is from being kept, the more it disappears into the
+       page. Black outside and panel-colour in the corners looked right in the
+       dark theme and inverted in the light one, where the corners came out
+       brighter than the area nobody had selected at all.
+
+       The colour is read from the stylesheet rather than hardcoded, so it
+       follows whichever theme is on.
+
+       Four rectangles rather than one fill with a hole in it, because a
+       composite operation here leaves a hairline seam at fractional pixels. */
+    const css = getComputedStyle(canvas)
+    const panel = css.getPropertyValue('--surface').trim() || '#141414'
+    /* The frame and the circle's edge sit on the washed area, which is the
+       panel's colour — so white chrome vanished in the light theme. Ink is the
+       text colour, which contrasts with the panel by definition in both. */
+    const ink = css.getPropertyValue('--text').trim() || '#f0f0f0'
+
+    ctx.save()
+    ctx.globalAlpha = 0.85
+    ctx.fillStyle = panel
     ctx.fillRect(0, 0, STAGE, y)
     ctx.fillRect(0, y + size, STAGE, STAGE - (y + size))
     ctx.fillRect(0, y, x, size)
     ctx.fillRect(x + size, y, STAGE - (x + size), size)
+    ctx.restore()
 
-    // Thirds, to line a face up against.
+    const cx = x + size / 2
+    const cy = y + size / 2
+    const r = size / 2
+
+    /* The corners the circle cuts off, washed out in the panel's own colour.
+       A dashed outline said where the circle was and left the corners at full
+       brightness, so a face framed neatly in the square still lost its edges
+       once the avatar rendered round. Painting them in the surface colour at
+       three-quarters shows the shape you are actually going to get while
+       leaving enough of the picture visible to keep dragging by. Lighter than
+       the wash outside the square, because a corner is inside the crop you
+       chose and merely lost to the round mask. */
+    ctx.save()
+    ctx.globalAlpha = 0.6
+    ctx.fillStyle = panel
+    ctx.beginPath()
+    ctx.rect(x, y, size, size)
+    ctx.arc(cx, cy, r, 0, Math.PI * 2)
+    ctx.fill('evenodd')
+    ctx.restore()
+
+    // Thirds, to line a face up against. Clipped to the circle, because a grid
+    // drawn across the washed-out corners is guidance for a region that is
+    // about to be thrown away.
+    ctx.save()
+    ctx.beginPath()
+    ctx.arc(cx, cy, r, 0, Math.PI * 2)
+    ctx.clip()
     ctx.strokeStyle = 'rgba(255,255,255,0.35)'
     ctx.lineWidth = 1
     ctx.beginPath()
@@ -158,21 +203,27 @@ export default function AvatarCropper({ file, onCancel, onCropped, saving, error
       ctx.lineTo(x + size, y + t)
     }
     ctx.stroke()
+    ctx.restore()
 
-    // What the avatar will actually show, since it renders round everywhere.
-    ctx.strokeStyle = 'rgba(255,255,255,0.5)'
-    ctx.setLineDash([4, 4])
+    // The edge of what the avatar shows.
+    ctx.save()
+    ctx.globalAlpha = 0.55
+    ctx.strokeStyle = ink
+    ctx.lineWidth = 1
     ctx.beginPath()
-    ctx.arc(x + size / 2, y + size / 2, size / 2, 0, Math.PI * 2)
+    ctx.arc(cx, cy, r - 0.5, 0, Math.PI * 2)
     ctx.stroke()
-    ctx.setLineDash([])
+    ctx.restore()
 
     // The frame itself, and a heavier mark at each corner so the edge reads
     // as a handle rather than as a border on the picture.
-    ctx.strokeStyle = 'rgba(255,255,255,0.9)'
+    ctx.save()
+    ctx.globalAlpha = 0.85
+    ctx.strokeStyle = ink
     ctx.lineWidth = 1.5
     ctx.strokeRect(x + 0.75, y + 0.75, size - 1.5, size - 1.5)
 
+    ctx.globalAlpha = 1
     ctx.lineWidth = 3
     const arm = Math.min(18, size / 4)
     ctx.beginPath()
@@ -187,6 +238,7 @@ export default function AvatarCropper({ file, onCancel, onCropped, saving, error
       ctx.lineTo(cx, cy + dy * arm)
     }
     ctx.stroke()
+    ctx.restore()
   }, [img, fx, fy, fsize, sx0, sy0, sw, sh])
 
   const start = (clientX, clientY) => {
