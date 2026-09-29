@@ -50,7 +50,45 @@ function client(request) {
   )
 }
 
+/**
+ * The request has to have come from our own pages.
+ *
+ * The endpoint is already behind a session and a plan check, so this is not
+ * what stops an attacker — it is what stops somebody else's page spending a
+ * signed-in student's daily allowance from their browser without them
+ * noticing. A bearer token in a header is not sent cross-origin by default,
+ * but the session here rides on a cookie, and a cookie is.
+ *
+ * Origin is absent on some same-origin requests, so a missing one is allowed
+ * and a wrong one is not. That is the distinction worth drawing: the check is
+ * for a header that says somewhere else, not for the absence of a header.
+ */
+function fromOurOwnSite(request) {
+  const origin = request.headers.get('origin')
+  if (!origin) return true
+
+  const here = request.nextUrl.origin
+  if (origin === here) return true
+
+  // Vercel gives every deployment its own hostname, and the production site
+  // its own domain, so an allowlist of one string would break previews.
+  const allowed = [process.env.NEXT_PUBLIC_SITE_URL, process.env.VERCEL_URL && `https://${process.env.VERCEL_URL}`]
+    .filter(Boolean)
+  if (allowed.includes(origin)) return true
+
+  try {
+    const host = new URL(origin).hostname
+    return host === request.nextUrl.hostname || host.endsWith('.vercel.app')
+  } catch {
+    return false
+  }
+}
+
 export async function POST(request) {
+  if (!fromOurOwnSite(request)) {
+    return NextResponse.json({ error: 'Not allowed from there.' }, { status: 403 })
+  }
+
   if (!process.env.ANTHROPIC_API_KEY) {
     return NextResponse.json(
       {
