@@ -355,7 +355,7 @@ const FEATURE_MODULES = [
   {
     label: 'Decay',
     title: 'Topics that fade on their own',
-    body: 'Prove something, leave it two weeks, and it fades back into your plan for a short retest. Nothing else takes a green tick away from you, and that is why other trackers quietly overstate what you still remember by May.',
+    body: 'Prove something, leave it two weeks, and it fades back into your plan for a short retest. Leave it three weeks longer and it counts as not known. Nothing else takes a green tick away from you, and that is why other trackers quietly overstate what you still remember by May.',
     Graphic: GraphicFade,
   },
   {

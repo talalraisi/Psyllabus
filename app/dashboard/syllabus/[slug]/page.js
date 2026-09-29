@@ -26,7 +26,7 @@ import {
   groupByUnit,
   sortTopics,
 } from '@/lib/progress'
-import { buildProgressDetailMap, effectiveStatus, isDecayed, daysSince, DECAY_DAYS } from '@/lib/decay'
+import { buildProgressDetailMap, effectiveStatus, isDecayed, daysSince, daysOfFadeLeft } from '@/lib/decay'
 
 export default function SyllabusPage() {
   const { slug } = useParams()
@@ -334,7 +334,12 @@ export default function SyllabusPage() {
                                 className={`text-[12.5px] font-medium ${STATUS_TEXT_COLORS[currentStatus]}`}
                                 title={
                                   currentStatus === 'decaying'
-                                    ? `Mastered ${daysSince(progressDetail[key]?.updatedAt)} days ago. Retest within the ${DECAY_DAYS}-day window to keep it green.`
+                                    ? `Last proved ${daysSince(progressDetail[key]?.updatedAt)} days ago. ${
+                                        daysOfFadeLeft(
+                                          progressDetail[key]?.status,
+                                          progressDetail[key]?.updatedAt
+                                        ) ?? 0
+                                      } days left before it drops to Weak. One correct answer resets it.`
                                     : 'Status is set by quiz results only'
                                 }
                               >

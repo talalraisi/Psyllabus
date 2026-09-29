@@ -599,7 +599,7 @@ const LEVELS = [
   ['Developing', 'developing', 'Getting there. Still comes round often.'],
   ['Proficient', 'proficient', 'Right more often than not, across more than one sitting.'],
   ['Mastered', 'mastered', 'Right consistently, on hard questions. Only time moves it now.'],
-  ['Fading', 'fading', 'Was proved, then left two weeks. Back for a short retest.'],
+  ['Fading', 'fading', 'Was proved, then left two weeks. Back for a short retest, and Weak if that passes too.'],
 ]
 
 export function LevelLadder() {

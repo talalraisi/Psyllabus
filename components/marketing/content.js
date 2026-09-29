@@ -24,7 +24,7 @@ export const HOW_IT_WORKS = [
 
 export const FEATURES = [
   ['Heatmap you cannot fake', 'Five levels, from Weak to Mastered, every one set by a quiz rather than by how you feel.', 'mastered'],
-  ['Topics that fade', 'Nail something, leave it two weeks untouched and it fades back into your plan for a retest.', 'fading'],
+  ['Topics that fade', 'Nail something, leave it two weeks untouched and it starts fading. Leave it another three and it counts as not known.', 'fading'],
   ['Mistake bank', 'Questions you got wrong come back on a spaced schedule, so you drill your own gaps.', 'weak'],
   ['Timed papers', 'Build a paper from any mix of topics and sit it against a live marks-per-minute clock.', 'developing'],
   ['Calendar and reminders', 'Put your tests and IA deadlines in, and the planner moves that subject up as they get close.', 'proficient'],
@@ -40,7 +40,7 @@ export const WHY = [
   },
   {
     title: 'Because forgetting is the default, not the exception',
-    body: 'Memory decays on a curve unless it is used, and the gap between learning something in October and being examined on it in May is where most marks quietly disappear. Anything you had proved starts Fading after about two weeks untouched and returns for a short retest. Spacing practice out like this is one of the most reliably supported findings in learning research.',
+    body: 'Memory decays on a curve unless it is used, and the gap between learning something in October and being examined on it in May is where most marks quietly disappear. Anything you had proved starts Fading after about two weeks untouched and returns for a short retest. Leave it three weeks longer and it drops to Weak, because a topic nobody has answered correctly in five weeks is not a topic they know. Spacing practice out like this is one of the most reliably supported findings in learning research.',
   },
   {
     title: 'Because testing is studying, not just measuring',
@@ -140,7 +140,7 @@ export const FEATURE_DETAIL = [
     title: 'Topics that fade on their own',
     lede: 'Prove something, leave it, and it quietly goes back on the list.',
     how: [
-      'Anything you proved starts fading after about two weeks untouched, and drops back into your plan for a short retest rather than a full one.',
+      'Anything you proved starts fading after about two weeks untouched, and drops back into your plan for a short retest rather than a full one. Fading lasts three weeks; answer one question correctly in that time and it is restored, ignore it and it becomes Weak.',
       'Fading is its own level with its own colour, so you can tell the difference between a topic you never learned and a topic you learned in October and have not seen since.',
       'Nothing else takes a green tick away from you. Only time does, and only after you have actually stopped touching it.',
     ],
