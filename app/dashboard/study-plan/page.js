@@ -437,6 +437,41 @@ export default function StudyPlanPage() {
                                   ))}
                                 </p>
                               )}
+
+                              {/* What to do with it, not just which one to
+                                  open. Naming the subtopic and leaving the
+                                  rest to you skips the part students are
+                                  worst at, and the order is not the same for
+                                  every subtopic: something you got wrong
+                                  needs reading first, something fading needs
+                                  retrieving and re-reading it wastes the
+                                  evening. */}
+                              {!isDone && item.steps?.length > 0 && (
+                                <ol className="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1.5">
+                                  {item.steps.map((step, i) => (
+                                    <li key={step.kind} className="flex items-center gap-2">
+                                      {i > 0 && (
+                                        <span aria-hidden="true" className="text-[10px]" style={{ color: 'var(--border-strong)' }}>
+                                          →
+                                        </span>
+                                      )}
+                                      <span
+                                        className="rounded-full border px-2.5 py-1 text-[11.5px]"
+                                        style={{
+                                          borderColor: 'var(--border)',
+                                          background: 'var(--surface-sunken)',
+                                          color: 'var(--text-body)',
+                                        }}
+                                      >
+                                        {step.label}
+                                        <span className="ml-1.5 tabular-nums" style={{ color: 'var(--text-faint)' }}>
+                                          {step.minutes}m
+                                        </span>
+                                      </span>
+                                    </li>
+                                  ))}
+                                </ol>
+                              )}
                             </div>
 
                             {!isDone && (
