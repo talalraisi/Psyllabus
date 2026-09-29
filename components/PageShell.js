@@ -1,3 +1,5 @@
+import Counting from '@/components/Counting'
+
 /**
  * Layout primitives. Every dashboard page composes these rather than
  * hand-rolling padding and headings, which is what keeps the vertical rhythm
@@ -96,7 +98,7 @@ export function Row({ children, className = '', as: Tag = 'li' }) {
 }
 
 /** Numbers as reference: no cards, grouped by a hairline, colour only where it means something. */
-export function StatRow({ stats, className = '' }) {
+export function StatRow({ stats, className = '', countUp = false }) {
   return (
     <div
       className={`flex flex-wrap items-baseline gap-x-12 gap-y-6 border-t pt-6 ${className}`}
@@ -108,7 +110,7 @@ export function StatRow({ stats, className = '' }) {
             className="text-[30px] font-semibold leading-none tracking-[-0.028em] tabular-nums"
             style={{ color: tone || 'var(--text)' }}
           >
-            {value}
+            {countUp ? <Counting to={value} /> : value}
           </p>
           <p className="mt-2 text-[13px]" style={{ color: 'var(--text-muted)' }}>
             {label}
