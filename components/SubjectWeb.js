@@ -1,27 +1,33 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
-import Link from 'next/link'
+import { useState } from 'react'
 import { displaySubtopic, STATUS_LABELS } from '@/lib/progress'
 
 /**
- * A subject as a web.
+ * A subject, one level at a time.
  *
- * The heatmap answers "how much is green". It cannot answer "where does this
- * sit" — a grid of five hundred squares has no shape, and a course does: four
- * or five themes, each with numbered units, each with the things you actually
- * get asked about. This draws that shape, and colours it with what you have
- * proved.
+ * The first version drew the whole course at once: every theme, every unit and
+ * every subtopic on three rings, sixty-eight nodes joined by lines that crossed
+ * each other. It looked like a great deal of work had gone into it and it
+ * answered no question a student actually has. Three things were wrong with it
+ * and they were all the same thing.
  *
- * Layout is radial and deterministic, not a force simulation. A physics engine
- * would settle somewhere slightly different every time you opened it, and the
- * one thing a map has to do is be in the same place tomorrow. Each topic gets
- * a sector of the circle proportional to its size; its units sit on the middle
- * ring inside that sector; the subtopics fan out on the rim.
+ * It was *too detailed*, because everything was on screen whether you had asked
+ * for it or not. It was *small*, because sixty-eight things sharing one circle
+ * leaves each of them four pixels and its name truncated to "A. Space, time and
+ * mot…". And the symmetry was *weird*, because each theme's sector was sized in
+ * proportion to how many subtopics it held, so the whole diagram sat lopsided
+ * for a reason nobody could see.
  *
- * Opening a topic re-lays the whole web around that topic instead. Every node
- * moves to its new position with a transition rather than a cut, so the change
- * reads as the same map turning rather than a different picture.
+ * So: one ring, evenly divided, showing only the children of wherever you are.
+ * Six themes to begin with, each big enough to carry its full name and a
+ * reading of how much of it is proved. Press one and it becomes its units.
+ * Press again and it becomes its subtopics. Depth is still there; it is just
+ * no longer all in your face at once.
+ *
+ * Equal sectors are the point, not a simplification. A theme twice the size of
+ * another is not twice as urgent, and sizing by count made the map about the
+ * syllabus's shape when it needed to be about yours.
  */
 
 const STATUS_COLOR = {
@@ -33,195 +39,123 @@ const STATUS_COLOR = {
   mastered: 'var(--status-mastered)',
 }
 
-const SIZE = 760
-const CENTRE = SIZE / 2
+/** Statuses that mean "this needs you". The number on a node counts these. */
+const NEEDS_WORK = new Set(['not_started', 'in_progress', 'decaying'])
 
-/** Polar to cartesian, with 12 o'clock as zero so the first topic is on top. */
+const SIZE = 620
+const CENTRE = SIZE / 2
+const RING = 208
+const HUB = 66
+
+/** Polar to cartesian, 12 o'clock as zero so the first item is on top. */
 function at(angle, radius) {
   const rad = (angle - 90) * (Math.PI / 180)
-  // Rounded, because the server and the browser disagree in the last decimal
-  // place of a float and React calls that a hydration mismatch. Two decimals
-  // is well below a pixel at this size.
-  const round = (n) => Math.round(n * 100) / 100
-  return { x: round(CENTRE + Math.cos(rad) * radius), y: round(CENTRE + Math.sin(rad) * radius) }
+  // Rounded: the server and the browser disagree in the last decimal of a
+  // float and React calls that a hydration mismatch.
+  const r = (n) => Math.round(n * 100) / 100
+  return { x: r(CENTRE + Math.cos(rad) * radius), y: r(CENTRE + Math.sin(rad) * radius) }
 }
 
-/**
- * "C.1" + "C.1 Wave model" is "C.1 Wave model", not "C.1 C.1 Wave model".
- * Some outlines carry the code in the unit name and some keep it separate.
- */
+/** "C.1" + "C.1 Wave model" is "C.1 Wave model", not "C.1 C.1 Wave model". */
 function unitLabel(u) {
   if (!u.code) return u.unit
   return u.unit.startsWith(u.code) ? u.unit : `${u.code} ${u.unit}`
 }
 
+/** Proportion proved, and how many still want work. */
+function tally(items) {
+  const done = items.filter((r) => !NEEDS_WORK.has(r.status)).length
+  return { total: items.length, done, todo: items.length - done, proved: items.length ? done / items.length : 0 }
+}
+
 /**
- * Where everything goes.
+ * What to draw, given where you are.
  *
- * `focus` is null for the whole subject, {topic} for one theme, or
- * {topic, unit} for one unit. Each step gives what is left the full circle
- * and hides the rest, which is the only way a theme with forty subtopics is
- * readable at this size — and it is what makes the dots grow as you go in,
- * because they are sharing the rim with fewer of their neighbours.
+ * focus is null for the themes, {topic} for that theme's units, and
+ * {topic, unit} for that unit's subtopics. Only one level is ever returned.
  */
-function layout(rows, focus) {
-  const byTopic = new Map()
-  for (const row of rows) {
-    if (!byTopic.has(row.topic)) byTopic.set(row.topic, new Map())
-    const units = byTopic.get(row.topic)
-    const unit = row.unit || row.topic
-    if (!units.has(unit)) units.set(unit, { unit, code: row.code, items: [] })
-    units.get(unit).items.push(row)
-  }
-
-  const topics = [...byTopic.entries()].map(([topic, units]) => ({
-    topic,
-    units: [...units.values()],
-    size: [...units.values()].reduce((n, u) => n + u.items.length, 0),
-  }))
-
-  // Going in narrows what is drawn: one theme, then one unit of it.
-  const shown = (focus ? topics.filter((t) => t.topic === focus.topic) : topics).map((t) => {
-    const units = focus?.unit ? t.units.filter((u) => u.unit === focus.unit) : t.units
-    return { ...t, units, size: units.reduce((n, u) => n + u.items.length, 0) }
-  })
-  const total = shown.reduce((n, t) => n + t.size, 0) || 1
-
-  const RING_TOPIC = focus ? 118 : 150
-  const RING_UNIT = focus ? 212 : 240
-  const RING_LEAF = focus ? 318 : 330
-
-  // The dots are sized to the room they have. Nine of them on the rim get to
-  // be big; three hundred cannot, and four pixels was what that looked like
-  // at every zoom whether there was room or not.
-  const spacing = (2 * Math.PI * RING_LEAF) / total
-  const leafR = Math.max(4.5, Math.min(11, spacing / 2.8))
-  // A dot needs a few pixels; a name needs about a hundred and thirty. Those
-  // are different questions, and labelling every leaf the moment the dots got
-  // big is how forty names ended up stacked on one rim.
-  const leavesLabelled = spacing >= 130
-
-  const nodes = []
-  const links = []
-  let cursor = 0
-  let seq = 0
-
-  for (const t of shown) {
-    /**
-     * A sector part proportional, part equal.
-     *
-     * Purely proportional meant a theme of four subtopics got four degrees,
-     * which put its node hard against its neighbour's and its name on top of
-     * that neighbour's name. Blending in an equal share guarantees every
-     * theme enough of the circle to be readable, while a theme twice the size
-     * of another still looks it.
-     */
-    const sweep = 360 * (0.6 * (t.size / total) + 0.4 * (1 / shown.length))
-    const start = cursor + (focus ? 0 : 3)
-    const end = cursor + sweep - (focus ? 0 : 3)
-    const mid = (start + end) / 2
-    cursor += sweep
-
-    const topicPoint = at(mid, RING_TOPIC)
-    const topicId = `t:${t.topic}`
-    nodes.push({
-      id: topicId,
+function levelOf(rows, focus) {
+  if (!focus) {
+    const byTopic = new Map()
+    for (const r of rows) {
+      if (!byTopic.has(r.topic)) byTopic.set(r.topic, [])
+      byTopic.get(r.topic).push(r)
+    }
+    return {
       kind: 'topic',
-      label: t.topic,
-      // Sectors are proportional to size, so a small theme sits right up
-      // against its neighbour. The label is staggered by this so two of them
-      // never land on the same line.
-      seq: seq++,
-      ...topicPoint,
-      topic: t.topic,
-    })
-    links.push({ from: { x: CENTRE, y: CENTRE }, to: topicPoint, kind: 'spine' })
-
-    let leafCursor = start
-    for (const u of t.units) {
-      const unitSweep = (u.items.length / t.size) * (end - start)
-      const unitMid = leafCursor + unitSweep / 2
-      const unitPoint = at(unitMid, RING_UNIT)
-      const unitId = `u:${t.topic}:${u.unit}`
-      nodes.push({
-        id: unitId,
-        kind: 'unit',
-        label: unitLabel(u),
-        ...unitPoint,
-        topic: t.topic,
-        unit: u.unit,
-      })
-      links.push({ from: topicPoint, to: unitPoint, kind: 'branch', topic: t.topic })
-
-      u.items.forEach((row, i) => {
-        // Spread the leaves across their unit's slice, leaving the edges alone
-        // so two units' leaves never sit on top of each other.
-        const step = unitSweep / (u.items.length + 1)
-        const leafAngle = leafCursor + step * (i + 1)
-        const leafPoint = at(leafAngle, RING_LEAF + (i % 2 ? leafR * 2.4 : 0))
-        nodes.push({
-          id: `s:${row.subject}:${row.subtopic}`,
-          kind: 'leaf',
-          label: displaySubtopic(row.subtopic),
-          status: row.status || 'not_started',
-          row,
-          r: leafR,
-          // Only once they are big enough for a word to sit under one without
-          // landing on its neighbour.
-          labelled: leavesLabelled,
-          ...leafPoint,
-          topic: t.topic,
-          unit: u.unit,
-        })
-        links.push({ from: unitPoint, to: leafPoint, kind: 'twig', topic: t.topic })
-      })
-
-      leafCursor += unitSweep
+      hub: null,
+      items: [...byTopic.entries()].map(([topic, items]) => ({
+        key: topic, label: topic, items, go: { topic },
+      })),
     }
   }
 
-  return { nodes, links, topics }
+  const inTopic = rows.filter((r) => r.topic === focus.topic)
+
+  if (!focus.unit) {
+    const byUnit = new Map()
+    for (const r of inTopic) {
+      const unit = r.unit || r.topic
+      if (!byUnit.has(unit)) byUnit.set(unit, { unit, code: r.code, items: [] })
+      byUnit.get(unit).items.push(r)
+    }
+    return {
+      kind: 'unit',
+      hub: focus.topic,
+      items: [...byUnit.values()].map((u) => ({
+        key: u.unit, label: unitLabel(u), items: u.items, go: { topic: focus.topic, unit: u.unit },
+      })),
+    }
+  }
+
+  const inUnit = inTopic.filter((r) => (r.unit || r.topic) === focus.unit)
+  return {
+    kind: 'leaf',
+    hub: focus.unit,
+    items: inUnit.map((r) => ({
+      key: `${r.subtopic}`, label: displaySubtopic(r.subtopic), items: [r], row: r,
+    })),
+  }
 }
 
 export default function SubjectWeb({ subject, rows, onPickSubtopic, fill = false }) {
   const [focus, setFocus] = useState(null)
-  const [hovered, setHovered] = useState(null)
-  // Drawn once the panel is on screen, so the entrance actually plays.
-  const [live, setLive] = useState(false)
+  const [hover, setHover] = useState(null)
 
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setLive(true))
-    return () => cancelAnimationFrame(id)
-  }, [])
+  const level = levelOf(rows || [], focus)
+  const n = level.items.length || 1
+  const whole = tally(rows || [])
+  const here = tally(level.items.flatMap((i) => i.items))
 
-  const { nodes, links, topics } = useMemo(() => layout(rows, focus), [rows, focus])
+  /* Nodes grow into the space they have. Six themes get to be large; thirty
+     subtopics cannot, but they still get more room than they did sharing a rim
+     with everything else in the course. */
+  const step = 360 / n
+  const nodeR = Math.max(13, Math.min(34, (Math.PI * RING) / n / 1.9))
+  const labelled = n <= 14
 
-  const counts = useMemo(() => {
-    const out = {}
-    for (const row of rows) out[row.status || 'not_started'] = (out[row.status || 'not_started'] || 0) + 1
-    return out
-  }, [rows])
-
-  const hoveredNode = hovered ? nodes.find((n) => n.id === hovered) : null
-  const activeTopic = hoveredNode?.topic || null
+  const up = () =>
+    setFocus((f) => (!f ? null : f.unit ? { topic: f.topic } : null))
 
   return (
-    <div>
-      <div className="mb-3 flex flex-wrap items-center gap-2">
+    <div className="flex flex-col">
+      {/* Where you are, and the way back. A diagram you can walk into needs to
+          say so in words as well as by redrawing itself. */}
+      <div className="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px]">
         <button
           onClick={() => setFocus(null)}
-          disabled={!focus}
-          className={focus ? 'btn btn-outline control-sm' : 'btn btn-quiet control-sm'}
+          className="font-medium"
+          style={{ color: focus ? 'var(--brand)' : 'var(--text)' }}
         >
           {subject}
         </button>
         {focus && (
           <>
-            <span style={{ color: 'var(--text-faint)' }}>›</span>
+            <span style={{ color: 'var(--text-faint)' }}>/</span>
             <button
               onClick={() => setFocus({ topic: focus.topic })}
-              disabled={!focus.unit}
-              className={focus.unit ? 'btn btn-outline control-sm' : 'btn btn-quiet control-sm'}
+              className="font-medium"
+              style={{ color: focus.unit ? 'var(--brand)' : 'var(--text)' }}
             >
               {focus.topic}
             </button>
@@ -229,244 +163,162 @@ export default function SubjectWeb({ subject, rows, onPickSubtopic, fill = false
         )}
         {focus?.unit && (
           <>
-            <span style={{ color: 'var(--text-faint)' }}>›</span>
-            <span className="text-[13px] font-medium">{focus.unit}</span>
+            <span style={{ color: 'var(--text-faint)' }}>/</span>
+            <span className="font-medium">{focus.unit}</span>
           </>
         )}
-        <div className="flex-1" />
-        <span className="text-[12px]" style={{ color: 'var(--text-faint)' }}>
-          {focus?.unit
-            ? 'Click a subtopic to practise it'
-            : focus
-              ? 'Click a unit to go further in'
-              : 'Click a topic or a unit to open it'}
+        <span className="ml-auto" style={{ color: 'var(--text-muted)' }}>
+          {here.todo > 0 ? `${here.todo} of ${here.total} need work` : `all ${here.total} proved`}
         </span>
       </div>
 
       <div
-        className="overflow-hidden rounded-[16px] border"
+        className="relative rounded-[14px] border"
         style={{
           borderColor: 'var(--border-strong)',
-          background: 'var(--surface-sunken)',
-          // Square, capped by the window. A fixed 72vh box is right on a
-          // desktop and wrong on a phone, where the map is only as wide as
-          // the screen and the leftover height shows up as two empty bands
-          // above and below it.
-          ...(fill ? { aspectRatio: '1 / 1', maxHeight: 'min(78vh, 840px)' } : null),
+          background: 'var(--surface)',
+          ...(fill ? { aspectRatio: '1 / 1', maxHeight: 'min(74vh, 720px)' } : null),
         }}
       >
         <svg
           viewBox={`0 0 ${SIZE} ${SIZE}`}
           className={fill ? 'h-full w-full' : 'h-auto w-full'}
-          preserveAspectRatio="xMidYMid meet"
           role="img"
-          aria-label={`${subject} as a map of topics and subtopics`}
+          aria-label={`${subject}, ${Math.round(whole.proved * 100)}% proved: ${here.todo} of ${here.total} shown need work`}
         >
-          {/* Rings, so the three levels read as levels rather than scatter. */}
-          {[150, 240, 330].map((r) => (
-            <circle
-              key={r}
-              cx={CENTRE}
-              cy={CENTRE}
-              r={r}
-              fill="none"
-              stroke="var(--border)"
-              strokeWidth="1"
-              opacity={live ? 0.5 : 0}
-              style={{ transition: 'opacity 600ms ease' }}
-            />
-          ))}
+          {/* One faint guide ring. The old version drew a line from the centre
+              to every node, which at sixty-eight nodes was a ball of string. */}
+          <circle
+            cx={CENTRE} cy={CENTRE} r={RING}
+            fill="none" stroke="var(--border)" strokeWidth="1"
+          />
 
-          {links.map((l, i) => {
-            const dim = activeTopic && l.topic && l.topic !== activeTopic
-            return (
-              <line
-                key={i}
-                x1={l.from.x}
-                y1={l.from.y}
-                x2={live ? l.to.x : l.from.x}
-                y2={live ? l.to.y : l.from.y}
-                stroke={
-                  l.kind === 'spine'
-                    ? 'color-mix(in oklab, var(--brand) 55%, transparent)'
-                    : l.kind === 'branch'
-                      ? 'color-mix(in oklab, var(--brand) 30%, transparent)'
-                      : 'var(--border-strong)'
-                }
-                strokeWidth={l.kind === 'spine' ? 2 : l.kind === 'branch' ? 1.4 : 1}
-                opacity={dim ? 0.12 : l.kind === 'twig' ? 0.65 : 1}
-                style={{
-                  transition: `x2 ${420 + (i % 7) * 40}ms cubic-bezier(0.16,1,0.3,1), y2 ${
-                    420 + (i % 7) * 40
-                  }ms cubic-bezier(0.16,1,0.3,1), opacity 200ms ease`,
-                }}
-              />
-            )
-          })}
-
-          {/* The subject itself, and the way back out. */}
-          <g
-            onClick={() => setFocus(focus?.unit ? { topic: focus.topic } : null)}
-            style={{ cursor: focus ? 'pointer' : 'default' }}
-          >
-            <circle cx={CENTRE} cy={CENTRE} r={52} fill="var(--surface)" stroke="var(--brand)" strokeWidth="1.5" />
-            <text
-              x={CENTRE}
-              y={CENTRE + 6}
-              textAnchor="middle"
-              style={{ fontSize: focus ? 16 : 24, fontWeight: 600, fill: 'var(--text)' }}
-            >
-              {focus ? 'Back' : `${Math.round(((counts.mastered || 0) / rows.length) * 100)}%`}
-            </text>
-          </g>
-
-          {nodes.map((n, i) => {
-            const dim = activeTopic && n.topic !== activeTopic
-            const isHovered = hovered === n.id
-            // Was 9 / 5.5 / 4 on a 760 canvas, which is why the whole thing
-            // read as specks rather than a diagram.
-            const r = n.kind === 'topic' ? 19 : n.kind === 'unit' ? 12 : n.r
-
-            /**
-             * Labels pushed outward along their own spoke.
-             *
-             * Sitting every label directly under its node put two topic names
-             * on top of each other wherever two sectors met near the top of
-             * the circle. Pushed out along the radius they spread the way the
-             * nodes already do, and the side of the circle they are on
-             * decides which way they run.
-             */
-            const grown = r * (isHovered ? 1.45 : 1)
-            const dx = n.x - CENTRE
-            const dy = n.y - CENTRE
-            const len = Math.hypot(dx, dy) || 1
-            // Topic names go inward, everything else outward. There are four
-            // or five topics and a hundred leaves: the inside of the circle
-            // is nearly empty and the rim is where the crowding is, so two
-            // theme names that met near twelve o'clock were landing on top of
-            // each other while there was open space behind them.
-            const pad = n.kind === 'topic' ? -(grown + 10) : grown + 11
-            const label = {
-              x: Math.round((n.x + (dx / len) * pad) * 100) / 100,
-              y: Math.round((n.y + (dy / len) * pad + 4) * 100) / 100,
-              anchor: dx / len > 0.25 ? 'start' : dx / len < -0.25 ? 'end' : 'middle',
-            }
-            const fill =
-              n.kind === 'leaf'
-                ? STATUS_COLOR[n.status] || 'var(--status-untested)'
-                : 'var(--surface)'
+          {level.items.map((item, i) => {
+            const p = at(i * step, RING)
+            const t = tally(item.items)
+            const isLeaf = level.kind === 'leaf'
+            const colour = isLeaf
+              ? STATUS_COLOR[item.row.status] || STATUS_COLOR.not_started
+              : 'var(--surface-sunken)'
+            const active = hover === item.key
 
             return (
               <g
-                key={n.id}
-                opacity={live ? (dim ? 0.2 : 1) : 0}
-                style={{
-                  transition: `opacity 300ms ease ${Math.min(i * 4, 500)}ms`,
-                  cursor: 'pointer',
-                }}
-                onMouseEnter={() => setHovered(n.id)}
-                onMouseLeave={() => setHovered(null)}
+                key={item.key}
+                onMouseEnter={() => setHover(item.key)}
+                onMouseLeave={() => setHover(null)}
                 onClick={() => {
-                  if (n.kind === 'topic') setFocus(focus?.topic === n.topic ? null : { topic: n.topic })
-                  else if (n.kind === 'unit') setFocus({ topic: n.topic, unit: n.unit })
-                  else if (n.kind === 'leaf') onPickSubtopic?.(n.row)
+                  if (isLeaf) onPickSubtopic?.(item.row)
+                  else setFocus(item.go)
                 }}
+                style={{ cursor: 'pointer' }}
               >
+                {/* How much of this is proved, as an arc round the node.
+                    One fact, read at a glance, no legend needed. */}
+                {!isLeaf && (
+                  <circle
+                    cx={p.x} cy={p.y} r={nodeR + 5}
+                    fill="none"
+                    stroke="var(--status-proficient)"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeDasharray={`${2 * Math.PI * (nodeR + 5) * t.proved} ${2 * Math.PI * (nodeR + 5)}`}
+                    transform={`rotate(-90 ${p.x} ${p.y})`}
+                    opacity="0.85"
+                  />
+                )}
                 <circle
-                  cx={n.x}
-                  cy={n.y}
-                  r={isHovered ? r * 1.45 : r}
-                  fill={fill}
-                  stroke={n.kind === 'leaf' ? 'var(--surface-sunken)' : 'var(--border-strong)'}
-                  strokeWidth={n.kind === 'leaf' ? 1.5 : 1.6}
-                  style={{
-                    transition:
-                      'cx 520ms cubic-bezier(0.16,1,0.3,1), cy 520ms cubic-bezier(0.16,1,0.3,1), r 180ms ease',
-                    filter: isHovered ? 'drop-shadow(0 0 6px color-mix(in oklab, var(--brand) 60%, transparent))' : 'none',
-                  }}
+                  cx={p.x} cy={p.y} r={nodeR}
+                  fill={colour}
+                  stroke={active ? 'var(--text)' : 'var(--border-strong)'}
+                  strokeWidth={active ? 2 : 1}
                 />
-                {(n.kind === 'topic' ||
-                  (focus && n.kind === 'unit') ||
-                  (n.kind === 'leaf' && n.labelled) ||
-                  isHovered) && (
+                {!isLeaf && (
                   <text
-                    x={label.x}
-                    y={label.y}
-                    textAnchor={label.anchor}
-                    style={{
-                      fontSize: n.kind === 'topic' ? 14 : n.kind === 'unit' ? 12 : 11,
-                      fontWeight: n.kind === 'topic' ? 600 : 500,
-                      fill: isHovered ? 'var(--text)' : 'var(--text-muted)',
-                      // A word crossing a link is a word you decode rather
-                      // than read, so it gets the background behind it.
-                      paintOrder: 'stroke',
-                      stroke: 'var(--surface-sunken)',
-                      strokeWidth: 3.5,
-                      strokeLinejoin: 'round',
-                      pointerEvents: 'none',
-                    }}
+                    x={p.x} y={p.y}
+                    textAnchor="middle" dominantBaseline="central"
+                    style={{ fontSize: nodeR * 0.8, fontWeight: 600, fill: 'var(--text)' }}
                   >
-                    {n.label.length > 24 ? `${n.label.slice(0, 22)}…` : n.label}
+                    {t.todo || '✓'}
+                  </text>
+                )}
+
+                {labelled && (
+                  <text
+                    x={p.x}
+                    y={p.y + nodeR + 20}
+                    textAnchor="middle"
+                    style={{ fontSize: 13, fill: 'var(--text-body)' }}
+                  >
+                    {item.label.length > 30 ? `${item.label.slice(0, 29)}…` : item.label}
                   </text>
                 )}
               </g>
             )
           })}
-        </svg>
-      </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5">
-        {[
-          ['mastered', 'Mastered'],
-          ['proficient', 'Proficient'],
-          ['confident', 'Developing'],
-          ['in_progress', 'Weak'],
-          ['decaying', 'Fading'],
-          ['not_started', 'Untested'],
-        ].map(([key, label]) => (
-          <span key={key} className="flex items-center gap-1.5">
-            <span
-              className="h-2.5 w-2.5 rounded-full"
-              style={{ background: STATUS_COLOR[key] }}
-            />
-            <span className="text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
-              {label}
-              {counts[key] ? ` ${counts[key]}` : ''}
-            </span>
-          </span>
-        ))}
-      </div>
-
-      {/* What the pointer is on, under the map rather than floating over it. */}
-      <div className="mt-3 flex min-h-[44px] flex-wrap items-center justify-between gap-3">
-        {hoveredNode ? (
-          <div className="min-w-0">
-            <p className="truncate text-[13.5px] font-medium">
-              {hoveredNode.label}
-            </p>
-            <p className="mt-0.5 text-[12px]" style={{ color: 'var(--text-faint)' }}>
-              {hoveredNode.kind === 'leaf'
-                ? STATUS_LABELS[hoveredNode.status] || 'Not tested yet'
-                : hoveredNode.kind === 'unit'
-                  ? 'Unit'
-                  : `${topics.find((t) => t.topic === hoveredNode.topic)?.size ?? 0} subtopics`}
-            </p>
-          </div>
-        ) : (
-          <p className="text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
-            Point at anything to read it. Click a subtopic to practise it.
-          </p>
-        )}
-
-        {hoveredNode?.kind === 'leaf' && (
-          <Link
-            href={`/dashboard/quiz?subject=${encodeURIComponent(hoveredNode.row.subject)}&topic=${encodeURIComponent(hoveredNode.row.topic)}&subtopic=${encodeURIComponent(hoveredNode.row.subtopic)}&count=5&review=practice&back=/dashboard/progress`}
-            className="btn btn-outline control-sm shrink-0"
+          {/* The hub reads whatever you are standing in, not the subject.
+              Left on the whole-subject figure it said 44% while you were
+              inside one theme, which everybody read as that theme's 44%. */}
+          <circle
+            cx={CENTRE} cy={CENTRE} r={HUB}
+            fill="var(--surface-sunken)" stroke="var(--border-strong)" strokeWidth="1"
+          />
+          <text
+            x={CENTRE} y={CENTRE - 8}
+            textAnchor="middle" dominantBaseline="central"
+            style={{ fontSize: 30, fontWeight: 600, fill: 'var(--text)' }}
           >
-            Quick 5
-          </Link>
-        )}
+            {Math.round(here.proved * 100)}%
+          </text>
+          <text
+            x={CENTRE} y={CENTRE + 18}
+            textAnchor="middle" dominantBaseline="central"
+            style={{ fontSize: 11, fill: 'var(--text-faint)' }}
+          >
+            proved
+          </text>
+        </svg>
+
+        {/* Read-out rather than a tooltip: it appears in the same place every
+            time, it is there for keyboard users, and it does not vanish. */}
+        <div
+          className="absolute inset-x-0 bottom-0 border-t px-4 py-3 text-[13px]"
+          style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
+        >
+          {(() => {
+            const item = level.items.find((i) => i.key === hover)
+            if (!item) {
+              return (
+                <span style={{ color: 'var(--text-faint)' }}>
+                  {level.kind === 'leaf'
+                    ? 'Press a subtopic to open it.'
+                    : `Press one to open its ${level.kind === 'topic' ? 'units' : 'subtopics'}.`}
+                </span>
+              )
+            }
+            const t = tally(item.items)
+            return (
+              <span className="flex flex-wrap items-baseline gap-x-3">
+                <span className="font-medium">{item.label}</span>
+                <span style={{ color: 'var(--text-muted)' }}>
+                  {level.kind === 'leaf'
+                    ? STATUS_LABELS[item.row.status]
+                    : t.todo > 0
+                      ? `${t.todo} of ${t.total} need work`
+                      : `all ${t.total} proved`}
+                </span>
+              </span>
+            )
+          })()}
+        </div>
       </div>
+
+      {focus && (
+        <button onClick={up} className="btn btn-quiet control-sm mt-3 self-start">
+          Back
+        </button>
+      )}
     </div>
   )
 }
