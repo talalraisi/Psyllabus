@@ -33,6 +33,22 @@ const QUESTION = {
 
 /** A course-shaped sample: three themes, a few units each, leaves with status. */
 const STATUSES = ['mastered', 'proficient', 'confident', 'in_progress', 'decaying', 'not_started']
+const ECON_ROWS = [
+  ['Unit 2 - Microeconomics', ['2.1 Demand', 6], ['2.4 Elasticity', 5], ['2.8 Externalities', 7]],
+  ['Unit 3 - Macroeconomics', ['3.2 Aggregate demand', 6], ['3.5 Monetary policy', 4]],
+].flatMap(([topic, ...units], t) =>
+  units.flatMap(([unit, n], u) =>
+    Array.from({ length: n }, (_, i) => ({
+      subject: 'Economics HL',
+      topic,
+      unit,
+      code: unit.split(' ')[0],
+      subtopic: `${unit.replace(/^\d\.\d /, '')} point ${i + 1}`,
+      status: STATUSES[(t + u + i + 2) % STATUSES.length],
+    }))
+  )
+)
+
 const WEB_ROWS = [
   ['A. Space, time and motion', ['A.1 Kinematics', 7], ['A.2 Forces and momentum', 8], ['A.3 Work and energy', 5]],
   ['B. Particulate nature of matter', ['B.1 Thermal transfers', 5], ['B.3 Gas laws', 4], ['B.5 Current and circuits', 6]],
@@ -74,7 +90,10 @@ export default function UiPreview() {
         link with one list. Press a row to open it.
       </p>
       <div className="mt-4" style={{ width: 'min(96vw, 900px)' }}>
-        <SubjectProgress items={WEB_ROWS} subjects={['Physics SL']} />
+        <SubjectProgress
+          items={[...WEB_ROWS, ...ECON_ROWS]}
+          subjects={['Physics SL', 'Economics HL']}
+        />
       </div>
 
       <h1 className="mt-10 text-[22px] font-semibold">Subject web</h1>
