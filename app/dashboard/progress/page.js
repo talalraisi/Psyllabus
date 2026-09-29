@@ -7,35 +7,16 @@ import { getProfile, getSyllabus } from '@/lib/cache'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
-import Heatmap from '@/components/Heatmap'
-import { Page, PageHeader, Section, StatRow } from '@/components/PageShell'
+import SubjectProgress from '@/components/SubjectProgress'
+import { Page, PageHeader } from '@/components/PageShell'
 import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { mergeSyllabusWithProgress } from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
 
-// Read left to right this is the ladder itself: everything tracked, then the
-// same subtopics sorted by how well they are actually held.
-const STAT_CARDS = [
-  { key: 'total', label: 'tracked', tone: 'var(--text)' },
-  { key: 'mastered', label: 'mastered', tone: 'var(--status-mastered)' },
-  { key: 'proficient', label: 'proficient', tone: 'var(--status-proficient)' },
-  { key: 'confident', label: 'developing', tone: 'var(--status-developing)' },
-  { key: 'inProgress', label: 'weak', tone: 'var(--status-weak)' },
-  { key: 'decaying', label: 'fading', tone: 'var(--status-fading)' },
-]
-
 export default function ProgressPage() {
   const [profile, setProfile] = useState(null)
   const [heatmapItems, setHeatmapItems] = useState([])
-  const [summary, setSummary] = useState({
-    total: 0,
-    mastered: 0,
-    proficient: 0,
-    confident: 0,
-    inProgress: 0,
-    decaying: 0,
-  })
   const [loading, setLoading] = useState(true)
 
   // The top bar runs for as long as this page is fetching, not just while the
@@ -80,14 +61,6 @@ export default function ProgressPage() {
         buildEffectiveProgressMap(progressRows)
       )
 
-      setSummary({
-        total: heatmap.length,
-        mastered: heatmap.filter((i) => i.status === 'mastered').length,
-        decaying: heatmap.filter((i) => i.status === 'decaying').length,
-        inProgress: heatmap.filter((i) => i.status === 'in_progress').length,
-        confident: heatmap.filter((i) => i.status === 'confident').length,
-        proficient: heatmap.filter((i) => i.status === 'proficient').length,
-      })
       setHeatmapItems(heatmap)
       setLoading(false)
     }
@@ -103,79 +76,45 @@ export default function ProgressPage() {
   }
 
   const subjects = (profile.subjects || []).filter((s) => !IB_CORE_SUBJECTS.includes(s))
-  const overallPercent = summary.total
-    ? Math.round((summary.mastered / summary.total) * 100)
-    : 0
 
-  const bySubject = subjects
-    .map((subject) => {
-      const items = heatmapItems.filter((i) => i.subject === subject)
-      const mastered = items.filter((i) => i.status === 'mastered').length
-      return {
-        subject,
-        count: items.length,
-        percent: items.length ? Math.round((mastered / items.length) * 100) : 0,
-      }
-    })
-    .filter((s) => s.count > 0)
+  /* One number in the header, and it is the one worth acting on.
+     "X% mastered" flattered: a subject 60% proved with the rest untested and
+     one 60% proved with the rest actively wrong are not the same evening, and
+     the percentage could not tell them apart. */
+  const needsWork = heatmapItems.filter((i) =>
+    ['not_started', 'in_progress', 'decaying'].includes(i.status)
+  ).length
 
   return (
     <DashboardLayout profile={profile}>
       <Page width="wide">
         <PageHeader
           title="Progress"
-          subtitle={`${overallPercent}% of all subtopics mastered across ${subjects.length} subject${subjects.length !== 1 ? 's' : ''}`}
+          subtitle={
+            heatmapItems.length
+              ? `${needsWork} of ${heatmapItems.length} subtopics need work across ${subjects.length} subject${subjects.length !== 1 ? 's' : ''}`
+              : 'Take a quiz and this fills in.'
+          }
         />
 
-        <StatRow
-          className="mb-14"
-          stats={STAT_CARDS.map((stat) => ({
-            label: stat.label,
-            value: summary[stat.key],
-            tone: stat.tone,
-          }))}
-        />
+        {/* One list, three levels deep, every row ending in something to do.
+            It replaces four readings of the same data: a percentage in the
+            subtitle, counts by status in a row of cards, the same percentages
+            again as bars, and every subtopic in the course as a coloured
+            square. None of them answered "which part of this needs me
+            tonight", and the only button on any of them opened a diagram
+            showing it a fifth way. */}
+        <SubjectProgress items={heatmapItems} subjects={subjects} />
 
-        {bySubject.length > 0 && (
-          <Section title="By subject">
-            <ul className="flex flex-col">
-              {bySubject.map(({ subject, percent }) => (
-                <li
-                  key={subject}
-                  className="flex items-center gap-5 border-b py-3 last:border-b-0"
-                  style={{ borderColor: 'var(--border)' }}
-                >
-                  <span className="w-52 shrink-0 truncate text-[14px]">{subject}</span>
-                  <span
-                    className="h-1 flex-1 overflow-hidden rounded-full"
-                    style={{ background: 'var(--border-strong)' }}
-                  >
-                    <span
-                      className="bar-fill block h-full rounded-full"
-                      style={{ width: `${percent}%`, background: 'var(--brand)' }}
-                    />
-                  </span>
-                  <span
-                    className="w-11 shrink-0 text-right text-[13.5px] font-semibold tabular-nums"
-                    style={{ color: 'var(--brand)' }}
-                  >
-                    {percent}%
-                  </span>
-                  {/* The map is a page now, not a panel that unfolds in a
-                      column too narrow to draw it in. */}
-                  <Link
-                    href={`/dashboard/map?subject=${encodeURIComponent(subject)}`}
-                    className="btn btn-outline control-sm shrink-0"
-                  >
-                    Open map
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </Section>
+        {subjects.length > 0 && (
+          <p className="mt-10 text-[13px]" style={{ color: 'var(--text-muted)' }}>
+            Prefer to see the shape of a course rather than a list?{' '}
+            <Link href="/dashboard/map" className="underline" style={{ color: 'var(--brand)' }}>
+              Open the map
+            </Link>
+            .
+          </p>
         )}
-
-        <Heatmap items={heatmapItems} subjects={subjects} />
       </Page>
     </DashboardLayout>
   )

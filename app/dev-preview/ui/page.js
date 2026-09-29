@@ -16,6 +16,7 @@ import Calculator from '@/components/Calculator'
 import QuestionMenu from '@/components/QuestionMenu'
 import TodoList from '@/components/TodoList'
 import SubjectWeb from '@/components/SubjectWeb'
+import SubjectProgress from '@/components/SubjectProgress'
 
 const ENABLED = process.env.NODE_ENV !== 'production'
 
@@ -66,6 +67,15 @@ export default function UiPreview() {
       <button onClick={() => setCalcOpen((v) => !v)} className="btn btn-outline control-md mt-3">
         {calcOpen ? 'Hide' : 'Show'} calculator
       </button>
+
+      <h1 className="mt-10 text-[22px] font-semibold">Progress, rebuilt</h1>
+      <p className="mt-1 text-[13px]" style={{ color: 'var(--text-muted)' }}>
+        Replaces the stat cards, the by-subject bars, the heatmap and the map
+        link with one list. Press a row to open it.
+      </p>
+      <div className="mt-4" style={{ width: 'min(96vw, 900px)' }}>
+        <SubjectProgress items={WEB_ROWS} subjects={['Physics SL']} />
+      </div>
 
       <h1 className="mt-10 text-[22px] font-semibold">Subject web</h1>
       {/* Wider than the rest of the page, because the map is the one thing
