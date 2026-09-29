@@ -11,12 +11,13 @@ import SubjectProgress from '@/components/SubjectProgress'
 import { Page, PageHeader } from '@/components/PageShell'
 import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { mergeSyllabusWithProgress } from '@/lib/progress'
-import { buildEffectiveProgressMap } from '@/lib/decay'
+import { buildEffectiveProgressMap, buildProgressDetailMap } from '@/lib/decay'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
 
 export default function ProgressPage() {
   const [profile, setProfile] = useState(null)
   const [heatmapItems, setHeatmapItems] = useState([])
+  const [detail, setDetail] = useState({})
   const [loading, setLoading] = useState(true)
 
   // The top bar runs for as long as this page is fetching, not just while the
@@ -61,6 +62,7 @@ export default function ProgressPage() {
         buildEffectiveProgressMap(progressRows)
       )
 
+      setDetail(buildProgressDetailMap(progressRows))
       setHeatmapItems(heatmap)
       setLoading(false)
     }
@@ -104,7 +106,7 @@ export default function ProgressPage() {
             square. None of them answered "which part of this needs me
             tonight", and the only button on any of them opened a diagram
             showing it a fifth way. */}
-        <SubjectProgress items={heatmapItems} subjects={subjects} />
+        <SubjectProgress items={heatmapItems} subjects={subjects} detail={detail} />
 
         {subjects.length > 0 && (
           <p className="mt-10 text-[13px]" style={{ color: 'var(--text-muted)' }}>
