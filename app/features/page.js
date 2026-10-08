@@ -31,7 +31,7 @@ export default function FeaturesPage() {
               className="elev rounded-[16px] border p-6 md:p-8"
               style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
             >
-              <div className="grid gap-6 md:grid-cols-[minmax(0,19rem)_1fr] md:gap-12">
+              <div className="grid gap-6 md:grid-cols-[minmax(0,22rem)_1fr] md:gap-12">
                 <div>
                   <p
                     className="text-[11px] font-semibold tabular-nums tracking-[0.16em]"
@@ -60,16 +60,35 @@ export default function FeaturesPage() {
                 </div>
 
                 <div>
-                  <ul className="flex flex-col gap-3.5">
-                    {f.how.map((line) => (
-                      <li key={line} className="flex gap-3">
-                        <IconCheck
-                          width={15}
-                          height={15}
-                          className="mt-[3px] shrink-0"
-                          style={{ color: 'var(--status-proficient)' }}
-                        />
-                        <p className="text-[14px] leading-[1.65]" style={{ color: 'var(--text-body)' }}>
+                  {/* Three facts, not three paragraphs.
+                      These were 685 words across the eight features, one of
+                      them 46 words long, and a page somebody opened to find
+                      out what the product does should not be read like a
+                      contract. Short enough to take in at a glance, laid out
+                      as tiles so the eye counts them rather than reading
+                      them. */}
+                  <ul className="grid gap-2.5 sm:grid-cols-3">
+                    {f.how.map((line, n) => (
+                      <li
+                        key={line}
+                        className="rounded-[12px] border p-3.5"
+                        style={{ borderColor: 'var(--border)', background: 'var(--surface-sunken)' }}
+                      >
+                        <span className="flex items-center gap-2">
+                          <IconCheck
+                            width={13}
+                            height={13}
+                            className="shrink-0"
+                            style={{ color: 'var(--status-proficient)' }}
+                          />
+                          <span
+                            className="text-[10px] font-semibold tabular-nums tracking-[0.14em]"
+                            style={{ color: 'var(--text-faint)' }}
+                          >
+                            {String(n + 1).padStart(2, '0')}
+                          </span>
+                        </span>
+                        <p className="mt-2 text-[13px] leading-[1.5]" style={{ color: 'var(--text-body)' }}>
                           {line}
                         </p>
                       </li>
