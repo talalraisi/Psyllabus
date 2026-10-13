@@ -553,7 +553,7 @@ export function PlanDemo() {
 
       <p className="mt-5 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
         Ordered by what you got wrong, what is fading, and which foundations unlock later
-        topics. Every line says why it is there, so you can disagree with it.
+        topics.
       </p>
     </div>
   )

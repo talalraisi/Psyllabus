@@ -27,13 +27,12 @@
  * Nothing glows. Two blooms lived in this space before and were disliked both
  * times. Ambient light reads as decoration; ambient movement reads as depth.
  *
- * One column, on the right, because the headline is left-aligned and that is
- * the side it leaves free. It flanked both sides while the hero was centred;
- * if it is ever centred again this wants splitting in two and raising to xl,
- * since 18%-wide flanks and a 768px headline collide below about 1280px.
- *
- * Hidden below lg, where there is no leftover space and a phone has better
- * uses for the battery, and off under prefers-reduced-motion.
+ * It flanks the headline on both sides, because the hero is centred now. That
+ * is also why it starts at xl rather than lg: the columns are 18% of the
+ * viewport each, and below about 1280px the headline's own 768px would reach
+ * into them. Narrow margins with nothing in them beat shapes sitting on top of
+ * the words. Off under prefers-reduced-motion, and absent on phones, which
+ * have better uses for the battery.
  */
 
 /* Loosely clustered rather than evenly spread — scatter looks accidental,
@@ -51,8 +50,8 @@ const CELLS = [
 /* pct is how far round the arc goes — a ring that is part-done, like every
    ring in the app. r is chosen so the dash maths stays readable. */
 const RINGS = [
-  { x: 40, y: 26, size: 168, pct: 0.68, w: 1.5, path: 'b', s: 46, d: 0 },
-  { x: 48, y: 58, size: 104, pct: 0.42, w: 1.5, path: 'c', s: 52, d: -18 },
+  { x: 14, y: 24, size: 124, pct: 0.68, w: 1.5, path: 'b', s: 46, d: 0 },
+  { x: 30, y: 60, size: 92, pct: 0.42, w: 1.5, path: 'c', s: 52, d: -18 },
 ]
 
 function Ring({ size, pct, w }) {
@@ -76,13 +75,10 @@ function Ring({ size, pct, w }) {
   )
 }
 
-export default function Drift() {
+function Column({ cells, rings, className }) {
   return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none absolute inset-y-0 right-0 hidden w-[42%] select-none lg:block"
-    >
-      {RINGS.map((r, i) => (
+    <div className={`pointer-events-none absolute inset-y-0 w-[18%] select-none ${className}`}>
+      {rings.map((r, i) => (
         <span
           key={`r${i}`}
           data-drift=""
@@ -97,7 +93,7 @@ export default function Drift() {
         </span>
       ))}
 
-      {CELLS.map((c, i) => (
+      {cells.map((c, i) => (
         <span
           key={`c${i}`}
           data-drift=""
@@ -113,6 +109,18 @@ export default function Drift() {
           }}
         />
       ))}
+    </div>
+  )
+}
+
+export default function Drift() {
+  /* Split rather than mirrored. A mirror reads as a pattern, and the moment
+     the eye catches the symmetry it starts looking at the decoration. */
+  const half = Math.ceil(CELLS.length / 2)
+  return (
+    <div aria-hidden="true" className="absolute inset-0 hidden xl:block">
+      <Column className="left-0" cells={CELLS.slice(0, half)} rings={RINGS.slice(0, 1)} />
+      <Column className="right-0" cells={CELLS.slice(half)} rings={RINGS.slice(1)} />
     </div>
   )
 }
