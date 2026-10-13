@@ -9,6 +9,7 @@ import { Heatmap, DecayDemo, PlanDemo } from '@/components/marketing/interactive
 import { Reveal, ScrollBar, CountUp, ForgettingCurve } from '@/components/marketing/scroll'
 import SiteNav from '@/components/marketing/SiteNav'
 import Roller from '@/components/marketing/Roller'
+import StepGraphic from '@/components/marketing/StepGraphic'
 import Drift from '@/components/marketing/Drift'
 import { FeatureModules } from '@/components/marketing/features'
 
@@ -211,6 +212,9 @@ export default async function Home() {
                 <p className="mt-3 text-[14.5px] leading-[1.7]" style={{ color: 'var(--text-body)' }}>
                   {body}
                 </p>
+                <div className="mt-7">
+                  <StepGraphic step={step} />
+                </div>
               </Reveal>
             ))}
           </div>
