@@ -8,7 +8,7 @@ import { HOW_IT_WORKS, FEATURES, WHY, ANSWERS } from '@/components/marketing/con
 import { Heatmap, DecayDemo, PlanDemo } from '@/components/marketing/interactive'
 import { Reveal, ScrollBar, CountUp, ForgettingCurve } from '@/components/marketing/scroll'
 import SiteNav from '@/components/marketing/SiteNav'
-import Roller from '@/components/marketing/Roller'
+import HeroMap from '@/components/marketing/HeroMap'
 import { FeatureModules } from '@/components/marketing/features'
 
 export const metadata = {
@@ -114,31 +114,26 @@ export default async function Home() {
               noticed, twice disliked, so they are gone rather than tuned. The
               page still moves while you sit on it: the grid behind this
               creeps one tile a minute. */}
-          <div className="hero-in mx-auto max-w-6xl">
-            <h1 className="max-w-3xl text-[clamp(2.6rem,6vw,4.6rem)] font-semibold leading-[0.98] tracking-[-0.038em]">
+          <div className="hero-in mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
+            <div>
+            {/* Scaled to the column rather than the window. At 6vw the second line
+                broke after "Start" once the map took half the width, and a
+                headline that wraps mid-phrase reads as a mistake. */}
+            <h1 className="text-[clamp(2.3rem,4.4vw,3.6rem)] font-semibold leading-[1.02] tracking-[-0.035em]">
               Stop guessing.
               <br />
               <span style={{ color: 'var(--brand)' }}>Start progressing.</span>
             </h1>
 
-            {/* Named one at a time rather than listed. A reader is one
-                person, and "for students of IB" speaks to them where "IB,
-                A-Level or AP" asks them to find themselves in a list. It also
-                puts something slow and quiet in motion at the top of the page,
-                where otherwise nothing moves until you scroll. */}
-            <p className="mt-8 text-[clamp(1.5rem,4vw,2.4rem)] font-semibold leading-tight tracking-[-0.03em]">
-              <span style={{ color: 'var(--text-muted)' }}>For students of </span>
-              <Roller words={['the IB Diploma', 'A-Levels', 'AP']} style={{ color: 'var(--brand)' }} />
-            </p>
-
             <p
-              className="mt-5 max-w-xl text-[17px] leading-[1.6]"
+              className="mt-7 max-w-lg text-[18px] leading-[1.6]"
               style={{ color: 'var(--text-body)' }}
             >
-              Every subtopic, coloured by what you proved in a quiz. Never by rating yourself.
+              Every subtopic of the IB, A-Levels or AP, coloured by what you proved in a
+              quiz. Never by rating yourself.
             </p>
 
-            <div className="mt-10 flex flex-wrap items-center gap-3">
+            <div className="mt-9 flex flex-wrap items-center gap-3">
               <Link href="/signup" className="btn btn-solid control-lg">
                 Start free with one subject
                 <IconArrowRight width={16} height={16} />
@@ -147,7 +142,16 @@ export default async function Home() {
                 See how it works
               </Link>
             </div>
+          </div>
 
+          {/* The product, rather than a sentence about the product.
+              The rolling line went because it put all three curricula in the
+              DOM to show one, so selecting the headline copied "the IB
+              DiplomaA-LevelsAP", and because three cards of course counts
+              underneath were doing the job the subjects page does now. What
+              belongs in that space is the thing being sold: a real subject,
+              really coloured, drawing itself as the page arrives. */}
+          <HeroMap />
           </div>
         </section>
 
