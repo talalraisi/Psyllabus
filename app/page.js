@@ -8,6 +8,7 @@ import { HOW_IT_WORKS, FEATURES, WHY, ANSWERS } from '@/components/marketing/con
 import { Heatmap, DecayDemo, PlanDemo } from '@/components/marketing/interactive'
 import { Reveal, ScrollBar, CountUp, ForgettingCurve } from '@/components/marketing/scroll'
 import SiteNav from '@/components/marketing/SiteNav'
+import Roller from '@/components/marketing/Roller'
 import { FeatureModules } from '@/components/marketing/features'
 
 export const metadata = {
@@ -107,28 +108,44 @@ export default async function Home() {
 
       <main>
         {/* ---------------------------------------------------------- hero */}
-        <section className="ground relative px-5 py-24 md:px-8 md:py-36">
+        {/* The first screen is the whole screen.
+            A headline, a sentence and two buttons occupied about a third of
+            it and left the rest grey, which reads as a page that has not
+            finished loading rather than one being restrained. min-h fills it
+            and the content sits centred in what it fills. */}
+        <section className="ground relative flex min-h-[calc(100svh-4rem)] items-center px-5 py-20 md:px-8 md:py-28">
           {/* No wash behind the headline. Two slow blooms lived here and they
               read as coloured spots on the page rather than as light — twice
               noticed, twice disliked, so they are gone rather than tuned. The
               page still moves while you sit on it: the grid behind this
               creeps one tile a minute. */}
-          <div className="hero-in mx-auto max-w-6xl">
+          {/* w-full because the section is a flex row now: without it the inner
+              div is sized to its content and mx-auto centres that, which pushed
+              the headline a couple of hundred pixels right of the logo above it. */}
+          <div className="hero-in mx-auto w-full max-w-6xl">
             <h1 className="max-w-3xl text-[clamp(2.6rem,6vw,4.6rem)] font-semibold leading-[0.98] tracking-[-0.038em]">
               Stop guessing.
               <br />
               <span style={{ color: 'var(--brand)' }}>Start progressing.</span>
             </h1>
 
-            <p
-              className="mt-7 max-w-lg text-[18px] leading-[1.6]"
-              style={{ color: 'var(--text-body)' }}
-            >
-              Every subtopic of the IB, A-Levels or AP, coloured by what you proved in a
-              quiz. Never by rating yourself.
+            {/* Named one at a time rather than listed. A reader is one person,
+                and "for students of A-Levels" speaks to them where a list asks
+                them to find themselves in it. It is also the only thing moving
+                on the first screen. */}
+            <p className="mt-6 text-[clamp(1.4rem,3.2vw,2.1rem)] font-semibold leading-tight tracking-[-0.028em]">
+              <span style={{ color: 'var(--text-muted)' }}>For students of </span>
+              <Roller words={['the IB Diploma', 'A-Levels', 'AP']} style={{ color: 'var(--brand)' }} />
             </p>
 
-            <div className="mt-9 flex flex-wrap items-center gap-3">
+            <p
+              className="mt-7 max-w-lg text-[17px] leading-[1.6]"
+              style={{ color: 'var(--text-body)' }}
+            >
+              Every subtopic, coloured by what you proved in a quiz. Never by rating yourself.
+            </p>
+
+            <div className="mt-10 flex flex-wrap items-center gap-3">
               <Link href="/signup" className="btn btn-solid control-lg">
                 Start free with one subject
                 <IconArrowRight width={16} height={16} />

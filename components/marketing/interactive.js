@@ -456,10 +456,7 @@ export function DecayDemo() {
         className="slider mt-2.5"
       />
 
-      <p className="mt-4 text-[12.5px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
-        Nothing else takes a green tick away from you. Forgetting happens whether an app admits
-        it or not.
-      </p>
+      
     </div>
   )
 }

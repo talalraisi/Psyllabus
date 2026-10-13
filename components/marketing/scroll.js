@@ -299,8 +299,8 @@ export function ForgettingCurve() {
       {/* The chart was unlabelled, so it asked the reader to work out what
           they were looking at from two coloured lines and a percentage. */}
       <p className="t-overline mb-1">How much you still know</p>
-      <h3 className="mb-5 text-[17px] font-semibold tracking-[-0.015em]">
-        Everything fades. Retesting is what changes the slope.
+      <h3 className="mb-5 text-[15px] font-medium" style={{ color: 'var(--text-muted)' }}>
+        Each dotted line is a retest. Every fall after one is shallower.
       </h3>
       <svg
         viewBox={`0 0 ${W} ${H}`}
@@ -392,10 +392,7 @@ export function ForgettingCurve() {
         </span>
       </div>
 
-      <p className="mt-3 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
-        Same memory, same starting point. Each dotted line is a retest, and every fall after one
-        is shallower than the last.
-      </p>
+
     </div>
   )
 }
