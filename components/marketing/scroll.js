@@ -304,7 +304,9 @@ export function ForgettingCurve() {
       </h3>
       <svg
         viewBox={`0 0 ${W} ${H}`}
-        className="w-full"
+        /* Capped, because w-full alone let a 560-wide drawing stretch to
+           whatever the container was and take its strokes and labels with it. */
+        className="w-full max-w-[520px]"
         role="img"
         aria-label="Two curves from the same start: without revisiting, retention falls to almost nothing by the exam. Retested four times, each fall is shallower and it stays high."
       >

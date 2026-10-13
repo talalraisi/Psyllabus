@@ -258,22 +258,27 @@ export default async function Home() {
 
         {/* ---------------------------------------------------------- decay */}
         <Section label="Fading" tint>
+          {/* The curve sits under the words it illustrates, not across the
+              page beneath everything.
+
+              It was in a full-width panel of its own below the slider, which
+              made two drawings of one idea stacked on top of each other — and
+              since its artwork is 560 wide and the panel was nearer a
+              thousand, it scaled up by about half again and every stroke and
+              label in it came out fat. Beside the text at its own size it
+              reads as a diagram rather than a banner. */}
           <div className="grid gap-10 md:grid-cols-[1fr_1fr] md:gap-14">
             <div>
               <Heading>Drag time forward</Heading>
               <p className="mt-5 text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
                 October&rsquo;s mastery is not May&rsquo;s. Move the slider and watch it slip back into your plan.
               </p>
+              <Reveal className="mt-8">
+                <ForgettingCurve />
+              </Reveal>
             </div>
             <DecayDemo />
           </div>
-
-          <Reveal
-            className="mt-12 rounded-2xl border p-6 md:p-8"
-            style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
-          >
-            <ForgettingCurve />
-          </Reveal>
         </Section>
 
         {/* --------------------------------------------------------- planner */}
