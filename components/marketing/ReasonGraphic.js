@@ -1,132 +1,221 @@
 /**
- * A small picture for each of the six reasons.
+ * A small piece of evidence for each of the six reasons.
  *
- * This was the heaviest block of unbroken prose on the page — six paragraphs,
- * two columns, no visual at all — and the one place where a reader is asked to
- * take six separate claims on trust in a row. Each reason makes a concrete
- * claim about a mechanism, so each gets a drawing of that mechanism rather than
- * an icon standing in for its topic.
+ * The first attempt at this was six abstract SVGs — grey bars, a curve, boxes
+ * with arrows — and it looked forced, because it was. None of them carried
+ * anything: you had to read the paragraph first and then work out which shape
+ * stood for which part of it, which is decoration doing an impression of
+ * information. A drawing earns its place by saying something the sentence
+ * cannot say cheaply, usually a number or a comparison.
  *
- * They are small on purpose. At this size they sit under a paragraph as
- * punctuation; any larger and six of them compete with the three step diagrams
- * further up the page and the section stops being text with support and starts
- * being a gallery.
+ * So these are concrete. Each one shows the actual mechanism with the actual
+ * figures the copy and the engine use — two weeks to Fading and five to Weak,
+ * the one-five-seven day return of a wrong answer, a predicted grade against a
+ * target with the confidence it rests on. Read the panel and you have the
+ * point; the paragraph beside it is then the explanation rather than the
+ * decoder ring.
  *
- * Server component, same as StepGraphic, and for the same reason: a
- * label-to-graphic map exported across a 'use client' boundary arrives as an
- * opaque reference and renders holes. Taking the index as a prop sidesteps it.
+ * HTML rather than SVG, which is the other half of the fix. These are mostly
+ * small type, and SVG text at 8px renders soft and ignores the page's font
+ * stack. As markup they get the real typeface, real hinting and real line
+ * breaks, and they end up looking like fragments of the product — which is
+ * what they are meant to be.
+ *
+ * Server component, same as StepGraphic: a label-to-graphic map exported
+ * across a 'use client' boundary arrives as an opaque reference and renders
+ * holes. Taking the index as a prop sidesteps it.
  */
 
-const SW = 1.4
-const W = 160
-const H = 54
+function Panel({ children }) {
+  return (
+    <div
+      className="rounded-lg border p-3.5"
+      style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
+    >
+      {children}
+    </div>
+  )
+}
 
-/** 01 — what you think you know, against what you proved. */
+/** A label, a proportional bar, and the figure it stands for. */
+function Bar({ label, pct, tone, value }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="w-[68px] shrink-0 text-[10.5px]" style={{ color: 'var(--text-faint)' }}>
+        {label}
+      </span>
+      <span
+        className="h-[7px] flex-1 overflow-hidden rounded-full"
+        style={{ background: 'var(--border)' }}
+      >
+        <span
+          className="grow block h-full rounded-full"
+          style={{ width: `${pct}%`, background: tone }}
+        />
+      </span>
+      <span className="w-[62px] shrink-0 text-right text-[10.5px] font-medium tabular-nums">
+        {value}
+      </span>
+    </div>
+  )
+}
+
+/** 01 — the mood you reported, against the questions you answered. */
 function SelfMarking() {
   return (
-    <>
-      <rect x="0" y="8" width="124" height="9" rx="4.5" fill="var(--border)" className="cell" style={{ transformOrigin: 'left' }} />
-      <rect x="0" y="30" width="68" height="9" rx="4.5" fill="var(--status-proficient)" className="cell" style={{ transformOrigin: 'left', animationDelay: '140ms' }} />
-      {/* the overrating, drawn as the distance between the two */}
-      <path d={`M68 4V43`} stroke="var(--border-strong)" strokeWidth={SW} strokeDasharray="3 3" />
-      <path d={`M124 4V12`} stroke="var(--border-strong)" strokeWidth={SW} strokeDasharray="3 3" />
-      <path d="M72 6h48m0 0l-5-3m5 3l-5 3" stroke="var(--status-weak)" strokeWidth={SW} strokeLinecap="round" strokeLinejoin="round" fill="none" />
-    </>
+    <Panel>
+      <div className="flex flex-col gap-2.5">
+        <Bar label="You said" pct={100} tone="var(--border-strong)" value="Confident" />
+        <Bar label="You proved" pct={40} tone="var(--status-proficient)" value="4 / 10" />
+      </div>
+    </Panel>
   )
 }
 
-/** 02 — the default is downward. */
+/** A status cell with the word under it. */
+function Step({ tone, head, sub, dashed = false }) {
+  return (
+    <div className="flex-1">
+      <div
+        className="cell h-[22px] rounded"
+        style={
+          dashed
+            ? { border: `1px dashed var(--status-${tone})` }
+            : { background: `var(--status-${tone})` }
+        }
+      />
+      <p className="mt-2 text-[10.5px] font-medium" style={{ color: `var(--status-${tone})` }}>
+        {head}
+      </p>
+      <p className="text-[10px]" style={{ color: 'var(--text-faint)' }}>
+        {sub}
+      </p>
+    </div>
+  )
+}
+
+/** 02 — the two dates in the copy, drawn as the states they produce. */
 function Decay() {
   return (
-    <>
-      <path d="M0 44h152" stroke="var(--border)" strokeWidth={SW} />
-      <path d="M0 6c34 0 46 10 60 20s32 17 92 17" stroke="var(--status-fading)" strokeWidth="2" fill="none" className="draw-line" style={{ '--len': 190 }} />
-      {/* the floor you fall to if nothing is retested */}
-      <path d="M0 33h152" stroke="var(--border-strong)" strokeWidth={SW} strokeDasharray="4 4" />
-      <rect className="cell" x="146" y="37" width="12" height="12" rx="3" fill="var(--status-weak)" style={{ animationDelay: '700ms' }} />
-    </>
+    <Panel>
+      <div className="flex items-start gap-2">
+        <Step tone="mastered" head="Proved" sub="day 0" />
+        <Step tone="fading" head="Fading" sub="2 weeks" dashed />
+        <Step tone="weak" head="Weak" sub="5 weeks" />
+      </div>
+    </Panel>
   )
 }
 
-/** 03 — one quiz, two jobs. */
+/** 03 — the same answer, counted twice. */
 function TwoJobs() {
   return (
-    <>
-      <rect x="0" y="18" width="40" height="18" rx="4" fill="none" stroke="var(--status-proficient)" strokeWidth={SW} />
-      <path d="M14 27h12m0 0l-3.5-3m3.5 3l-3.5 3" stroke="var(--status-proficient)" strokeWidth={SW} strokeLinecap="round" strokeLinejoin="round" fill="none" />
-      <path d="M46 24c14-12 28-14 44-14" stroke="var(--border-strong)" strokeWidth={SW} fill="none" className="draw-line" style={{ '--len': 70 }} />
-      <path d="M46 30c14 12 28 14 44 14" stroke="var(--border-strong)" strokeWidth={SW} fill="none" className="draw-line" style={{ '--len': 70, animationDelay: '120ms' }} />
-      <rect className="cell" x="96" y="2" width="58" height="15" rx="4" fill="var(--border)" style={{ transformOrigin: 'left', animationDelay: '300ms' }} />
-      <rect className="cell" x="96" y="37" width="44" height="15" rx="4" fill="var(--border)" style={{ transformOrigin: 'left', animationDelay: '400ms' }} />
-    </>
+    <Panel>
+      <p className="text-[10.5px] font-medium" style={{ color: 'var(--status-proficient)' }}>
+        One answer
+      </p>
+      <div className="mt-2 flex flex-col gap-1.5">
+        {['Tells the planner where you stand', 'Makes the thing harder to forget'].map((t) => (
+          <div key={t} className="flex items-start gap-2">
+            <span className="mt-[5px] h-[5px] w-[5px] shrink-0 rounded-full" style={{ background: 'var(--brand)' }} />
+            <span className="text-[11px] leading-snug" style={{ color: 'var(--text-body)' }}>
+              {t}
+            </span>
+          </div>
+        ))}
+      </div>
+    </Panel>
   )
 }
 
-/** 04 — the wrong one comes back, at widening gaps. */
+/** 04 — a wrong answer, and when it comes back. */
 function Spacing() {
-  const stops = [4, 30, 76, 142]
+  const stops = ['1 day', '5 days', '1 week']
   return (
-    <>
-      <path d="M4 27h148" stroke="var(--border)" strokeWidth={SW} />
-      <rect className="cell" x="0" y="21" width="12" height="12" rx="3" fill="var(--status-weak)" />
-      {stops.slice(1).map((x, i) => (
-        <circle
-          key={x}
-          className="cell"
-          cx={x}
-          cy="27"
-          r="5"
-          fill={i === stops.length - 2 ? 'var(--status-proficient)' : 'var(--border-strong)'}
-          style={{ animationDelay: `${200 + i * 160}ms` }}
-        />
-      ))}
-    </>
+    <Panel>
+      <div className="flex items-end gap-1.5">
+        <div className="shrink-0">
+          <div className="cell h-[22px] w-[22px] rounded" style={{ background: 'var(--status-weak)' }} />
+          <p className="mt-2 text-[10px]" style={{ color: 'var(--text-faint)' }}>
+            wrong
+          </p>
+        </div>
+        {stops.map((s, i) => (
+          <div key={s} className="flex-1" style={{ flexGrow: i + 1 }}>
+            <div className="flex items-center gap-1">
+              <span className="h-px flex-1" style={{ background: 'var(--border-strong)' }} />
+              <span
+                className="cell h-[9px] w-[9px] shrink-0 rounded-full"
+                style={{
+                  background: i === stops.length - 1 ? 'var(--status-proficient)' : 'var(--border-strong)',
+                  animationDelay: `${i * 140}ms`,
+                }}
+              />
+            </div>
+            <p className="mt-2 text-[10px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
+              {s}
+            </p>
+          </div>
+        ))}
+      </div>
+    </Panel>
   )
 }
 
-/** 05 — the evening, in order, worst first. */
+/** 05 — one line of the plan, with the reason it is on it. */
 function Direction() {
-  const rows = [
-    { tone: 'weak', w: 104 },
-    { tone: 'developing', w: 78 },
-    { tone: 'proficient', w: 54 },
-  ]
   return (
-    <>
-      {/* the time you said you had */}
-      <path d="M0 2v50M152 2v50" stroke="var(--border-strong)" strokeWidth={SW} />
-      <path d="M0 27h152" stroke="var(--border)" strokeWidth={SW} strokeDasharray="3 4" />
-      {rows.map((r, i) => (
-        <g key={r.tone}>
-          <rect x="8" y={6 + i * 16} width="3" height="11" rx="1.5" fill={`var(--status-${r.tone})`} />
-          <rect
-            className="cell"
-            x="16"
-            y={6 + i * 16}
-            width={r.w}
-            height="11"
-            rx="3"
-            fill="var(--border)"
-            style={{ transformOrigin: 'left', animationDelay: `${i * 90}ms` }}
-          />
-        </g>
-      ))}
-    </>
+    <Panel>
+      <div className="flex items-baseline justify-between">
+        <span className="text-[10.5px] font-medium">1h 30m tonight</span>
+        <span className="text-[10px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
+          85 min planned
+        </span>
+      </div>
+      <div className="mt-2.5 flex items-start gap-2.5">
+        <span className="mt-[3px] h-[26px] w-[3px] shrink-0 rounded-full" style={{ background: 'var(--status-weak)' }} />
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-[11px] font-medium">Circular motion and gravitation</p>
+          <p className="text-[10px]" style={{ color: 'var(--text-faint)' }}>
+            Weak · unlocks 4 later topics
+          </p>
+        </div>
+        <span className="shrink-0 text-[10px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
+          35 min
+        </span>
+      </div>
+    </Panel>
   )
 }
 
-/** 06 — the gap between where you are and where you want to be. */
+/** 06 — the gap, and how much syllabus the number rests on. */
 function Prediction() {
   return (
-    <>
-      <path d="M0 44h152" stroke="var(--border)" strokeWidth={SW} />
-      <rect className="cell" x="22" y="18" width="26" height="26" rx="3" fill="var(--status-proficient)" opacity="0.85" style={{ transformOrigin: 'bottom' }} />
-      <rect className="cell" x="88" y="4" width="26" height="40" rx="3" fill="none" stroke="var(--brand)" strokeWidth={SW} strokeDasharray="4 3" style={{ transformOrigin: 'bottom', animationDelay: '160ms' }} />
-      <path d="M56 24h24m0 0l-5-3m5 3l-5 3" stroke="var(--border-strong)" strokeWidth={SW} strokeLinecap="round" strokeLinejoin="round" fill="none" />
-      {/* how much syllabus the number rests on */}
-      <rect x="22" y="48" width="92" height="3" rx="1.5" fill="var(--border)" />
-      <rect className="cell" x="22" y="48" width="34" height="3" rx="1.5" fill="var(--status-developing)" style={{ transformOrigin: 'left', animationDelay: '320ms' }} />
-    </>
+    <Panel>
+      <div className="flex items-end gap-5">
+        {[
+          ['Predicted', '5', 'var(--status-developing)'],
+          ['Target', '7', 'var(--brand)'],
+        ].map(([label, n, tone]) => (
+          <div key={label}>
+            <p className="text-[10px]" style={{ color: 'var(--text-faint)' }}>
+              {label}
+            </p>
+            <p className="text-[22px] font-semibold leading-none tabular-nums" style={{ color: tone }}>
+              {n}
+            </p>
+          </div>
+        ))}
+      </div>
+      <div className="mt-3">
+        <span className="block h-[5px] overflow-hidden rounded-full" style={{ background: 'var(--border)' }}>
+          <span className="grow block h-full rounded-full" style={{ width: '18%', background: 'var(--status-developing)' }} />
+        </span>
+        <p className="mt-1.5 text-[10px]" style={{ color: 'var(--text-faint)' }}>
+          Low confidence · 3 quizzes so far
+        </p>
+      </div>
+    </Panel>
   )
 }
 
@@ -134,10 +223,5 @@ const BY_INDEX = [SelfMarking, Decay, TwoJobs, Spacing, Direction, Prediction]
 
 export default function ReasonGraphic({ n }) {
   const Inner = BY_INDEX[n]
-  if (!Inner) return null
-  return (
-    <svg viewBox={`0 0 ${W} ${H}`} fill="none" aria-hidden="true" className="w-full max-w-[200px]">
-      <Inner />
-    </svg>
-  )
+  return Inner ? <Inner /> : null
 }
