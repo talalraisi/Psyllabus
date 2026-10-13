@@ -33,8 +33,18 @@ const csp = [
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "object-src 'none'",
-  'upgrade-insecure-requests',
-].join('; ')
+]
+
+/* upgrade-insecure-requests is deliberately not in the list above.
+
+   A browser ignores it in a report-only policy and logs an error saying so, on
+   every page load — which was the only error in this site's console and made
+   the console useless for spotting real ones. It belongs to the enforced
+   policy, so it gets added when this is enforced rather than reported. */
+const UPGRADE = 'upgrade-insecure-requests'
+
+const cspReportOnly = csp.join('; ')
+export const cspEnforced = [...csp, UPGRADE].join('; ')
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -69,7 +79,7 @@ const nextConfig = {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
           },
-          { key: 'Content-Security-Policy-Report-Only', value: csp },
+          { key: 'Content-Security-Policy-Report-Only', value: cspReportOnly },
         ],
       },
     ]

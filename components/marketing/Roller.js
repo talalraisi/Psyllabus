@@ -21,6 +21,15 @@ import { useEffect, useRef, useState } from 'react'
  * The widest word reserves the space. Without that the line jumps every time
  * "AP" follows "A-Levels", and a hero that twitches is worse than a hero that
  * is still.
+ *
+ * Each word is then centred inside that reserved slot, which matters since the
+ * hero became centred. Left-aligned, a short word simply sat at the start of
+ * the slot and the slack fell off the end where nobody read it. Centred, that
+ * same slack became a visible hole — "For students of" followed by a gap and
+ * then "AP". Hence also why this sits on its own line in the hero rather than
+ * trailing the words that introduce it: a fixed-width slot can be centred on a
+ * line of its own, but in the middle of a sentence its centre is not the
+ * line's centre and the short words look misplaced.
  */
 export default function Roller({ words, ms = 3500, className = '', style }) {
   const [at, setAt] = useState(0)
@@ -63,7 +72,7 @@ export default function Roller({ words, ms = 3500, className = '', style }) {
           <span
             key={word}
             aria-hidden={!current}
-            className="col-start-1 row-start-1 whitespace-nowrap"
+            className="col-start-1 row-start-1 justify-self-center whitespace-nowrap"
             style={{
               /* Only the word on screen is selectable. Every word has to be in
                  the DOM for the roll to work, and without this, selecting the
