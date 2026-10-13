@@ -9,6 +9,7 @@ import { Heatmap, DecayDemo, PlanDemo } from '@/components/marketing/interactive
 import { Reveal, ScrollBar, CountUp, ForgettingCurve } from '@/components/marketing/scroll'
 import SiteNav from '@/components/marketing/SiteNav'
 import Roller from '@/components/marketing/Roller'
+import Drift from '@/components/marketing/Drift'
 import { FeatureModules } from '@/components/marketing/features'
 
 export const metadata = {
@@ -122,6 +123,8 @@ export default async function Home() {
           {/* w-full because the section is a flex row now: without it the inner
               div is sized to its content and mx-auto centres that, which pushed
               the headline a couple of hundred pixels right of the logo above it. */}
+          <Drift />
+
           <div className="hero-in mx-auto w-full max-w-6xl">
             <h1 className="max-w-3xl text-[clamp(2.6rem,6vw,4.6rem)] font-semibold leading-[0.98] tracking-[-0.038em]">
               Stop guessing.

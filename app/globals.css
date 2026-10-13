@@ -1051,6 +1051,36 @@ body {
   to   { transform: scaleX(1); }
 }
 
+/* Drift.
+
+   Three paths rather than one, because eight things moving on the same curve
+   read as a carousel. Each is a long, shallow loop — a couple of dozen pixels
+   over half a minute — so the corner of the eye registers that the page is
+   alive without anything asking to be watched. Nothing scales, nothing fades
+   in and out, nothing glows: the blooms that lived here before were twice
+   noticed and twice disliked, and the lesson was that ambient light reads as
+   decoration where ambient motion reads as depth. */
+@keyframes drift-a {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  50%  { transform: translate(-10px, -16px) rotate(-2deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+@keyframes drift-b {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  50%  { transform: translate(12px, 10px) rotate(3deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+@keyframes drift-c {
+  0%   { transform: translate(0, 0); }
+  33%  { transform: translate(8px, -12px); }
+  66%  { transform: translate(-6px, 6px); }
+  100% { transform: translate(0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-drift] { animation: none !important; }
+}
+
 /* A button that answers the press. */
 .press { transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1); }
 .press:active { transform: scale(0.97); }
