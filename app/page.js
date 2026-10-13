@@ -4,7 +4,6 @@ import logoMark from '@/public/logo-mark.png'
 import { IconCheck, IconArrowRight, IconClose } from '@/components/Icons'
 import ThemeToggle from '@/components/ThemeToggle'
 import { operatorLine, OPERATOR } from '@/lib/legal'
-import { coursesIn } from '@/lib/catalogue'
 import { HOW_IT_WORKS, FEATURES, WHY, ANSWERS } from '@/components/marketing/content'
 import { Heatmap, DecayDemo, PlanDemo } from '@/components/marketing/interactive'
 import { Reveal, ScrollBar, CountUp, ForgettingCurve } from '@/components/marketing/scroll'
@@ -127,13 +126,9 @@ export default async function Home() {
                 A-Level or AP" asks them to find themselves in a list. It also
                 puts something slow and quiet in motion at the top of the page,
                 where otherwise nothing moves until you scroll. */}
-            <p className="mt-7 text-[17px] font-medium tracking-[-0.01em]">
+            <p className="mt-8 text-[clamp(1.5rem,4vw,2.4rem)] font-semibold leading-tight tracking-[-0.03em]">
               <span style={{ color: 'var(--text-muted)' }}>For students of </span>
-              <Roller
-                words={['the IB Diploma', 'A-Levels', 'AP']}
-                className="font-semibold"
-                style={{ color: 'var(--brand)' }}
-              />
+              <Roller words={['the IB Diploma', 'A-Levels', 'AP']} style={{ color: 'var(--brand)' }} />
             </p>
 
             <p
@@ -153,36 +148,6 @@ export default async function Home() {
               </Link>
             </div>
 
-            {/* The three programmes, with what is actually mapped for each.
-                This was three promises about pricing and privacy, which are
-                true and are also on the pricing page, the terms and the footer.
-                What somebody landing here needs to know first is whether their
-                own course is in it. */}
-            {/* Real cards, sitting on the page rather than three columns
-                separated by hairlines. This is the first thing somebody
-                checks — whether their own course is in here — so it is worth
-                looking like something. */}
-            <dl className="mt-20 grid gap-3 sm:grid-cols-3">
-              {[
-                ['IB Diploma', `${coursesIn('IB')} courses mapped`, 'Every group, HL and SL, with the core alongside them.'],
-                ['A-Level', `${coursesIn('A-Level')} courses mapped`, 'AS and A2 content, split the way the specifications split it.'],
-                ['AP', `${coursesIn('AP')} courses mapped`, 'Course and exam description units, unit by unit.'],
-              ].map(([term, count, def]) => (
-                <div
-                  key={term}
-                  className="elev lift rounded-[14px] border p-6"
-                  style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
-                >
-                  <dt className="text-[15px] font-semibold tracking-[-0.015em]">{term}</dt>
-                  <dd className="mt-1.5 text-[13px] font-medium tabular-nums" style={{ color: 'var(--brand)' }}>
-                    {count}
-                  </dd>
-                  <dd className="mt-3 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                    {def}
-                  </dd>
-                </div>
-              ))}
-            </dl>
           </div>
         </section>
 
