@@ -63,7 +63,7 @@ function Section({ children, label, tint = false, className = '', id }) {
       <div className="mx-auto max-w-6xl">
         {label && (
           <p
-            className="mb-4 text-center text-[11.5px] font-semibold uppercase tracking-[0.14em]"
+            className="mb-4 text-[11.5px] font-semibold uppercase tracking-[0.14em]"
             style={{ color: 'var(--text-faint)' }}
           >
             {label}
@@ -78,7 +78,7 @@ function Section({ children, label, tint = false, className = '', id }) {
 function Heading({ children, className = '' }) {
   return (
     <h2
-      className={`mx-auto text-center text-[clamp(1.7rem,3.2vw,2.4rem)] font-semibold leading-[1.12] tracking-[-0.028em] ${className}`}
+      className={`text-[clamp(1.7rem,3.2vw,2.4rem)] font-semibold leading-[1.12] tracking-[-0.028em] ${className}`}
     >
       {children}
     </h2>
@@ -126,8 +126,8 @@ export default async function Home() {
               the headline a couple of hundred pixels right of the logo above it. */}
           <Drift />
 
-          <div className="hero-in mx-auto w-full max-w-6xl text-center">
-            <h1 className="mx-auto max-w-3xl text-[clamp(2.6rem,6vw,4.6rem)] font-semibold leading-[0.98] tracking-[-0.038em]">
+          <div className="hero-in mx-auto w-full max-w-6xl">
+            <h1 className="max-w-3xl text-[clamp(2.6rem,6vw,4.6rem)] font-semibold leading-[0.98] tracking-[-0.038em]">
               Stop guessing.
               <br />
               <span style={{ color: 'var(--brand)' }}>Start progressing.</span>
@@ -137,23 +137,19 @@ export default async function Home() {
                 and "for students of A-Levels" speaks to them where a list asks
                 them to find themselves in it. It is also the only thing moving
                 on the first screen. */}
-            <p className="mt-7 text-[clamp(1.4rem,3.2vw,2.1rem)] font-semibold leading-tight tracking-[-0.028em]">
-              <span className="block" style={{ color: 'var(--text-muted)' }}>For students of</span>
-              <Roller
-                className="mt-1"
-                words={['the IB Diploma', 'A-Levels', 'AP']}
-                style={{ color: 'var(--brand)' }}
-              />
+            <p className="mt-6 text-[clamp(1.4rem,3.2vw,2.1rem)] font-semibold leading-tight tracking-[-0.028em]">
+              <span style={{ color: 'var(--text-muted)' }}>For students of </span>
+              <Roller words={['the IB Diploma', 'A-Levels', 'AP']} style={{ color: 'var(--brand)' }} />
             </p>
 
             <p
-              className="mx-auto mt-7 max-w-lg text-[17px] leading-[1.6]"
+              className="mt-7 max-w-lg text-[17px] leading-[1.6]"
               style={{ color: 'var(--text-body)' }}
             >
               Every subtopic, coloured by what you proved in a quiz. Never by rating yourself.
             </p>
 
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+            <div className="mt-10 flex flex-wrap items-center gap-3">
               <Link href="/signup" className="btn btn-solid control-lg">
                 Start free with one subject
                 <IconArrowRight width={16} height={16} />
@@ -228,7 +224,7 @@ export default async function Home() {
         {/* ------------------------------------------------------ objections */}
         <Section tint>
           <Heading className="max-w-2xl">What students say goes wrong with tools like this</Heading>
-          <p className="mx-auto mt-4 max-w-lg text-center text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+          <p className="mt-4 max-w-lg text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
             Taken from what IB students actually complain about. Here is what this does instead.
           </p>
 
@@ -279,7 +275,7 @@ export default async function Home() {
             </div>
           </div>
 
-          <p className="mx-auto mt-9 max-w-xl text-center text-[15px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+          <p className="mt-9 max-w-xl text-[15px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
             Ten points is mastery. Leave a subtopic alone and it fades back, because that is what happens to it.
           </p>
         </Section>
@@ -294,28 +290,26 @@ export default async function Home() {
               because it is the product doing the thing; the curve was the
               textbook explaining it. ForgettingCurve is still in scroll.js for
               a page that has room to explain rather than show. */}
-          <Heading>Drag time forward</Heading>
-          <p
-            className="mx-auto mt-5 max-w-lg text-center text-[15.5px] leading-relaxed"
-            style={{ color: 'var(--text-body)' }}
-          >
-            October&rsquo;s mastery is not May&rsquo;s. Move the slider and watch it slip back into your plan.
-          </p>
-          <div className="mx-auto mt-12 max-w-2xl">
+          <div className="grid gap-10 md:grid-cols-[1fr_1fr] md:gap-14">
+            <div>
+              <Heading>Drag time forward</Heading>
+              <p className="mt-5 text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                October&rsquo;s mastery is not May&rsquo;s. Move the slider and watch it slip back into your plan.
+              </p>
+            </div>
             <DecayDemo />
           </div>
         </Section>
 
         {/* --------------------------------------------------------- planner */}
         <Section label="The plan">
-          <Heading>Tell it how long you have</Heading>
-          <p
-            className="mx-auto mt-5 max-w-lg text-center text-[15.5px] leading-relaxed"
-            style={{ color: 'var(--text-body)' }}
-          >
-            Five minutes or five hours. Every line says why it is there, so you can disagree with it.
-          </p>
-          <div className="mx-auto mt-12 max-w-2xl">
+          <div className="grid gap-10 md:grid-cols-[1fr_1.1fr] md:gap-14">
+            <div>
+              <Heading>Tell it how long you have</Heading>
+              <p className="mt-5 text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                Five minutes or five hours. Every line says why it is there, so you can disagree with it.
+              </p>
+            </div>
             <PlanDemo />
           </div>
         </Section>
@@ -323,7 +317,7 @@ export default async function Home() {
         {/* ------------------------------------------------------- features */}
         <Section label="Features" tint id="features">
           <Heading className="max-w-2xl">Three questions, and what answers each</Heading>
-          <p className="mx-auto mt-4 max-w-lg text-center text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+          <p className="mt-4 max-w-lg text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
             Shown rather than described, because a list of feature names tells you nothing about
             whether any of it is any good.
           </p>
@@ -369,13 +363,15 @@ export default async function Home() {
             told it again, which makes the second page look like it has
             nothing of its own. */}
         <Section tint id="schools">
-          <div className="mx-auto max-w-xl text-center">
-            <Heading>One code opens it for the whole year group</Heading>
-            <p className="mt-5 text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-              Typed in once at sign-up. No cards, no seat counting, every code has a limit, and
-              no teacher dashboard on any plan.
-            </p>
-            <Link href="/schools" className="btn btn-outline control-lg mt-9">
+          <div className="flex flex-wrap items-end justify-between gap-8">
+            <div className="max-w-xl">
+              <Heading>One code opens it for the whole year group</Heading>
+              <p className="mt-5 text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                Typed in once at sign-up. No cards, no seat counting, every code has a limit, and
+                no teacher dashboard on any plan.
+              </p>
+            </div>
+            <Link href="/schools" className="btn btn-outline control-lg">
               How it works for schools
               <IconArrowRight width={16} height={16} />
             </Link>
