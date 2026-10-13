@@ -8,7 +8,6 @@ import { HOW_IT_WORKS, FEATURES, WHY, ANSWERS } from '@/components/marketing/con
 import { Heatmap, DecayDemo, PlanDemo } from '@/components/marketing/interactive'
 import { Reveal, ScrollBar, CountUp, ForgettingCurve } from '@/components/marketing/scroll'
 import SiteNav from '@/components/marketing/SiteNav'
-import HeroMap from '@/components/marketing/HeroMap'
 import { FeatureModules } from '@/components/marketing/features'
 
 export const metadata = {
@@ -114,12 +113,8 @@ export default async function Home() {
               noticed, twice disliked, so they are gone rather than tuned. The
               page still moves while you sit on it: the grid behind this
               creeps one tile a minute. */}
-          <div className="hero-in mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
-            <div>
-            {/* Scaled to the column rather than the window. At 6vw the second line
-                broke after "Start" once the map took half the width, and a
-                headline that wraps mid-phrase reads as a mistake. */}
-            <h1 className="text-[clamp(2.3rem,4.4vw,3.6rem)] font-semibold leading-[1.02] tracking-[-0.035em]">
+          <div className="hero-in mx-auto max-w-6xl">
+            <h1 className="max-w-3xl text-[clamp(2.6rem,6vw,4.6rem)] font-semibold leading-[0.98] tracking-[-0.038em]">
               Stop guessing.
               <br />
               <span style={{ color: 'var(--brand)' }}>Start progressing.</span>
@@ -142,16 +137,6 @@ export default async function Home() {
                 See how it works
               </Link>
             </div>
-          </div>
-
-          {/* The product, rather than a sentence about the product.
-              The rolling line went because it put all three curricula in the
-              DOM to show one, so selecting the headline copied "the IB
-              DiplomaA-LevelsAP", and because three cards of course counts
-              underneath were doing the job the subjects page does now. What
-              belongs in that space is the thing being sold: a real subject,
-              really coloured, drawing itself as the page arrives. */}
-          <HeroMap />
           </div>
         </section>
 
