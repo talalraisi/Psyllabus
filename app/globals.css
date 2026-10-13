@@ -1037,6 +1037,20 @@ body {
   .nav-word::after { transition: none; }
 }
 
+/* The slideshow's progress pill.
+
+   An animation rather than a transition, because a transition cannot be
+   paused. The fill used to be a transform with a 5.2s duration that dropped to
+   220ms whenever the carousel took focus — and since the target was still
+   scaleX(1), changing the duration made the bar shoot to the end instead of
+   stopping. Then the timer restarted on resume while the bar was already full,
+   so it sat at 100% for a whole slide. animation-play-state freezes where it
+   is, which is what pausing should look like. */
+@keyframes pill-fill {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
 /* A button that answers the press. */
 .press { transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1); }
 .press:active { transform: scale(0.97); }

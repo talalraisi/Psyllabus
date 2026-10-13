@@ -9,6 +9,7 @@ import { HOW_IT_WORKS, FEATURES, WHY, ANSWERS } from '@/components/marketing/con
 import { Heatmap, DecayDemo, PlanDemo } from '@/components/marketing/interactive'
 import { Reveal, ScrollBar, CountUp, ForgettingCurve } from '@/components/marketing/scroll'
 import SiteNav from '@/components/marketing/SiteNav'
+import Roller from '@/components/marketing/Roller'
 import { FeatureModules } from '@/components/marketing/features'
 
 export const metadata = {
@@ -121,8 +122,22 @@ export default async function Home() {
               <span style={{ color: 'var(--brand)' }}>Start progressing.</span>
             </h1>
 
+            {/* Named one at a time rather than listed. A reader is one
+                person, and "for students of IB" speaks to them where "IB,
+                A-Level or AP" asks them to find themselves in a list. It also
+                puts something slow and quiet in motion at the top of the page,
+                where otherwise nothing moves until you scroll. */}
+            <p className="mt-7 text-[17px] font-medium tracking-[-0.01em]">
+              <span style={{ color: 'var(--text-muted)' }}>For students of </span>
+              <Roller
+                words={['the IB Diploma', 'A-Levels', 'AP']}
+                className="font-semibold"
+                style={{ color: 'var(--brand)' }}
+              />
+            </p>
+
             <p
-              className="mt-8 max-w-xl text-[17px] leading-[1.6]"
+              className="mt-5 max-w-xl text-[17px] leading-[1.6]"
               style={{ color: 'var(--text-body)' }}
             >
               Every subtopic, coloured by what you proved in a quiz. Never by rating yourself.

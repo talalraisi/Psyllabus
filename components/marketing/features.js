@@ -477,6 +477,9 @@ function Stage({ items }) {
   const [ref, seen] = useInView({ threshold: 0.25 })
   const [at, setAt] = useState(0)
   const [paused, setPaused] = useState(false)
+  /* Bumped every time the advance timer (re)starts, which is what keeps the
+     fill and the countdown telling the same story after a pause. */
+  const [cycle, setCycle] = useState(0)
   const [reduced, setReduced] = useState(false)
 
   useEffect(() => {
@@ -487,9 +490,42 @@ function Stage({ items }) {
     return () => mq.removeEventListener('change', read)
   }, [])
 
+  /**
+   * Hold still while somebody is working the controls.
+   *
+   * This replaces onFocusCapture and onBlurCapture, which worked, for one that
+   * handles the case they got wrong: moving focus from one pill to the next
+   * fires a blur before the next focus, so the React pair unpaused in the gap.
+   * focusout here re-checks on the next frame, once the browser has actually
+   * moved focus, and only releases if it has genuinely left the stage.
+   *
+   * It matters for one person in particular: somebody moving through the pills
+   * with a keyboard, who otherwise has the thing they are pointing at replaced
+   * every five seconds while they are pointing at it.
+   */
+  useEffect(() => {
+    const node = ref.current
+    if (!node) return
+    const hold = () => setPaused(true)
+    const release = () => {
+      // focusout fires before focus lands on the next element, so the check
+      // has to happen after the browser has moved it.
+      requestAnimationFrame(() => setPaused(!!node.contains(document.activeElement)))
+    }
+    node.addEventListener('focusin', hold)
+    node.addEventListener('focusout', release)
+    return () => {
+      node.removeEventListener('focusin', hold)
+      node.removeEventListener('focusout', release)
+    }
+  }, [ref])
+
   useEffect(() => {
     if (!seen || paused || reduced || items.length < 2) return
-    const id = setTimeout(() => setAt((i) => (i + 1) % items.length), SLIDE_MS)
+    const id = setTimeout(() => {
+      setAt((i) => (i + 1) % items.length)
+      setCycle((c) => c + 1)
+    }, SLIDE_MS)
     return () => clearTimeout(id)
   }, [at, seen, paused, reduced, items.length])
 
@@ -518,12 +554,7 @@ function Stage({ items }) {
        broken rather than paused. Focus still stops it, because a person
        tabbing through the pills is working with it and should not have it
        move underneath them. */
-    <div
-      ref={ref}
-      className="relative mt-14"
-      onFocusCapture={() => setPaused(true)}
-      onBlurCapture={() => setPaused(false)}
-    >
+    <div ref={ref} className="relative mt-14">
       {/* The words change with the slide and are stacked in one cell, so the
           stage below does not jump when a two-line title follows a one-line
           one. */}
@@ -634,15 +665,22 @@ function Stage({ items }) {
               style={{ width: i === at ? 34 : 6, background: 'var(--border-strong)' }}
             >
               <span
+                /* Keyed on the cycle as well as the slide, so returning to a
+                   slide you have already seen starts its fill again from zero
+                   rather than inheriting a finished animation. */
+                key={`${i}:${i === at ? cycle : 'idle'}`}
                 className="block h-full w-full rounded-full"
                 style={{
                   background: 'var(--brand)',
                   transformOrigin: 'left',
-                  transform: i === at ? 'scaleX(1)' : 'scaleX(0)',
-                  transition:
-                    i === at && seen && !paused && !reduced
-                      ? `transform ${SLIDE_MS}ms linear`
-                      : 'transform 220ms ease',
+                  ...(i === at && !reduced
+                    ? {
+                        animation: `pill-fill ${SLIDE_MS}ms linear forwards`,
+                        // Frozen where it stands while something in the stage
+                        // has focus, and while the stage is still off screen.
+                        animationPlayState: seen && !paused ? 'running' : 'paused',
+                      }
+                    : { transform: i === at ? 'scaleX(1)' : 'scaleX(0)', transition: 'transform 220ms ease' }),
                 }}
               />
             </button>
