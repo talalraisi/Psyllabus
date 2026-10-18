@@ -292,13 +292,16 @@ export default async function Home() {
               textbook explaining it. ForgettingCurve is still in scroll.js for
               a page that has room to explain rather than show. */}
           <Heading>Drag time forward</Heading>
-          <p
-            className="mx-auto mt-5 max-w-lg text-center text-[15.5px] leading-relaxed"
-            style={{ color: 'var(--text-body)' }}
-          >
-            October&rsquo;s mastery is not May&rsquo;s. Move the slider and watch it slip back into your plan.
-          </p>
-          <div className="mx-auto mt-12 max-w-2xl">
+          {/* The heading stays centred and the body does not. A centred
+              heading over a centred column leaves a channel of dead margin
+              down both sides of the page; an uneven split under a centred
+              heading keeps the voice in the middle and gives the width to the
+              thing worth looking at. This one leans right, the planner below
+              leans left, so the page alternates instead of marching. */}
+          <div className="mt-12 grid items-center gap-10 md:grid-cols-[0.78fr_1.22fr] md:gap-16">
+            <p className="text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+              October&rsquo;s mastery is not May&rsquo;s. Move the slider and watch it slip back into your plan.
+            </p>
             <DecayDemo />
           </div>
         </Section>
@@ -306,14 +309,13 @@ export default async function Home() {
         {/* --------------------------------------------------------- planner */}
         <Section label="The plan">
           <Heading>Tell it how long you have</Heading>
-          <p
-            className="mx-auto mt-5 max-w-lg text-center text-[15.5px] leading-relaxed"
-            style={{ color: 'var(--text-body)' }}
-          >
-            Five minutes or five hours.
-          </p>
-          <div className="mx-auto mt-12 max-w-2xl">
+          <div className="mt-12 grid items-center gap-10 md:grid-cols-[1.22fr_0.78fr] md:gap-16">
+            {/* Demo first in the source as well as on screen, so the order
+                read aloud matches the order seen. */}
             <PlanDemo />
+            <p className="text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+              Five minutes or five hours. The session fits the time you actually have.
+            </p>
           </div>
         </Section>
 

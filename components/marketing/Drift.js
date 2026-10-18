@@ -75,9 +75,12 @@ function Ring({ size, pct, w }) {
   )
 }
 
-function Column({ cells, rings, className }) {
+function Column({ cells, rings, className, width }) {
   return (
-    <div className={`pointer-events-none absolute inset-y-0 w-[18%] select-none ${className}`}>
+    <div
+      className={`pointer-events-none absolute inset-y-0 select-none ${className}`}
+      style={{ width }}
+    >
       {rings.map((r, i) => (
         <span
           key={`r${i}`}
@@ -114,13 +117,19 @@ function Column({ cells, rings, className }) {
 }
 
 export default function Drift() {
-  /* Split rather than mirrored. A mirror reads as a pattern, and the moment
-     the eye catches the symmetry it starts looking at the decoration. */
-  const half = Math.ceil(CELLS.length / 2)
+  /* Uneven on purpose, in both width and contents: a narrow left margin with
+     three cells and the small ring, a wider right one with four and the large
+     one. Two matching flanks around a centred headline is a mirror, and the
+     moment the eye catches the symmetry it stops reading the page and starts
+     looking at the decoration. The headline stays centred; what surrounds it
+     does not have to be.
+
+     Widths are kept under the margin a centred 768px headline leaves at this
+     breakpoint, which is why this is xl and not lg. */
   return (
     <div aria-hidden="true" className="absolute inset-0 hidden xl:block">
-      <Column className="left-0" cells={CELLS.slice(0, half)} rings={RINGS.slice(0, 1)} />
-      <Column className="right-0" cells={CELLS.slice(half)} rings={RINGS.slice(1)} />
+      <Column className="left-0" width="14%" cells={CELLS.slice(0, 3)} rings={[RINGS[1]]} />
+      <Column className="right-0" width="21%" cells={CELLS.slice(3)} rings={[RINGS[0]]} />
     </div>
   )
 }
