@@ -4,9 +4,17 @@
  * Time studied, as rows you read left to right.
  *
  * One row per month with days 1 to 31 across, for any range up to a year.
- * For five years, one row per year with weeks across: a square per day would
- * be 1,800 squares or a 60-row wall, and a week is the finest grain that
- * still fits on five lines.
+ * For five years, one row per year with a square per fortnight: a square per
+ * day would be 1,800 squares or a 60-row wall.
+ *
+ * Every frame uses the same 31-column grid, so a square is the same size
+ * whichever frame you are on. The first version gave five years a square per
+ * week, which is 53 columns; its squares came out a third smaller than the
+ * months' and the whole thing visibly shrank every time you switched to it.
+ * A fortnight is 27 columns, so a year fits the grid the months already use.
+ * And the height eases between frames rather than snapping — 1M is one row
+ * and 1Y is twelve, and that difference should read as the card opening up,
+ * not jumping.
  *
  * This replaced the vendored activity heatmap from 21st.dev, whose calendar
  * runs each week down a column the way GitHub's does. Reading a day at a time
@@ -15,7 +23,7 @@
  * went with it: every row here already is a month, with its total at the end.
  */
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 const FRAMES = [
   { key: '1M', name: '1 month', months: 1 },
@@ -32,11 +40,11 @@ const MIX = [0, 30, 52, 76, 100]
 // Squares stay between these. Below the minimum the grid scrolls sideways
 // inside the card rather than shrinking into specks; above the maximum a
 // 3-month view on a wide screen turns into bathroom tiles. A phone fits all
-// 31 days of a month at the minimum once the month totals step aside. Weeks
-// go smaller still: five years is 53 columns, and as an overview of the shape
-// of a year the squares can be 3.5px before they stop reading.
-const MIN_CELL = { day: 6, week: 3.5 }
+// 31 columns at the minimum once the month totals step aside.
+const COLS = 31
+const MIN_CELL = 6
 const MAX_CELL = 20
+const GRAIN_LABEL = { day: 'day', fortnight: 'two weeks' }
 
 const MONTH = new Intl.DateTimeFormat('en-GB', { month: 'short' })
 const MONTH_YEAR = new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'numeric' })
@@ -88,7 +96,6 @@ function buildMonths(byDay, months, today) {
   }
   return {
     grain: 'day',
-    cols: 31,
     rows,
     start: new Date(today.getFullYear(), today.getMonth() - months + 1, 1),
     ticks: [[0, '1'], [7, '8'], [14, '15'], [21, '22'], [28, '29']],
@@ -99,25 +106,24 @@ function buildYears(byDay, years, today) {
   const todayKey = dayKey(today)
   const rows = []
   for (let y = today.getFullYear() - years + 1; y <= today.getFullYear(); y++) {
-    const weeks = []
+    const spans = []
     for (let i = 0; ; i++) {
       const date = new Date(y, 0, 1 + i)
       if (date.getFullYear() !== y || date > today) break
-      const col = Math.floor(i / 7)
-      const week = weeks[col] ?? (weeks[col] = { key: `${y}-w${col}`, col, value: 0, date, end: date, today: false })
-      week.value += byDay.get(dayKey(date)) || 0
-      week.end = date
-      if (dayKey(date) === todayKey) week.today = true
+      const col = Math.floor(i / 14)
+      const span = spans[col] ?? (spans[col] = { key: `${y}-f${col}`, col, value: 0, date, end: date, today: false })
+      span.value += byDay.get(dayKey(date)) || 0
+      span.end = date
+      if (dayKey(date) === todayKey) span.today = true
     }
-    rows.push({ key: String(y), label: String(y), title: String(y), cells: weeks, total: weeks.reduce((s, w) => s + w.value, 0) })
+    rows.push({ key: String(y), label: String(y), title: String(y), cells: spans, total: spans.reduce((s, w) => s + w.value, 0) })
   }
   return {
-    grain: 'week',
-    cols: 53,
+    grain: 'fortnight',
     rows,
     start: new Date(today.getFullYear() - years + 1, 0, 1),
-    // The week each quarter's first day falls in.
-    ticks: [[0, 'Jan'], [12, 'Apr'], [25, 'Jul'], [39, 'Oct']],
+    // The fortnight each quarter's first day falls in.
+    ticks: [[0, 'Jan'], [6, 'Apr'], [12, 'Jul'], [19, 'Oct']],
   }
 }
 
@@ -142,26 +148,32 @@ function summarise(byDay, start, today) {
 
 const days = (n) => `${n} day${n === 1 ? '' : 's'}`
 
-export default function StudyHeatmap({ data }) {
-  const [frame, setFrame] = useState(DEFAULT_FRAME)
-  // Read once on the client: reading the clock while rendering would make
-  // this impure, and on the server it would be the server's date.
-  const [today, setToday] = useState(null)
-  const [tip, setTip] = useState(null)
+function startOfToday() {
+  const now = new Date()
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate())
+}
 
-  useEffect(() => {
-    const init = () => {
-      const now = new Date()
-      setToday(new Date(now.getFullYear(), now.getMonth(), now.getDate()))
-      try {
-        const saved = localStorage.getItem(STORE)
-        if (FRAMES.some((f) => f.key === saved)) setFrame(saved)
-      } catch {
-        /* storage blocked: the default frame is fine */
-      }
-    }
-    init()
-  }, [])
+function savedFrame() {
+  try {
+    const saved = localStorage.getItem(STORE)
+    return FRAMES.some((f) => f.key === saved) ? saved : DEFAULT_FRAME
+  } catch {
+    return DEFAULT_FRAME
+  }
+}
+
+export default function StudyHeatmap({ data }) {
+  // Both read in the first render on the client, so the card arrives at its
+  // real size. Setting them from an effect drew a placeholder first and then
+  // swapped in a card of a different height a frame later. On the server
+  // there is no clock or storage to read, and nothing renders until the
+  // client has them; the dashboard only shows this after its data has
+  // loaded in the browser, so it never meets that case.
+  const [frame, setFrame] = useState(() => (typeof window === 'undefined' ? DEFAULT_FRAME : savedFrame()))
+  const [today] = useState(() => (typeof window === 'undefined' ? null : startOfToday()))
+  const [tip, setTip] = useState(null)
+  const rowsRef = useRef(null)
+  const [rowsHeight, setRowsHeight] = useState(null)
 
   useEffect(() => {
     if (!tip) return
@@ -177,6 +189,16 @@ export default function StudyHeatmap({ data }) {
     [byDay, spec, today]
   )
   const summary = useMemo(() => (model ? summarise(byDay, model.start, today) : null), [byDay, model, today])
+  const ready = Boolean(model)
+
+  // The rows' height, so the box around them can ease to it.
+  useEffect(() => {
+    const el = rowsRef.current
+    if (!el) return
+    const observer = new ResizeObserver(() => setRowsHeight(el.offsetHeight))
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [ready])
 
   const choose = (key) => {
     setFrame(key)
@@ -195,8 +217,8 @@ export default function StudyHeatmap({ data }) {
   const fill = (level) =>
     level === 0 ? 'var(--border)' : `color-mix(in srgb, var(--brand) ${MIX[level]}%, var(--border))`
   const gridStyle = {
-    gridTemplateColumns: `repeat(${model.cols}, minmax(${MIN_CELL[model.grain]}px, 1fr))`,
-    maxWidth: model.cols * (MAX_CELL + 3),
+    gridTemplateColumns: `repeat(${COLS}, minmax(${MIN_CELL}px, 1fr))`,
+    maxWidth: COLS * (MAX_CELL + 3),
   }
   const grid = 'grid flex-1 gap-[2px] sm:gap-[3px]'
   const range =
@@ -284,63 +306,72 @@ export default function StudyHeatmap({ data }) {
         </div>
       </div>
 
-      <div className="mt-4 overflow-x-auto pb-1" onPointerOver={onOver} onPointerLeave={() => setTip(null)}>
-        <div className="flex flex-col gap-[3px] sm:gap-1">
-          <div className="flex items-end gap-2 sm:gap-3" aria-hidden="true">
-            <span className="w-10 shrink-0" />
-            <div className={grid} style={gridStyle}>
-              {model.ticks.map(([col, label]) => (
-                <span
-                  key={label}
-                  className="whitespace-nowrap text-[10px] leading-3"
-                  style={{ gridColumn: `${col + 1} / span 6`, color: 'var(--text-faint)' }}
-                >
-                  {label}
-                </span>
-              ))}
-            </div>
-            <span className="hidden w-16 shrink-0 sm:block" />
-          </div>
-
-          {model.rows.map((row) => (
-            <div
-              key={row.key}
-              role="img"
-              aria-label={`${row.title}: ${formatStudyTime(row.total)}, ${days(row.cells.filter((c) => c.value > 0).length)} with study`}
-              className="flex items-center gap-2 sm:gap-3"
-            >
-              <span className="w-10 shrink-0 whitespace-nowrap text-[11px] tabular-nums" style={{ color: 'var(--text-muted)' }}>
-                {row.label}
-              </span>
+      {/* Eases to the rows' height when the frame changes, instead of the
+          card snapping from one row to twelve. Padded and pulled back by the
+          same 3px so the overflow that hides rows mid-change does not also
+          clip today's outline at the edge. */}
+      <div
+        className="-mx-[3px] mt-4 overflow-hidden px-[3px] transition-[height] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none"
+        style={{ height: rowsHeight ?? 'auto' }}
+      >
+        <div ref={rowsRef} className="overflow-x-auto pb-1" onPointerOver={onOver} onPointerLeave={() => setTip(null)}>
+          <div className="flex flex-col gap-[3px] sm:gap-1">
+            <div className="flex items-end gap-2 sm:gap-3" aria-hidden="true">
+              <span className="w-10 shrink-0" />
               <div className={grid} style={gridStyle}>
-                {row.cells.map((c) => (
+                {model.ticks.map(([col, label]) => (
                   <span
-                    key={c.key}
-                    data-tip={model.grain === 'day' ? DAY.format(c.date) : `${SHORT.format(c.date)} – ${SHORT.format(c.end)}`}
-                    data-value={c.value > 0 ? formatStudyTime(c.value) : 'Nothing logged'}
-                    className="aspect-square"
-                    style={{
-                      // A share of the square rather than fixed pixels: 3px
-                      // on a 7px phone square makes a dot.
-                      borderRadius: '22%',
-                      gridColumnStart: c.col + 1,
-                      background: fill(levelOf(c.value)),
-                      outline: c.today ? '1.5px solid var(--text-muted)' : undefined,
-                      outlineOffset: c.today ? 1 : undefined,
-                    }}
-                  />
+                    key={label}
+                    className="whitespace-nowrap text-[10px] leading-3"
+                    style={{ gridColumn: `${col + 1} / span 6`, color: 'var(--text-faint)' }}
+                  >
+                    {label}
+                  </span>
                 ))}
               </div>
-              <span className="hidden w-16 shrink-0 text-right text-[11px] tabular-nums sm:block" style={{ color: 'var(--text-muted)' }}>
-                {row.total > 0 ? formatStudyTime(row.total) : '—'}
-              </span>
+              <span className="hidden w-16 shrink-0 sm:block" />
             </div>
-          ))}
+
+            {model.rows.map((row) => (
+              <div
+                key={row.key}
+                role="img"
+                aria-label={`${row.title}: ${formatStudyTime(row.total)}, ${days(row.cells.filter((c) => c.value > 0).length)} with study`}
+                className="flex items-center gap-2 sm:gap-3"
+              >
+                <span className="w-10 shrink-0 whitespace-nowrap text-[11px] tabular-nums" style={{ color: 'var(--text-muted)' }}>
+                  {row.label}
+                </span>
+                <div className={grid} style={gridStyle}>
+                  {row.cells.map((c) => (
+                    <span
+                      key={c.key}
+                      data-tip={model.grain === 'day' ? DAY.format(c.date) : `${SHORT.format(c.date)} – ${SHORT.format(c.end)}`}
+                      data-value={c.value > 0 ? formatStudyTime(c.value) : 'Nothing logged'}
+                      className="aspect-square"
+                      style={{
+                        // A share of the square rather than fixed pixels: 3px
+                        // on a 7px phone square makes a dot.
+                        borderRadius: '22%',
+                        gridColumnStart: c.col + 1,
+                        background: fill(levelOf(c.value)),
+                        outline: c.today ? '1.5px solid var(--text-muted)' : undefined,
+                        outlineOffset: c.today ? 1 : undefined,
+                      }}
+                    />
+                  ))}
+                </div>
+                <span className="hidden w-16 shrink-0 text-right text-[11px] tabular-nums sm:block" style={{ color: 'var(--text-muted)' }}>
+                  {row.total > 0 ? formatStudyTime(row.total) : '—'}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
       <p className="mt-3 text-[10.5px]" style={{ color: 'var(--text-faint)' }}>
-        {range} · one square per {model.grain} · counts time in quizzes
+        {range} · one square per {GRAIN_LABEL[model.grain]} · counts time in quizzes
       </p>
 
       {tip && (

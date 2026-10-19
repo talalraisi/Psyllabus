@@ -12,7 +12,7 @@
  * still survive.
  */
 
-import { Suspense, useMemo } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 import { notFound, useSearchParams } from 'next/navigation'
 import StudyHeatmap, { dayKey } from '@/components/StudyHeatmap'
 
@@ -37,6 +37,14 @@ function sample() {
 function Inner() {
   const empty = useSearchParams().has('empty')
   const data = useMemo(() => (empty ? [] : sample()), [empty])
+  // Client only, like the dashboard, which only draws the heatmap once its
+  // data has arrived in the browser. The heatmap reads the clock and the
+  // remembered frame in its first render, which a server render cannot do.
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => {
+    const show = () => setMounted(true)
+    show()
+  }, [])
   return (
     <main className="min-h-screen px-5 py-12" style={{ background: 'var(--bg)' }}>
       <div className="mx-auto max-w-5xl">
@@ -44,7 +52,7 @@ function Inner() {
           Time studied
         </h2>
         <div className="rounded-[16px] border p-5 sm:p-6" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
-          <StudyHeatmap data={data} />
+          {mounted && <StudyHeatmap data={data} />}
         </div>
       </div>
     </main>
