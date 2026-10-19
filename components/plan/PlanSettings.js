@@ -135,6 +135,8 @@ export default function PlanSettings({ profile, settings, subjects, topicsBySubj
       Object.entries(slots).map(([d, list]) => [d, (list || []).reduce((n, [a, b]) => n + (b - a), 0)])
     )
     const plan_settings = {
+      // Kept from before: set by the plan page, not by anything on this panel.
+      ...(profile?.plan_settings?.tz ? { tz: profile.plan_settings.tz } : {}),
       slots,
       // Kept alongside, for anything that only reads minutes per day.
       week,

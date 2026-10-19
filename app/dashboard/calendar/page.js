@@ -11,6 +11,9 @@ import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { IconCheck, IconClose } from '@/components/Icons'
 import ReminderWatcher from '@/components/ReminderWatcher'
 import MonthGrid from '@/components/MonthGrid'
+import WeekView from '@/components/calendar/WeekView'
+import CalendarConnections from '@/components/calendar/CalendarConnections'
+import TestSuggestions from '@/components/calendar/TestSuggestions'
 import TodoList from '@/components/TodoList'
 import { accessibleSubjects } from '@/lib/access'
 import {
@@ -58,6 +61,16 @@ export default function CalendarPage() {
   const [selected, setSelected] = useState(() => localDateKey(new Date()))
   const [draft, setDraft] = useState(null)
 
+  // The rest of the ecosystem: the week view, the student's own calendars,
+  // the study blocks the plan has scheduled, and their subscription link.
+  const [view, setView] = useState('week')
+  const [weekStart, setWeekStart] = useState(() => new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay()))
+  const [imported, setImported] = useState([])
+  const [blocks, setBlocks] = useState([])
+  const [connections, setConnections] = useState([])
+  const [feedToken, setFeedToken] = useState(null)
+  const [origin, setOrigin] = useState('')
+
   const router = useRouter()
   const supabase = createClient()
 
@@ -82,6 +95,27 @@ export default function CalendarPage() {
     [supabase]
   )
 
+  const loadEcosystem = useCallback(async () => {
+    const from = new Date(Date.now() - 14 * 86400000).toISOString()
+    const to = new Date(Date.now() + 43 * 86400000).toISOString()
+    const [b, p, c, f] = await Promise.all([
+      supabase
+        .from('calendar_busy')
+        .select('connection_id, event_uid, title, starts_at, ends_at, all_day, transparent')
+        .gte('ends_at', from)
+        .lte('starts_at', to)
+        .order('starts_at'),
+      supabase.from('plan_blocks').select('starts_at, ends_at, title, subject, kind').gte('starts_at', from).order('starts_at'),
+      supabase.from('calendar_connections').select('id, label, last_synced_at, last_error, event_count, dismissed').order('created_at'),
+      supabase.from('calendar_feeds').select('token').maybeSingle(),
+    ])
+    setImported(b.data || [])
+    setBlocks(p.data || [])
+    setConnections(c.data || [])
+    setFeedToken(f.data?.token || null)
+    return c.data || []
+  }, [supabase])
+
   useEffect(() => {
     let cancelled = false
     async function load() {
@@ -98,13 +132,63 @@ export default function CalendarPage() {
       }
       setProfile(profileData)
       await loadEvents(user.id)
-      if (!cancelled) setLoading(false)
+      const conns = await loadEcosystem()
+      if (cancelled) return
+      setOrigin(window.location.origin)
+      setLoading(false)
+
+      // Connected calendars older than three hours are refreshed, behind the
+      // page that is already showing the last copy.
+      const stale = conns.some((c) => !c.last_synced_at || Date.now() - new Date(c.last_synced_at).getTime() > 3 * 3600000)
+      if (stale) {
+        const res = await fetch('/api/calendar/sync', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' }).catch(() => null)
+        if (res?.ok && !cancelled) await loadEcosystem()
+      }
     }
     load()
     return () => {
       cancelled = true
     }
-  }, [router, supabase, loadEvents])
+  }, [router, supabase, loadEvents, loadEcosystem])
+
+  /** A test found in the student's own calendar, confirmed by them. */
+  const addSuggested = async (row, { kind, subject }) => {
+    const user = await getCurrentUser(supabase)
+    if (!user) return
+    // All-day imports are dates (UTC midnight); stored here at 23:59 on that
+    // date in the student's day, the same as an all-day event added by hand.
+    const at = new Date(row.starts_at)
+    const due = row.all_day ? new Date(at.getUTCFullYear(), at.getUTCMonth(), at.getUTCDate(), 23, 59) : at
+    const { data, error: err } = await supabase
+      .from('calendar_events')
+      .insert({
+        user_id: user.id,
+        title: row.title.slice(0, 120),
+        kind,
+        subject,
+        due_at: due.toISOString(),
+        all_day: row.all_day,
+        remind_minutes_before: 1440,
+        source_uid: row.event_uid,
+      })
+      .select()
+      .single()
+    if (err) {
+      setError(err.message)
+      return
+    }
+    setEvents((prev) => [...prev, data].sort((a, b) => new Date(a.due_at) - new Date(b.due_at)))
+  }
+
+  /** "Not a test": remembered against that event, so it is not offered again. */
+  const dismissSuggested = async (row) => {
+    const conn = connections.find((c) => c.id === row.connection_id)
+    if (!conn) return
+    const dismissed = [...(conn.dismissed || []), row.event_uid].slice(-500)
+    setConnections((cs) => cs.map((c) => (c.id === conn.id ? { ...c, dismissed } : c)))
+    const { error: err } = await supabase.from('calendar_connections').update({ dismissed }).eq('id', conn.id)
+    if (err) setError(err.message)
+  }
 
   const byDay = useMemo(() => groupByDay(events), [events])
   const next = useMemo(() => upcoming(events).slice(0, 8), [events])
@@ -196,7 +280,7 @@ export default function CalendarPage() {
       <Page width="wide">
         <PageHeader
           title="Calendar"
-          subtitle="Tests, deadlines and orals, with a reminder before each."
+          subtitle="Your tests, your own calendar and your study plan, in one place."
           action={
             <button
               onClick={() => setDraft(emptyDraft(selected))}
@@ -370,17 +454,62 @@ export default function CalendarPage() {
           </div>
         )}
 
-        {/* Month grid */}
+        <TestSuggestions
+          imported={imported}
+          events={events}
+          connections={connections}
+          subjects={subjects}
+          now={today}
+          onAdd={addSuggested}
+          onDismiss={dismissSuggested}
+        />
+
+        <div role="tablist" aria-label="Calendar view" className="mb-4 flex gap-2">
+          {[
+            ['week', 'Week'],
+            ['month', 'Month'],
+          ].map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              role="tab"
+              aria-selected={view === key}
+              onClick={() => setView(key)}
+              className={view === key ? 'btn btn-solid control-sm' : 'btn btn-outline control-sm'}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
         <Section>
-          <MonthGrid
-            cursor={cursor}
-            today={today}
-            selected={selected}
-            eventsByDay={byDay}
-            onSelect={setSelected}
-            onShiftMonth={shiftMonth}
-            onToday={() => setCursor(new Date(today.getFullYear(), today.getMonth(), 1))}
-          />
+          {view === 'week' ? (
+            <WeekView
+              weekStart={weekStart}
+              today={today}
+              busy={imported}
+              blocks={blocks}
+              events={events}
+              selected={selected}
+              onSelectDay={setSelected}
+              onShiftWeek={(n) => setWeekStart((w) => new Date(w.getFullYear(), w.getMonth(), w.getDate() + 7 * n))}
+              onToday={() => setWeekStart(new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay()))}
+            />
+          ) : (
+            <MonthGrid
+              cursor={cursor}
+              today={today}
+              selected={selected}
+              eventsByDay={byDay}
+              onSelect={setSelected}
+              onShiftMonth={shiftMonth}
+              onToday={() => setCursor(new Date(today.getFullYear(), today.getMonth(), 1))}
+            />
+          )}
+        </Section>
+
+        <Section title="Connected calendars">
+          <CalendarConnections connections={connections} feedToken={feedToken} origin={origin} onChanged={loadEcosystem} />
         </Section>
 
         <div className="grid gap-x-14 lg:grid-cols-2">

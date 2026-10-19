@@ -59,6 +59,14 @@ function writeSnapshot(id, snap) {
   }
 }
 
+/** A calendar older than this is refreshed when the plan opens. */
+const STALE_MS = 3 * 60 * 60 * 1000
+const BLOCKS = (id) => `psyllabus:plan-blocks:${id}`
+
+/** Timed, busy events from the student's own calendars, as the engine wants them. */
+const toBusy = (rows) =>
+  (rows || []).filter((r) => !r.all_day && !r.transparent).map((r) => ({ start: r.starts_at, end: r.ends_at }))
+
 const fmt = (m) => (m >= 60 ? `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, '0')}m` : `${m} min`)
 
 export default function StudyPlanPage() {
@@ -70,6 +78,7 @@ export default function StudyPlanPage() {
   const [mistakes, setMistakes] = useState([])
   const [adjustments, setAdjustments] = useState([])
   const [quizzedToday, setQuizzedToday] = useState(() => new Set())
+  const [busy, setBusy] = useState([])
   const [covered, setCovered] = useState(null)
   const [now, setNow] = useState(null)
   const [snapshot, setSnapshot] = useState(null)
@@ -118,7 +127,7 @@ export default function StudyPlanPage() {
       // Free accounts plan only against the subject they can actually open.
       const usable = accessibleSubjects(profileData)
 
-      const [syllabusRows, { data: progressRows }, mistakesResult, eventsResult, adjustmentsResult, todayResult] =
+      const [syllabusRows, { data: progressRows }, mistakesResult, eventsResult, adjustmentsResult, todayResult, busyResult, connectionsResult] =
         await Promise.all([
           getSyllabus(supabase, usable),
           supabase.from('progress').select('*').eq('user_id', user.id),
@@ -127,6 +136,9 @@ export default function StudyPlanPage() {
           supabase.from('plan_adjustments').select('task_id, kind, on_date, to_date').eq('user_id', user.id).gte('on_date', weekAgo),
           // What was quizzed today: finishing a task's quiz is what marks it done.
           supabase.from('quiz_attempts').select('subject, subtopic').eq('user_id', user.id).gte('completed_at', midnight.toISOString()),
+          // The student's own calendars: busy time comes out of their free time.
+          supabase.from('calendar_busy').select('starts_at, ends_at, all_day, transparent').gte('ends_at', midnight.toISOString()).lte('starts_at', horizonEnd),
+          supabase.from('calendar_connections').select('id, last_synced_at'),
         ])
 
       const eff = buildEffectiveProgressMap(progressRows)
@@ -140,10 +152,28 @@ export default function StudyPlanPage() {
       setMistakes(mistakesResult?.data || [])
       setAdjustments(adjustmentsResult?.data || [])
       setQuizzedToday(new Set((todayResult?.data || []).filter((a) => a.subtopic).map((a) => progressKey(a.subject, a.subtopic))))
+      setBusy(toBusy(busyResult?.data))
       setCovered(await getCoveredSubtopics(supabase))
       setSnapshot(readSnapshot(profileData.id))
       setNow(at)
       setLoading(false)
+
+      // Refresh connected calendars that are getting old, then re-read them.
+      // In the background: the plan is already on screen from the last copy.
+      const stale = (connectionsResult?.data || []).some(
+        (c) => !c.last_synced_at || at.getTime() - new Date(c.last_synced_at).getTime() > STALE_MS
+      )
+      if (stale) {
+        const res = await fetch('/api/calendar/sync', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' }).catch(() => null)
+        if (res?.ok) {
+          const { data } = await supabase
+            .from('calendar_busy')
+            .select('starts_at, ends_at, all_day, transparent')
+            .gte('ends_at', midnight.toISOString())
+            .lte('starts_at', horizonEnd)
+          setBusy(toBusy(data))
+        }
+      }
     }
     load()
   }, [router, supabase])
@@ -186,8 +216,8 @@ export default function StudyPlanPage() {
   )
 
   const plan = useMemo(
-    () => (now ? buildPlan({ candidates, settings, mistakes, adjustments, keepToday: snapshot, now }) : null),
-    [now, candidates, settings, mistakes, adjustments, snapshot]
+    () => (now ? buildPlan({ candidates, settings, mistakes, adjustments, keepToday: snapshot, busy, now }) : null),
+    [now, candidates, settings, mistakes, adjustments, snapshot, busy]
   )
 
   const deadline = useMemo(
@@ -214,6 +244,67 @@ export default function StudyPlanPage() {
     }
     keep()
   }, [plan, profile, snapshot, configured])
+
+  /**
+   * The plan's place in the student's calendar.
+   *
+   * Every scheduled block with a clock time is written to plan_blocks, which
+   * the in-app calendar and the student's phone (through their subscription
+   * link) both read. Written only when the blocks have actually changed, and
+   * only from today on, so earlier days keep what was planned for them.
+   */
+  useEffect(() => {
+    if (!plan || !profile || !configured) return
+    const rows = []
+    for (const d of plan.days) {
+      if (!d.timeline) continue
+      const [y, m, dd] = d.date.split('-').map(Number)
+      for (const t of d.tasks) {
+        if (t.start == null || t.overflow) continue
+        rows.push({
+          day: d.date,
+          starts_at: new Date(y, m - 1, dd, 0, t.start).toISOString(),
+          ends_at: new Date(y, m - 1, dd, 0, t.end).toISOString(),
+          title: t.kind === 'review' ? `Mistakes due back: ${t.subject}` : `${t.subject}: ${displaySubtopic(t.subtopic)}`,
+          subject: t.subject,
+          kind: t.kind,
+        })
+      }
+    }
+    const signature = JSON.stringify(rows)
+    let previous = null
+    try {
+      previous = localStorage.getItem(BLOCKS(profile.id))
+    } catch {
+      /* write anyway */
+    }
+    if (previous === signature) return
+    const write = async () => {
+      const { error } = await supabase.from('plan_blocks').delete().gte('day', plan.days[0].date)
+      if (error) return
+      if (rows.length && (await supabase.from('plan_blocks').insert(rows)).error) return
+      try {
+        localStorage.setItem(BLOCKS(profile.id), signature)
+      } catch {
+        /* rewritten next time, harmlessly */
+      }
+    }
+    write()
+  }, [plan, profile, configured, supabase])
+
+  // The student's time zone, so their subscribed calendar puts all-day tests
+  // on their date. Saved once, and again only if they move.
+  useEffect(() => {
+    if (!profile || !configured) return
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+    if (!tz || profile.plan_settings?.tz === tz) return
+    const save = async () => {
+      const plan_settings = { ...profile.plan_settings, tz }
+      const { error } = await supabase.from('profiles').update({ plan_settings }).eq('id', profile.id)
+      if (!error) setProfile((p) => ({ ...p, plan_settings }))
+    }
+    save()
+  }, [profile, configured, supabase])
 
   const replanToday = useCallback(() => {
     if (!profile) return

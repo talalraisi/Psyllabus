@@ -18,6 +18,7 @@ import {
   normaliseSlots,
   layoutDay,
   rhythmOf,
+  subtractBusy,
 } from '../lib/study-plan.js'
 
 let n = 0
@@ -312,6 +313,23 @@ check('focus: the subject chosen for a weekday is that day\'s subject', () => {
   const monday = buildPlan({ candidates: candidates({ statusOf: statusMix, settings: s }), settings: s, now: NOW }).days.find((d) => d.weekday === 1)
   const own = monday.tasks.filter((t) => !t.fixed)
   assert.ok(own.length > 0 && own.every((t) => t.subject === 'History SL'), own.map((t) => t.subject).join(','))
+})
+
+check('busy time from your own calendar comes out of the time you painted', () => {
+  // 4-8pm painted, football 5-6:30pm.
+  assert.deepEqual(subtractBusy([[960, 1200]], [[1020, 1110]]), [[960, 1020], [1110, 1200]])
+  assert.deepEqual(subtractBusy([[960, 1200]], [[900, 1300]]), [], 'busy all evening: no study time')
+  assert.deepEqual(subtractBusy([[960, 1020]], [[965, 1020]]), [], 'a five-minute sliver is not study time')
+})
+check('the plan schedules around your calendar, and leaves unpainted days alone', () => {
+  const s = resolveSettings({ ...profile, plan_settings: { ...profile.plan_settings, slots: { 1: [[960, 1200]] } } })
+  // Monday 19 Oct, football 5-6:30pm Muscat.
+  const busy = [{ start: new Date(2026, 9, 19, 17, 0), end: new Date(2026, 9, 19, 18, 30) }]
+  const days = buildPlan({ candidates: candidates({ statusOf: statusMix, settings: s }), settings: s, busy, now: NOW }).days
+  const mon = days.find((d) => d.date === day(1))
+  assert.deepEqual(mon.slots, [[960, 1020], [1110, 1200]])
+  for (const t of mon.tasks.filter((t) => !t.overflow)) assert.ok(t.end <= 1020 || t.start >= 1110, `${t.start}-${t.end} clashes with football`)
+  assert.equal(days.find((d) => d.date === day(2)).slots, null, 'Tuesday was not painted')
 })
 
 console.log('steps')
