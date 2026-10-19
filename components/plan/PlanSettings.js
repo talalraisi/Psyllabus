@@ -168,9 +168,6 @@ export default function PlanSettings({ profile, settings, subjects, topicsBySubj
         <div>
           <p className="t-overline">{firstTime ? 'One minute to set up' : 'Your plan'}</p>
           <h2 className="mt-1.5 text-[18px] font-semibold tracking-[-0.02em]">How you study</h2>
-          <p className="mt-1 max-w-xl text-[12.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-            The plan fits around this. Change any of it whenever your week changes.
-          </p>
         </div>
         {!firstTime && onClose && (
           <button type="button" onClick={onClose} className="btn btn-quiet control-sm shrink-0">
@@ -182,12 +179,12 @@ export default function PlanSettings({ profile, settings, subjects, topicsBySubj
       <div className="flex flex-col gap-6">
         <Section
           title="When you are free"
-          hint="Drag over the hours you can study. The plan puts real times on your day, with breaks, inside these. Gaps between them count as breaks too."
+          hint="Drag over the hours you can study."
         >
           <WeekGrid value={slots} onChange={setSlots} />
         </Section>
 
-        <Section title="Your rhythm" hint="How long you work before a break, and how long the break is.">
+        <Section title="Your rhythm" hint="Minutes of work, then minutes of break.">
           <div role="radiogroup" aria-label="Rhythm" className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {Object.entries(RHYTHMS).map(([key, r]) => (
               <Choice key={key} on={style.rhythm === key} onClick={() => setStyle((s) => ({ ...s, rhythm: key }))} title={r.label} hint={r.hint} />
@@ -222,7 +219,7 @@ export default function PlanSettings({ profile, settings, subjects, topicsBySubj
           )}
         </Section>
 
-        <Section title="How you like to study" hint="Pick everything that works for you. Your tasks are built from these.">
+        <Section title="How you like to study" hint="Pick any. Your tasks are built from these.">
           <div className="flex flex-wrap gap-2">
             {Object.entries(METHODS).map(([key, name]) => (
               <Chip key={key} on={style.methods.includes(key)} onClick={() => toggleMethod(key)}>
@@ -300,7 +297,7 @@ export default function PlanSettings({ profile, settings, subjects, topicsBySubj
 
         <Section
           title="Topics you have covered in class"
-          hint="Tick the ones your class has done, in whatever order your school teaches them. Leave a subject on all topics if you are revising everything."
+          hint="Tick what your class has covered, in any order."
         >
           <ul className="flex flex-col">
             {subjects.map((subject) => {
@@ -350,7 +347,7 @@ export default function PlanSettings({ profile, settings, subjects, topicsBySubj
           </ul>
         </Section>
 
-        <Section title="Exam dates" hint="Filled in from your exam session. Change any that are different for you.">
+        <Section title="Exam dates">
           {/* Dates as text, with a picker only when one is being changed: a
               column of date inputs was the bulkiest thing on the panel, and
               on a phone they cannot be made smaller without iOS zooming in. */}
@@ -390,9 +387,7 @@ export default function PlanSettings({ profile, settings, subjects, topicsBySubj
         <Section title="Your targets">
           <p className="text-[12.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
             {missingTargets.length
-              ? `The plan spends the most time where you are furthest from your target, so it needs one for each subject. ${
-                  missingTargets.length === subjects.length ? 'None are set yet.' : `${missingTargets.join(', ')} ${missingTargets.length === 1 ? 'has' : 'have'} none.`
-                } `
+              ? `${missingTargets.length === subjects.length ? 'None set yet' : `Missing for ${missingTargets.join(', ')}`} — the plan uses them to decide where your time goes. `
               : `${subjects.map((s) => `${s} ${targets[s]}`).join(' · ')} `}
             <Link href="/dashboard/prediction" className="font-medium text-[var(--brand)] hover:underline">
               {missingTargets.length ? 'Set targets' : 'Change'}

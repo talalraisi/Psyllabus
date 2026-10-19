@@ -24,7 +24,7 @@ import {
  * study plan knows. Recorded with the run so time can be counted per subject.
  * A resumed run keeps the label it was started with.
  */
-export default function SessionTimer({ minutes, label = null }) {
+export default function SessionTimer({ minutes, label = null, compact = false }) {
   const [timer, setTimer] = useState(() => ({ state: 'idle', minutes, remaining: minutes * 60 }))
   const [ready, setReady] = useState(false)
   const firedRef = useRef(false)
@@ -94,6 +94,50 @@ export default function SessionTimer({ minutes, label = null }) {
 
   const total = (timer.minutes || minutes) * 60
   const elapsed = total > 0 ? 1 - timer.remaining / total : 0
+
+  /* One row, for the study plan: the time, how far through, and the controls.
+     The full version's heading and explanation are for a page where the timer
+     is the subject; in the plan it is a tool beside the list. */
+  if (compact) {
+    return (
+      <div className="flex items-center gap-3">
+        <p className="w-[4.5rem] shrink-0 text-[20px] font-semibold tabular-nums tracking-[-0.02em]" role="timer" aria-live={timer.state === 'running' ? 'off' : 'polite'}>
+          {formatDuration(timer.remaining)}
+        </p>
+        <div
+          className="h-1 flex-1 overflow-hidden rounded-full bg-[var(--surface-sunken)]"
+          role="progressbar"
+          aria-label="Block progress"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(elapsed * 100)}
+        >
+          <div className="h-full rounded-full bg-[var(--brand)] transition-[width] duration-1000 ease-linear" style={{ width: `${Math.min(100, Math.max(0, elapsed * 100))}%` }} />
+        </div>
+        {timer.state !== 'running' ? (
+          <button onClick={start} className="btn btn-solid control-sm shrink-0">
+            {timer.state === 'paused' ? 'Resume' : timer.state === 'done' ? 'Again' : 'Start block'}
+          </button>
+        ) : (
+          <button onClick={pauseTimer} className="btn btn-outline control-sm shrink-0">
+            Pause
+          </button>
+        )}
+        {timer.state !== 'idle' && (
+          <button
+            onClick={() => {
+              firedRef.current = false
+              resetTimer(minutes)
+            }}
+            className="btn btn-quiet control-sm shrink-0"
+            aria-label="Reset timer"
+          >
+            Reset
+          </button>
+        )}
+      </div>
+    )
+  }
 
   return (
     <div className="rounded-[var(--r-md)] border border-[var(--border-strong)] p-4">

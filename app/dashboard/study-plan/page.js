@@ -460,15 +460,12 @@ export default function StudyPlanPage() {
         />
 
         {notificationsSupported() && permission === 'default' && configured && (
-          <div className="mb-8 flex flex-wrap items-center gap-4 border-l-2 pl-4" style={{ borderColor: 'var(--border-strong)' }}>
-            <div className="min-w-0 flex-1">
-              <p className="text-[14.5px] font-medium">Turn on reminders</p>
-              <p className="mt-1 text-[13px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                Alerts before tests and deadlines, and when a block ends. They need the app open.
-              </p>
-            </div>
-            <button onClick={enableNotifications} className="btn btn-solid control-sm shrink-0 text-xs">
-              Allow notifications
+          <div className="mb-8 flex items-center justify-between gap-4 rounded-[12px] border px-4 py-2.5" style={{ borderColor: 'var(--border)' }}>
+            <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
+              Reminders before tests and when a block ends
+            </p>
+            <button onClick={enableNotifications} className="shrink-0 text-[13px] font-medium text-[var(--brand)] hover:underline">
+              Turn on
             </button>
           </div>
         )}
@@ -478,11 +475,7 @@ export default function StudyPlanPage() {
         {configured && candidates.length === 0 && plan.days[0].tasks.length === 0 ? (
           <EmptyState
             title={items.length ? 'Nothing left to plan' : 'Take a quiz to build your plan'}
-            description={
-              items.length
-                ? 'Everything you have been taught is mastered. Keep testing to hold it there, or move "Where your classes are" on as you learn new topics.'
-                : 'The plan is built from what you have proved. It needs one quiz to start.'
-            }
+            description={items.length ? 'Everything you have covered is mastered.' : 'Take one quiz and your plan builds itself.'}
             action={
               <Link href="/dashboard/subjects" className="btn btn-solid control-md">
                 Open a subject
@@ -535,17 +528,15 @@ export default function StudyPlanPage() {
                     </div>
                   )}
 
-                  <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-[13px]" style={{ color: 'var(--text-muted)' }}>
+                  <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t pt-4 text-[13px]" style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}>
                     {tomorrow && (
-                      <p>
-                        <span className="font-medium" style={{ color: 'var(--text-body)' }}>
-                          Tomorrow, {WEEKDAYS[tomorrow.weekday]}:
-                        </span>{' '}
+                      <p className="tabular-nums">
+                        <span style={{ color: 'var(--text-body)' }}>Tomorrow</span> ·{' '}
                         {tomorrow.minutes === 0
-                          ? 'a day off'
+                          ? 'day off'
                           : tomorrow.tasks.length
-                            ? `${tomorrow.tasks.length} task${tomorrow.tasks.length === 1 ? '' : 's'}, ${fmt(tomorrow.planned)} — ${[...new Set(tomorrow.tasks.map((t) => t.subject))].join(', ')}`
-                            : 'nothing planned yet'}
+                            ? `${fmt(tomorrow.planned)} · ${[...new Set(tomorrow.tasks.map((t) => t.subject.replace(/ (SL|HL)$/, '')))].join(', ')}`
+                            : 'nothing yet'}
                       </p>
                     )}
                     <button type="button" onClick={replanToday} className="font-medium text-[var(--brand)] hover:underline">
@@ -557,22 +548,17 @@ export default function StudyPlanPage() {
                   <TodoList className="mb-12 mt-12" title="Also today" subjects={accessibleSubjects(profile)} />
 
                   {events.length === 0 && (
-                    <Link href="/dashboard/calendar" className="group flex items-center gap-4 border-t py-5" style={{ borderColor: 'var(--border)' }}>
-                      <IconCalendar width={17} height={17} className="shrink-0 text-[var(--brand)]" />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-[15px] font-semibold tracking-[-0.012em]">Add your next test</p>
-                        <p className="mt-1 text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
-                          With a date on the calendar, the plan puts that subject first as it gets close.
-                        </p>
-                      </div>
-                      <IconArrowRight width={18} height={18} className="shrink-0 text-[var(--brand)]" />
+                    <Link href="/dashboard/calendar" className="flex items-center gap-3 border-t py-4 text-[14px] font-medium" style={{ borderColor: 'var(--border)' }}>
+                      <IconCalendar width={16} height={16} className="shrink-0 text-[var(--brand)]" />
+                      <span className="flex-1">Add your next test</span>
+                      <IconArrowRight width={16} height={16} className="shrink-0 text-[var(--brand)]" />
                     </Link>
                   )}
                 </>
               ) : (
                 <div className="flex flex-col gap-8">
-                  <p className="text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                    Everything still to do, most marks per hour first. {plan.unscheduled > 0 && `${plan.unscheduled} of these do not fit in the next two weeks at the time you have set.`}
+                  <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
+                    Most marks per hour first{plan.unscheduled > 0 ? ` · ${plan.unscheduled} don't fit the next two weeks` : ''}
                   </p>
                   {subjects.map((subject) => {
                     const left = candidates.filter((c) => c.subject === subject)
@@ -619,9 +605,7 @@ export default function StudyPlanPage() {
               {!hasAllSubjects(profile) && (profile.subjects || []).length > 1 && (
                 <Link href="/dashboard/profile#unlock" className="mt-10 flex items-center gap-3 border-l-2 pl-4" style={{ borderColor: 'var(--border-strong)' }}>
                   <IconCheck width={16} height={16} className="shrink-0 text-[var(--brand)]" />
-                  <span className="text-sm text-[var(--text-body)]">
-                    This plan covers one subject on the free plan. Unlock the rest with your school code.
-                  </span>
+                  <span className="text-[13px] text-[var(--text-body)]">Free plan: one subject. Unlock the rest with a school code.</span>
                 </Link>
               )}
             </>

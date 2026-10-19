@@ -296,7 +296,7 @@ export default function TodoList({
           value={todo.due_on || ''}
           onChange={(e) => patch(todo, { due_on: e.target.value || null })}
           aria-label="Due date"
-          className="input control-sm"
+          className="input control-sm px-3 text-[16px] sm:text-[13px]"
           style={{ width: 150 }}
         />
         {subjects.length > 0 && (
@@ -304,7 +304,7 @@ export default function TodoList({
             value={todo.subject || ''}
             onChange={(e) => patch(todo, { subject: e.target.value || null })}
             aria-label="Subject"
-            className="input control-sm"
+            className="input control-sm px-3 text-[16px] sm:text-[13px]"
             style={{ width: 190 }}
           >
             <option value="">No subject</option>
@@ -341,7 +341,7 @@ export default function TodoList({
           if (value !== (todo.note || '')) patch(todo, { note: value || null })
         }}
         placeholder="Notes: what it needs, where it is, who asked for it"
-        className="input mt-2 w-full resize-y text-[13px]"
+        className="input mt-2 w-full resize-y px-3 text-[16px] sm:text-[13px]"
         style={{ height: 'auto', padding: '8px 12px' }}
       />
     </li>
@@ -394,7 +394,7 @@ export default function TodoList({
             maxLength={200}
             placeholder={defaultDue ? 'Add something for this day' : 'Lab report friday #physics'}
             aria-label="New to-do"
-            className="input control-md flex-1"
+            className="input control-md flex-1 px-3.5 text-[16px] sm:text-[13.5px]"
           />
           <button
             onClick={add}

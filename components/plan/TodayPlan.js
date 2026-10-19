@@ -1,18 +1,19 @@
 'use client'
 
 /**
- * Today's plan: what to do, when, for how long, with the breaks.
+ * Today's plan, as an agenda: when, what, and the one thing worth knowing
+ * about it.
  *
- * Each task says why it is there and what doing it means — the steps, sized
- * to the task rather than an equal share of the evening — and ends in
- * something you can see. A task with a quiz behind it ticks itself off when
- * you finish the quiz; the quiz is the proof, so nobody has to tick a box to
- * be believed. You can still mark anything done yourself.
+ * It began as a stack of bordered cards, each carrying two reasons, a row of
+ * long step labels and three buttons, and read like a form. Now the times run
+ * down a thin line on the left, each task is a title with a single reason and
+ * its steps in a word or two, and there is one button — Start — with
+ * everything else behind ···. The full step instructions are still there, on
+ * hover. Breaks are a gap in the line rather than a row of their own.
  *
- * With free time painted, every task and break has a clock time inside it.
- * The plan is automatic, but the student's word beats it: skip something
- * today, move it to tomorrow or a chosen day, or mark it done, and the rest
- * re-arranges around that.
+ * A task with a quiz behind it ticks itself off when that quiz is finished;
+ * the quiz is the evidence. Anything can still be marked done by hand, and
+ * skipped or moved, and the student's word beats the plan.
  */
 
 import { useState } from 'react'
@@ -35,16 +36,20 @@ const LEARN = {
 }
 const kindOf = (t) => (t.kind === 'learn' ? LEARN[t.status] || LEARN.not_started : KIND[t.kind] || LEARN.not_started)
 
+// The one reason shown, most telling first: a test coming up beats "weak",
+// which beats "early topic".
+const REASON_ORDER = ['event', 'review', 'decaying', 'target', 'retest', 'weak', 'shaky', 'untested', 'proficient', 'noquiz', 'foundation']
 const REASON_COLOR = {
-  weak: 'var(--status-weak)',
-  decaying: 'var(--status-fading)',
   event: 'var(--status-weak)',
-  target: 'var(--brand)',
   review: 'var(--status-weak)',
+  decaying: 'var(--status-fading)',
+  target: 'var(--brand)',
   retest: 'var(--brand)',
+  weak: 'var(--status-weak)',
 }
+const reasonOf = (t) => [...(t.reasons || [])].sort((a, b) => REASON_ORDER.indexOf(a.kind) - REASON_ORDER.indexOf(b.kind))[0]
 
-const fmt = (m) => (m >= 60 ? `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, '0')}m` : `${m} min`)
+const fmt = (m) => (m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? ` ${String(m % 60).padStart(2, '0')}m` : ''}` : `${m}m`)
 
 /** Minutes from midnight as a clock time: 4:05pm. */
 export const clock = (m) => {
@@ -52,15 +57,16 @@ export const clock = (m) => {
   return `${((h + 11) % 12) + 1}:${String(m % 60).padStart(2, '0')}${h < 12 ? 'am' : 'pm'}`
 }
 
-function TaskMenu({ task, tomorrow, onAdjust, done, close }) {
+function TaskMenu({ task, tomorrow, onAdjust, onResources, done, close }) {
   const [picking, setPicking] = useState(false)
   const item = 'block w-full rounded-[8px] px-3 py-2 text-left text-[13px] hover:bg-[var(--surface-sunken)]'
   return (
-    <div
-      role="menu"
-      className="absolute right-0 top-full z-20 mt-1 w-56 rounded-[12px] border p-1 shadow-lg"
-      style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
-    >
+    <div role="menu" className="absolute right-0 top-full z-20 mt-1 w-52 rounded-[12px] border p-1 shadow-lg" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
+      {task.subtopic && (
+        <button role="menuitem" type="button" className={item} onClick={() => { onResources(task); close() }}>
+          Resources
+        </button>
+      )}
       <button role="menuitem" type="button" className={item} onClick={() => { onAdjust(task, done ? 'undone' : 'done'); close() }}>
         {done ? 'Not done after all' : 'Mark as done'}
       </button>
@@ -88,7 +94,7 @@ function TaskMenu({ task, tomorrow, onAdjust, done, close }) {
             />
           ) : (
             <button role="menuitem" type="button" className={item} onClick={() => setPicking(true)}>
-              Move to another day…
+              Another day…
             </button>
           )}
         </>
@@ -106,33 +112,26 @@ export default function TodayPlan({ day, tomorrowKey, style, isDone, hrefFor, on
   const remaining = tasks.filter((t) => !isDone(t))
   const complete = tasks.length > 0 && remaining.length === 0
   const current = remaining[0] || null
+  const timed = Boolean(day.timeline)
 
-  /**
-   * The day as rows: tasks and breaks, in time order.
-   *
-   * With free time painted, the engine has given everything a clock time and
-   * the breaks are its own — the gaps between windows included. Without it,
-   * a break falls after whichever task crosses each block boundary. Anything
-   * that fitted no window comes last, under "if you have time".
-   */
+  // Rows in time order: tasks, and the breaks between them.
   const rows = []
-  if (day.timeline) {
+  if (timed) {
     const byId = new Map(tasks.map((t) => [t.id, t]))
-    let n = 0
     for (const x of day.timeline) {
-      if (x.type === 'task' && byId.has(x.id)) rows.push({ type: 'task', task: byId.get(x.id), n: ++n })
+      if (x.type === 'task' && byId.has(x.id)) rows.push({ type: 'task', task: byId.get(x.id) })
       else if (x.type === 'break') rows.push({ type: 'break', start: x.start, minutes: x.end - x.start })
     }
     const extra = tasks.filter((t) => t.overflow)
     if (extra.length) {
       rows.push({ type: 'heading', label: 'If you have time' })
-      for (const t of extra) rows.push({ type: 'task', task: t, n: ++n })
+      for (const t of extra) rows.push({ type: 'task', task: t })
     }
   } else {
     let run = 0
     let next = rhythm.work
     tasks.forEach((t, i) => {
-      rows.push({ type: 'task', task: t, n: i + 1 })
+      rows.push({ type: 'task', task: t })
       run += t.minutes
       if (Number.isFinite(rhythm.work) && rhythm.rest > 0 && run >= next && i < tasks.length - 1) {
         rows.push({ type: 'break', minutes: rhythm.rest })
@@ -140,46 +139,44 @@ export default function TodayPlan({ day, tomorrowKey, style, isDone, hrefFor, on
       }
     })
   }
+
   const windows = (day.slots || []).map(([a, b]) => `${clock(a)}–${clock(b)}`).join(', ')
-  const pattern = Number.isFinite(rhythm.work)
-    ? `${rhythm.work}-minute blocks${day.breaks ? `, ${day.breaks} break${day.breaks === 1 ? '' : 's'}` : ''}`
-    : 'No set breaks'
+  const headline =
+    day.minutes === 0 ? 'Day off' : complete ? 'All done' : tasks.length === 0 ? 'Nothing planned' : fmt(day.planned)
+  const sub =
+    day.minutes === 0
+      ? null
+      : day.late
+        ? 'Your free time today has passed'
+        : complete
+          ? `${fmt(doneMinutes)} studied`
+          : [`${tasks.length} task${tasks.length === 1 ? '' : 's'}`, windows, Number.isFinite(rhythm.work) ? `${rhythm.work}/${rhythm.rest}` : null]
+              .filter(Boolean)
+              .join(' · ')
 
   return (
     <div>
-      <div className="elev mb-6 rounded-[16px] border p-6" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
+      <div className="mb-8">
         <p className="t-overline">Today · {WEEKDAYS[day.weekday]}</p>
-        <h2 className="mt-2 text-[clamp(1.25rem,2.4vw,1.6rem)] font-semibold leading-tight tracking-[-0.025em]">
-          {day.minutes === 0
-            ? 'A day off'
-            : complete
-              ? 'Everything for today is done'
-              : tasks.length === 0
-                ? 'Nothing planned today'
-                : `${tasks.length} task${tasks.length === 1 ? '' : 's'}, ${fmt(day.planned)}`}
-        </h2>
-        <p className="mt-1.5 text-[13px]" style={{ color: 'var(--text-muted)' }}>
-          {day.minutes === 0
-            ? 'No free time today. Change your week if that is wrong.'
-            : day.late
-              ? 'Your free time today has passed. This is what was planned, if you get a moment.'
-              : complete
-                ? `${fmt(doneMinutes)} done. Tomorrow's plan is ready below.`
-                : `${done.length ? `${done.length} of ${tasks.length} done · ` : ''}${pattern} · ${windows || `${fmt(day.minutes)} set aside`}`}
-        </p>
+        <div className="mt-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <h2 className="text-[clamp(1.6rem,3.2vw,2.1rem)] font-semibold leading-none tracking-[-0.03em] tabular-nums">{headline}</h2>
+          {sub && (
+            <p className="text-[13px] tabular-nums" style={{ color: 'var(--text-muted)' }}>
+              {sub}
+            </p>
+          )}
+        </div>
 
         {tasks.length > 0 && (
-          <div className="mt-5 h-1.5 overflow-hidden rounded-full" style={{ background: 'var(--border-strong)' }}>
-            <div
-              className="h-full rounded-full transition-[width] duration-500"
-              style={{ width: `${day.planned ? (doneMinutes / day.planned) * 100 : 0}%`, background: 'var(--brand)' }}
-            />
+          <div className="mt-4 h-1 overflow-hidden rounded-full" style={{ background: 'var(--border)' }}>
+            <div className="h-full rounded-full transition-[width] duration-500" style={{ width: `${day.planned ? (doneMinutes / day.planned) * 100 : 0}%`, background: 'var(--brand)' }} />
           </div>
         )}
 
         {tasks.length > 0 && !complete && (
-          <div className="mt-5">
+          <div className="mt-4">
             <SessionTimer
+              compact
               minutes={Number.isFinite(rhythm.work) ? rhythm.work : day.planned}
               label={current?.subject ? { subject: current.subject, subtopic: current.subtopic } : null}
             />
@@ -187,23 +184,27 @@ export default function TodayPlan({ day, tomorrowKey, style, isDone, hrefFor, on
         )}
       </div>
 
-      <ol className="flex flex-col gap-2">
+      <ol className="relative">
         {rows.map((row, r) => {
           if (row.type === 'heading') {
             return (
-              <li key={`h${r}`} className="pb-1 pt-4">
+              <li key={`h${r}`} className="pb-2 pt-6">
                 <p className="t-overline">{row.label}</p>
               </li>
             )
           }
           if (row.type === 'break') {
             return (
-              <li key={`b${r}`}>
-                <p className="flex items-center gap-3 py-1.5 pl-9 text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
-                  <span className="h-px flex-1" style={{ background: 'var(--border)' }} />
-                  {row.start != null ? `${clock(row.start)} · ` : ''}Break · {row.minutes} min
-                  <span className="h-px flex-1" style={{ background: 'var(--border)' }} />
-                </p>
+              <li key={`b${r}`} className="flex items-center">
+                <span className="w-16 shrink-0 pr-3 text-right text-[11px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
+                  {row.start != null ? clock(row.start) : ''}
+                </span>
+                <span className="relative flex w-5 shrink-0 justify-center self-stretch" aria-hidden="true">
+                  <span className="w-px" style={{ backgroundImage: 'linear-gradient(var(--border-strong) 50%, transparent 0)', backgroundSize: '1px 6px' }} />
+                </span>
+                <span className="py-2 pl-3 text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
+                  Break · {row.minutes}m
+                </span>
               </li>
             )
           }
@@ -212,80 +213,55 @@ export default function TodayPlan({ day, tomorrowKey, style, isDone, hrefFor, on
           const k = kindOf(task)
           const finished = isDone(task)
           const href = hrefFor(task)
+          const reason = reasonOf(task)
+          const last = r === rows.length - 1
           return (
-            <li key={task.id}>
-              <div
-                className="rounded-[12px] border px-4 py-3.5"
-                style={{
-                  borderColor: finished ? 'var(--border)' : 'var(--border-strong)',
-                  background: finished ? 'transparent' : 'var(--surface)',
-                  opacity: finished ? 0.65 : 1,
-                }}
-              >
-                <div className="flex flex-wrap items-start gap-3">
-                  <span className="mt-0.5 w-5 shrink-0 text-[12px] font-semibold tabular-nums" style={{ color: 'var(--text-faint)' }}>
-                    {finished ? <IconCheck width={14} height={14} className="text-[var(--brand)]" /> : row.n}
-                  </span>
+            <li key={task.id} className="group flex">
+              {/* When */}
+              <span className="w-16 shrink-0 pr-3 pt-3.5 text-right text-[12px] tabular-nums" style={{ color: finished ? 'var(--text-faint)' : 'var(--text-body)' }}>
+                {task.start != null && !task.overflow ? clock(task.start) : fmt(task.minutes)}
+              </span>
 
-                  <div className="min-w-[12rem] flex-1">
-                    <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
-                      {task.start != null && !task.overflow && (
-                        <span className="font-semibold tabular-nums" style={{ color: 'var(--text-body)' }}>
-                          {clock(task.start)}–{clock(task.end)}
-                        </span>
-                      )}
-                      <span className="rounded-full px-2 py-0.5 text-[10.5px] font-semibold" style={{ color: k.color, background: `color-mix(in srgb, ${k.color} 12%, transparent)` }}>
+              {/* The line, and this task's point on it */}
+              <span className="relative flex w-5 shrink-0 justify-center" aria-hidden="true">
+                <span className="absolute inset-y-0 w-px" style={{ background: 'var(--border)', top: r === 0 ? 18 : 0, bottom: last ? 'calc(100% - 18px)' : 0 }} />
+                <span
+                  className="relative mt-[15px] flex h-[11px] w-[11px] items-center justify-center rounded-full"
+                  style={finished ? { background: 'var(--brand)' } : { background: 'var(--bg)', boxShadow: `inset 0 0 0 2px ${k.color}` }}
+                >
+                  {finished && <IconCheck width={8} height={8} style={{ color: 'var(--bg)' }} />}
+                </span>
+              </span>
+
+              {/* What */}
+              <div className="min-w-0 flex-1 rounded-[10px] px-3 py-2.5 transition-colors group-hover:bg-[var(--surface)]">
+                <div className="flex items-start gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="flex items-center gap-2 text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
+                      <span className="font-semibold" style={{ color: finished ? 'var(--text-faint)' : k.color }}>
                         {k.label}
                       </span>
-                      <span className="truncate">
-                        {task.subject}
-                        {task.topic ? ` · ${task.topic}` : ''}
-                      </span>
+                      <span className="truncate">{task.subject}</span>
                     </p>
-                    <p className={`mt-1 text-[14.5px] ${finished ? 'line-through' : ''}`} style={{ color: finished ? 'var(--text-faint)' : 'var(--text-body)' }}>
-                      {task.kind === 'review' ? `Mistakes due back in ${task.subject}` : displaySubtopic(task.subtopic)}
+                    <p className={`mt-0.5 text-[15px] leading-snug ${finished ? 'line-through' : ''}`} style={{ color: finished ? 'var(--text-faint)' : 'var(--text)' }}>
+                      {task.kind === 'review' ? 'Mistakes due back' : displaySubtopic(task.subtopic)}
                     </p>
-
-                    {!finished && task.reasons?.length > 0 && (
-                      <p className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5">
-                        {task.reasons.slice(0, 2).map((reason) => (
-                          <span key={reason.kind + reason.label} className="text-[12px]" style={{ color: REASON_COLOR[reason.kind] || 'var(--text-muted)' }}>
-                            {reason.label}
-                          </span>
-                        ))}
+                    {!finished && (
+                      <p className="mt-1 flex flex-wrap items-center gap-x-2 text-[12px] tabular-nums" style={{ color: 'var(--text-muted)' }}>
+                        <span title={(task.steps || []).map((s) => `${s.label} (${s.minutes}m)`).join(' → ')}>
+                          {(task.steps || []).map((s) => `${s.short} ${s.minutes}m`).join(' · ')}
+                        </span>
+                        {reason && (
+                          <>
+                            <span aria-hidden="true">·</span>
+                            <span style={{ color: REASON_COLOR[reason.kind] || 'var(--text-muted)' }}>{reason.label}</span>
+                          </>
+                        )}
                       </p>
-                    )}
-
-                    {!finished && task.steps?.length > 0 && (
-                      <ol className="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1.5">
-                        {task.steps.map((step, n) => (
-                          <li key={step.kind + n} className="flex items-center gap-2">
-                            {n > 0 && (
-                              <span aria-hidden="true" className="text-[10px]" style={{ color: 'var(--border-strong)' }}>
-                                →
-                              </span>
-                            )}
-                            <span className="rounded-full border px-2.5 py-1 text-[11.5px]" style={{ borderColor: 'var(--border)', background: 'var(--surface-sunken)', color: 'var(--text-body)' }}>
-                              {step.label}
-                              <span className="ml-1.5 tabular-nums" style={{ color: 'var(--text-faint)' }}>
-                                {step.minutes}m
-                              </span>
-                            </span>
-                          </li>
-                        ))}
-                      </ol>
                     )}
                   </div>
 
-                  <div className="relative flex shrink-0 items-center gap-2">
-                    <span className="hidden text-[12px] tabular-nums sm:block" style={{ color: 'var(--text-faint)' }}>
-                      {task.minutes} min
-                    </span>
-                    {!finished && task.subtopic && (
-                      <button type="button" onClick={() => onResources(task)} className="btn btn-quiet control-sm">
-                        Resources
-                      </button>
-                    )}
+                  <div className="relative flex shrink-0 items-center gap-1.5">
                     {!finished &&
                       (href ? (
                         <Link href={href} className="btn btn-solid control-sm">
@@ -306,7 +282,9 @@ export default function TodayPlan({ day, tomorrowKey, style, isDone, hrefFor, on
                     >
                       ···
                     </button>
-                    {menu === task.id && <TaskMenu task={task} tomorrow={tomorrowKey} done={finished} onAdjust={onAdjust} close={() => setMenu(null)} />}
+                    {menu === task.id && (
+                      <TaskMenu task={task} tomorrow={tomorrowKey} done={finished} onAdjust={onAdjust} onResources={onResources} close={() => setMenu(null)} />
+                    )}
                   </div>
                 </div>
               </div>
