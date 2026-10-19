@@ -14,7 +14,8 @@
 
 import { Suspense, useEffect, useMemo, useState } from 'react'
 import { notFound, useSearchParams } from 'next/navigation'
-import StudyHeatmap, { dayKey } from '@/components/StudyHeatmap'
+import StudyHeatmap from '@/components/StudyHeatmap'
+import { dayKey } from '@/lib/study-time'
 
 const ENABLED = process.env.NODE_ENV !== 'production'
 

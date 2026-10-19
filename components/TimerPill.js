@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { formatDuration } from '@/lib/notify'
-import { readTimer, subscribeTimer, pauseTimer } from '@/lib/session-timer'
+import { readTimer, subscribeTimer, pauseTimer, settleTimer } from '@/lib/session-timer'
 
 /**
  * The running session timer, visible from anywhere in the dashboard.
@@ -24,14 +24,22 @@ export default function TimerPill() {
   const [timer, setTimer] = useState(null)
   const pathname = usePathname()
 
+  // The pill is on every dashboard page, which makes it the place that
+  // records a session that ran out somewhere else — on a quiz, or with the
+  // tab shut — and sends anything still waiting from a dropped connection.
   useEffect(() => {
     setTimer(readTimer())
+    settleTimer()
     return subscribeTimer(setTimer)
   }, [])
 
   useEffect(() => {
     if (timer?.state !== 'running') return
-    const id = setInterval(() => setTimer(readTimer()), 1000)
+    const id = setInterval(() => {
+      const next = readTimer()
+      if (next.state === 'done') settleTimer()
+      setTimer(next)
+    }, 1000)
     return () => clearInterval(id)
   }, [timer?.state])
 

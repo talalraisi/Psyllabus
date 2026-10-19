@@ -24,6 +24,7 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { dayKey } from '@/lib/study-time'
 
 const FRAMES = [
   { key: '1M', name: '1 month', months: 1 },
@@ -51,10 +52,6 @@ const MONTH_YEAR = new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'nume
 const DAY = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
 const SHORT = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 
-/** The local calendar date as YYYY-MM-DD — not UTC, which is a different day after 8pm in Muscat. */
-export function dayKey(date) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
-}
 
 /** Minutes as a person would say them: "<1 min", "25 min", "2h 05m". */
 export function formatStudyTime(minutes) {
@@ -371,7 +368,7 @@ export default function StudyHeatmap({ data }) {
       </div>
 
       <p className="mt-3 text-[10.5px]" style={{ color: 'var(--text-faint)' }}>
-        {range} · one square per {GRAIN_LABEL[model.grain]} · counts time in quizzes
+        {range} · one square per {GRAIN_LABEL[model.grain]} · quizzes and the session timer, counted once
       </p>
 
       {tip && (

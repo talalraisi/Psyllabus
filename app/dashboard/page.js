@@ -27,7 +27,8 @@ import { buildEffectiveProgressMap, buildProgressDetailMap } from '@/lib/decay'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
 import { hasAllSubjects, isSubjectLocked, accessibleSubjects } from '@/lib/access'
 import { getCoveredSubtopics } from '@/lib/coverage'
-import StudyHeatmap, { dayKey } from '@/components/StudyHeatmap'
+import StudyHeatmap from '@/components/StudyHeatmap'
+import { studyIntervals, minutesPerDay } from '@/lib/study-time'
 
 function greeting(now) {
   const hour = now.getHours()
@@ -106,7 +107,8 @@ export default function Dashboard() {
   const [overall, setOverall] = useState(0)
   const [counts, setCounts] = useState({ mastered: 0, weak: 0, decaying: 0, due: 0, tested: 0 })
   const [session, setSession] = useState({ items: [], perItemMinutes: 0 })
-  // Minutes of questions answered, per local day, for the past five years.
+  // Minutes studied per local day for the past five years: quizzes and the
+  // session timer, with any time covered by both counted once.
   const [studyDays, setStudyDays] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -146,7 +148,7 @@ export default function Dashboard() {
       const since = new Date()
       since.setFullYear(since.getFullYear() - 5)
       since.setMonth(0, 1)
-      const [profileData, { data: progressRows }, { count: dueCount }, eventsResult, attemptsResult] =
+      const [profileData, { data: progressRows }, { count: dueCount }, eventsResult, attemptsResult, sessionsResult] =
         await Promise.all([
           getProfile(supabase, user.id, { onFresh: setProfile }),
           supabase
@@ -165,14 +167,17 @@ export default function Dashboard() {
             .select('*')
             .eq('user_id', user.id)
             .eq('completed', false),
-          // The only study time this app actually records. The session timer
-          // keeps a live countdown in localStorage and nothing else, so time
-          // spent answering questions is the honest number to draw here.
+          // Time spent answering questions, and time the session timer ran.
           supabase
             .from('quiz_attempts')
             .select('completed_at, elapsed_seconds')
             .eq('user_id', user.id)
             .gte('completed_at', since.toISOString()),
+          supabase
+            .from('study_sessions')
+            .select('started_at, ended_at')
+            .eq('user_id', user.id)
+            .gte('started_at', since.toISOString()),
         ])
 
       if (!profileData) {
@@ -231,16 +236,14 @@ export default function Dashboard() {
       setNextEvent(pending[0] || null)
       setNow(new Date())
 
-      // Bucketed by the student's own calendar day, not UTC: a quiz at 1am in
-      // Muscat belongs to the day it felt like, not the previous one. Kept in
-      // fractional minutes so a 40-second quiz still lights its square.
-      const perDay = new Map()
-      for (const a of attemptsResult?.data || []) {
-        if (!a.completed_at || !a.elapsed_seconds) continue
-        const key = dayKey(new Date(a.completed_at))
-        perDay.set(key, (perDay.get(key) || 0) + a.elapsed_seconds / 60)
-      }
-      setStudyDays([...perDay].map(([date, value]) => ({ date, value })))
+      // Merged rather than added, because the timer is meant to keep running
+      // through quizzes; split by the student's own calendar day. See
+      // lib/study-time.js.
+      setStudyDays(
+        minutesPerDay(
+          studyIntervals({ attempts: attemptsResult?.data || [], sessions: sessionsResult?.data || [] })
+        )
+      )
       setSubjectStats(stats)
       setLoading(false)
     }

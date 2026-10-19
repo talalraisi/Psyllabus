@@ -26,6 +26,7 @@ import {
 import { planLabel, hasAllSubjects } from '@/lib/access'
 import { clearCache } from '@/lib/cache'
 import TimerPill from '@/components/TimerPill'
+import { stopTimerForSignOut } from '@/lib/session-timer'
 import FeedbackButton from '@/components/FeedbackButton'
 import ThemeToggle from '@/components/ThemeToggle'
 
@@ -177,6 +178,9 @@ export default function DashboardLayout({ children, profile }) {
     if (signingOut) return
     setSigningOut(true)
     clearCache()
+    // Save the running session while it can still be saved as this student's,
+    // and stop the clock so it does not carry on into someone else's account.
+    await stopTimerForSignOut()
     await supabase.auth.signOut()
     router.push('/login')
   }
