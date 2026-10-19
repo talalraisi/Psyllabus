@@ -95,7 +95,7 @@ const tidy = (v) => v.replace(/\*/g, '×').replace(/\//g, '÷')
 
 const KEY_STYLE = {
   digit: { background: 'var(--surface-sunken)', color: 'var(--text)', fontSize: 17 },
-  fn: { background: 'transparent', color: 'var(--text-body)', border: '1px solid var(--border)', fontSize: 13 },
+  fn: { background: 'transparent', color: 'var(--text-body)', borderWidth: 1, borderStyle: 'solid', borderColor: 'var(--border)', fontSize: 13 },
   op: { background: 'color-mix(in srgb, var(--brand) 13%, var(--surface))', color: 'var(--brand)', fontSize: 19 },
   clear: { background: 'color-mix(in srgb, var(--status-weak) 12%, var(--surface))', color: 'var(--status-weak)', fontSize: 12.5, fontWeight: 600 },
   equals: { background: 'var(--brand)', color: '#fff', fontSize: 20 },

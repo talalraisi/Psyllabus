@@ -13,7 +13,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
-import { getProfile, getSyllabus } from '@/lib/cache'
+import { getProfile } from '@/lib/cache'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
@@ -26,13 +26,10 @@ import ReminderWatcher from '@/components/ReminderWatcher'
 import PlanSettings from '@/components/plan/PlanSettings'
 import TodayPlan from '@/components/plan/TodayPlan'
 import { getSlugForSubject } from '@/lib/subject-map'
-import { progressKey, displaySubtopic, STATUS_COLORS } from '@/lib/progress'
-import { buildEffectiveProgressMap, buildProgressDetailMap } from '@/lib/decay'
-import { predictSubject } from '@/lib/prediction'
+import { displaySubtopic, STATUS_COLORS } from '@/lib/progress'
 import { accessibleSubjects, hasAllSubjects } from '@/lib/access'
-import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
-import { getCoveredSubtopics } from '@/lib/coverage'
-import { resolveSettings, buildCandidates, buildPlan, nextDeadline, dateKey, WEEKDAYS } from '@/lib/study-plan'
+import { dateKey, WEEKDAYS } from '@/lib/study-plan'
+import { readSnapshot, writeSnapshot, snapshotFor, loadPlanInputs, loadBusy, computePlan, isTaskDone } from '@/lib/plan-data'
 import {
   notificationsSupported,
   notificationPermission,
@@ -40,32 +37,9 @@ import {
   notify,
 } from '@/lib/notify'
 
-const SNAPSHOT = (id) => `psyllabus:plan-today:${id}`
-
-function readSnapshot(id) {
-  try {
-    return JSON.parse(localStorage.getItem(SNAPSHOT(id)) || 'null')
-  } catch {
-    return null
-  }
-}
-
-function writeSnapshot(id, snap) {
-  try {
-    if (snap) localStorage.setItem(SNAPSHOT(id), JSON.stringify(snap))
-    else localStorage.removeItem(SNAPSHOT(id))
-  } catch {
-    /* today will simply re-plan on the next visit */
-  }
-}
-
 /** A calendar older than this is refreshed when the plan opens. */
 const STALE_MS = 3 * 60 * 60 * 1000
 const BLOCKS = (id) => `psyllabus:plan-blocks:${id}`
-
-/** Timed, busy events from the student's own calendars, as the engine wants them. */
-const toBusy = (rows) =>
-  (rows || []).filter((r) => !r.all_day && !r.transparent).map((r) => ({ start: r.starts_at, end: r.ends_at }))
 
 const fmt = (m) => (m >= 60 ? `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, '0')}m` : `${m} min`)
 
@@ -120,109 +94,39 @@ export default function StudyPlanPage() {
       // Read once, on the client: "today" is the student's day, not the
       // server's, and reading the clock while rendering would be impure.
       const at = new Date()
-      const midnight = new Date(at.getFullYear(), at.getMonth(), at.getDate())
-      const weekAgo = dateKey(new Date(at.getFullYear(), at.getMonth(), at.getDate() - 7))
-      const horizonEnd = new Date(at.getFullYear(), at.getMonth(), at.getDate() + 15).toISOString()
+      const inputs = await loadPlanInputs(supabase, { userId: user.id, profile: profileData, at })
 
-      // Free accounts plan only against the subject they can actually open.
-      const usable = accessibleSubjects(profileData)
-
-      const [syllabusRows, { data: progressRows }, mistakesResult, eventsResult, adjustmentsResult, todayResult, busyResult, connectionsResult] =
-        await Promise.all([
-          getSyllabus(supabase, usable),
-          supabase.from('progress').select('*').eq('user_id', user.id),
-          supabase.from('mistakes').select('subject, next_review_at').eq('user_id', user.id).lte('next_review_at', horizonEnd),
-          supabase.from('calendar_events').select('*').eq('user_id', user.id).eq('completed', false),
-          supabase.from('plan_adjustments').select('task_id, kind, on_date, to_date').eq('user_id', user.id).gte('on_date', weekAgo),
-          // What was quizzed today: finishing a task's quiz is what marks it done.
-          supabase.from('quiz_attempts').select('subject, subtopic').eq('user_id', user.id).gte('completed_at', midnight.toISOString()),
-          // The student's own calendars: busy time comes out of their free time.
-          supabase.from('calendar_busy').select('starts_at, ends_at, all_day, transparent').gte('ends_at', midnight.toISOString()).lte('starts_at', horizonEnd),
-          supabase.from('calendar_connections').select('id, last_synced_at'),
-        ])
-
-      const eff = buildEffectiveProgressMap(progressRows)
       setProfile(profileData)
-      setItems(
-        (syllabusRows || []).map((row) => ({ ...row, status: eff[progressKey(row.subject, row.subtopic)] || 'not_started' }))
-      )
-      setEffective(eff)
-      setDetails(buildProgressDetailMap(progressRows))
-      setEvents(eventsResult?.data || [])
-      setMistakes(mistakesResult?.data || [])
-      setAdjustments(adjustmentsResult?.data || [])
-      setQuizzedToday(new Set((todayResult?.data || []).filter((a) => a.subtopic).map((a) => progressKey(a.subject, a.subtopic))))
-      setBusy(toBusy(busyResult?.data))
-      setCovered(await getCoveredSubtopics(supabase))
+      setItems(inputs.items)
+      setEffective(inputs.effective)
+      setDetails(inputs.details)
+      setEvents(inputs.events)
+      setMistakes(inputs.mistakes)
+      setAdjustments(inputs.adjustments)
+      setQuizzedToday(inputs.quizzedToday)
+      setBusy(inputs.busy)
+      setCovered(inputs.covered)
       setSnapshot(readSnapshot(profileData.id))
       setNow(at)
       setLoading(false)
 
       // Refresh connected calendars that are getting old, then re-read them.
       // In the background: the plan is already on screen from the last copy.
-      const stale = (connectionsResult?.data || []).some(
+      const stale = inputs.connections.some(
         (c) => !c.last_synced_at || at.getTime() - new Date(c.last_synced_at).getTime() > STALE_MS
       )
       if (stale) {
         const res = await fetch('/api/calendar/sync', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' }).catch(() => null)
-        if (res?.ok) {
-          const { data } = await supabase
-            .from('calendar_busy')
-            .select('starts_at, ends_at, all_day, transparent')
-            .gte('ends_at', midnight.toISOString())
-            .lte('starts_at', horizonEnd)
-          setBusy(toBusy(data))
-        }
+        if (res?.ok) setBusy(await loadBusy(supabase, at))
       }
     }
     load()
   }, [router, supabase])
 
-  /**
-   * The examined subjects. TOK, the Extended Essay and CAS are coursework and
-   * service, not syllabuses to be tested topic by topic: an "Extended Essay
-   * exam in 560 days" countdown is wrong, and so is a plan sending you to quiz
-   * CAS. Left out here as they are from the predicted total.
-   */
-  const subjects = useMemo(
-    () => accessibleSubjects(profile).filter((s) => !IB_CORE_SUBJECTS.includes(s)),
-    [profile]
-  )
-  const planItems = useMemo(() => items.filter((i) => subjects.includes(i.subject)), [items, subjects])
-  const settings = useMemo(() => resolveSettings(profile), [profile])
-  const configured = Boolean(profile?.plan_settings && Object.keys(profile.plan_settings).length)
-
-  const { predicted, sizes, topicsBySubject } = useMemo(() => {
-    const predicted = {}
-    const sizes = {}
-    const topicsBySubject = {}
-    for (const subject of subjects) {
-      const rows = items.filter((r) => r.subject === subject)
-      sizes[subject] = rows.length
-      predicted[subject] = predictSubject(subject, rows, effective, profile?.curriculum).grade
-      const firstAt = new Map()
-      for (const r of rows) if (!firstAt.has(r.topic) || (r.position ?? 0) < firstAt.get(r.topic)) firstAt.set(r.topic, r.position ?? 0)
-      topicsBySubject[subject] = [...firstAt].sort((a, b) => a[1] - b[1]).map(([t]) => t)
-    }
-    return { predicted, sizes, topicsBySubject }
-  }, [subjects, items, effective, profile])
-
-  const candidates = useMemo(
-    () =>
-      now
-        ? buildCandidates({ items: planItems, details, profile, settings, predicted, subjectSizes: sizes, events, covered, now })
-        : [],
-    [now, planItems, details, profile, settings, predicted, sizes, events, covered]
-  )
-
-  const plan = useMemo(
-    () => (now ? buildPlan({ candidates, settings, mistakes, adjustments, keepToday: snapshot, busy, now }) : null),
-    [now, candidates, settings, mistakes, adjustments, snapshot, busy]
-  )
-
-  const deadline = useMemo(
-    () => (now ? nextDeadline({ events, profile, settings, subjects, now }) : null),
-    [now, events, profile, settings, subjects]
+  // Planned the same way the dashboard plans it (lib/plan-data.js).
+  const { subjects, settings, configured, topicsBySubject, candidates, plan, deadline } = useMemo(
+    () => computePlan({ profile, items, effective, details, events, mistakes, adjustments, busy, covered, snapshot, now }),
+    [profile, items, effective, details, events, mistakes, adjustments, busy, covered, snapshot, now]
   )
 
   /**
@@ -235,10 +139,9 @@ export default function StudyPlanPage() {
    */
   useEffect(() => {
     if (!plan || !profile || !configured) return
-    const today = plan.days[0]
-    if (snapshot?.date === today.date) return
+    const snap = snapshotFor(plan, snapshot)
+    if (!snap) return
     const keep = () => {
-      const snap = { date: today.date, tasks: today.tasks.map(({ steps, done, ...t }) => t) }
       writeSnapshot(profile.id, snap)
       setSnapshot(snap)
     }
@@ -312,17 +215,7 @@ export default function StudyPlanPage() {
     setSnapshot(null)
   }, [profile])
 
-  const isDone = useCallback(
-    (task) => {
-      if (task.kind === 'review') {
-        const end = now ? new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1) : null
-        return !mistakes.some((m) => m.subject === task.subject && end && new Date(m.next_review_at) < end)
-      }
-      if (task.done) return true
-      return task.quizzable && quizzedToday.has(task.key)
-    },
-    [mistakes, quizzedToday, now]
-  )
+  const isDone = useCallback((task) => isTaskDone(task, { mistakes, quizzedToday, now }), [mistakes, quizzedToday, now])
 
   const quizHref = (task) =>
     `/dashboard/quiz?subject=${encodeURIComponent(task.subject)}&topic=${encodeURIComponent(task.topic)}&subtopic=${encodeURIComponent(task.subtopic)}&back=/dashboard/study-plan`

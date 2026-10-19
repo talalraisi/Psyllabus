@@ -11,7 +11,9 @@ import { Page, PageHeader, Section, StatRow, PageLoading } from '@/components/Pa
 import CountUp from '@/components/CountUp'
 import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { IconChevronRight, IconArrowRight, IconCheck, IconClock } from '@/components/Icons'
-import { buildQueue, buildSession } from '@/lib/planner'
+import { readSnapshot, writeSnapshot, snapshotFor, loadPlanInputs, computePlan, isTaskDone } from '@/lib/plan-data'
+import { clock } from '@/components/plan/TodayPlan'
+import { WEEKDAYS } from '@/lib/study-plan'
 import { relativeDay } from '@/lib/calendar'
 import TodoList from '@/components/TodoList'
 import { getSlugForSubject } from '@/lib/subject-map'
@@ -23,10 +25,9 @@ import {
   displaySubtopic,
   STATUS_TEXT_COLORS,
 } from '@/lib/progress'
-import { buildEffectiveProgressMap, buildProgressDetailMap } from '@/lib/decay'
+import { buildEffectiveProgressMap } from '@/lib/decay'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
 import { hasAllSubjects, isSubjectLocked, accessibleSubjects } from '@/lib/access'
-import { getCoveredSubtopics } from '@/lib/coverage'
 import StudyHeatmap from '@/components/StudyHeatmap'
 import { studyIntervals, minutesPerDay } from '@/lib/study-time'
 
@@ -47,7 +48,24 @@ const REASON_STYLE = {
   foundation: 'text-[var(--brand)]',
   exam: 'text-[var(--status-weak)]',
   event: 'text-[var(--status-weak)] font-medium',
+  review: 'text-[var(--status-weak)]',
+  target: 'text-[var(--brand)]',
+  noquiz: 'text-[var(--text-faint)]',
 }
+
+/** Where a plan task's button goes, and what it says. */
+function actionFor(task) {
+  if (task.kind === 'review') return { href: '/dashboard/mistakes', label: 'Review' }
+  if (task.quizzable && task.subtopic) {
+    return {
+      href: `/dashboard/quiz?subject=${encodeURIComponent(task.subject)}&topic=${encodeURIComponent(task.topic)}&subtopic=${encodeURIComponent(task.subtopic)}&back=/dashboard`,
+      label: 'Quiz',
+    }
+  }
+  return { href: `/dashboard/syllabus/${getSlugForSubject(task.subject)}`, label: 'Open' }
+}
+
+const taskTitle = (task) => (task.kind === 'review' ? 'Mistakes due back' : displaySubtopic(task.subtopic))
 
 /**
  * A percentage you can see at a glance.
@@ -106,7 +124,8 @@ export default function Dashboard() {
   const [nextEvent, setNextEvent] = useState(null)
   const [overall, setOverall] = useState(0)
   const [counts, setCounts] = useState({ mastered: 0, weak: 0, decaying: 0, due: 0, tested: 0 })
-  const [session, setSession] = useState({ items: [], perItemMinutes: 0 })
+  // The first day on the study plan with something left on it, and what.
+  const [upNext, setUpNext] = useState(null)
   // Minutes studied per local day for the past five years: quizzes and the
   // session timer, with any time covered by both counted once.
   const [studyDays, setStudyDays] = useState([])
@@ -215,20 +234,33 @@ export default function Dashboard() {
       })
       setOverall(merged.length ? Math.round((mastered / merged.length) * 100) : 0)
 
-      // What a student can actually sit today, so the one thing this page
-      // tells them to do is not a subtopic whose only button says
-      // "Questions coming soon".
-      const covered = await getCoveredSubtopics(supabase)
-
-      const queue = buildQueue({
-        items: merged,
-        details: buildProgressDetailMap(progressRows),
-        subjectMastery: stats,
+      // What to do next is whatever the study plan says, planned the same
+      // way and reading the same kept day (lib/plan-data.js), so the two
+      // pages can never name different things.
+      const at = new Date()
+      const inputs = await loadPlanInputs(supabase, {
+        userId: user.id,
         profile: profileData,
+        at,
+        progressRows: progressRows || [],
         events: eventsResult?.data || [],
-        covered,
       })
-      setSession(buildSession(queue, { minutes: profileData.session_minutes || undefined }))
+      const held = readSnapshot(profileData.id)
+      const { plan, configured } = computePlan({ profile: profileData, ...inputs, snapshot: held, now: at })
+      if (configured) {
+        const snap = snapshotFor(plan, held)
+        if (snap) writeSnapshot(profileData.id, snap)
+      }
+      const doneToday = (t) => isTaskDone(t, { mistakes: inputs.mistakes, quizzedToday: inputs.quizzedToday, now: at })
+      let next = null
+      for (const [i, day] of (plan?.days || []).entries()) {
+        const left = i === 0 ? day.tasks.filter((t) => !doneToday(t)) : day.tasks
+        if (left.length) {
+          next = { today: i === 0, date: day.date, tasks: left }
+          break
+        }
+      }
+      setUpNext(next)
 
       const pending = (eventsResult?.data || [])
         .filter((e) => new Date(e.due_at).getTime() >= Date.now())
@@ -273,8 +305,9 @@ export default function Dashboard() {
   // to-do list that long is one nobody opens.
   // The one thing to do, and the two after it. The planner already ranks the
   // whole queue; a dashboard's job is to name the top of it, not reprint it.
-  const [nextUp, ...afterThat] = session.items
+  const [nextUp, ...afterThat] = upNext?.tasks || []
   const queued = afterThat.slice(0, 3)
+  const upNextDay = upNext && !upNext.today ? WEEKDAYS[new Date(`${upNext.date}T12:00:00`).getDay()] : null
 
   /**
    * The second line of the header.
@@ -378,7 +411,7 @@ export default function Dashboard() {
                 Open {firstSubject || 'my subjects'}
                 <IconArrowRight width={16} height={16} />
               </Link>
-              {nextUp && (
+              {nextUp?.subtopic && nextUp.quizzable && (
                 <Link
                   href={`/dashboard/quiz?subject=${encodeURIComponent(nextUp.subject)}&topic=${encodeURIComponent(nextUp.topic)}&subtopic=${encodeURIComponent(nextUp.subtopic)}&count=5&review=practice&back=/dashboard`}
                   className="btn btn-outline control-md"
@@ -397,14 +430,20 @@ export default function Dashboard() {
               className="text-[10.5px] font-semibold uppercase tracking-[0.16em]"
               style={{ color: 'var(--text-faint)' }}
             >
-              Next up
+              {upNextDay ? `Next up · ${upNextDay}` : 'Next up'}
             </p>
 
             <h2 className="mt-3 text-[clamp(1.35rem,2.8vw,1.8rem)] font-semibold leading-tight tracking-[-0.028em]">
-              {displaySubtopic(nextUp.subtopic)}
+              {taskTitle(nextUp)}
             </h2>
-            <p className="mt-2 text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
-              {nextUp.subject} · {nextUp.topic}
+            <p className="mt-2 text-[13.5px] tabular-nums" style={{ color: 'var(--text-muted)' }}>
+              {[
+                nextUp.subject,
+                nextUp.topic,
+                nextUp.start != null && !nextUp.overflow ? `${clock(nextUp.start)} · ${nextUp.minutes} min` : `${nextUp.minutes} min`,
+              ]
+                .filter(Boolean)
+                .join(' · ')}
             </p>
 
             {nextUp.reasons?.length > 0 && (
@@ -421,14 +460,14 @@ export default function Dashboard() {
             )}
 
             <div className="mt-7 flex flex-wrap items-center gap-3">
-              <Link
-                href={`/dashboard/quiz?subject=${encodeURIComponent(nextUp.subject)}&topic=${encodeURIComponent(nextUp.topic)}&subtopic=${encodeURIComponent(nextUp.subtopic)}&back=/dashboard`}
-                className="btn btn-solid control-lg"
-              >
-                Sit this one
+              <Link href={actionFor(nextUp).href} className="btn btn-solid control-lg">
+                {nextUp.kind === 'review' ? 'Review them' : actionFor(nextUp).label === 'Quiz' ? 'Sit this one' : 'Open it'}
                 <IconArrowRight width={16} height={16} />
               </Link>
-              {counts.due > 0 && (
+              <Link href="/dashboard/study-plan" className="btn btn-outline control-md">
+                Today&apos;s plan
+              </Link>
+              {counts.due > 0 && nextUp.kind !== 'review' && (
                 <Link
                   href="/dashboard/quiz?mode=mistakes&back=/dashboard"
                   className="btn btn-outline control-md"
@@ -550,22 +589,20 @@ export default function Dashboard() {
                     style={{ borderColor: 'var(--border)' }}
                   >
                     <span
-                      className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_COLORS[item.status]}`}
+                      className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_COLORS[item.status] || 'bg-[var(--status-weak)]'}`}
                       aria-hidden="true"
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
+                      <p className="truncate text-[11.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
+                        {item.start != null && !item.overflow ? `${clock(item.start)} · ` : ''}
                         {item.subject}
                       </p>
                       <p className="mt-0.5 truncate text-[13.5px]" style={{ color: 'var(--text-body)' }}>
-                        {displaySubtopic(item.subtopic)}
+                        {taskTitle(item)}
                       </p>
                     </div>
-                    <Link
-                      href={`/dashboard/quiz?subject=${encodeURIComponent(item.subject)}&topic=${encodeURIComponent(item.topic)}&subtopic=${encodeURIComponent(item.subtopic)}&back=/dashboard`}
-                      className="btn btn-quiet control-sm shrink-0"
-                    >
-                      Quiz
+                    <Link href={actionFor(item).href} className="btn btn-quiet control-sm shrink-0">
+                      {actionFor(item).label}
                     </Link>
                   </li>
                 ))}
