@@ -94,7 +94,7 @@ function SubjectMap() {
       <Page width="wide">
         <PageHeader
           title="Subject map"
-          subtitle="Your course as a web: themes, then units, then the subtopics themselves."
+          subtitle="Pick a node to see where you stand."
         />
 
         <Link
