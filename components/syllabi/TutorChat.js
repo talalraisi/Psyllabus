@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import MathText from '@/components/MathText'
 import SyllabiMark from '@/components/SyllabiMark'
+import SubjectOrbit, { subjectCode } from '@/components/syllabi/SubjectOrbit'
 
 /**
  * Asking Syllabi something, as a conversation.
@@ -15,6 +16,17 @@ import SyllabiMark from '@/components/SyllabiMark'
 
 const MAX = 2000
 const KEY = (subject) => `psyllabus:tutor:${subject || 'general'}`
+const LAST = 'psyllabus:tutor:last'
+
+/** The subject this tab was last talking about, if it is still one of theirs. */
+function lastSubject(subjects) {
+  try {
+    const s = sessionStorage.getItem(LAST)
+    return s && subjects.includes(s) ? s : ''
+  } catch {
+    return ''
+  }
+}
 
 function load(subject) {
   try {
@@ -98,9 +110,9 @@ function Answer({ text }) {
 }
 
 export default function TutorChat({ subjects = [], topicsFor }) {
-  const [subject, setSubject] = useState(subjects[0] || '')
+  const [subject, setSubject] = useState(() => (typeof window === 'undefined' ? '' : lastSubject(subjects)))
   const [topic, setTopic] = useState('')
-  const [messages, setMessages] = useState(() => (typeof window === 'undefined' ? [] : load(subjects[0] || '')))
+  const [messages, setMessages] = useState(() => (typeof window === 'undefined' ? [] : load(lastSubject(subjects))))
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState(null)
@@ -122,8 +134,14 @@ export default function TutorChat({ subjects = [], topicsFor }) {
     if (busy) return
     setSubject(s)
     setTopic('')
-    setMessages(load(s))
+    setMessages(s ? load(s) : [])
     setNotice(null)
+    try {
+      if (s) sessionStorage.setItem(LAST, s)
+      else sessionStorage.removeItem(LAST)
+    } catch {
+      /* it will just ask again next time */
+    }
   }
 
   const send = async (text) => {
@@ -194,24 +212,32 @@ export default function TutorChat({ subjects = [], topicsFor }) {
     'Check my answer to a question',
   ]
 
+  // First, the orbit: which subject is this about?
+  if (!subject && subjects.length > 0) {
+    return <SubjectOrbit subjects={subjects} onPick={switchSubject} />
+  }
+
   return (
-    <div className="flex flex-col">
-      {/* What we are talking about. */}
+    <div className="pop-enter flex flex-col">
+      {/* What we are talking about, and the way back to the orbit. */}
       <div className="mb-3 flex flex-wrap items-center gap-2">
         {subjects.length > 0 && (
-          <select
-            value={subject}
-            onChange={(e) => switchSubject(e.target.value)}
+          <button
+            type="button"
+            onClick={() => switchSubject('')}
             disabled={busy}
-            aria-label="Subject"
-            className="input h-9 w-auto max-w-[16rem] px-3 text-[16px] sm:text-[13px]"
+            title="Pick another subject"
+            className="flex h-9 items-center gap-2 rounded-full border pl-1 pr-3 text-[13px] font-medium transition-colors hover:bg-[var(--surface-sunken)] disabled:opacity-50"
+            style={{ borderColor: 'var(--border-strong)' }}
           >
-            {subjects.map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
-            ))}
-          </select>
+            <span className="flex h-7 w-7 items-center justify-center rounded-full text-[10.5px] font-semibold" style={{ background: 'var(--text)', color: 'var(--bg)' }}>
+              {subjectCode(subject)}
+            </span>
+            <span className="max-w-[14rem] truncate">{subject}</span>
+            <span aria-hidden="true" style={{ color: 'var(--text-faint)' }}>
+              ⇄
+            </span>
+          </button>
         )}
         {topics.length > 0 && (
           <select
