@@ -27,7 +27,7 @@ import { buildEffectiveProgressMap, buildProgressDetailMap } from '@/lib/decay'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
 import { hasAllSubjects, isSubjectLocked, accessibleSubjects } from '@/lib/access'
 import { getCoveredSubtopics } from '@/lib/coverage'
-import { ActivityHeatmap, toKey } from '@/components/ui/activity-heatmap'
+import StudyHeatmap, { dayKey } from '@/components/StudyHeatmap'
 
 function greeting(now) {
   const hour = now.getHours()
@@ -92,16 +92,6 @@ function Ring({ percent }) {
   )
 }
 
-/** Minutes as a person would say them: "<1 min", "25 min", "2h 05m". */
-function formatStudyTime(minutes) {
-  if (minutes <= 0) return '0 min'
-  if (minutes < 1) return '<1 min'
-  if (minutes < 60) return `${Math.round(minutes)} min`
-  const h = Math.floor(minutes / 60)
-  const m = Math.round(minutes - h * 60)
-  return `${h}h ${String(m).padStart(2, '0')}m`
-}
-
 export default function Dashboard() {
   const [profile, setProfile] = useState(null)
   const [subjectStats, setSubjectStats] = useState({})
@@ -116,7 +106,7 @@ export default function Dashboard() {
   const [overall, setOverall] = useState(0)
   const [counts, setCounts] = useState({ mastered: 0, weak: 0, decaying: 0, due: 0, tested: 0 })
   const [session, setSession] = useState({ items: [], perItemMinutes: 0 })
-  // Minutes of questions answered, per local day, for the past year.
+  // Minutes of questions answered, per local day, for the past five years.
   const [studyDays, setStudyDays] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -150,8 +140,12 @@ export default function Dashboard() {
        * On a database in Singapore that is a couple of hundred milliseconds off
        * every dashboard load, every time.
        */
-      const yearAgo = new Date()
-      yearAgo.setFullYear(yearAgo.getFullYear() - 1)
+      // Five years back, the longest frame the heatmap offers. The rows are
+      // two small columns each, so even a heavy user's five years is a few
+      // thousand of them at most.
+      const since = new Date()
+      since.setFullYear(since.getFullYear() - 5)
+      since.setMonth(0, 1)
       const [profileData, { data: progressRows }, { count: dueCount }, eventsResult, attemptsResult] =
         await Promise.all([
           getProfile(supabase, user.id, { onFresh: setProfile }),
@@ -178,7 +172,7 @@ export default function Dashboard() {
             .from('quiz_attempts')
             .select('completed_at, elapsed_seconds')
             .eq('user_id', user.id)
-            .gte('completed_at', yearAgo.toISOString()),
+            .gte('completed_at', since.toISOString()),
         ])
 
       if (!profileData) {
@@ -243,7 +237,7 @@ export default function Dashboard() {
       const perDay = new Map()
       for (const a of attemptsResult?.data || []) {
         if (!a.completed_at || !a.elapsed_seconds) continue
-        const key = toKey(new Date(a.completed_at))
+        const key = dayKey(new Date(a.completed_at))
         perDay.set(key, (perDay.get(key) || 0) + a.elapsed_seconds / 60)
       }
       setStudyDays([...perDay].map(([date, value]) => ({ date, value })))
@@ -526,13 +520,7 @@ export default function Dashboard() {
               className="rounded-[16px] border p-5 sm:p-6"
               style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
             >
-              <ActivityHeatmap
-                data={studyDays}
-                days={182}
-                cellSize={13}
-                color="var(--brand)"
-                formatValue={formatStudyTime}
-              />
+              <StudyHeatmap data={studyDays} />
             </div>
           </Section>
         )}
