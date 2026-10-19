@@ -508,7 +508,7 @@ export default function CalendarPage() {
           )}
         </Section>
 
-        <Section title="Connected calendars">
+        <Section>
           <CalendarConnections connections={connections} feedToken={feedToken} origin={origin} onChanged={loadEcosystem} />
         </Section>
 

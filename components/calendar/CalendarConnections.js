@@ -1,67 +1,53 @@
 'use client'
 
 /**
- * The two doors of the calendar ecosystem.
+ * The two doors of the calendar ecosystem, kept short.
  *
- * In: connect your own calendar by its private link, so the plan schedules
- * around your life and offers your tests as Psyllabus tests. Out: a private
- * subscription link that puts your study plan and test dates into the
- * calendar on your phone.
+ * In: paste your calendar's private link and the plan works around it.
+ * Out: one link that puts your study plan on your phone.
  *
- * The private link is the fiddly part for a student, so each provider gets
- * its exact steps. Once pasted it is never shown back: a calendar's private
- * address is a key to it, and the screen is somewhere other people look.
+ * The first version explained everything up front and read as a wall of
+ * text. Each half is now a title, one line, and the action; the
+ * step-by-step for each provider is behind "How?" for whoever needs it.
  */
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase'
 
-const PROVIDERS = {
-  google: {
-    name: 'Google Calendar',
-    steps: [
-      'On a computer, open calendar.google.com.',
-      'Click the gear icon, then Settings.',
-      'On the left, under "Settings for my calendars", click your calendar.',
-      'Scroll to "Integrate calendar" and copy "Secret address in iCal format".',
-    ],
-  },
-  apple: {
-    name: 'Apple Calendar',
-    steps: [
-      'On your iPhone, open Calendar and tap Calendars at the bottom.',
-      'Tap the ⓘ next to your calendar.',
-      'Turn on "Public Calendar", then tap "Share Link…" and Copy.',
-      'Anyone with that link can see that calendar, so keep it to yourself.',
-    ],
-  },
-  outlook: {
-    name: 'Outlook',
-    steps: [
-      'Open outlook.com (or Outlook on the web) and go to Settings → Calendar.',
-      'Choose "Shared calendars", then "Publish a calendar".',
-      'Pick your calendar and "Can view all details", then Publish.',
-      'Copy the ICS link.',
-    ],
-  },
+const STEPS = {
+  Google: ['Open calendar.google.com on a computer', 'Settings → your calendar → Integrate calendar', 'Copy "Secret address in iCal format"'],
+  Apple: ['Calendar app → Calendars → ⓘ next to your calendar', 'Turn on Public Calendar → Share Link → Copy'],
+  Outlook: ['outlook.com → Settings → Calendar → Shared calendars', 'Publish a calendar → copy the ICS link'],
+}
+const SUBSCRIBE = {
+  Google: 'calendar.google.com → + next to Other calendars → From URL → paste',
+  Outlook: 'Add calendar → Subscribe from web → paste',
 }
 
 const ago = (iso) => {
   if (!iso) return 'not yet'
   const m = Math.round((Date.now() - new Date(iso).getTime()) / 60000)
   if (m < 1) return 'just now'
-  if (m < 60) return `${m} min ago`
+  if (m < 60) return `${m}m ago`
   const h = Math.round(m / 60)
   return h < 24 ? `${h}h ago` : `${Math.round(h / 24)}d ago`
 }
 
-const field = 'input h-9 px-3 text-[16px] sm:text-[13px]'
+function How({ children }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="mt-2">
+      <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} className="text-[12px] font-medium text-[var(--brand)] hover:underline">
+        {open ? 'Hide' : 'How?'}
+      </button>
+      {open && <div className="mt-2 text-[12px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>{children}</div>}
+    </div>
+  )
+}
 
 export default function CalendarConnections({ connections, feedToken, origin, onChanged }) {
-  const [provider, setProvider] = useState('google')
   const [url, setUrl] = useState('')
-  const [label, setLabel] = useState('')
-  const [busy, setBusy] = useState(null) // 'connect' | 'sync' | 'feed' | connection id
+  const [busy, setBusy] = useState(null)
   const [error, setError] = useState(null)
   const [copied, setCopied] = useState(false)
   const supabase = createClient()
@@ -71,27 +57,20 @@ export default function CalendarConnections({ connections, feedToken, origin, on
     if (!url.trim()) return
     setBusy('connect')
     setError(null)
+    // Named from the link itself, so there is one box to fill in, not two.
+    const name = /google/i.test(url) ? 'Google Calendar' : /icloud|apple/i.test(url) ? 'Apple Calendar' : /outlook|office|live\.com/i.test(url) ? 'Outlook' : 'My calendar'
     const res = await fetch('/api/calendar/sync', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ url, label: label || PROVIDERS[provider].name }),
+      body: JSON.stringify({ url, label: name }),
     }).catch(() => null)
     const body = await res?.json().catch(() => ({}))
     setBusy(null)
     if (!res?.ok) {
-      setError(body?.error || 'That did not work. Check your connection and try again.')
+      setError(body?.error || 'That did not work. Try again.')
       return
     }
     setUrl('')
-    setLabel('')
-    onChanged?.()
-  }
-
-  const syncNow = async () => {
-    setBusy('sync')
-    setError(null)
-    await fetch('/api/calendar/sync', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ force: true }) }).catch(() => null)
-    setBusy(null)
     onChanged?.()
   }
 
@@ -113,113 +92,72 @@ export default function CalendarConnections({ connections, feedToken, origin, on
   }
 
   const feedUrl = feedToken ? `${origin}/api/calendar/feed/${feedToken}.ics` : null
-  const webcal = feedUrl?.replace(/^https?:/, 'webcal:')
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <section className="rounded-[14px] border p-5" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
-        <h3 className="text-[14px] font-semibold tracking-[-0.01em]">Your calendar, in your plan</h3>
-        <p className="mt-0.5 text-[12.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-          Connect the calendar you already use. Your plan works around everything in it, and anything that looks like a
-          test is offered as one. Only times and titles are read — never locations, notes or who is invited.
+    <div className="grid gap-4 lg:grid-cols-2">
+      <section className="rounded-[14px] border p-5" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
+        <h3 className="text-[14px] font-semibold">Connect your calendar</h3>
+        <p className="mt-0.5 text-[12.5px]" style={{ color: 'var(--text-muted)' }}>
+          Your plan works around it.
         </p>
 
-        {connections.length > 0 && (
-          <ul className="mt-4 flex flex-col">
-            {connections.map((c) => (
-              <li key={c.id} className="flex items-center justify-between gap-3 border-b py-2.5 last:border-b-0" style={{ borderColor: 'var(--border)' }}>
-                <div className="min-w-0">
-                  <p className="truncate text-[13px] font-medium">{c.label}</p>
-                  <p className="text-[11.5px]" style={{ color: c.last_error ? 'var(--status-weak)' : 'var(--text-muted)' }}>
-                    {c.last_error ? c.last_error : `${c.event_count} event${c.event_count === 1 ? '' : 's'} in the next six weeks · updated ${ago(c.last_synced_at)}`}
-                  </p>
-                </div>
-                <button type="button" onClick={() => disconnect(c)} disabled={busy === c.id} className="shrink-0 text-[12px] font-medium hover:underline" style={{ color: 'var(--text-muted)' }}>
-                  {busy === c.id ? 'Removing…' : 'Disconnect'}
-                </button>
-              </li>
-            ))}
-            <li className="pt-2">
-              <button type="button" onClick={syncNow} disabled={busy === 'sync'} className="text-[12px] font-medium text-[var(--brand)] hover:underline">
-                {busy === 'sync' ? 'Updating…' : 'Update now'}
-              </button>
-            </li>
-          </ul>
-        )}
-
-        <form onSubmit={connect} className="mt-4 border-t pt-4" style={{ borderColor: 'var(--border)' }}>
-          <div role="tablist" aria-label="Where your calendar is" className="flex flex-wrap gap-1.5">
-            {Object.entries(PROVIDERS).map(([key, p]) => (
-              <button
-                key={key}
-                type="button"
-                role="tab"
-                aria-selected={provider === key}
-                onClick={() => setProvider(key)}
-                className="rounded-full border px-3 py-1 text-[12px] transition-colors"
-                style={{
-                  borderColor: provider === key ? 'var(--brand)' : 'var(--border)',
-                  background: provider === key ? 'color-mix(in srgb, var(--brand) 10%, var(--surface))' : 'var(--surface)',
-                  color: provider === key ? 'var(--text)' : 'var(--text-muted)',
-                }}
-              >
-                {p.name}
-              </button>
-            ))}
-          </div>
-          <ol className="mt-3 flex list-decimal flex-col gap-1 pl-5 text-[12.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-            {PROVIDERS[provider].steps.map((s) => (
-              <li key={s}>{s}</li>
-            ))}
-          </ol>
-          <input
-            type="text"
-            maxLength={80}
-            value={label}
-            onChange={(e) => setLabel(e.target.value)}
-            placeholder={`Name it (optional) — e.g. School timetable`}
-            aria-label="Name for this calendar"
-            className={`${field} mt-3 w-full`}
-          />
-          <div className="mt-2 flex flex-col gap-2 sm:flex-row">
-            <input
-              type="url"
-              inputMode="url"
-              autoComplete="off"
-              spellCheck={false}
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="Paste the link here"
-              aria-label="Private calendar link"
-              className={`${field} flex-1`}
-            />
-            <button type="submit" disabled={!url.trim() || busy === 'connect'} className="btn btn-solid control-sm shrink-0">
-              {busy === 'connect' ? 'Reading it…' : 'Connect'}
+        {connections.map((c) => (
+          <div key={c.id} className="mt-3 flex items-center justify-between gap-3 text-[12.5px]">
+            <span className="min-w-0 truncate">
+              <span className="font-medium">{c.label}</span>
+              <span style={{ color: c.last_error ? 'var(--status-weak)' : 'var(--text-faint)' }}> · {c.last_error ? 'needs a new link' : ago(c.last_synced_at)}</span>
+            </span>
+            <button type="button" onClick={() => disconnect(c)} disabled={busy === c.id} className="shrink-0 hover:underline" style={{ color: 'var(--text-muted)' }}>
+              Remove
             </button>
           </div>
-          {error && (
-            <p role="alert" className="mt-2 text-[12.5px]" style={{ color: 'var(--status-weak)' }}>
-              {error}
-            </p>
-          )}
+        ))}
+
+        <form onSubmit={connect} className="mt-3 flex gap-2">
+          <input
+            type="url"
+            inputMode="url"
+            autoComplete="off"
+            spellCheck={false}
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="Paste your calendar link"
+            aria-label="Private calendar link"
+            className="input h-9 flex-1 px-3 text-[16px] sm:text-[13px]"
+          />
+          <button type="submit" disabled={!url.trim() || busy === 'connect'} className="btn btn-solid control-sm shrink-0">
+            {busy === 'connect' ? '…' : 'Connect'}
+          </button>
         </form>
+        {error && (
+          <p role="alert" className="mt-2 text-[12px]" style={{ color: 'var(--status-weak)' }}>
+            {error}
+          </p>
+        )}
+        <How>
+          {Object.entries(STEPS).map(([name, steps]) => (
+            <p key={name} className="mb-1.5">
+              <span className="font-medium" style={{ color: 'var(--text-body)' }}>{name}:</span> {steps.join(' → ')}
+            </p>
+          ))}
+          <p style={{ color: 'var(--text-faint)' }}>Only times and titles are read.</p>
+        </How>
       </section>
 
-      <section className="rounded-[14px] border p-5" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
-        <h3 className="text-[14px] font-semibold tracking-[-0.01em]">Your plan, in your calendar</h3>
-        <p className="mt-0.5 text-[12.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-          Subscribe once and your study blocks and test dates appear in the calendar on your phone, with their reminders,
-          and keep themselves up to date.
+      <section className="rounded-[14px] border p-5" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
+        <h3 className="text-[14px] font-semibold">Plan on your phone</h3>
+        <p className="mt-0.5 text-[12.5px]" style={{ color: 'var(--text-muted)' }}>
+          Study blocks and tests in your phone&apos;s calendar.
         </p>
 
         {!feedToken ? (
-          <button type="button" onClick={() => makeFeed()} disabled={busy === 'feed'} className="btn btn-solid control-sm mt-4">
-            {busy === 'feed' ? 'Making your link…' : 'Get my calendar link'}
+          <button type="button" onClick={() => makeFeed()} disabled={busy === 'feed'} className="btn btn-solid control-sm mt-3">
+            Get link
           </button>
         ) : (
-          <div className="mt-4">
-            <div className="flex flex-wrap gap-2">
-              <a href={webcal} className="btn btn-solid control-sm">
+          <>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <a href={feedUrl.replace(/^https?:/, 'webcal:')} className="btn btn-solid control-sm">
                 Add to Apple Calendar
               </a>
               <button
@@ -237,23 +175,20 @@ export default function CalendarConnections({ connections, feedToken, origin, on
                 {copied ? 'Copied' : 'Copy link'}
               </button>
             </div>
-            <ul className="mt-3 flex flex-col gap-1.5 text-[12.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-              <li>
-                <span className="font-medium">Google Calendar:</span> on a computer, click + next to “Other calendars”, choose
-                “From URL”, and paste the link. Google updates it on its own schedule, sometimes only once a day.
-              </li>
-              <li>
-                <span className="font-medium">Outlook:</span> Add calendar → Subscribe from web, and paste the link.
-              </li>
-            </ul>
-            <p className="mt-3 text-[11.5px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
-              Anyone with this link can see your study plan and test dates, so do not share it. If it gets out,{' '}
-              <button type="button" onClick={() => makeFeed(true)} disabled={busy === 'feed'} className="font-medium underline">
-                make a new one
-              </button>{' '}
-              and the old one stops working.
-            </p>
-          </div>
+            <How>
+              {Object.entries(SUBSCRIBE).map(([name, step]) => (
+                <p key={name} className="mb-1.5">
+                  <span className="font-medium" style={{ color: 'var(--text-body)' }}>{name}:</span> {step}
+                </p>
+              ))}
+              <p style={{ color: 'var(--text-faint)' }}>
+                Keep the link private.{' '}
+                <button type="button" onClick={() => makeFeed(true)} className="underline">
+                  New link
+                </button>
+              </p>
+            </How>
+          </>
         )}
       </section>
     </div>
