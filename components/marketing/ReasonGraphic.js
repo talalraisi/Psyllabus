@@ -21,9 +21,10 @@
  * breaks, and they end up looking like fragments of the product — which is
  * what they are meant to be.
  *
- * Server component, same as StepGraphic: a label-to-graphic map exported
- * across a 'use client' boundary arrives as an opaque reference and renders
- * holes. Taking the index as a prop sidesteps it.
+ * Server component on purpose: a label-to-graphic map exported across a
+ * 'use client' boundary arrives as an opaque reference and renders holes,
+ * which this page has been bitten by once. Taking the index as a prop
+ * sidesteps it, and with no client JS here the boundary never arises.
  */
 
 function Panel({ children }) {

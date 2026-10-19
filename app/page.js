@@ -9,7 +9,6 @@ import { Heatmap, DecayDemo, PlanDemo } from '@/components/marketing/interactive
 import { Reveal, ScrollBar, CountUp } from '@/components/marketing/scroll'
 import SiteNav from '@/components/marketing/SiteNav'
 import Roller from '@/components/marketing/Roller'
-import StepGraphic from '@/components/marketing/StepGraphic'
 import ReasonGraphic from '@/components/marketing/ReasonGraphic'
 import Drift from '@/components/marketing/Drift'
 import { FeatureModules } from '@/components/marketing/features'
@@ -140,7 +139,7 @@ export default async function Home() {
                 on the first screen. */}
             <p className="mt-6 text-[clamp(1.4rem,3.2vw,2.1rem)] font-semibold leading-tight tracking-[-0.028em]">
               <span style={{ color: 'var(--text-muted)' }}>For students of </span>
-              <Roller words={['the IB Diploma', 'A-Levels', 'AP']} style={{ color: 'var(--brand)' }} />
+              <Roller words={['AP', 'A-Levels', 'IBDP']} style={{ color: 'var(--brand)' }} />
             </p>
 
             <p
@@ -150,13 +149,15 @@ export default async function Home() {
               Every subtopic, coloured by what you proved in a quiz. Never by rating yourself.
             </p>
 
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-              <Link href="/signup" className="btn btn-solid control-lg">
-                Start free with one subject
+            {/* One button. The second was a scroll link to a section the
+                reader reaches anyway, so it competed with the only action
+                that matters for nothing. And "with one subject" was
+                explaining the pricing in the verb — sign-up says that
+                itself. */}
+            <div className="mt-10 flex justify-center">
+              <Link href="/signup" className="btn btn-outline control-lg">
+                Start free
                 <IconArrowRight width={16} height={16} />
-              </Link>
-              <Link href="#how-it-works" className="btn btn-outline control-lg">
-                See how it works
               </Link>
             </div>
           </div>
@@ -213,9 +214,6 @@ export default async function Home() {
                 <p className="mt-3 text-[14.5px] leading-[1.7]" style={{ color: 'var(--text-body)' }}>
                   {body}
                 </p>
-                <div className="mt-7">
-                  <StepGraphic step={step} />
-                </div>
               </Reveal>
             ))}
           </div>
