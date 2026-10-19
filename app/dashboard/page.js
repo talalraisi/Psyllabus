@@ -27,6 +27,7 @@ import { buildEffectiveProgressMap, buildProgressDetailMap } from '@/lib/decay'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
 import { hasAllSubjects, isSubjectLocked, accessibleSubjects } from '@/lib/access'
 import { getCoveredSubtopics } from '@/lib/coverage'
+import { ActivityHeatmap, toKey } from '@/components/ui/activity-heatmap'
 
 function greeting(now) {
   const hour = now.getHours()
@@ -91,6 +92,16 @@ function Ring({ percent }) {
   )
 }
 
+/** Minutes as a person would say them: "<1 min", "25 min", "2h 05m". */
+function formatStudyTime(minutes) {
+  if (minutes <= 0) return '0 min'
+  if (minutes < 1) return '<1 min'
+  if (minutes < 60) return `${Math.round(minutes)} min`
+  const h = Math.floor(minutes / 60)
+  const m = Math.round(minutes - h * 60)
+  return `${h}h ${String(m).padStart(2, '0')}m`
+}
+
 export default function Dashboard() {
   const [profile, setProfile] = useState(null)
   const [subjectStats, setSubjectStats] = useState({})
@@ -105,6 +116,8 @@ export default function Dashboard() {
   const [overall, setOverall] = useState(0)
   const [counts, setCounts] = useState({ mastered: 0, weak: 0, decaying: 0, due: 0, tested: 0 })
   const [session, setSession] = useState({ items: [], perItemMinutes: 0 })
+  // Minutes of questions answered, per local day, for the past year.
+  const [studyDays, setStudyDays] = useState([])
   const [loading, setLoading] = useState(true)
 
   // The top bar runs for as long as this page is fetching, not just while the
@@ -137,7 +150,9 @@ export default function Dashboard() {
        * On a database in Singapore that is a couple of hundred milliseconds off
        * every dashboard load, every time.
        */
-      const [profileData, { data: progressRows }, { count: dueCount }, eventsResult] =
+      const yearAgo = new Date()
+      yearAgo.setFullYear(yearAgo.getFullYear() - 1)
+      const [profileData, { data: progressRows }, { count: dueCount }, eventsResult, attemptsResult] =
         await Promise.all([
           getProfile(supabase, user.id, { onFresh: setProfile }),
           supabase
@@ -156,6 +171,14 @@ export default function Dashboard() {
             .select('*')
             .eq('user_id', user.id)
             .eq('completed', false),
+          // The only study time this app actually records. The session timer
+          // keeps a live countdown in localStorage and nothing else, so time
+          // spent answering questions is the honest number to draw here.
+          supabase
+            .from('quiz_attempts')
+            .select('completed_at, elapsed_seconds')
+            .eq('user_id', user.id)
+            .gte('completed_at', yearAgo.toISOString()),
         ])
 
       if (!profileData) {
@@ -213,6 +236,17 @@ export default function Dashboard() {
         .sort((a, b) => new Date(a.due_at) - new Date(b.due_at))
       setNextEvent(pending[0] || null)
       setNow(new Date())
+
+      // Bucketed by the student's own calendar day, not UTC: a quiz at 1am in
+      // Muscat belongs to the day it felt like, not the previous one. Kept in
+      // fractional minutes so a 40-second quiz still lights its square.
+      const perDay = new Map()
+      for (const a of attemptsResult?.data || []) {
+        if (!a.completed_at || !a.elapsed_seconds) continue
+        const key = toKey(new Date(a.completed_at))
+        perDay.set(key, (perDay.get(key) || 0) + a.elapsed_seconds / 60)
+      }
+      setStudyDays([...perDay].map(([date, value]) => ({ date, value })))
       setSubjectStats(stats)
       setLoading(false)
     }
@@ -481,6 +515,26 @@ export default function Dashboard() {
               </p>
             </Link>
           </div>
+        )}
+
+        {/* Time studied. Only once there is some: a year of empty squares on a
+            new account says nothing and looks like a broken page, the same
+            reason the cards above wait for activity. */}
+        {studyDays.length > 0 && (
+          <Section title="Time studied">
+            <div
+              className="rounded-[16px] border p-5 sm:p-6"
+              style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+            >
+              <ActivityHeatmap
+                data={studyDays}
+                days={182}
+                cellSize={13}
+                color="var(--brand)"
+                formatValue={formatStudyTime}
+              />
+            </div>
+          </Section>
         )}
 
         <div className="grid gap-x-14 lg:grid-cols-2">

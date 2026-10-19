@@ -255,6 +255,30 @@
   --color-review: var(--status-decaying);
   --color-solid: var(--success-text);
   --color-mastered: var(--status-mastered);
+
+  /* shadcn's colour names, pointed at this project's tokens.
+
+     Components from the shadcn ecosystem (components/ui) are written against
+     text-foreground, bg-muted, bg-popover, ring-ring and friends. None of those
+     existed here, so their classes generated nothing and the component came
+     out unstyled. Mapping the names rather than rewriting each component keeps
+     vendored code close to its source and makes the next one work as dropped
+     in. Checked before adding: no existing markup used any of these classes,
+     so nothing already on the site changes colour.
+
+     muted is --border rather than --surface-sunken on purpose. shadcn uses it
+     for empty cells and inset controls, and sunken is #101010 against a
+     #141414 card in dark mode — empty heatmap squares would all but vanish. */
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--text);
+  --color-popover: var(--surface);
+  --color-popover-foreground: var(--text);
+  --color-muted: var(--border);
+  --color-muted-foreground: var(--text-muted);
+  --color-primary: var(--brand);
+  --color-ring: var(--brand);
 }
 
 /* Form controls default to system colours such as `buttontext`, which follow
