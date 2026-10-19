@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
-import { TASKS } from '@/lib/syllabi-prompts'
+import { TASKS, DRAFT_REVIEW_SCHEMA } from '@/lib/syllabi-prompts'
+import { rubricFor } from '@/lib/criteria'
+import { cleanReview } from '@/lib/draft-review'
 import { hasSyllabi } from '@/lib/access'
 import { MODELS, claim, settle } from '@/lib/ai-cost'
 // Only this deployment and our own domains: any *.vercel.app origin used to
@@ -117,7 +119,9 @@ export async function POST(request) {
     return NextResponse.json({ error: claimed.error, code: claimed.code }, { status: claimed.status })
   }
 
-  const prompt = build({ kind, subject, topic, interest, weak, strong })
+  const review = task === 'draft_feedback'
+  const rubric = review ? rubricFor(kind, subject) : null
+  const prompt = build({ kind, subject, topic, interest, weak, strong, rubric })
   const anthropic = new Anthropic()
   const model = MODELS.writing
 
@@ -128,8 +132,10 @@ export async function POST(request) {
       // Thinking counts towards this, so it leaves room for the answer. With
       // the input caps above, it is what makes the claim's reservation a
       // ceiling (062-ai-limits.sql).
-      max_tokens: task === 'draft_feedback' ? 4000 : 3000,
-      output_config: { effort: 'medium' },
+      max_tokens: review ? 6000 : 3000,
+      // A draft comes back as JSON the page can lay out: marks per criterion
+      // and highlights on the student's own sentences.
+      output_config: { effort: 'medium', ...(review ? { format: { type: 'json_schema', schema: DRAFT_REVIEW_SCHEMA } } : {}) },
       system: prompt,
       messages: [
         {
@@ -160,6 +166,17 @@ export async function POST(request) {
 
   // Settled with what it actually cost, so the day's budget is exact.
   await settle(supabase, claimed.id, model, response.usage).catch(() => {})
+
+  if (review) {
+    const parsed = response.stop_reason === 'end_turn' ? cleanReview(answer, text, rubric) : null
+    if (!parsed) {
+      return NextResponse.json(
+        { error: response.stop_reason === 'refusal' ? answer : 'Syllabi could not finish reading that. Try again, or send a shorter part.' },
+        { status: 502 }
+      )
+    }
+    return NextResponse.json({ review: parsed, remaining: claimed.remaining })
+  }
 
   return NextResponse.json({
     answer,

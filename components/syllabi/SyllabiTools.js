@@ -3,20 +3,12 @@
 import { useState } from 'react'
 
 /**
- * Syllabi's fixed tools: a draft read against the criteria, research
- * question ideas, and study advice. Three set tasks rather than a chat box,
- * because each one comments and never composes (lib/syllabi-prompts.js).
+ * Syllabi's idea tools: research question directions and study advice. Set
+ * tasks rather than a chat box, because each one suggests and never composes
+ * (lib/syllabi-prompts.js). Drafts have their own page (DraftStudio).
  */
 
 const TASKS = [
-  {
-    key: 'draft_feedback',
-    label: 'Read my draft',
-    hint: 'Paste an IA, EE or TOK draft. You get what an examiner would say.',
-    placeholder: 'Paste your draft.',
-    rows: 9,
-    minWords: 50,
-  },
   {
     key: 'research_questions',
     label: 'Research questions',
@@ -45,7 +37,7 @@ export default function SyllabiTools({ subjects = [] }) {
   const [busy, setBusy] = useState(false)
 
   const words = text.trim() ? text.trim().split(/\s+/).length : 0
-  const limit = task.key === 'draft_feedback' ? 60000 : 2000
+  const limit = 2000
 
   const ask = async () => {
     if (busy) return
@@ -114,7 +106,6 @@ export default function SyllabiTools({ subjects = [] }) {
           >
             <option value="ia">IA</option>
             <option value="ee">Extended Essay</option>
-            {task.key === 'draft_feedback' && <option value="tok">TOK essay</option>}
           </select>
         )}
       </div>
@@ -154,7 +145,7 @@ export default function SyllabiTools({ subjects = [] }) {
       )}
 
       <p className="mt-4 text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
-        Syllabi comments on your work and never writes it.
+        Syllabi suggests directions and never writes your work.
       </p>
     </div>
   )

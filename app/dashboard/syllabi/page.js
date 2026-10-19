@@ -15,6 +15,7 @@ import LockedPanel from '@/components/LockedPanel'
 import { Page, PageHeader, PageLoading } from '@/components/PageShell'
 import TutorChat from '@/components/syllabi/TutorChat'
 import SyllabiTools from '@/components/syllabi/SyllabiTools'
+import DraftStudio from '@/components/syllabi/DraftStudio'
 import { hasSyllabi } from '@/lib/access'
 
 export default function SyllabiPage() {
@@ -73,7 +74,8 @@ export default function SyllabiPage() {
               <div className="flex rounded-[10px] p-0.5" style={{ background: 'var(--surface-sunken)' }}>
                 {[
                   ['ask', 'Ask'],
-                  ['tools', 'Drafts & ideas'],
+                  ['draft', 'Draft feedback'],
+                  ['tools', 'Ideas'],
                 ].map(([key, label]) => (
                   <button
                     key={key}
@@ -99,6 +101,8 @@ export default function SyllabiPage() {
           />
         ) : tab === 'ask' ? (
           <TutorChat subjects={subjects} topicsFor={(s) => topicsBySubject[s] || []} />
+        ) : tab === 'draft' ? (
+          <DraftStudio subjects={subjects} />
         ) : (
           <SyllabiTools subjects={subjects} />
         )}
