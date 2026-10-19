@@ -43,7 +43,8 @@ function sample(now) {
 
 function Inner() {
   const variant = useSearchParams().get('style') || ''
-  const [now] = useState(() => new Date())
+  // Mid-afternoon today, so the painted free time is still ahead of it.
+  const [now] = useState(() => { const d = new Date(); d.setHours(15, 0, 0, 0); return d })
   const [adjustments, setAdjustments] = useState([])
   const [done, setDone] = useState(() => new Set())
 
@@ -58,7 +59,10 @@ function Inner() {
       plan: 'premium',
       subjects: SUBJECTS,
       target_grades: { 'Physics HL': '7', 'Economics SL': '5', 'History SL': '6' },
-      plan_settings: { week: { 0: 120, 1: 120, 2: 120, 3: 120, 4: 120, 5: 0, 6: 150 }, style },
+      plan_settings: {
+        slots: { 0: [[960, 1080], [1140, 1230]], 1: [[960, 1080], [1140, 1230]], 2: [[960, 1080], [1140, 1230]], 3: [[960, 1080], [1140, 1230]], 4: [[960, 1080], [1140, 1230]], 5: [], 6: [[600, 780]] },
+        style,
+      },
     }
   }, [variant])
   const data = useMemo(() => sample(now), [now])

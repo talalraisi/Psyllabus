@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Today's plan: what to do, in what order, for how long, with the breaks.
+ * Today's plan: what to do, when, for how long, with the breaks.
  *
  * Each task says why it is there and what doing it means — the steps, sized
  * to the task rather than an equal share of the evening — and ends in
@@ -9,6 +9,7 @@
  * you finish the quiz; the quiz is the proof, so nobody has to tick a box to
  * be believed. You can still mark anything done yourself.
  *
+ * With free time painted, every task and break has a clock time inside it.
  * The plan is automatic, but the student's word beats it: skip something
  * today, move it to tomorrow or a chosen day, or mark it done, and the rest
  * re-arranges around that.
@@ -19,7 +20,7 @@ import Link from 'next/link'
 import SessionTimer from '@/components/SessionTimer'
 import { IconCheck } from '@/components/Icons'
 import { displaySubtopic } from '@/lib/progress'
-import { WEEKDAYS, RHYTHMS } from '@/lib/study-plan'
+import { WEEKDAYS, rhythmOf } from '@/lib/study-plan'
 
 const KIND = {
   review: { label: 'Mistakes', color: 'var(--status-weak)' },
@@ -44,6 +45,12 @@ const REASON_COLOR = {
 }
 
 const fmt = (m) => (m >= 60 ? `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, '0')}m` : `${m} min`)
+
+/** Minutes from midnight as a clock time: 4:05pm. */
+export const clock = (m) => {
+  const h = Math.floor(m / 60) % 24
+  return `${((h + 11) % 12) + 1}:${String(m % 60).padStart(2, '0')}${h < 12 ? 'am' : 'pm'}`
+}
 
 function TaskMenu({ task, tomorrow, onAdjust, done, close }) {
   const [picking, setPicking] = useState(false)
@@ -71,7 +78,7 @@ function TaskMenu({ task, tomorrow, onAdjust, done, close }) {
             <input
               type="date"
               autoFocus
-              className="input m-1 w-[calc(100%-0.5rem)]"
+              className="input m-1 h-9 w-[calc(100%-0.5rem)] px-3 text-[16px] sm:text-[13px]"
               aria-label="Move to which day"
               onChange={(e) => {
                 if (!e.target.value) return
@@ -92,7 +99,7 @@ function TaskMenu({ task, tomorrow, onAdjust, done, close }) {
 
 export default function TodayPlan({ day, tomorrowKey, style, isDone, hrefFor, onResources, onAdjust }) {
   const [menu, setMenu] = useState(null)
-  const rhythm = RHYTHMS[style.rhythm] || RHYTHMS[25]
+  const rhythm = rhythmOf(style)
   const tasks = day.tasks
   const done = tasks.filter(isDone)
   const doneMinutes = done.reduce((n, t) => n + t.minutes, 0)
@@ -100,26 +107,47 @@ export default function TodayPlan({ day, tomorrowKey, style, isDone, hrefFor, on
   const complete = tasks.length > 0 && remaining.length === 0
   const current = remaining[0] || null
 
-  // Where the breaks fall: after the task that crosses each block boundary.
-  const breakAfter = new Set()
-  if (Number.isFinite(rhythm.work)) {
+  /**
+   * The day as rows: tasks and breaks, in time order.
+   *
+   * With free time painted, the engine has given everything a clock time and
+   * the breaks are its own — the gaps between windows included. Without it,
+   * a break falls after whichever task crosses each block boundary. Anything
+   * that fitted no window comes last, under "if you have time".
+   */
+  const rows = []
+  if (day.timeline) {
+    const byId = new Map(tasks.map((t) => [t.id, t]))
+    let n = 0
+    for (const x of day.timeline) {
+      if (x.type === 'task' && byId.has(x.id)) rows.push({ type: 'task', task: byId.get(x.id), n: ++n })
+      else if (x.type === 'break') rows.push({ type: 'break', start: x.start, minutes: x.end - x.start })
+    }
+    const extra = tasks.filter((t) => t.overflow)
+    if (extra.length) {
+      rows.push({ type: 'heading', label: 'If you have time' })
+      for (const t of extra) rows.push({ type: 'task', task: t, n: ++n })
+    }
+  } else {
     let run = 0
     let next = rhythm.work
     tasks.forEach((t, i) => {
+      rows.push({ type: 'task', task: t, n: i + 1 })
       run += t.minutes
-      if (run >= next && i < tasks.length - 1) {
-        breakAfter.add(t.id)
+      if (Number.isFinite(rhythm.work) && rhythm.rest > 0 && run >= next && i < tasks.length - 1) {
+        rows.push({ type: 'break', minutes: rhythm.rest })
         while (next <= run) next += rhythm.work
       }
     })
   }
+  const windows = (day.slots || []).map(([a, b]) => `${clock(a)}–${clock(b)}`).join(', ')
+  const pattern = Number.isFinite(rhythm.work)
+    ? `${rhythm.work}-minute blocks${day.breaks ? `, ${day.breaks} break${day.breaks === 1 ? '' : 's'}` : ''}`
+    : 'No set breaks'
 
   return (
     <div>
-      <div
-        className="elev mb-6 rounded-[16px] border p-6"
-        style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
-      >
+      <div className="elev mb-6 rounded-[16px] border p-6" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
         <p className="t-overline">Today · {WEEKDAYS[day.weekday]}</p>
         <h2 className="mt-2 text-[clamp(1.25rem,2.4vw,1.6rem)] font-semibold leading-tight tracking-[-0.025em]">
           {day.minutes === 0
@@ -132,10 +160,12 @@ export default function TodayPlan({ day, tomorrowKey, style, isDone, hrefFor, on
         </h2>
         <p className="mt-1.5 text-[13px]" style={{ color: 'var(--text-muted)' }}>
           {day.minutes === 0
-            ? 'You set today to zero minutes. Change your week if that is wrong.'
-            : complete
-              ? `${fmt(doneMinutes)} done. Tomorrow's plan is ready below.`
-              : `${done.length ? `${done.length} of ${tasks.length} done · ` : ''}${Number.isFinite(rhythm.work) ? `${rhythm.work}-minute blocks${day.breaks ? `, ${day.breaks} break${day.breaks === 1 ? '' : 's'}` : ''}` : 'One block'} · ${fmt(day.minutes)} set aside`}
+            ? 'No free time today. Change your week if that is wrong.'
+            : day.late
+              ? 'Your free time today has passed. This is what was planned, if you get a moment.'
+              : complete
+                ? `${fmt(doneMinutes)} done. Tomorrow's plan is ready below.`
+                : `${done.length ? `${done.length} of ${tasks.length} done · ` : ''}${pattern} · ${windows || `${fmt(day.minutes)} set aside`}`}
         </p>
 
         {tasks.length > 0 && (
@@ -158,7 +188,27 @@ export default function TodayPlan({ day, tomorrowKey, style, isDone, hrefFor, on
       </div>
 
       <ol className="flex flex-col gap-2">
-        {tasks.map((task, i) => {
+        {rows.map((row, r) => {
+          if (row.type === 'heading') {
+            return (
+              <li key={`h${r}`} className="pb-1 pt-4">
+                <p className="t-overline">{row.label}</p>
+              </li>
+            )
+          }
+          if (row.type === 'break') {
+            return (
+              <li key={`b${r}`}>
+                <p className="flex items-center gap-3 py-1.5 pl-9 text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
+                  <span className="h-px flex-1" style={{ background: 'var(--border)' }} />
+                  {row.start != null ? `${clock(row.start)} · ` : ''}Break · {row.minutes} min
+                  <span className="h-px flex-1" style={{ background: 'var(--border)' }} />
+                </p>
+              </li>
+            )
+          }
+
+          const task = row.task
           const k = kindOf(task)
           const finished = isDone(task)
           const href = hrefFor(task)
@@ -174,11 +224,16 @@ export default function TodayPlan({ day, tomorrowKey, style, isDone, hrefFor, on
               >
                 <div className="flex flex-wrap items-start gap-3">
                   <span className="mt-0.5 w-5 shrink-0 text-[12px] font-semibold tabular-nums" style={{ color: 'var(--text-faint)' }}>
-                    {finished ? <IconCheck width={14} height={14} className="text-[var(--brand)]" /> : i + 1}
+                    {finished ? <IconCheck width={14} height={14} className="text-[var(--brand)]" /> : row.n}
                   </span>
 
                   <div className="min-w-[12rem] flex-1">
                     <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
+                      {task.start != null && !task.overflow && (
+                        <span className="font-semibold tabular-nums" style={{ color: 'var(--text-body)' }}>
+                          {clock(task.start)}–{clock(task.end)}
+                        </span>
+                      )}
                       <span className="rounded-full px-2 py-0.5 text-[10.5px] font-semibold" style={{ color: k.color, background: `color-mix(in srgb, ${k.color} 12%, transparent)` }}>
                         {k.label}
                       </span>
@@ -193,9 +248,9 @@ export default function TodayPlan({ day, tomorrowKey, style, isDone, hrefFor, on
 
                     {!finished && task.reasons?.length > 0 && (
                       <p className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5">
-                        {task.reasons.slice(0, 2).map((r) => (
-                          <span key={r.kind + r.label} className="text-[12px]" style={{ color: REASON_COLOR[r.kind] || 'var(--text-muted)' }}>
-                            {r.label}
+                        {task.reasons.slice(0, 2).map((reason) => (
+                          <span key={reason.kind + reason.label} className="text-[12px]" style={{ color: REASON_COLOR[reason.kind] || 'var(--text-muted)' }}>
+                            {reason.label}
                           </span>
                         ))}
                       </p>
@@ -210,10 +265,7 @@ export default function TodayPlan({ day, tomorrowKey, style, isDone, hrefFor, on
                                 →
                               </span>
                             )}
-                            <span
-                              className="rounded-full border px-2.5 py-1 text-[11.5px]"
-                              style={{ borderColor: 'var(--border)', background: 'var(--surface-sunken)', color: 'var(--text-body)' }}
-                            >
+                            <span className="rounded-full border px-2.5 py-1 text-[11.5px]" style={{ borderColor: 'var(--border)', background: 'var(--surface-sunken)', color: 'var(--text-body)' }}>
                               {step.label}
                               <span className="ml-1.5 tabular-nums" style={{ color: 'var(--text-faint)' }}>
                                 {step.minutes}m
@@ -254,20 +306,10 @@ export default function TodayPlan({ day, tomorrowKey, style, isDone, hrefFor, on
                     >
                       ···
                     </button>
-                    {menu === task.id && (
-                      <TaskMenu task={task} tomorrow={tomorrowKey} done={finished} onAdjust={onAdjust} close={() => setMenu(null)} />
-                    )}
+                    {menu === task.id && <TaskMenu task={task} tomorrow={tomorrowKey} done={finished} onAdjust={onAdjust} close={() => setMenu(null)} />}
                   </div>
                 </div>
               </div>
-
-              {breakAfter.has(task.id) && (
-                <p className="flex items-center gap-3 py-2 pl-9 text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
-                  <span className="h-px flex-1" style={{ background: 'var(--border)' }} />
-                  Break · {rhythm.rest} min
-                  <span className="h-px flex-1" style={{ background: 'var(--border)' }} />
-                </p>
-              )}
             </li>
           )
         })}

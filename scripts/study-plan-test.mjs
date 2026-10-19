@@ -277,19 +277,25 @@ check('the day runs: mistakes due, then the main piece of learning, then the res
   assert.ok(d.tasks[1].first && d.tasks[1].kind === 'learn')
 })
 
-check('times: tasks sit inside the free windows, with breaks where the rhythm puts them', () => {
+check('times: tasks sit inside the free windows, with a break once a full block is done', () => {
   const tasks = [
-    { id: 'a', minutes: 20 }, { id: 'b', minutes: 15 }, { id: 'c', minutes: 25 }, { id: 'd', minutes: 40 },
+    { id: 'a', minutes: 20 }, { id: 'b', minutes: 15 }, { id: 'c', minutes: 10 }, { id: 'd', minutes: 25 }, { id: 'e', minutes: 40 },
   ]
   // 4:00-5:00pm and 7:00-8:00pm, 25/5.
   const tl = layoutDay(tasks, [[960, 1020], [1140, 1200]], { work: 25, rest: 5 })
-  const at = Object.fromEntries(tasks.map((t) => [t.id, [t.start, t.end]]))
+  const at = Object.fromEntries(tasks.map((t) => [t.id, t.overflow ? 'overflow' : [t.start, t.end]]))
   assert.deepEqual(at.a, [960, 980])
-  assert.deepEqual(at.b, [985, 1000], 'break before going past 25 minutes of work')
-  assert.deepEqual(at.c, [1140, 1165], 'did not fit what was left of 4-5pm, so 7pm')
-  assert.ok(tasks.find((t) => t.id === 'd').overflow, 'fits nowhere: marked for if there is time')
+  assert.deepEqual(at.b, [980, 995], 'no break yet: only 20 minutes done')
+  assert.deepEqual(at.c, [1000, 1010], 'break after 35 minutes of work')
+  assert.deepEqual(at.d, [1140, 1165], 'did not fit what was left of 4-5pm, so 7pm')
+  assert.equal(at.e, 'overflow', 'fits nowhere: marked for if there is time')
+  assert.deepEqual(tl.filter((x) => x.type === 'break').map((b) => [b.start, b.end]), [[995, 1000]])
   for (const x of tl) assert.ok((x.start >= 960 && x.end <= 1020) || (x.start >= 1140 && x.end <= 1200), JSON.stringify(x))
-  assert.equal(tl.filter((x) => x.type === 'break').length, 1)
+})
+check('no break straight after a short opener', () => {
+  const tasks = [{ id: 'mistakes', minutes: 5 }, { id: 'lesson', minutes: 35 }, { id: 'next', minutes: 15 }]
+  const tl = layoutDay(tasks, [[960, 1080]], { work: 25, rest: 5 })
+  assert.deepEqual(tl.map((x) => x.type), ['task', 'task', 'break', 'task'])
 })
 check('today only counts the free time still ahead; if it has all gone, no clock times', () => {
   const at6pm = new Date(2026, 9, 18, 18, 0) // Sunday
