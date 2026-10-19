@@ -16,7 +16,7 @@ export default function FeaturesPage() {
       <PageHead
         eyebrow="Features"
         title="All eight, in detail"
-        intro="The front page shows these one at a time, which is the right amount to decide whether to keep reading and the wrong amount to decide whether to sign up. This is how each one actually works, and where it stops."
+        intro="The front page shows these one at a time, which is the right amount to decide whether to keep reading and the wrong amount to decide whether to sign up. This is how each one actually works, in full, with the numbers it runs on — and where each one stops."
       />
 
       {/* Nothing here is on the front page and nothing on the front page is
@@ -31,7 +31,7 @@ export default function FeaturesPage() {
               className="elev rounded-[16px] border p-6 md:p-8"
               style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
             >
-              <div className="grid gap-6 md:grid-cols-[minmax(0,22rem)_1fr] md:gap-12">
+              <div className="grid gap-6 md:grid-cols-[minmax(0,19rem)_1fr] md:gap-12">
                 <div>
                   <p
                     className="text-[11px] font-semibold tabular-nums tracking-[0.16em]"
@@ -60,13 +60,31 @@ export default function FeaturesPage() {
                 </div>
 
                 <div>
-                  {/* Three facts, not three paragraphs.
-                      These were 685 words across the eight features, one of
-                      them 46 words long, and a page somebody opened to find
-                      out what the product does should not be read like a
-                      contract. Short enough to take in at a glance, laid out
-                      as tiles so the eye counts them rather than reading
-                      them. */}
+                  {/* The explanation, then the summary of it.
+
+                      This page was trimmed to three tiles and a one-line
+                      limit per feature on the grounds that nobody reads a
+                      contract. That was the wrong cut to make here: the front
+                      page is where a feature gets a glance, and this is the
+                      page somebody opens precisely because the glance was not
+                      enough. The tiles stay underneath as the recap — they
+                      are genuinely good at being scanned — but the mechanism
+                      is spelled out above them now, with the real numbers the
+                      engine runs on rather than adjectives about them. */}
+                  <div className="flex flex-col gap-4">
+                    {f.detail.map((para) => (
+                      <p key={para} className="text-[14.5px] leading-[1.75]" style={{ color: 'var(--text-body)' }}>
+                        {para}
+                      </p>
+                    ))}
+                  </div>
+
+                  <p
+                    className="mb-3 mt-7 text-[10px] font-semibold uppercase tracking-[0.16em]"
+                    style={{ color: 'var(--text-faint)' }}
+                  >
+                    In short
+                  </p>
                   <ul className="grid gap-2.5 sm:grid-cols-3">
                     {f.how.map((line, n) => (
                       <li
@@ -116,7 +134,7 @@ export default function FeaturesPage() {
             One subject is free for as long as you want it, and a school code opens the rest.
           </p>
           <Link href="/signup" className="btn btn-solid control-lg">
-            Start free with one subject
+            Start free
             <IconArrowRight width={16} height={16} />
           </Link>
         </div>

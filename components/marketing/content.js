@@ -126,6 +126,10 @@ export const ANSWERS = [
 export const FEATURE_DETAIL = [
   {
     label: 'The map',
+    detail: [
+      'A level is a running total of evidence, not a count of attempts. Every question carries a difficulty, that difficulty is banded into five heat levels, and the heat decides what a correct answer is worth — half a point for recall and one step, a point and a half at the hardest end of the paper. Ten points is mastery. Below five you are Weak, five to seven Developing, seven to nine Proficient, nine and above Mastered.',
+      'Which means an easy run cannot reach the top. Ten of the simplest questions is five points, and five points is Developing. The only route into the highest band is questions that were genuinely hard for you, which is the whole reason the engine prices by heat instead of counting right answers. A subtopic nobody has asked you about stays grey rather than green, because zero points and never attempted are the same state and deserve the same colour.',
+    ],
     title: 'A heatmap you cannot fake',
     lede: 'Every subtopic of your course, coloured by what you proved.',
     how: [
@@ -137,6 +141,10 @@ export const FEATURE_DETAIL = [
   },
   {
     label: 'Decay',
+    detail: [
+      'Fading is measured from your last correct answer, not from the last time the row was touched. That distinction matters: any quiz on a subtopic updates it, including one where every answer was wrong, so without the rule a fading topic could be cleared by sitting a quiz and failing it. Retention has to be re-proved, not revisited.',
+      'Fourteen days without a correct answer and a subtopic starts fading. Twenty-one days after that — five weeks in total — it stops counting as known and returns to Weak. Only Mastered and Proficient fade, because something you never proved cannot quietly un-prove itself. One correct answer clears the whole thing, however long it has been.',
+    ],
     title: 'Topics that fade on their own',
     lede: 'Prove something, leave it, and it quietly goes back on the list.',
     how: [
@@ -148,6 +156,10 @@ export const FEATURE_DETAIL = [
   },
   {
     label: 'Review',
+    detail: [
+      'Every question you get wrong is kept against the subtopic it came from and returned to you on a widening gap: after a day, then five days, then a week. Answer it correctly each time and it leaves the bank for good. Get it wrong once and the schedule restarts from the beginning, because a question you have just missed is not one you nearly know.',
+      'The questions come back inside ordinary sessions rather than as a separate chore, so revision and review are the same act. The bank only ever holds questions you actually attempted — it is a record of the mistakes you made, not a model of the mistakes you might make.',
+    ],
     title: 'A mistake bank that schedules itself',
     lede: 'Your own wrong answers, on a widening schedule.',
     how: [
@@ -159,6 +171,10 @@ export const FEATURE_DETAIL = [
   },
   {
     label: 'Papers',
+    detail: [
+      'You can assemble a paper from any combination of topics, or sit the structure your subject actually examines — Paper 1 and Paper 2, in their real shape. The clock runs against the pace the paper needs and shows marks per minute as you go, so you discover you are running slow during the paper, which is when it can still be fixed, rather than at the end.',
+      'Everything a paper produces feeds the same map as a single quiz, so sitting one is not a side activity that leaves your levels untouched. The limit is honest: a generated paper is built to the shape of a real one. It is not a past paper, and nothing here is scraped from one.',
+    ],
     title: 'Timed papers with real pacing',
     lede: 'Sit a paper the way your subject examines it, against a clock that tells you the truth.',
     how: [
@@ -170,6 +186,10 @@ export const FEATURE_DETAIL = [
   },
   {
     label: 'Calendar',
+    detail: [
+      'Put in your tests, your mocks and your IA deadlines, and the plan starts bending toward them. As a date gets closer that subject carries more weight in the ordering, so the evening tilts toward what is being examined soonest without you sitting down to re-plan it yourself.',
+      "A deadline changes the priority of a line but never hides the reasoning behind it — every item still states why it is on the list, so you can disagree with it. It does not read your school's calendar or your inbox. What is in it is what you put in it.",
+    ],
     title: 'Deadlines that change the plan',
     lede: 'Put a test in and the plan reorders itself as it gets close.',
     how: [
@@ -181,6 +201,10 @@ export const FEATURE_DETAIL = [
   },
   {
     label: 'Sessions',
+    detail: [
+      'The timer starts once and follows you between pages, recording time against the subjects you actually worked on rather than the one you had open when you started. At the end of an evening there is a single number for whether that evening happened.',
+      'It measures effort and only effort. Time in a session never moves a subtopic up a level — only questions do that. This is deliberate, because hours logged is the easiest number in studying to inflate, and a tool that rewarded sitting still would be measuring the wrong thing.',
+    ],
     title: 'A timer that follows you around',
     lede: 'One number for whether tonight actually happened.',
     how: [
@@ -192,6 +216,10 @@ export const FEATURE_DETAIL = [
   },
   {
     label: 'Resources',
+    detail: [
+      'Each subtopic carries hand-picked lessons and notes, so a wrong answer ends somewhere specific. The usual failure after getting something wrong is a search box and twenty minutes of deciding which video to trust; here the gap you just demonstrated is already attached to something that explains it.',
+      "Links open on the creator's own site. Nothing is rehosted, mirrored or re-uploaded, and everything is credited to whoever made it. If a creator wants their link taken down it comes down.",
+    ],
     title: 'Something to read for the exact gap',
     lede: 'A wrong answer leads somewhere, not into a search box.',
     how: [
@@ -203,6 +231,10 @@ export const FEATURE_DETAIL = [
   },
   {
     label: 'Prediction',
+    detail: [
+      'The predicted grade is a running total built only from quiz results. Nothing you tell it about yourself feeds in, because a prediction assembled partly from self-assessment is a prediction of your mood.',
+      'It also states how much of your syllabus it rests on, which is the part most predictions leave out. Three quizzes is labelled low confidence rather than dressed up as a forecast, and the number moves as the coverage grows. It measures the evidence you have produced so far. It is not a forecast of results day.',
+    ],
     title: 'A grade you can check the maths on',
     lede: 'A running total built only from results, stated with its own confidence.',
     how: [
