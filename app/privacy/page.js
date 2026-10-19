@@ -91,6 +91,11 @@ function Privacy() {
           </li>
           <li>
             {ar
+              ? 'ما تسأل عنه Syllabi وما تلصقه فيه، ويُرسل إلى Anthropic لكتابة الإجابة. لا نحفظ المحادثة: تبقى في نافذة متصفحك فقط وتُمحى عند إغلاقها. نحتفظ فقط بعدد الطلبات وتكلفتها والمادة، لنطبّق الحد اليومي.'
+              : 'What you ask Syllabi and what you paste into it, which is sent to Anthropic to write the answer. We do not save the conversation: it stays in your browser tab and is gone when you close it. We keep only a count of requests, their cost and the subject, to apply the daily limit.'}
+          </li>
+          <li>
+            {ar
               ? 'صورة الملف الشخصي، فقط إذا اخترت رفعها، وتظهر لك وحدك.'
               : 'A profile photo, only if you choose to upload one. It is shown only to you.'}
           </li>

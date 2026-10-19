@@ -1,12 +1,11 @@
-import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
-import { cookieOptionsFor } from '@/lib/cookie-domain'
 import { TASKS } from '@/lib/syllabi-prompts'
 import { hasSyllabi } from '@/lib/access'
+import { MODELS, claim, settle } from '@/lib/ai-cost'
 // Only this deployment and our own domains: any *.vercel.app origin used to
 // pass, and anyone can put a page on vercel.app.
-import { fromOurOwnSite } from '@/lib/request-supabase'
+import { fromOurOwnSite, supabaseFor } from '@/lib/request-supabase'
 
 /**
  * Syllabi: the one place in the app that talks to a model at request time.
@@ -17,8 +16,10 @@ import { fromOurOwnSite } from '@/lib/request-supabase'
  * things have to be true before a single token is spent.
  *
  * 1. It is a signed-in student. The key is ours; an open endpoint is a bill.
- * 2. They have not already had their allowance today. Enforced by a count in
- *    the database rather than anything the client says about itself.
+ * 2. They have not already had their allowance today, and the day's budget
+ *    across everyone is not spent. Claimed in the database before the call,
+ *    under a lock, so parallel requests cannot all slip through
+ *    (062-ai-limits.sql).
  * 3. The task is one of ours. Free-form prompts from the browser would make
  *    the integrity rules decorative.
  *
@@ -29,29 +30,15 @@ import { fromOurOwnSite } from '@/lib/request-supabase'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-/** What one student may ask for in a day. Tuned to be generous and finite. */
-const DAILY_LIMIT = 12
-
 /** Longest draft accepted, in characters. An EE is about 25,000. */
 const MAX_INPUT = 60000
 
-const MODEL = process.env.SYLLABI_MODEL || 'claude-sonnet-5'
+/** Everything except a draft is a sentence or two. */
+const MAX_SHORT = 2000
 
-function client(request) {
-  const cookieOptions = cookieOptionsFor(request.nextUrl.hostname)
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    {
-      ...(cookieOptions ? { cookieOptions } : {}),
-      cookies: {
-        getAll: () => request.cookies.getAll(),
-        // Nothing here changes the session, so there is nothing to write back.
-        setAll: () => {},
-      },
-    }
-  )
-}
+/** A short string, or nothing. These go into the instructions, so they are cut to size. */
+const short = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '')
+const list = (v) => (Array.isArray(v) ? v.filter((x) => typeof x === 'string').slice(0, 20).map((x) => x.slice(0, 150)) : undefined)
 
 export async function POST(request) {
   if (!fromOurOwnSite(request)) {
@@ -76,21 +63,27 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Malformed request.' }, { status: 400 })
   }
 
-  const { task, text = '', subject = '', kind = 'ia', topic = '', interest = '', weak, strong } = body || {}
+  const { task, text = '' } = body || {}
+  const kind = ['ia', 'ee', 'tok'].includes(body?.kind) ? body.kind : 'ia'
+  const topic = short(body?.topic, 200)
+  const interest = short(body?.interest, 1000)
+  const weak = list(body?.weak)
+  const strong = list(body?.strong)
 
   const build = TASKS[task]
   if (!build) {
     return NextResponse.json({ error: 'Unknown task.' }, { status: 400 })
   }
 
-  if (typeof text !== 'string' || text.length > MAX_INPUT) {
+  const limit = task === 'draft_feedback' ? MAX_INPUT : MAX_SHORT
+  if (typeof text !== 'string' || text.length > limit) {
     return NextResponse.json(
-      { error: `That is longer than Syllabi reads in one go (${MAX_INPUT.toLocaleString()} characters).` },
+      { error: `That is longer than Syllabi reads in one go (${limit.toLocaleString()} characters).` },
       { status: 413 }
     )
   }
 
-  const supabase = client(request)
+  const supabase = supabaseFor(request)
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -102,7 +95,7 @@ export async function POST(request) {
   // on the button: an endpoint that trusts the UI to hide it is not gated.
   const { data: profile } = await supabase
     .from('profiles')
-    .select('plan, is_admin, access_expires_at')
+    .select('plan, is_admin, access_expires_at, subjects')
     .eq('id', user.id)
     .maybeSingle()
 
@@ -116,25 +109,27 @@ export async function POST(request) {
     )
   }
 
-  const { data: usedToday } = await supabase.rpc('ai_requests_today', { p_user: user.id })
-  if ((usedToday || 0) >= DAILY_LIMIT) {
-    return NextResponse.json(
-      {
-        error: `That is ${DAILY_LIMIT} for today. Syllabi resets at midnight.`,
-        code: 'limit_reached',
-      },
-      { status: 429 }
-    )
+  // One of their own subjects, since it goes into the instructions.
+  const subject = (profile.subjects || []).includes(body?.subject) ? body.subject : ''
+
+  const claimed = await claim(supabase, task, subject)
+  if (!claimed.ok) {
+    return NextResponse.json({ error: claimed.error, code: claimed.code }, { status: claimed.status })
   }
 
   const prompt = build({ kind, subject, topic, interest, weak, strong })
   const anthropic = new Anthropic()
+  const model = MODELS.writing
 
   let response
   try {
     response = await anthropic.messages.create({
-      model: MODEL,
-      max_tokens: 2000,
+      model,
+      // Thinking counts towards this, so it leaves room for the answer. With
+      // the input caps above, it is what makes the claim's reservation a
+      // ceiling (062-ai-limits.sql).
+      max_tokens: task === 'draft_feedback' ? 4000 : 3000,
+      output_config: { effort: 'medium' },
       system: prompt,
       messages: [
         {
@@ -146,30 +141,28 @@ export async function POST(request) {
   } catch (e) {
     // The student gets a sentence, not a stack trace; the log gets the detail.
     console.error('syllabi:', e?.message || e)
+    // Nothing came back, so nothing was spent.
+    await settle(supabase, claimed.id, model, null).catch(() => {})
     return NextResponse.json(
       { error: 'Syllabi could not answer that just now. Try again in a minute.' },
       { status: 502 }
     )
   }
 
-  const answer = response.content
-    .filter((block) => block.type === 'text')
-    .map((block) => block.text)
-    .join('\n')
-    .trim()
+  const answer =
+    response.stop_reason === 'refusal'
+      ? 'Syllabi can’t help with that one.'
+      : response.content
+          .filter((block) => block.type === 'text')
+          .map((block) => block.text)
+          .join('\n')
+          .trim()
 
-  // Recorded after the fact, including the tokens, so the bill has a paper
-  // trail per student rather than one number at the end of the month.
-  await supabase.from('ai_usage').insert({
-    user_id: user.id,
-    task,
-    subject: subject || null,
-    input_tokens: response.usage?.input_tokens || 0,
-    output_tokens: response.usage?.output_tokens || 0,
-  })
+  // Settled with what it actually cost, so the day's budget is exact.
+  await settle(supabase, claimed.id, model, response.usage).catch(() => {})
 
   return NextResponse.json({
     answer,
-    remaining: Math.max(0, DAILY_LIMIT - (usedToday || 0) - 1),
+    remaining: claimed.remaining,
   })
 }

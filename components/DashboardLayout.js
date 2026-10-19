@@ -28,6 +28,7 @@ import { clearCache } from '@/lib/cache'
 import TimerPill from '@/components/TimerPill'
 import { stopTimerForSignOut } from '@/lib/session-timer'
 import FeedbackButton from '@/components/FeedbackButton'
+import SyllabiMark from '@/components/SyllabiMark'
 import ThemeToggle from '@/components/ThemeToggle'
 
 const NAV_ITEMS = [
@@ -43,6 +44,12 @@ const NAV_ITEMS = [
     label: 'Diploma Core',
     Icon: IconSchool,
     match: (p) => p === '/dashboard/core',
+  },
+  {
+    href: '/dashboard/syllabi',
+    label: 'Syllabi',
+    Icon: ({ width, style }) => <SyllabiMark size={width} style={style} />,
+    match: (p) => p === '/dashboard/syllabi',
   },
   {
     href: '/dashboard/flashcards',
