@@ -145,13 +145,16 @@ check('Friday, with no minutes, gets nothing', () => {
   const friday = plan().days.find((d) => d.weekday === 5)
   assert.equal(friday.tasks.length, 0)
 })
-check('mixed: no subject takes more than half a day while others are waiting, and none sits back to back when it need not', () => {
+check('mixed: what the plan picks by value never gives one subject more than half a day, and nothing sits back to back when it need not', () => {
+  // Retests that are due and the furthest-behind subject's one guaranteed
+  // lesson are exempt by design; everything chosen by value is not.
   for (const d of plan().days) {
     const bySubject = {}
-    for (const t of d.tasks) bySubject[t.subject] = (bySubject[t.subject] || 0) + t.minutes
-    const subjects = Object.keys(bySubject)
-    if (subjects.length > 1) for (const m of Object.values(bySubject)) assert.ok(m <= Math.max(40, d.study * 0.5) + 12, `${d.date} lopsided`)
+    for (const t of d.tasks) if (!t.fixed && !t.first) bySubject[t.subject] = (bySubject[t.subject] || 0) + t.minutes
+    for (const [s, m] of Object.entries(bySubject)) assert.ok(m <= Math.max(40, d.study * 0.5), `${d.date} ${s} has ${m} of ${d.study}`)
     for (let i = 1; i < d.tasks.length; i++) {
+      // A subject's mistakes, then its lesson, is a pairing rather than a repeat.
+      if (d.tasks[i - 1].kind === 'review') continue
       if (d.tasks[i].subject === d.tasks[i - 1].subject) {
         const others = d.tasks.slice(i).some((t) => t.subject !== d.tasks[i].subject)
         assert.ok(!others, `${d.date} back to back when it need not be`)
@@ -210,6 +213,37 @@ check('today stays as it was shown, even after a quiz changes what is weak', () 
   const shown = plan().days[0]
   const after = plan({ keepToday: shown, candidates: candidates({ statusOf: () => 'proficient' }) })
   assert.deepEqual(after.days[0].tasks.map((t) => t.id), shown.tasks.map((t) => t.id))
+})
+
+check('today as shown still loses what the student skips or moves away', () => {
+  const shown = plan().days[0]
+  const [a, b] = shown.tasks.filter((t) => t.kind === 'learn')
+  const p = plan({ keepToday: shown, adjustments: [{ kind: 'skip', task_id: a.id, on_date: day(0) }, { kind: 'move', task_id: b.id, to_date: day(2) }] })
+  assert.ok(!p.days[0].tasks.some((t) => t.id === a.id || t.id === b.id))
+  assert.ok(p.days[2].tasks.some((t) => t.id === b.id))
+})
+
+check('the subject furthest from target gets real learning every study day, not just cheap upkeep', () => {
+  // Physics two grades under with weak topics; the others full of quick, valuable fading retests.
+  const lastCorrect = new Date(NOW.getTime() - 33 * 86400000).toISOString()
+  const statusOf = (s, t, i) => (s === 'Physics HL' ? 'in_progress' : 'decaying')
+  const details = Object.fromEntries(
+    syllabus(statusOf).filter((r) => r.status === 'decaying').map((r) => [`${r.subject}::${r.subtopic}`, { updatedAt: lastCorrect }])
+  )
+  const p = plan({ candidates: candidates({ statusOf, details }) })
+  for (const d of p.days.filter((d) => d.study >= 40)) {
+    assert.ok(
+      d.tasks.some((t) => t.subject === 'Physics HL' && t.kind === 'learn'),
+      `${d.date}: no Physics learning — ${d.tasks.map((t) => t.subject + ':' + t.kind).join(', ')}`
+    )
+  }
+})
+
+check('the day runs: mistakes due, then the main piece of learning, then the rest', () => {
+  const mistakes = [{ subject: 'History SL', next_review_at: NOW.toISOString() }]
+  const d = plan({ mistakes }).days[0]
+  assert.equal(d.tasks[0].kind, 'review')
+  assert.ok(d.tasks[1].first && d.tasks[1].kind === 'learn')
 })
 
 console.log('steps')

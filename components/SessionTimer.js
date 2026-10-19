@@ -19,7 +19,12 @@ import {
  * session no longer kills the clock: this component is a view over shared
  * state rather than the owner of it.
  */
-export default function SessionTimer({ minutes }) {
+/**
+ * `label` — { subject, subtopic } — is what the next run is for, when the
+ * study plan knows. Recorded with the run so time can be counted per subject.
+ * A resumed run keeps the label it was started with.
+ */
+export default function SessionTimer({ minutes, label = null }) {
   const [timer, setTimer] = useState(() => ({ state: 'idle', minutes, remaining: minutes * 60 }))
   const [ready, setReady] = useState(false)
   const firedRef = useRef(false)
@@ -79,7 +84,12 @@ export default function SessionTimer({ minutes }) {
     if (notificationPermission() === 'default') await requestNotificationPermission()
     firedRef.current = false
     const t = readTimer()
-    startTimer(t.minutes, t.state === 'paused' ? t.remaining : null)
+    const resuming = t.state === 'paused'
+    startTimer(
+      t.minutes,
+      resuming ? t.remaining : null,
+      resuming && t.subject ? { subject: t.subject, subtopic: t.subtopic } : label
+    )
   }
 
   const total = (timer.minutes || minutes) * 60

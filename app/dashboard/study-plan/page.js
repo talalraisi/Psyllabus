@@ -1,33 +1,38 @@
 'use client'
 
+/**
+ * The study plan.
+ *
+ * What to study, on which day, and for how long — planned by lib/study-plan.js
+ * from what the student has proved, how far each subject is from its target,
+ * what is dated on their calendar, and how they have said they like to work.
+ * This page loads that evidence, keeps today steady once it has been shown,
+ * and records the student's own edits, which always win over the plan.
+ */
+
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
-import { getProfile, getSyllabus, invalidateProfile } from '@/lib/cache'
+import { getProfile, getSyllabus } from '@/lib/cache'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader, EmptyState, PageLoading } from '@/components/PageShell'
 import { startLoading, stopLoading } from '@/components/LoadingBar'
-import { IconArrowRight, IconClock, IconCheck, IconCalendar } from '@/components/Icons'
-import SessionTimer from '@/components/SessionTimer'
+import { IconArrowRight, IconCheck, IconCalendar } from '@/components/Icons'
 import TodoList from '@/components/TodoList'
 import ResourceHubDrawer from '@/components/ResourceHubDrawer'
 import ReminderWatcher from '@/components/ReminderWatcher'
+import PlanSettings from '@/components/plan/PlanSettings'
+import TodayPlan from '@/components/plan/TodayPlan'
 import { getSlugForSubject } from '@/lib/subject-map'
-import {
-  progressKey,
-  computeCompletionPercent,
-  STATUS_COLORS,
-  STATUS_LABELS,
-  displaySubtopic,
-  STATUS_TEXT_COLORS,
-} from '@/lib/progress'
+import { progressKey, displaySubtopic, STATUS_COLORS } from '@/lib/progress'
 import { buildEffectiveProgressMap, buildProgressDetailMap } from '@/lib/decay'
-import { buildQueue, buildSession, groupBySubjectRanked } from '@/lib/planner'
+import { predictSubject } from '@/lib/prediction'
 import { accessibleSubjects, hasAllSubjects } from '@/lib/access'
+import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
 import { getCoveredSubtopics } from '@/lib/coverage'
-import { upcoming, relativeDay, KIND_LABEL, KIND_DOT } from '@/lib/calendar'
+import { resolveSettings, buildCandidates, buildPlan, nextDeadline, dateKey, WEEKDAYS } from '@/lib/study-plan'
 import {
   notificationsSupported,
   notificationPermission,
@@ -35,53 +40,59 @@ import {
   notify,
 } from '@/lib/notify'
 
-// Below this there is no session to plan: one subtopic costs about 22 minutes,
-// so a five-minute block could only ever promise something it cannot deliver.
-const MIN_MINUTES = 15
-// Eight hours. Past that it is not a study session, it is a whole day, and the
-// queue would be padded with subtopics nobody is getting to.
-const MAX_MINUTES = 480
+const SNAPSHOT = (id) => `psyllabus:plan-today:${id}`
 
-const REASON_STYLE = {
-  weak: 'text-[var(--status-weak)]',
-  decaying: 'text-[var(--status-fading)]',
-  shaky: 'text-[var(--status-developing)]',
-  proficient: 'text-[var(--status-proficient)]',
-  untested: 'text-[var(--text-faint)]',
-  foundation: 'text-[var(--brand)]',
-  exam: 'text-[var(--status-weak)]',
-  event: 'text-[var(--status-weak)] font-medium',
+function readSnapshot(id) {
+  try {
+    return JSON.parse(localStorage.getItem(SNAPSHOT(id)) || 'null')
+  } catch {
+    return null
+  }
 }
+
+function writeSnapshot(id, snap) {
+  try {
+    if (snap) localStorage.setItem(SNAPSHOT(id), JSON.stringify(snap))
+    else localStorage.removeItem(SNAPSHOT(id))
+  } catch {
+    /* today will simply re-plan on the next visit */
+  }
+}
+
+const fmt = (m) => (m >= 60 ? `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, '0')}m` : `${m} min`)
 
 export default function StudyPlanPage() {
   const [profile, setProfile] = useState(null)
   const [items, setItems] = useState([])
+  const [effective, setEffective] = useState({})
   const [details, setDetails] = useState({})
-  const [mastery, setMastery] = useState({})
   const [events, setEvents] = useState([])
+  const [mistakes, setMistakes] = useState([])
+  const [adjustments, setAdjustments] = useState([])
+  const [quizzedToday, setQuizzedToday] = useState(() => new Set())
   const [covered, setCovered] = useState(null)
-  const [dueReviews, setDueReviews] = useState(0)
-  const [minutes, setMinutes] = useState(40)
-  const [minutesInput, setMinutesInput] = useState('40')
-  const [done, setDone] = useState(() => new Set())
+  const [now, setNow] = useState(null)
+  const [snapshot, setSnapshot] = useState(null)
   const [view, setView] = useState('today')
+  const [editing, setEditing] = useState(false)
   const [drawerItem, setDrawerItem] = useState(null)
   const [permission, setPermission] = useState('default')
+  const [notice, setNotice] = useState(null)
   const [loading, setLoading] = useState(true)
+  const router = useRouter()
+  const supabase = createClient()
 
   // The top bar runs for as long as this page is fetching, not just while the
-  // route is in flight. A page that has arrived but has no data yet is the
-  // part that feels broken.
+  // route is in flight.
   useEffect(() => {
     if (!loading) return
     startLoading()
     return () => stopLoading()
   }, [loading])
-  const router = useRouter()
-  const supabase = createClient()
 
   useEffect(() => {
-    setPermission(notificationPermission())
+    const read = () => setPermission(notificationPermission())
+    read()
   }, [])
 
   useEffect(() => {
@@ -91,91 +102,208 @@ export default function StudyPlanPage() {
         router.push('/login')
         return
       }
-
       const profileData = await getProfile(supabase, user.id, { onFresh: setProfile })
-
       if (!profileData) {
         router.push('/onboarding')
         return
       }
-      setProfile(profileData)
 
-      const saved = parseInt(profileData.session_minutes, 10)
-      if (!Number.isNaN(saved)) {
-        setMinutes(saved)
-        setMinutesInput(String(saved))
-      }
+      // Read once, on the client: "today" is the student's day, not the
+      // server's, and reading the clock while rendering would be impure.
+      const at = new Date()
+      const midnight = new Date(at.getFullYear(), at.getMonth(), at.getDate())
+      const weekAgo = dateKey(new Date(at.getFullYear(), at.getMonth(), at.getDate() - 7))
+      const horizonEnd = new Date(at.getFullYear(), at.getMonth(), at.getDate() + 15).toISOString()
 
       // Free accounts plan only against the subject they can actually open.
       const usable = accessibleSubjects(profileData)
 
-      const [syllabusRows, { data: progressRows }, { count: due }, eventsResult] =
+      const [syllabusRows, { data: progressRows }, mistakesResult, eventsResult, adjustmentsResult, todayResult] =
         await Promise.all([
           getSyllabus(supabase, usable),
           supabase.from('progress').select('*').eq('user_id', user.id),
-          supabase
-            .from('mistakes')
-            .select('id', { count: 'exact', head: true })
-            .eq('user_id', user.id)
-            .lte('next_review_at', new Date().toISOString()),
-          // The calendar table only exists after migration 012; a missing table
-          // must not take the whole plan down.
-          supabase
-            .from('calendar_events')
-            .select('*')
-            .eq('user_id', user.id)
-            .eq('completed', false),
+          supabase.from('mistakes').select('subject, next_review_at').eq('user_id', user.id).lte('next_review_at', horizonEnd),
+          supabase.from('calendar_events').select('*').eq('user_id', user.id).eq('completed', false),
+          supabase.from('plan_adjustments').select('task_id, kind, on_date, to_date').eq('user_id', user.id).gte('on_date', weekAgo),
+          // What was quizzed today: finishing a task's quiz is what marks it done.
+          supabase.from('quiz_attempts').select('subject, subtopic').eq('user_id', user.id).gte('completed_at', midnight.toISOString()),
         ])
 
-      const effective = buildEffectiveProgressMap(progressRows)
-      const merged = (syllabusRows || []).map((row) => ({
-        ...row,
-        status: effective[progressKey(row.subject, row.subtopic)] || 'not_started',
-      }))
-
-      const perSubject = {}
-      for (const subject of usable) {
-        perSubject[subject] = computeCompletionPercent(
-          merged.filter((r) => r.subject === subject),
-          effective,
-          subject
-        )
-      }
-
-      setItems(merged)
+      const eff = buildEffectiveProgressMap(progressRows)
+      setProfile(profileData)
+      setItems(
+        (syllabusRows || []).map((row) => ({ ...row, status: eff[progressKey(row.subject, row.subtopic)] || 'not_started' }))
+      )
+      setEffective(eff)
       setDetails(buildProgressDetailMap(progressRows))
-      setMastery(perSubject)
       setEvents(eventsResult?.data || [])
-      setDueReviews(due || 0)
-      // Things with a quiz behind them rank above things without one.
+      setMistakes(mistakesResult?.data || [])
+      setAdjustments(adjustmentsResult?.data || [])
+      setQuizzedToday(new Set((todayResult?.data || []).filter((a) => a.subtopic).map((a) => progressKey(a.subject, a.subtopic))))
       setCovered(await getCoveredSubtopics(supabase))
+      setSnapshot(readSnapshot(profileData.id))
+      setNow(at)
       setLoading(false)
     }
     load()
   }, [router, supabase])
 
-  const queue = useMemo(
-    () => buildQueue({ items, details, subjectMastery: mastery, profile, events, covered }),
-    [items, details, mastery, profile, events, covered]
+  /**
+   * The examined subjects. TOK, the Extended Essay and CAS are coursework and
+   * service, not syllabuses to be tested topic by topic: an "Extended Essay
+   * exam in 560 days" countdown is wrong, and so is a plan sending you to quiz
+   * CAS. Left out here as they are from the predicted total.
+   */
+  const subjects = useMemo(
+    () => accessibleSubjects(profile).filter((s) => !IB_CORE_SUBJECTS.includes(s)),
+    [profile]
+  )
+  const planItems = useMemo(() => items.filter((i) => subjects.includes(i.subject)), [items, subjects])
+  const settings = useMemo(() => resolveSettings(profile), [profile])
+  const configured = Boolean(profile?.plan_settings && Object.keys(profile.plan_settings).length)
+
+  const { predicted, sizes, topicsBySubject } = useMemo(() => {
+    const predicted = {}
+    const sizes = {}
+    const topicsBySubject = {}
+    for (const subject of subjects) {
+      const rows = items.filter((r) => r.subject === subject)
+      sizes[subject] = rows.length
+      predicted[subject] = predictSubject(subject, rows, effective, profile?.curriculum).grade
+      const firstAt = new Map()
+      for (const r of rows) if (!firstAt.has(r.topic) || (r.position ?? 0) < firstAt.get(r.topic)) firstAt.set(r.topic, r.position ?? 0)
+      topicsBySubject[subject] = [...firstAt].sort((a, b) => a[1] - b[1]).map(([t]) => t)
+    }
+    return { predicted, sizes, topicsBySubject }
+  }, [subjects, items, effective, profile])
+
+  const candidates = useMemo(
+    () =>
+      now
+        ? buildCandidates({ items: planItems, details, profile, settings, predicted, subjectSizes: sizes, events, covered, now })
+        : [],
+    [now, planItems, details, profile, settings, predicted, sizes, events, covered]
   )
 
-  const session = useMemo(() => buildSession(queue, { minutes }), [queue, minutes])
-  const grouped = useMemo(() => groupBySubjectRanked(queue), [queue])
-  const nextEvents = useMemo(() => upcoming(events).slice(0, 3), [events])
+  const plan = useMemo(
+    () => (now ? buildPlan({ candidates, settings, mistakes, adjustments, keepToday: snapshot, now }) : null),
+    [now, candidates, settings, mistakes, adjustments, snapshot]
+  )
 
-  /** Persist the chosen block length so the next session opens the same way. */
-  const commitMinutes = useCallback(
-    async (value) => {
-      const clamped = Math.min(MAX_MINUTES, Math.max(MIN_MINUTES, value))
-      setMinutes(clamped)
-      setMinutesInput(String(clamped))
-      const user = await getCurrentUser(supabase)
-      if (!user) return
-      await supabase.from('profiles').update({ session_minutes: clamped }).eq('id', user.id)
-      invalidateProfile(user.id)
+  const deadline = useMemo(
+    () => (now ? nextDeadline({ events, profile, settings, subjects, now }) : null),
+    [now, events, profile, settings, subjects]
+  )
+
+  /**
+   * Today, once shown, stays as shown.
+   *
+   * Without this the plan would reshuffle under the student the moment a quiz
+   * moved a status — finish the first task and the second one changes. The
+   * first plan of the day is kept, per device, and only the student's own
+   * skips, moves and pins change it until tomorrow or until they ask.
+   */
+  useEffect(() => {
+    if (!plan || !profile || !configured) return
+    const today = plan.days[0]
+    if (snapshot?.date === today.date) return
+    const keep = () => {
+      const snap = { date: today.date, tasks: today.tasks.map(({ steps, done, ...t }) => t) }
+      writeSnapshot(profile.id, snap)
+      setSnapshot(snap)
+    }
+    keep()
+  }, [plan, profile, snapshot, configured])
+
+  const replanToday = useCallback(() => {
+    if (!profile) return
+    writeSnapshot(profile.id, null)
+    setSnapshot(null)
+  }, [profile])
+
+  const isDone = useCallback(
+    (task) => {
+      if (task.kind === 'review') {
+        const end = now ? new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1) : null
+        return !mistakes.some((m) => m.subject === task.subject && end && new Date(m.next_review_at) < end)
+      }
+      if (task.done) return true
+      return task.quizzable && quizzedToday.has(task.key)
     },
-    [supabase]
+    [mistakes, quizzedToday, now]
   )
+
+  const quizHref = (task) =>
+    `/dashboard/quiz?subject=${encodeURIComponent(task.subject)}&topic=${encodeURIComponent(task.topic)}&subtopic=${encodeURIComponent(task.subtopic)}&back=/dashboard/study-plan`
+  const hrefFor = (task) =>
+    task.kind === 'review' ? '/dashboard/mistakes' : task.quizzable && task.subtopic ? quizHref(task) : null
+
+  /**
+   * The student's edits. Shown at once, saved behind, put back if the save
+   * fails — an edit that silently did not stick is worse than one refused.
+   */
+  const adjust = useCallback(
+    async (task, kind, toDate = null) => {
+      if (!plan) return
+      const today = plan.days[0].date
+      const before = adjustments
+      let next = adjustments
+      let undo = null
+
+      if (kind === 'undone') {
+        next = adjustments.filter((a) => !(a.task_id === task.id && a.kind === 'done' && a.on_date === today))
+      } else {
+        const row = { task_id: task.id, kind, on_date: today, to_date: kind === 'move' ? toDate : null }
+        // One edit of each kind per task per day: a second move replaces the first.
+        next = [...adjustments.filter((a) => !(a.task_id === task.id && a.kind === kind && a.on_date === today)), row]
+        if (kind === 'skip' || kind === 'move') undo = { task, kind }
+      }
+      setAdjustments(next)
+
+      const del = supabase.from('plan_adjustments').delete().eq('task_id', task.id).eq('on_date', today)
+      const kindToClear = kind === 'undone' ? 'done' : kind
+      const { error: e1 } = await del.eq('kind', kindToClear)
+      let e2 = null
+      if (kind !== 'undone') {
+        ;({ error: e2 } = await supabase
+          .from('plan_adjustments')
+          .insert({ task_id: task.id, kind, on_date: today, to_date: kind === 'move' ? toDate : null }))
+      }
+      if (e1 || e2) {
+        setAdjustments(before)
+        setNotice({ text: 'That change did not save. Check your connection and try again.' })
+        return
+      }
+      if (undo) {
+        const when =
+          kind === 'skip'
+            ? 'Skipped for today'
+            : toDate === plan.days[1]?.date
+              ? 'Moved to tomorrow'
+              : `Moved to ${WEEKDAYS[new Date(`${toDate}T00:00`).getDay()]} ${toDate.slice(8)}`
+        setNotice({ text: when, undo })
+      } else setNotice(null)
+    },
+    [plan, adjustments, supabase]
+  )
+
+  const undoLast = async () => {
+    if (!notice?.undo || !plan) return
+    const { task, kind } = notice.undo
+    const today = plan.days[0].date
+    const before = adjustments
+    setAdjustments(adjustments.filter((a) => !(a.task_id === task.id && a.kind === kind && a.on_date === today)))
+    setNotice(null)
+    // Back into today where it was, since the snapshot dropped it.
+    if (snapshot?.date === today && !snapshot.tasks.some((t) => t.id === task.id)) {
+      const { steps, done, ...t } = task
+      const snap = { ...snapshot, tasks: [...snapshot.tasks, t] }
+      writeSnapshot(profile.id, snap)
+      setSnapshot(snap)
+    }
+    const { error } = await supabase.from('plan_adjustments').delete().eq('task_id', task.id).eq('kind', kind).eq('on_date', today)
+    if (error) setAdjustments(before)
+  }
 
   const enableNotifications = async () => {
     const result = await requestNotificationPermission()
@@ -188,7 +316,7 @@ export default function StudyPlanPage() {
     }
   }
 
-  if (loading) {
+  if (loading || !plan) {
     return (
       <DashboardLayout profile={null}>
         <PageLoading title="Study Plan" width="default" rows={5} variant="plan" />
@@ -196,19 +324,28 @@ export default function StudyPlanPage() {
     )
   }
 
-  const remaining = session.items.filter((i) => !done.has(i.id))
-  const completedCount = session.items.length - remaining.length
-  const sessionComplete = session.items.length > 0 && remaining.length === 0
+  const tomorrow = plan.days[1]
+  const settingsPanel = (
+    <PlanSettings
+      profile={profile}
+      settings={settings}
+      subjects={subjects}
+      topicsBySubject={topicsBySubject}
+      firstTime={!configured}
+      onClose={() => setEditing(false)}
+      onSaved={(plan_settings) => {
+        setProfile((p) => ({ ...p, plan_settings }))
+        setEditing(false)
+        replanToday()
+      }}
+    />
+  )
 
-  const quizHref = (item) =>
-    `/dashboard/quiz?subject=${encodeURIComponent(item.subject)}&topic=${encodeURIComponent(item.topic)}&subtopic=${encodeURIComponent(item.subtopic)}&back=/dashboard/study-plan`
-
-  const toggleDone = (id) =>
-    setDone((prev) => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      return next
-    })
+  const countdown = deadline
+    ? deadline.days === 0
+      ? `${deadline.title} today`
+      : `${deadline.title} in ${deadline.days} day${deadline.days === 1 ? '' : 's'}`
+    : `${candidates.length} subtopic${candidates.length === 1 ? '' : 's'} still to secure`
 
   return (
     <DashboardLayout profile={profile}>
@@ -216,49 +353,27 @@ export default function StudyPlanPage() {
       <Page width="default">
         <PageHeader
           title="Study Plan"
-          subtitle={`${queue.length} subtopic${queue.length === 1 ? '' : 's'} still to secure`}
+          subtitle={countdown}
           action={
-            <Link href="/dashboard/calendar" className="btn btn-outline control-md">
-              Calendar
-            </Link>
+            <div className="flex flex-wrap gap-2">
+              {configured && (
+                <button type="button" onClick={() => setEditing((v) => !v)} className="btn btn-outline control-md" aria-expanded={editing}>
+                  How I study
+                </button>
+              )}
+              <Link href="/dashboard/calendar" className="btn btn-outline control-md">
+                Calendar
+              </Link>
+            </div>
           }
         />
 
-        {/* What is actually coming up */}
-        {nextEvents.length > 0 && (
-          <ul className="mb-10 flex flex-col">
-            {nextEvents.map((event) => (
-              <li
-                key={event.id}
-                className="flex items-center gap-3 border-b py-3 last:border-b-0"
-                style={{ borderColor: 'var(--border)' }}
-              >
-                <span
-                  className={`h-2 w-2 shrink-0 rounded-full ${KIND_DOT[event.kind]}`}
-                  aria-hidden="true"
-                />
-                <div className="min-w-0 flex-1">
-                  <p className="t-caption truncate">
-                    {KIND_LABEL[event.kind]}
-                    {event.subject ? ` · ${event.subject}` : ''}
-                  </p>
-                  <p className="truncate text-[14.5px] font-medium">{event.title}</p>
-                </div>
-                <span className="t-caption shrink-0">{relativeDay(event.due_at)}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-
-        {notificationsSupported() && permission === 'default' && (
-          <div
-            className="mb-10 flex flex-wrap items-center gap-4 border-l-2 pl-4"
-            style={{ borderColor: 'var(--border-strong)' }}
-          >
+        {notificationsSupported() && permission === 'default' && configured && (
+          <div className="mb-8 flex flex-wrap items-center gap-4 border-l-2 pl-4" style={{ borderColor: 'var(--border-strong)' }}>
             <div className="min-w-0 flex-1">
               <p className="text-[14.5px] font-medium">Turn on reminders</p>
               <p className="mt-1 text-[13px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              Alerts before tests and deadlines, and when a block ends. They need the app open.
+                Alerts before tests and deadlines, and when a block ends. They need the app open.
               </p>
             </div>
             <button onClick={enableNotifications} className="btn btn-solid control-sm shrink-0 text-xs">
@@ -267,13 +382,15 @@ export default function StudyPlanPage() {
           </div>
         )}
 
-        {queue.length === 0 ? (
+        {(!configured || editing) && <div className="mb-10">{settingsPanel}</div>}
+
+        {configured && candidates.length === 0 && plan.days[0].tasks.length === 0 ? (
           <EmptyState
-            title={items.length ? 'Everything is mastered' : 'Take a quiz to build your plan'}
+            title={items.length ? 'Nothing left to plan' : 'Take a quiz to build your plan'}
             description={
               items.length
-                ? 'Nothing is weak or decaying right now. Keep testing to hold it there.'
-                : 'The planner ranks subtopics by what you got wrong, what is decaying, what a test is coming up on, and what unlocks later work. It needs one quiz to start.'
+                ? 'Everything you have been taught is mastered. Keep testing to hold it there, or move "Where your classes are" on as you learn new topics.'
+                : 'The plan is built from what you have proved. It needs one quiz to start.'
             }
             action={
               <Link href="/dashboard/subjects" className="btn btn-solid control-md">
@@ -282,342 +399,142 @@ export default function StudyPlanPage() {
             }
           />
         ) : (
-          <>
-            {/* View switch */}
-            <div className="mb-8 flex flex-wrap gap-2">
-              {[
-                ['today', "Today's session"],
-                ['all', 'Full priority list'],
-              ].map(([key, label]) => (
-                <button
-                  key={key}
-                  onClick={() => setView(key)}
-                  aria-pressed={view === key}
-                  className={`${view === key ? 'btn btn-solid control-sm' : 'btn btn-outline control-sm'}`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-
-            {view === 'today' ? (
-              <>
-                <div className="mb-10">
-                  {/* The plan for tonight, as a card: what it is, how long it
-                      takes, how far through you are. The controls sit inside
-                      it, because "how long have I got" is part of the plan
-                      rather than a setting about it. */}
-                  <div
-                    className="elev mb-8 rounded-[16px] border p-6"
-                    style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+          configured && (
+            <>
+              <div className="mb-8 flex flex-wrap gap-2">
+                {[
+                  ['today', 'Today'],
+                  ['all', 'Everything left'],
+                ].map(([key, label]) => (
+                  <button
+                    key={key}
+                    onClick={() => setView(key)}
+                    aria-pressed={view === key}
+                    className={view === key ? 'btn btn-solid control-sm' : 'btn btn-outline control-sm'}
                   >
-                    <div className="flex flex-wrap items-start justify-between gap-4">
-                      <div className="min-w-0">
-                        <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em]" style={{ color: 'var(--text-faint)' }}>
-                          {sessionComplete ? 'Session complete' : 'Tonight'}
-                        </p>
-                        <h2 className="mt-2 text-[clamp(1.25rem,2.4vw,1.6rem)] font-semibold leading-tight tracking-[-0.025em]">
-                          {sessionComplete
-                            ? 'Everything planned is done'
-                            : `${session.items.length} subtopic${session.items.length === 1 ? '' : 's'}, about ${minutes} minutes`}
-                        </h2>
-                        <p className="mt-1.5 text-[13px]" style={{ color: 'var(--text-muted)' }}>
-                          {completedCount > 0
-                            ? `${completedCount} of ${session.items.length} done · about ${session.perItemMinutes} minutes each`
-                            : `About ${session.perItemMinutes} minutes each: read it, sit the quiz, go back over what you missed.`}
-                        </p>
-                      </div>
-
-                      <label className="shrink-0">
-                        <span className="t-overline">I have</span>
-                        <div className="mt-1 flex items-center gap-2">
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            value={minutesInput}
-                            aria-label="Minutes available"
-                            onChange={(e) => setMinutesInput(e.target.value.replace(/[^0-9]/g, ''))}
-                            onBlur={() => {
-                              const parsed = parseInt(minutesInput, 10)
-                              commitMinutes(Number.isNaN(parsed) ? minutes : parsed)
-                            }}
-                            onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
-                            className="input w-20 text-center tabular-nums"
-                          />
-                          <span className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
-                            min
-                          </span>
-                        </div>
-                      </label>
-                    </div>
-
-                    {/* How far through the evening you are, at a glance. */}
-                    {session.items.length > 0 && !sessionComplete && (
-                      <div
-                        className="mt-5 h-1.5 overflow-hidden rounded-full"
-                        style={{ background: 'var(--border-strong)' }}
-                      >
-                        <div
-                          className="bar-fill h-full rounded-full"
-                          style={{
-                            width: `${(completedCount / session.items.length) * 100}%`,
-                            background: 'var(--brand)',
-                          }}
-                        />
-                      </div>
-                    )}
-
-                    <div className="mt-5">
-                      <SessionTimer minutes={minutes} />
-                    </div>
-                  </div>
-
-                  {sessionComplete ? (
-                    <div className="border-l-2 pl-4" style={{ borderColor: 'var(--status-proficient)' }}>
-                      <p className="text-[14.5px] font-medium" style={{ color: 'var(--status-proficient)' }}>
-                        You worked through everything planned for today.
-                      </p>
-                      <p className="mt-1.5 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-                        Increase the time above to keep going, or come back tomorrow when the queue
-                        has re-ranked.
-                      </p>
-                    </div>
-                  ) : (
-                    <ol className="stagger flex flex-col">
-                      {session.items.map((item, index) => {
-                        const isDone = done.has(item.id)
-                        return (
-                          <li
-                            key={item.id}
-                            className="flex flex-wrap items-center gap-3 rounded-[12px] border px-4 py-3.5"
-                            style={{
-                              borderColor: isDone ? 'var(--border)' : 'var(--border-strong)',
-                              background: isDone ? 'transparent' : 'var(--surface)',
-                              marginBottom: 8,
-                              opacity: isDone ? 0.6 : 1,
-                            }}
-                          >
-                            <span
-                              className="shrink-0 text-[12px] font-semibold tabular-nums"
-                              style={{ color: 'var(--text-faint)', width: 18 }}
-                            >
-                              {index + 1}
-                            </span>
-                            <button
-                              onClick={() => toggleDone(item.id)}
-                              aria-label={isDone ? 'Mark as not done' : 'Mark as done'}
-                              aria-pressed={isDone}
-                              className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-[var(--r-sm)] border transition-colors duration-150 ${
-                                isDone
-                                  ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
-                                  : 'border-[var(--border-hover)]'
-                              }`}
-                            >
-                              {isDone && <IconCheck width={12} height={12} />}
-                            </button>
-
-                            <div className="min-w-[12rem] flex-1">
-                              <p className="t-caption truncate">
-                                {item.subject} · {item.topic}
-                              </p>
-                              <p
-                                className={`truncate text-[14.5px] ${isDone ? 'text-[var(--text-faint)] line-through' : 'text-[var(--text-body)]'}`}
-                              >
-                                {displaySubtopic(item.subtopic)}
-                              </p>
-                              {item.reasons.length > 0 && !isDone && (
-                                <p className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
-                                  {item.reasons.slice(0, 2).map((r) => (
-                                    <span
-                                      key={r.kind}
-                                      className={`text-xs ${REASON_STYLE[r.kind] || 'text-[var(--text-faint)]'}`}
-                                    >
-                                      {r.label}
-                                    </span>
-                                  ))}
-                                </p>
-                              )}
-
-                              {/* What to do with it, not just which one to
-                                  open. Naming the subtopic and leaving the
-                                  rest to you skips the part students are
-                                  worst at, and the order is not the same for
-                                  every subtopic: something you got wrong
-                                  needs reading first, something fading needs
-                                  retrieving and re-reading it wastes the
-                                  evening. */}
-                              {!isDone && item.steps?.length > 0 && (
-                                <ol className="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1.5">
-                                  {item.steps.map((step, i) => (
-                                    <li key={step.kind} className="flex items-center gap-2">
-                                      {i > 0 && (
-                                        <span aria-hidden="true" className="text-[10px]" style={{ color: 'var(--border-strong)' }}>
-                                          →
-                                        </span>
-                                      )}
-                                      <span
-                                        className="rounded-full border px-2.5 py-1 text-[11.5px]"
-                                        style={{
-                                          borderColor: 'var(--border)',
-                                          background: 'var(--surface-sunken)',
-                                          color: 'var(--text-body)',
-                                        }}
-                                      >
-                                        {step.label}
-                                        <span className="ml-1.5 tabular-nums" style={{ color: 'var(--text-faint)' }}>
-                                          {step.minutes}m
-                                        </span>
-                                      </span>
-                                    </li>
-                                  ))}
-                                </ol>
-                              )}
-                            </div>
-
-                            {!isDone && (
-                              <div className="flex shrink-0 items-center gap-2">
-                                <span
-                                  className="hidden text-[12px] tabular-nums sm:block"
-                                  style={{ color: 'var(--text-faint)' }}
-                                >
-                                  ~{session.perItemMinutes} min
-                                </span>
-                                <button
-                                  onClick={() => setDrawerItem(item)}
-                                  className="btn btn-quiet control-sm"
-                                >
-                                  Resources
-                                </button>
-                                <Link href={quizHref(item)} className="btn btn-solid control-sm">
-                                  Start
-                                </Link>
-                              </div>
-                            )}
-                          </li>
-                        )
-                      })}
-                    </ol>
-                  )}
-                </div>
-
-                {/* The evening's other half. Subtopics above, everything else
-                    that has to happen tonight here. */}
-                <TodoList className="mt-12 mb-12" title="Also tonight" subjects={accessibleSubjects(profile)} />
-
-                {dueReviews > 0 && (
-                  <Link
-                    href="/dashboard/mistakes"
-                    className="group flex items-center gap-4 border-t py-5"
-                    style={{ borderColor: 'var(--border)' }}
-                  >
-                    <div className="min-w-0 flex-1">
-                      <p className="text-[15px] font-semibold tracking-[-0.012em]">
-                        {dueReviews} to redeem
-                      </p>
-                      <p className="mt-1 text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
-                        Questions you got wrong. Three in a row clears one.
-                      </p>
-                    </div>
-                    <IconArrowRight width={18} height={18} className="shrink-0 text-[var(--brand)]" />
-                  </Link>
-                )}
-
-                {events.length === 0 && (
-                  <Link
-                    href="/dashboard/calendar"
-                    className="group flex items-center gap-4 border-t py-5"
-                    style={{ borderColor: 'var(--border)' }}
-                  >
-                    <IconCalendar width={17} height={17} className="shrink-0 text-[var(--brand)]" />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-[15px] font-semibold tracking-[-0.012em]">Add your next test</p>
-                      <p className="mt-1 text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
-                        With a date on the calendar, the planner puts that subject first as it
-                        approaches.
-                      </p>
-                    </div>
-                    <IconArrowRight width={18} height={18} className="shrink-0 text-[var(--brand)]" />
-                  </Link>
-                )}
-              </>
-            ) : (
-              <div className="flex flex-col gap-8">
-                {grouped.map(({ subject, items: subjectItems }) => (
-                  <section key={subject}>
-                    <div className="mb-3 flex items-center justify-between gap-4">
-                      <h2 className="t-overline">{subject}</h2>
-                      <Link
-                        href={`/dashboard/syllabus/${getSlugForSubject(subject)}`}
-                        className="text-sm font-medium text-[var(--brand)] hover:underline"
-                      >
-                        Open syllabus
-                      </Link>
-                    </div>
-                    <ul className="flex flex-col">
-                      {subjectItems.slice(0, 12).map((item, i) => (
-                        <li
-                  key={item.id}
-                  className="border-b last:border-b-0"
-                  style={{ borderColor: 'var(--border)' }}
-                >
-                          <div className="flex flex-wrap items-center gap-3 px-1 py-3.5">
-                            <span
-                              className={`h-2 w-2 shrink-0 rounded-full ${STATUS_COLORS[item.status]}`}
-                              aria-hidden="true"
-                            />
-                            <div className="min-w-[10rem] flex-1">
-                              <p className="t-caption truncate">{item.topic}</p>
-                              <p className="truncate text-sm text-[var(--text-body)]">
-                                {displaySubtopic(item.subtopic)}
-                              </p>
-                            </div>
-                            <span
-                              className={`hidden shrink-0 text-xs font-medium sm:block ${STATUS_TEXT_COLORS[item.status]}`}
-                            >
-                              {STATUS_LABELS[item.status]}
-                            </span>
-                            <div className="flex shrink-0 items-center gap-2">
-                              <button
-                                onClick={() => setDrawerItem(item)}
-                                className="btn btn-quiet control-sm"
-                              >
-                                Resources
-                              </button>
-                              <Link
-                                href={quizHref(item)}
-                                className="btn btn-outline control-sm"
-                              >
-                                Practise
-                              </Link>
-                            </div>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                    {subjectItems.length > 12 && (
-                      <p className="t-caption mt-2">
-                        Showing the 12 most urgent of {subjectItems.length}.
-                      </p>
-                    )}
-                  </section>
+                    {label}
+                  </button>
                 ))}
               </div>
-            )}
 
-            {!hasAllSubjects(profile) && (profile.subjects || []).length > 1 && (
-              <Link
-                href="/dashboard/profile#unlock"
-                className="mt-10 flex items-center gap-3 border-l-2 pl-4"
-                style={{ borderColor: 'var(--border-strong)' }}
-              >
-                <IconCheck width={16} height={16} className="shrink-0 text-[var(--brand)]" />
-                <span className="text-sm text-[var(--text-body)]">
-                  This plan covers one subject on the free plan. Unlock the rest with your school
-                  code.
-                </span>
-              </Link>
-            )}
-          </>
+              {view === 'today' ? (
+                <>
+                  <TodayPlan
+                    day={plan.days[0]}
+                    tomorrowKey={tomorrow?.date}
+                    style={settings.style}
+                    isDone={isDone}
+                    hrefFor={hrefFor}
+                    onResources={setDrawerItem}
+                    onAdjust={adjust}
+                  />
+
+                  {notice && (
+                    <div
+                      role="status"
+                      className="mt-4 flex items-center justify-between gap-3 rounded-[12px] border px-4 py-2.5 text-[13px]"
+                      style={{ borderColor: 'var(--border-strong)', background: 'var(--surface-sunken)' }}
+                    >
+                      <span>{notice.text}</span>
+                      {notice.undo && (
+                        <button type="button" onClick={undoLast} className="font-medium text-[var(--brand)] hover:underline">
+                          Undo
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-[13px]" style={{ color: 'var(--text-muted)' }}>
+                    {tomorrow && (
+                      <p>
+                        <span className="font-medium" style={{ color: 'var(--text-body)' }}>
+                          Tomorrow, {WEEKDAYS[tomorrow.weekday]}:
+                        </span>{' '}
+                        {tomorrow.minutes === 0
+                          ? 'a day off'
+                          : tomorrow.tasks.length
+                            ? `${tomorrow.tasks.length} task${tomorrow.tasks.length === 1 ? '' : 's'}, ${fmt(tomorrow.planned)} — ${[...new Set(tomorrow.tasks.map((t) => t.subject))].join(', ')}`
+                            : 'nothing planned yet'}
+                      </p>
+                    )}
+                    <button type="button" onClick={replanToday} className="font-medium text-[var(--brand)] hover:underline">
+                      Re-plan today
+                    </button>
+                  </div>
+
+                  {/* The evening's other half: everything that is not a subtopic. */}
+                  <TodoList className="mb-12 mt-12" title="Also today" subjects={accessibleSubjects(profile)} />
+
+                  {events.length === 0 && (
+                    <Link href="/dashboard/calendar" className="group flex items-center gap-4 border-t py-5" style={{ borderColor: 'var(--border)' }}>
+                      <IconCalendar width={17} height={17} className="shrink-0 text-[var(--brand)]" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[15px] font-semibold tracking-[-0.012em]">Add your next test</p>
+                        <p className="mt-1 text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
+                          With a date on the calendar, the plan puts that subject first as it gets close.
+                        </p>
+                      </div>
+                      <IconArrowRight width={18} height={18} className="shrink-0 text-[var(--brand)]" />
+                    </Link>
+                  )}
+                </>
+              ) : (
+                <div className="flex flex-col gap-8">
+                  <p className="text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                    Everything still to do, most marks per hour first. {plan.unscheduled > 0 && `${plan.unscheduled} of these do not fit in the next two weeks at the time you have set.`}
+                  </p>
+                  {subjects.map((subject) => {
+                    const left = candidates.filter((c) => c.subject === subject)
+                    if (!left.length) return null
+                    return (
+                      <section key={subject}>
+                        <div className="mb-3 flex items-center justify-between gap-4">
+                          <h2 className="t-overline">
+                            {subject} · {left.length} left · about {fmt(left.reduce((n, c) => n + c.minutes, 0))}
+                          </h2>
+                          <Link href={`/dashboard/syllabus/${getSlugForSubject(subject)}`} className="text-sm font-medium text-[var(--brand)] hover:underline">
+                            Open syllabus
+                          </Link>
+                        </div>
+                        <ul className="flex flex-col">
+                          {left.slice(0, 12).map((c) => (
+                            <li key={c.id} className="flex flex-wrap items-center gap-3 border-b px-1 py-3 last:border-b-0" style={{ borderColor: 'var(--border)' }}>
+                              <span className={`h-2 w-2 shrink-0 rounded-full ${STATUS_COLORS[c.status]}`} aria-hidden="true" />
+                              <div className="min-w-[10rem] flex-1">
+                                <p className="t-caption truncate">{c.topic}</p>
+                                <p className="truncate text-sm text-[var(--text-body)]">{displaySubtopic(c.subtopic)}</p>
+                              </div>
+                              <span className="hidden shrink-0 text-xs tabular-nums sm:block" style={{ color: 'var(--text-faint)' }}>
+                                {c.minutes} min
+                              </span>
+                              <button onClick={() => setDrawerItem(c)} className="btn btn-quiet control-sm">
+                                Resources
+                              </button>
+                              {c.quizzable && (
+                                <Link href={quizHref(c)} className="btn btn-outline control-sm">
+                                  Practise
+                                </Link>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                        {left.length > 12 && <p className="t-caption mt-2">Showing the 12 worth the most of {left.length}.</p>}
+                      </section>
+                    )
+                  })}
+                </div>
+              )}
+
+              {!hasAllSubjects(profile) && (profile.subjects || []).length > 1 && (
+                <Link href="/dashboard/profile#unlock" className="mt-10 flex items-center gap-3 border-l-2 pl-4" style={{ borderColor: 'var(--border-strong)' }}>
+                  <IconCheck width={16} height={16} className="shrink-0 text-[var(--brand)]" />
+                  <span className="text-sm text-[var(--text-body)]">
+                    This plan covers one subject on the free plan. Unlock the rest with your school code.
+                  </span>
+                </Link>
+              )}
+            </>
+          )
         )}
 
         <ResourceHubDrawer
@@ -627,7 +544,7 @@ export default function StudyPlanPage() {
           topic={drawerItem?.topic}
           subtopic={drawerItem?.subtopic}
           hlOnly={drawerItem?.hl_only}
-          quizHref={drawerItem ? quizHref(drawerItem) : null}
+          quizHref={drawerItem && drawerItem.quizzable && drawerItem.subtopic ? quizHref(drawerItem) : null}
         />
       </Page>
     </DashboardLayout>
