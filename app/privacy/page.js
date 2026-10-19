@@ -11,7 +11,7 @@ function Privacy() {
   return (
     <LegalDoc
       titles={{ en: 'Privacy Policy', ar: 'سياسة الخصوصية' }}
-      updated={{ en: '5 September 2026', ar: '٥ سبتمبر ٢٠٢٦' }}
+      updated={{ en: '19 October 2026', ar: '١٩ أكتوبر ٢٠٢٦' }}
       lang={lang}
       setLang={setLang}
     >
@@ -63,6 +63,31 @@ function Privacy() {
             {ar
               ? 'إجاباتك في الاختبارات وتقدمك الدراسي والوقت الذي تستغرقه في كل سؤال. هذه هي الخدمة نفسها: بدونها لا يمكن للمنصة أن تعرف ما تعرفه.'
               : 'Your quiz answers, study progress and time spent per question. This is the service itself: without it the app cannot know what you know.'}
+          </li>
+          <li>
+            {ar
+              ? 'وقت المذاكرة عند استخدامك المؤقّت: متى بدأ، ومدته، والمادة أو الموضوع الذي كان له، لتعرض لك المنصة الوقت الذي ذاكرته.'
+              : 'Study time, when you use the timer: when it ran, for how long, and which subject or topic it was for, so the app can show you the time you have put in.'}
+          </li>
+          <li>
+            {ar
+              ? 'إعدادات خطة المذاكرة: الأوقات المتاحة لك للمذاكرة، وطريقتك المفضلة في المذاكرة، ومواعيد اختباراتك، ومنطقتك الزمنية، لتوضع المذاكرة في أوقات صحيحة. المنطقة الزمنية ليست موقعك.'
+              : 'Your study plan settings: the times you are free to study, how you like to study, your exam dates and your time zone, so study is placed at the right times. A time zone is not your location.'}
+          </li>
+          <li>
+            {ar
+              ? 'قائمة المهام، والاختبارات والمواعيد النهائية التي تضيفها إلى تقويمك في المنصة.'
+              : 'Your to-do list, and the tests and deadlines you add to your calendar in the app.'}
+          </li>
+          <li>
+            {ar
+              ? 'إذا ربطت تقويمك، وهذا اختياري: الرابط الخاص الذي تلصقه، ومنه عناوين وأوقات أحداث الأسابيع الستة القادمة فقط، لتتجنب خطتك الأوقات المشغولة. لا تُقرأ أماكن الأحداث ولا أوصافها ولا قوائم المدعوين ولا تُخزَّن.'
+              : 'If you connect your own calendar, which is optional: the private link you paste, and from it only the titles and times of events in the next six weeks, so your plan can work around them. Locations, descriptions and guest lists are never read or stored.'}
+          </li>
+          <li>
+            {ar
+              ? 'إذا أنشأت رابطاً لعرض خطتك في تقويم هاتفك، وهذا اختياري: رابط خاص يعرض أوقات مذاكرتك ومواعيد اختباراتك. يستطيع كل من يملك الرابط رؤيتها، فاحتفظ به لنفسك. ويمكنك استبداله برابط جديد في أي وقت، فيتوقف الرابط القديم عن العمل.'
+              : 'If you make a link to show your plan in your phone’s calendar, which is optional: a private link that shows your study blocks and test dates. Anyone who has the link can see them, so keep it to yourself. You can replace it with a new one at any time, and the old one stops working.'}
           </li>
           <li>
             {ar
@@ -126,6 +151,11 @@ function Privacy() {
             ? 'خوادم قواعد البيانات موجودة خارج سلطنة عُمان، وباستخدامك للمنصة فإنك توافق على نقل بياناتك ومعالجتها في تلك الولايات القضائية.'
             : 'Database servers are located outside Oman. By using the service you consent to your data being transferred to and processed in those jurisdictions.'}
         </p>
+        <p>
+          {ar
+            ? 'إذا ربطت تقويمك، يجلبه خادمنا من مزوّد التقويم الخاص بك (مثل Google أو Apple أو Microsoft) باستخدام الرابط الذي أعطيتنا إياه. هذا المزوّد يحتفظ بتقويمك أصلاً، ولا نرسل إليه أي شيء عنك.'
+            : 'If you connect a calendar, our server fetches it from your calendar provider (such as Google, Apple or Microsoft) using the link you gave us. That provider already holds your calendar, and we send it nothing about you.'}
+        </p>
       </Clause>
 
       <Clause n="7" title={ar ? 'مدة الاحتفاظ' : 'How long we keep it'}>
@@ -133,6 +163,11 @@ function Privacy() {
           {ar
             ? 'نحتفظ ببياناتك ما دام حسابك قائماً. عند حذف الحساب تُحذف البيانات فوراً وبشكل نهائي، ولا يُحتفظ بنسخة مؤرشفة ولا يمكن استرجاعها.'
             : 'We keep your data for as long as your account exists. When you delete your account it is removed immediately and permanently. No archived copy is kept and it cannot be recovered.'}
+        </p>
+        <p>
+          {ar
+            ? 'التقويم المربوط نسخة عمل فقط: كل تحديث يستبدلها، ولا يُحتفظ إلا بالأسابيع الستة القادمة، وعند فصل التقويم تُحذف نسخته فوراً.'
+            : 'A connected calendar is a working copy only: each refresh replaces it, only the next six weeks are kept, and disconnecting the calendar deletes its copy immediately.'}
         </p>
       </Clause>
 
