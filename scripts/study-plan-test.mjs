@@ -15,6 +15,9 @@ import {
   stepsFor,
   nextDeadline,
   dateKey,
+  normaliseSlots,
+  layoutDay,
+  rhythmOf,
 } from '../lib/study-plan.js'
 
 let n = 0
@@ -114,7 +117,7 @@ check('a test in the calendar pulls its subject up, and says so', () => {
   assert.deepEqual(weekOut.map((x) => x.subject), ['Physics HL', 'Economics SL', 'History SL'])
   assert.ok(econ.reasons.some((r) => r.label === 'Econ mock in 2 days'))
 })
-check('topics the class has not reached are left out', () => {
+check('an older "up to" saving is still read the way it was written', () => {
   const s = resolveSettings({ ...profile, plan_settings: { ...profile.plan_settings, taught: { 'Physics HL': 'Topic 2' } } })
   const c = candidates({ settings: s })
   const physicsTopics = new Set(c.filter((x) => x.subject === 'Physics HL').map((x) => x.topic))
@@ -127,7 +130,35 @@ check('no questions yet: still planned, but after things that can be quizzed, an
   const quizzable = c.find((x) => x.quizzable)
   assert.ok(c.indexOf(quizzable) === 0)
   const notYet = c.find((x) => !x.quizzable)
-  assert.deepEqual(stepsFor(notYet).map((s) => s.kind), ['read', 'recall'])
+  assert.deepEqual(stepsFor(notYet).map((s) => s.kind), ['learn', 'recall'])
+})
+
+check('covered topics are the ones ticked, in any order the school teaches them', () => {
+  const s = resolveSettings({ ...profile, plan_settings: { ...profile.plan_settings, taught: { 'Physics HL': ['Topic 4', 'Topic 1'] } } })
+  const c = candidates({ settings: s })
+  const topics = new Set(c.filter((x) => x.subject === 'Physics HL').map((x) => x.topic))
+  assert.deepEqual([...topics].sort(), ['Topic 1', 'Topic 4'])
+})
+check('ticking none is the same as everything', () => {
+  const s = resolveSettings({ ...profile, plan_settings: { ...profile.plan_settings, taught: { 'Physics HL': [] } } })
+  assert.equal(new Set(candidates({ settings: s }).filter((x) => x.subject === 'Physics HL').map((x) => x.topic)).size, 6)
+})
+check('rhythms: your own numbers work, and are kept within sense', () => {
+  assert.deepEqual(rhythmOf({ rhythm: 'custom', custom: { work: 35, rest: 7 } }), { work: 35, rest: 7 })
+  assert.deepEqual(rhythmOf({ rhythm: 'custom', custom: { work: 2, rest: 500 } }), { work: 10, rest: 60 })
+  assert.equal(studyMinutesFor(90, { rhythm: '45' }), 67)
+})
+check('older settings still load: "reading" is now learn-first, and flashcards off is kept', () => {
+  const s = resolveSettings({ plan_settings: { style: { order: 'reading', cards: false } } })
+  assert.equal(s.style.order, 'learn')
+  assert.deepEqual(s.style.methods, ['questions'])
+})
+check('painted free time: tidied, merged, and counted as the day', () => {
+  assert.deepEqual(normaliseSlots([[960, 1020], [1000, 1080], [600, 602], [1200, 1260]]), [[960, 1080], [1200, 1260]])
+  const s = resolveSettings({ plan_settings: { slots: { 1: [[960, 1080]] } } })
+  assert.equal(s.week[1], 120)
+  assert.deepEqual(s.slots[1], [[960, 1080]])
+  assert.equal(s.slots[2], null, 'unpainted days keep their minutes')
 })
 
 console.log('the days')
@@ -246,20 +277,68 @@ check('the day runs: mistakes due, then the main piece of learning, then the res
   assert.ok(d.tasks[1].first && d.tasks[1].kind === 'learn')
 })
 
+check('times: tasks sit inside the free windows, with breaks where the rhythm puts them', () => {
+  const tasks = [
+    { id: 'a', minutes: 20 }, { id: 'b', minutes: 15 }, { id: 'c', minutes: 25 }, { id: 'd', minutes: 40 },
+  ]
+  // 4:00-5:00pm and 7:00-8:00pm, 25/5.
+  const tl = layoutDay(tasks, [[960, 1020], [1140, 1200]], { work: 25, rest: 5 })
+  const at = Object.fromEntries(tasks.map((t) => [t.id, [t.start, t.end]]))
+  assert.deepEqual(at.a, [960, 980])
+  assert.deepEqual(at.b, [985, 1000], 'break before going past 25 minutes of work')
+  assert.deepEqual(at.c, [1140, 1165], 'did not fit what was left of 4-5pm, so 7pm')
+  assert.ok(tasks.find((t) => t.id === 'd').overflow, 'fits nowhere: marked for if there is time')
+  for (const x of tl) assert.ok((x.start >= 960 && x.end <= 1020) || (x.start >= 1140 && x.end <= 1200), JSON.stringify(x))
+  assert.equal(tl.filter((x) => x.type === 'break').length, 1)
+})
+check('today only counts the free time still ahead; if it has all gone, no clock times', () => {
+  const at6pm = new Date(2026, 9, 18, 18, 0) // Sunday
+  const s = resolveSettings({ ...profile, plan_settings: { ...profile.plan_settings, slots: { 0: [[960, 1200]] } } })
+  const d = buildPlan({ candidates: candidates({ statusOf: statusMix, settings: s }), settings: s, now: at6pm }).days[0]
+  assert.equal(d.minutes, 120, '6-8pm left of 4-8pm')
+  assert.ok(d.tasks.every((t) => t.overflow || t.start >= 1080))
+  const s2 = resolveSettings({ ...profile, plan_settings: { ...profile.plan_settings, slots: { 0: [[840, 960]] } } })
+  const d2 = buildPlan({ candidates: candidates({ statusOf: statusMix, settings: s2 }), settings: s2, now: at6pm }).days[0]
+  assert.ok(d2.late && d2.timeline === null && d2.tasks.length > 0)
+})
+check('focus: the subject chosen for a weekday is that day\'s subject', () => {
+  const s = resolveSettings({ ...profile, plan_settings: { ...profile.plan_settings, style: { mix: 'focus', focusDays: { 1: ['History SL'] } } } })
+  const monday = buildPlan({ candidates: candidates({ statusOf: statusMix, settings: s }), settings: s, now: NOW }).days.find((d) => d.weekday === 1)
+  const own = monday.tasks.filter((t) => !t.fixed)
+  assert.ok(own.length > 0 && own.every((t) => t.subject === 'History SL'), own.map((t) => t.subject).join(','))
+})
+
 console.log('steps')
 check('steps always add up to the task, in the order the student likes', () => {
   const task = { kind: 'learn', status: 'confident', minutes: 25, quizzable: true }
-  for (const order of ['auto', 'questions', 'reading']) {
-    const steps = stepsFor(task, { order, cards: true })
+  for (const order of ['auto', 'questions', 'learn']) {
+    const steps = stepsFor(task, { order, methods: ['questions'] })
     assert.equal(steps.reduce((m, s) => m + s.minutes, 0), 25)
   }
-  assert.equal(stepsFor(task, { order: 'questions' })[0].kind, 'quiz')
-  assert.equal(stepsFor(task, { order: 'reading' })[0].kind, 'read')
+  assert.equal(stepsFor(task, { order: 'questions', methods: [] })[0].kind, 'quiz')
+  assert.equal(stepsFor(task, { order: 'learn', methods: [] })[0].kind, 'revise')
 })
-check('topping up uses flashcards only for those who want them', () => {
-  const task = { kind: 'topup', minutes: 20, quizzable: true }
-  assert.deepEqual(stepsFor(task, { cards: true }).map((s) => s.kind), ['quiz', 'cards'])
-  assert.deepEqual(stepsFor(task, { cards: false }).map((s) => s.kind), ['quiz'])
+check('new is learned, seen-before is revised, and nothing is "read"', () => {
+  const fresh = stepsFor({ kind: 'learn', status: 'not_started', minutes: 35, quizzable: true }, { order: 'auto', methods: [] })
+  const weak = stepsFor({ kind: 'learn', status: 'in_progress', minutes: 40, quizzable: true }, { order: 'auto', methods: [] })
+  assert.equal(fresh[0].label, 'Learn it')
+  assert.equal(weak[0].label, 'Revise it')
+  const all = [fresh, weak].flat().map((s) => s.label + s.kind).join(' ')
+  assert.ok(!/read/i.test(all), all)
+})
+check('questions first never means testing a topic before it has been learned', () => {
+  const fresh = stepsFor({ kind: 'learn', status: 'not_started', minutes: 35, quizzable: true }, { order: 'questions', methods: [] })
+  assert.equal(fresh[0].kind, 'learn')
+})
+check('tasks are built from the techniques the student likes', () => {
+  const noQuiz = { kind: 'learn', status: 'not_started', minutes: 25, quizzable: false }
+  assert.match(stepsFor(noQuiz, { methods: ['blurting'] })[1].label, /^Blurt it/)
+  assert.match(stepsFor(noQuiz, { methods: ['teach'] })[1].label, /as if teaching/)
+  const topup = { kind: 'topup', minutes: 20, quizzable: true }
+  assert.deepEqual(stepsFor(topup, { methods: ['flashcards'] }).map((s) => s.kind), ['quiz', 'cards'])
+  assert.deepEqual(stepsFor(topup, { methods: ['questions'] }).map((s) => s.kind), ['quiz'])
+  const weak = { kind: 'learn', status: 'in_progress', minutes: 40, quizzable: true }
+  assert.ok(stepsFor(weak, { order: 'auto', methods: ['exam'] }).some((s) => s.label === 'Exam-style questions'))
 })
 
 console.log('countdown')
