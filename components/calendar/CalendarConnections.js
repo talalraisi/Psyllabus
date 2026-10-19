@@ -172,7 +172,16 @@ export default function CalendarConnections({ connections, feedToken, origin, on
               <li key={s}>{s}</li>
             ))}
           </ol>
-          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+          <input
+            type="text"
+            maxLength={80}
+            value={label}
+            onChange={(e) => setLabel(e.target.value)}
+            placeholder={`Name it (optional) — e.g. School timetable`}
+            aria-label="Name for this calendar"
+            className={`${field} mt-3 w-full`}
+          />
+          <div className="mt-2 flex flex-col gap-2 sm:flex-row">
             <input
               type="url"
               inputMode="url"
