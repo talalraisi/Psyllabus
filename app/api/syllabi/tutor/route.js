@@ -4,6 +4,8 @@ import { supabaseFor, fromOurOwnSite } from '@/lib/request-supabase'
 import { hasSyllabi } from '@/lib/access'
 import { MODELS, claim, settle } from '@/lib/ai-cost'
 import { tutorSystem } from '@/lib/tutor-prompt'
+import { toBlocks, AttachmentError } from '@/lib/attachments'
+import { linksIn, fetchPage } from '@/lib/link-fetch'
 
 /**
  * Syllabi as a tutor: a conversation, streamed.
@@ -17,6 +19,12 @@ import { tutorSystem } from '@/lib/tutor-prompt'
  * The conversation lives in the student's browser, not our database: each
  * request carries the recent turns, trimmed here to a fixed size. The model
  * sees their course, their subject and the syllabus, never who they are.
+ *
+ * Files (photos, PDFs, text) and links ride on the message being sent and
+ * only that one; they are not sent again with later turns. A message with
+ * either is claimed as 'tutor_files', which has its own smaller allowance,
+ * and links are only fetched once the claim has gone through, so this route
+ * cannot be used to fetch pages for free.
  */
 
 export const runtime = 'nodejs'
@@ -86,6 +94,16 @@ export async function POST(request) {
   const { messages, error, status } = conversation(body?.messages)
   if (error) return NextResponse.json({ error }, { status: status || 400 })
 
+  let files
+  try {
+    files = toBlocks(body?.attachments)
+  } catch (e) {
+    if (e instanceof AttachmentError) return NextResponse.json({ error: e.message }, { status: 413 })
+    throw e
+  }
+  const question = messages[messages.length - 1].content
+  const links = linksIn(question)
+
   // Only one of their own subjects, and only a topic that is in it: both go
   // into the instructions, so neither can be free text.
   const subject = (profile.subjects || []).includes(body?.subject) ? body.subject : ''
@@ -102,8 +120,31 @@ export async function POST(request) {
   const named = new Set(rows.flatMap((r) => [r.topic, r.unit, r.subtopic]))
   const topic = typeof body?.topic === 'string' && named.has(body.topic) ? body.topic : ''
 
-  const claimed = await claim(supabase, 'tutor', subject)
+  const task = files.blocks.length || links.length ? 'tutor_files' : 'tutor'
+  const claimed = await claim(supabase, task, subject)
   if (!claimed.ok) return NextResponse.json({ error: claimed.error, code: claimed.code }, { status: claimed.status })
+
+  // The pages behind any links, read in parallel; one that will not open is
+  // named to the model so it can say so rather than guess at it.
+  const pages = await Promise.all(
+    links.map((url) =>
+      fetchPage(url).then(
+        (page) => ({
+          type: 'document',
+          title: page.title || url,
+          context: `A web page the student linked: ${page.url}`,
+          source: { type: 'text', media_type: 'text/plain', data: page.text },
+        }),
+        (e) => ({ type: 'text', text: `(The student linked ${url}, but it could not be opened: ${e?.message || 'unknown reason'}.)` })
+      )
+    )
+  )
+  if (files.blocks.length || pages.length) {
+    messages[messages.length - 1] = {
+      role: 'user',
+      content: [...files.blocks, ...pages, { type: 'text', text: question }],
+    }
+  }
 
   const model = MODELS.tutor
   const anthropic = new Anthropic()

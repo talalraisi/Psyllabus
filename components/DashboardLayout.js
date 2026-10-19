@@ -49,7 +49,7 @@ const NAV_ITEMS = [
     href: '/dashboard/syllabi',
     label: 'Syllabi',
     Icon: ({ width, style }) => <SyllabiMark size={width} style={style} />,
-    match: (p) => p === '/dashboard/syllabi',
+    match: (p) => p.startsWith('/dashboard/syllabi'),
   },
   {
     href: '/dashboard/flashcards',
@@ -409,7 +409,8 @@ export default function DashboardLayout({ children, profile }) {
 
       {/* On every signed-in page, because the page somebody is looking at when
           something goes wrong is the page they should be able to say so from. */}
-      <FeedbackButton />
+      {/* The draft studio has its own buttons in that corner. */}
+      {!pathname.startsWith('/dashboard/syllabi/draft') && <FeedbackButton />}
     </div>
   )
 }

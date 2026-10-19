@@ -42,6 +42,7 @@ check('a criterion the model skipped scores zero', r.criteria[3].score === 0)
 check('invented quotes are dropped', r.highlights.length === 3, String(r.highlights.length))
 check('curly quotes and extra spaces still match', r.highlights.some((h) => h.quote.startsWith('I measured')))
 check('an unknown criterion is blanked and an odd kind becomes an issue', r.highlights[2].criterion === '' && r.highlights[2].kind === 'issue')
+check('impact defaults to medium when missing', r.highlights.every((h) => ['high', 'medium', 'low'].includes(h.impact)))
 check('broken JSON gives nothing, not a crash', cleanReview('{not json', draft, null) === null)
 
 const parts = segments(draft, r.highlights)

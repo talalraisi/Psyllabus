@@ -1400,3 +1400,50 @@ input[type='range'].slider:focus-visible::-moz-range-thumb {
   mask-image: radial-gradient(ellipse 70% 60% at 50% 42%, #000 0%, transparent 74%);
   opacity: 0.7;
 }
+
+/* Syllabi.
+   Messages rise in as they arrive, the caret blinks while an answer is being
+   written, the hub breathes, and the studio's highlights pulse once when a
+   comment points at them. All of it off under reduced motion. */
+@keyframes sy-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes sy-caret {
+  0%, 45% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+@keyframes sy-orbit {
+  to { transform: rotate(360deg); }
+}
+@keyframes sy-counter {
+  to { transform: rotate(-360deg); }
+}
+@keyframes sy-flash {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand) 45%, transparent); }
+  100% { box-shadow: 0 0 0 10px transparent; }
+}
+@keyframes sy-dot {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+.sy-rise { animation: sy-rise 320ms cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+.sy-caret::after {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: -0.15em;
+  border-radius: 2px;
+  background: var(--brand);
+  animation: sy-caret 1s steps(1) infinite;
+}
+.sy-orbit { animation: sy-orbit 28s linear infinite; }
+.sy-counter { animation: sy-counter 28s linear infinite; }
+.sy-flash { animation: sy-flash 700ms ease-out; }
+.sy-dot { animation: sy-dot 1.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .sy-rise, .sy-orbit, .sy-counter, .sy-flash, .sy-dot { animation: none; }
+  .sy-caret::after { animation: none; }
+}

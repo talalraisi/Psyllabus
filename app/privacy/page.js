@@ -91,8 +91,8 @@ function Privacy() {
           </li>
           <li>
             {ar
-              ? 'ما تسأل عنه Syllabi وما تلصقه فيه، ويُرسل إلى Anthropic لكتابة الإجابة. لا نحفظ المحادثة: تبقى في نافذة متصفحك فقط وتُمحى عند إغلاقها. نحتفظ فقط بعدد الطلبات وتكلفتها والمادة، لنطبّق الحد اليومي.'
-              : 'What you ask Syllabi and what you paste into it, which is sent to Anthropic to write the answer. We do not save the conversation: it stays in your browser tab and is gone when you close it. We keep only a count of requests, their cost and the subject, to apply the daily limit.'}
+              ? 'ما تسأل عنه Syllabi وما تلصقه فيه، وأي صور أو ملفات أو مسودات ترسلها إليه، وتُرسل إلى Anthropic لكتابة الإجابة. إذا أرفقت رابطاً، يفتح خادمنا تلك الصفحة ويرسل نصها معها. لا نحفظ المحادثة ولا الملفات ولا المسودات: تبقى في نافذة متصفحك فقط وتُمحى عند إغلاقها. نحتفظ فقط بعدد الطلبات وتكلفتها والمادة، لنطبّق الحد اليومي.'
+              : 'What you ask Syllabi, what you paste into it, and any photos, files or drafts you send it, which are sent to Anthropic to write the answer. If you include a link, our server opens that page and sends its text along. We do not save the conversation, files or drafts: they stay in your browser tab and are gone when you close it. We keep only a count of requests, their cost and the subject, to apply the daily limit.'}
           </li>
           <li>
             {ar

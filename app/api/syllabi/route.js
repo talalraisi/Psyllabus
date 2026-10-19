@@ -3,6 +3,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { TASKS, DRAFT_REVIEW_SCHEMA } from '@/lib/syllabi-prompts'
 import { rubricFor } from '@/lib/criteria'
 import { cleanReview } from '@/lib/draft-review'
+import { RESEARCH_SCHEMA, STUDY_SCHEMA, cleanResearch, cleanStudy } from '@/lib/ideas'
 import { hasSyllabi } from '@/lib/access'
 import { MODELS, claim, settle } from '@/lib/ai-cost'
 // Only this deployment and our own domains: any *.vercel.app origin used to
@@ -37,6 +38,9 @@ const MAX_INPUT = 60000
 
 /** Everything except a draft is a sentence or two. */
 const MAX_SHORT = 2000
+
+/** Every task answers as JSON the page lays out. */
+const SCHEMAS = { draft_feedback: DRAFT_REVIEW_SCHEMA, research_questions: RESEARCH_SCHEMA, study_advice: STUDY_SCHEMA }
 
 /** A short string, or nothing. These go into the instructions, so they are cut to size. */
 const short = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '')
@@ -135,7 +139,7 @@ export async function POST(request) {
       max_tokens: review ? 6000 : 3000,
       // A draft comes back as JSON the page can lay out: marks per criterion
       // and highlights on the student's own sentences.
-      output_config: { effort: 'medium', ...(review ? { format: { type: 'json_schema', schema: DRAFT_REVIEW_SCHEMA } } : {}) },
+      output_config: { effort: 'medium', format: { type: 'json_schema', schema: SCHEMAS[task] } },
       system: prompt,
       messages: [
         {
@@ -167,19 +171,20 @@ export async function POST(request) {
   // Settled with what it actually cost, so the day's budget is exact.
   await settle(supabase, claimed.id, model, response.usage).catch(() => {})
 
-  if (review) {
-    const parsed = response.stop_reason === 'end_turn' ? cleanReview(answer, text, rubric) : null
-    if (!parsed) {
-      return NextResponse.json(
-        { error: response.stop_reason === 'refusal' ? answer : 'Syllabi could not finish reading that. Try again, or send a shorter part.' },
-        { status: 502 }
-      )
-    }
-    return NextResponse.json({ review: parsed, remaining: claimed.remaining })
+  // Every task answers as JSON; it is checked before the page sees it.
+  const parsed =
+    response.stop_reason !== 'end_turn'
+      ? null
+      : review
+        ? cleanReview(answer, text, rubric)
+        : task === 'research_questions'
+          ? cleanResearch(answer)
+          : cleanStudy(answer)
+  if (!parsed) {
+    return NextResponse.json(
+      { error: response.stop_reason === 'refusal' ? answer : 'Syllabi could not finish that. Try again, or send a shorter part.' },
+      { status: 502 }
+    )
   }
-
-  return NextResponse.json({
-    answer,
-    remaining: claimed.remaining,
-  })
+  return NextResponse.json(review ? { review: parsed, remaining: claimed.remaining } : { result: parsed, remaining: claimed.remaining })
 }
