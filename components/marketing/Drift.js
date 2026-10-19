@@ -27,12 +27,8 @@
  * Nothing glows. Two blooms lived in this space before and were disliked both
  * times. Ambient light reads as decoration; ambient movement reads as depth.
  *
- * It flanks the headline on both sides, because the hero is centred now. That
- * is also why it starts at xl rather than lg: the columns are 18% of the
- * viewport each, and below about 1280px the headline's own 768px would reach
- * into them. Narrow margins with nothing in them beat shapes sitting on top of
- * the words. Off under prefers-reduced-motion, and absent on phones, which
- * have better uses for the battery.
+ * Hidden below lg, where there is no leftover space and a phone has better
+ * uses for the battery, and off under prefers-reduced-motion.
  */
 
 /* Loosely clustered rather than evenly spread — scatter looks accidental,
@@ -50,8 +46,8 @@ const CELLS = [
 /* pct is how far round the arc goes — a ring that is part-done, like every
    ring in the app. r is chosen so the dash maths stays readable. */
 const RINGS = [
-  { x: 14, y: 24, size: 124, pct: 0.68, w: 1.5, path: 'b', s: 46, d: 0 },
-  { x: 30, y: 60, size: 92, pct: 0.42, w: 1.5, path: 'c', s: 52, d: -18 },
+  { x: 40, y: 26, size: 168, pct: 0.68, w: 1.5, path: 'b', s: 46, d: 0 },
+  { x: 48, y: 58, size: 104, pct: 0.42, w: 1.5, path: 'c', s: 52, d: -18 },
 ]
 
 function Ring({ size, pct, w }) {
@@ -117,19 +113,14 @@ function Column({ cells, rings, className, width }) {
 }
 
 export default function Drift() {
-  /* Uneven on purpose, in both width and contents: a narrow left margin with
-     three cells and the small ring, a wider right one with four and the large
-     one. Two matching flanks around a centred headline is a mirror, and the
-     moment the eye catches the symmetry it stops reading the page and starts
-     looking at the decoration. The headline stays centred; what surrounds it
-     does not have to be.
-
-     Widths are kept under the margin a centred 768px headline leaves at this
-     breakpoint, which is why this is xl and not lg. */
+  /* One column, on the right, because the headline is left-aligned again and
+     that is the side it leaves free. It flanked both sides while the hero was
+     centred; if it is ever centred again, split it in two uneven columns and
+     raise the breakpoint to xl, since a centred 768px headline leaves too
+     little margin at lg for anything to sit in. */
   return (
-    <div aria-hidden="true" className="absolute inset-0 hidden xl:block">
-      <Column className="left-0" width="14%" cells={CELLS.slice(0, 3)} rings={[RINGS[1]]} />
-      <Column className="right-0" width="21%" cells={CELLS.slice(3)} rings={[RINGS[0]]} />
+    <div aria-hidden="true" className="absolute inset-0 hidden lg:block">
+      <Column className="right-0" width="42%" cells={CELLS} rings={RINGS} />
     </div>
   )
 }

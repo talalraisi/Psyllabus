@@ -24,10 +24,12 @@ import { useEffect, useRef, useState } from 'react'
  * centred inside it: the line is nailed down and only the word moves, which is
  * the only thing here that should.
  *
- * It helps that the three names are now close in length. "the IB Diploma"
- * against "AP" was a slot more than three times wider than its shortest
- * occupant; "A-Levels" against "AP" and "IBDP" leaves little enough that the
- * centring absorbs it.
+ * Where the slack sits depends on how the line is set, and this line is
+ * left-aligned: the word packs to the left of the slot and "the IB Diploma"
+ * against "AP" leaves its difference trailing off the end, past where anyone
+ * reads. Centre the line and that stops working — the same slack lands
+ * between "of" and the word — so centre the word in the slot at the same
+ * time.
  */
 export default function Roller({ words, ms = 3500, className = '', style }) {
   const [at, setAt] = useState(0)
@@ -67,10 +69,13 @@ export default function Roller({ words, ms = 3500, className = '', style }) {
           <span
             key={word}
             aria-hidden={!current}
-            /* Centred in the slot, so the air left by a short word falls
-               evenly either side instead of all at the end, where a centred
-               line turns it into a hole after "of". */
-            className="col-start-1 row-start-1 justify-self-center whitespace-nowrap"
+            /* Packed to the left of the slot, which is right while this
+               line is left-aligned: a short word's slack trails off the end,
+               past where anyone is reading. It was centred in the slot for as
+               long as the hero was, because centred the same slack sits
+               between "of" and the word and reads as a hole. If this line is
+               ever centred again, centre the word in the slot again with it. */
+            className="col-start-1 row-start-1 whitespace-nowrap"
             style={{
               /* Only the word on screen is selectable. Every word has to be in
                  the DOM for the roll to work, and without this, selecting the
