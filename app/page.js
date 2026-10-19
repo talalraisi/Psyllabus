@@ -9,7 +9,6 @@ import { Heatmap, DecayDemo, PlanDemo } from '@/components/marketing/interactive
 import { Reveal, ScrollBar, CountUp } from '@/components/marketing/scroll'
 import SiteNav from '@/components/marketing/SiteNav'
 import Roller from '@/components/marketing/Roller'
-import ReasonGraphic from '@/components/marketing/ReasonGraphic'
 import Drift from '@/components/marketing/Drift'
 import { FeatureModules } from '@/components/marketing/features'
 
@@ -350,9 +349,6 @@ export default async function Home() {
                   <h3 className="text-[17px] font-semibold leading-snug tracking-[-0.015em]">{title}</h3>
                 </div>
                 <p className="text-[14.5px] leading-[1.7]" style={{ color: 'var(--text-body)' }}>{body}</p>
-                <div className="mt-6">
-                  <ReasonGraphic n={i} />
-                </div>
               </Reveal>
             ))}
           </div>
