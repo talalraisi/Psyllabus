@@ -137,28 +137,9 @@ export default async function Home() {
                 and "for students of A-Levels" speaks to them where a list asks
                 them to find themselves in it. It is also the only thing moving
                 on the first screen. */}
-            {/* Two lines, and the slot's air stops being a hole.
-
-                On one line a fixed-width slot puts its slack between "of" and
-                a short word, where it reads as a typo. Centred on a line of
-                its own there is nothing beside it for the slack to open a gap
-                against, so the same fixed slot — still nailed down, still
-                never re-centring the line — simply looks like a word sitting
-                in the middle. It gets to be the bigger of the two lines as
-                well, which is the right way round: the curriculum is the part
-                the reader is looking for. */}
-            <p className="mt-7 font-semibold leading-tight tracking-[-0.028em]">
-              <span
-                className="block text-[clamp(1.05rem,2.1vw,1.35rem)]"
-                style={{ color: 'var(--text-muted)' }}
-              >
-                For students of
-              </span>
-              <Roller
-                className="mt-1 text-[clamp(1.9rem,4.4vw,3rem)]"
-                words={['AP', 'A-Levels', 'IBDP']}
-                style={{ color: 'var(--brand)' }}
-              />
+            <p className="mt-6 text-[clamp(1.4rem,3.2vw,2.1rem)] font-semibold leading-tight tracking-[-0.028em]">
+              <span style={{ color: 'var(--text-muted)' }}>For students of </span>
+              <Roller words={['the IB Diploma', 'A-Levels', 'AP']} style={{ color: 'var(--brand)' }} />
             </p>
 
             <p
@@ -168,15 +149,13 @@ export default async function Home() {
               Every subtopic, coloured by what you proved in a quiz. Never by rating yourself.
             </p>
 
-            {/* One button. The second was a scroll link to a section the
-                reader reaches anyway, so it competed with the only action
-                that matters for nothing. And "with one subject" was
-                explaining the pricing in the verb — sign-up says that
-                itself. */}
-            <div className="mt-10 flex justify-center">
-              <Link href="/signup" className="btn btn-hero">
-                Start free
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+              <Link href="/signup" className="btn btn-solid control-lg">
+                Start free with one subject
                 <IconArrowRight width={16} height={16} />
+              </Link>
+              <Link href="#how-it-works" className="btn btn-outline control-lg">
+                See how it works
               </Link>
             </div>
           </div>

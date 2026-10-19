@@ -474,30 +474,6 @@ body {
     background: var(--brand-tint);
   }
 
-  /* The hero's single button.
-
-     It carried btn-outline at control-lg, which is a 44px pill sized to sit
-     politely beside a second button. On its own in the middle of an empty
-     screen that reads as small and unsure rather than restrained. This is the
-     same black-and-green idea with the weight the only action on the first
-     screen deserves: the page's own background rather than a panel tint, a
-     border heavy enough to hold an edge at that size, and room around the
-     words. */
-  .btn-hero {
-    background: var(--bg);
-    color: var(--brand);
-    border: 1.5px solid var(--brand);
-    height: 56px;
-    padding-inline: 34px;
-    font-size: 16px;
-    letter-spacing: -0.012em;
-  }
-
-  .btn-hero:hover:not(:disabled) {
-    background: var(--brand);
-    color: var(--bg);
-  }
-
   .btn-quiet {
     background: var(--surface);
     color: var(--text-body);

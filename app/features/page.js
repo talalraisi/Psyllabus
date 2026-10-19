@@ -134,7 +134,7 @@ export default function FeaturesPage() {
             One subject is free for as long as you want it, and a school code opens the rest.
           </p>
           <Link href="/signup" className="btn btn-solid control-lg">
-            Start free
+            Start free with one subject
             <IconArrowRight width={16} height={16} />
           </Link>
         </div>
