@@ -87,7 +87,7 @@ export default function SubjectOrbit({ subjects = 173 }) {
                       className="orbit-ring"
                       style={{ animationDuration: `${ring.seconds}s`, animationDirection: r % 2 ? 'normal' : 'reverse' }}
                     >
-                      <SubjectTile name={name} size={48} status={r * 2 + i} />
+                      <SubjectTile name={name} size={48} />
                     </div>
                   </div>
                 )
@@ -107,15 +107,17 @@ export default function SubjectOrbit({ subjects = 173 }) {
               background: 'var(--bg)',
             }}
           >
-            {/* The short mark is the cap, the P and the S: the first third
-                of the logo, cut just before the Y. */}
-            <span className="relative block overflow-hidden" style={{ width: 'calc(var(--k) * 2.62)', height: 'calc(var(--k) * 3.25)' }}>
+            {/* The short mark is the cap, the P and the S, cropped to exactly
+                what is drawn (measured from the image: x 22-486, y 22-586 of
+                1472 x 613) so it sits in the middle of the circle rather than
+                carrying the logo's own margins with it. */}
+            <span className="relative block overflow-hidden" style={{ width: 'calc(var(--k) * 2.797)', height: 'calc(var(--k) * 3.4)' }}>
               <Image
                 src={logoMark}
                 alt=""
                 sizes="120px"
-                className="absolute left-0 top-0 max-w-none"
-                style={{ height: 'calc(var(--k) * 3.25)', width: 'auto' }}
+                className="absolute max-w-none"
+                style={{ height: 'calc(var(--k) * 3.695)', width: 'auto', left: 'calc(var(--k) * -0.1326)', top: 'calc(var(--k) * -0.1326)' }}
               />
             </span>
           </div>

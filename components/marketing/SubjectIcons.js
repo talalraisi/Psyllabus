@@ -25,6 +25,7 @@ const svg = (children) =>
 export const SUBJECT_ICONS = {
   physics: {
     label: 'Physics',
+    color: 'oklch(0.62 0.13 255)',
     Icon: svg(
       <>
         <circle cx="12" cy="12" r="1.6" fill="currentColor" />
@@ -36,6 +37,7 @@ export const SUBJECT_ICONS = {
   },
   chemistry: {
     label: 'Chemistry',
+    color: 'oklch(0.62 0.14 300)',
     Icon: svg(
       <>
         <path d="M9 3h6M10 3v6l-5.4 9.3A1.8 1.8 0 0 0 6.2 21h11.6a1.8 1.8 0 0 0 1.6-2.7L14 9V3" />
@@ -45,6 +47,7 @@ export const SUBJECT_ICONS = {
   },
   biology: {
     label: 'Biology',
+    color: 'oklch(0.6 0.13 150)',
     Icon: svg(
       <>
         <path d="M8 3c0 4.5 8 4.5 8 9s-8 4.5-8 9" />
@@ -55,10 +58,12 @@ export const SUBJECT_ICONS = {
   },
   maths: {
     label: 'Maths',
+    color: 'oklch(0.6 0.15 30)',
     Icon: svg(<path d="M18 5H6l6.5 7L6 19h12" />),
   },
   geography: {
     label: 'Geography',
+    color: 'oklch(0.62 0.12 200)',
     Icon: svg(
       <>
         <circle cx="12" cy="12" r="9" />
@@ -68,6 +73,7 @@ export const SUBJECT_ICONS = {
   },
   english: {
     label: 'English',
+    color: 'oklch(0.6 0.12 20)',
     Icon: svg(
       <>
         <path d="M4 19.5V5.5A2.5 2.5 0 0 1 6.5 3H20v14H6.5A2.5 2.5 0 0 0 4 19.5Zm0 0A2.5 2.5 0 0 0 6.5 22H20" />
@@ -77,6 +83,7 @@ export const SUBJECT_ICONS = {
   },
   economics: {
     label: 'Economics',
+    color: 'oklch(0.62 0.13 160)',
     Icon: svg(
       <>
         <path d="M3 3v18h18" />
@@ -87,6 +94,7 @@ export const SUBJECT_ICONS = {
   },
   history: {
     label: 'History',
+    color: 'oklch(0.64 0.1 70)',
     Icon: svg(
       <>
         <path d="M2.5 9.5 12 4l9.5 5.5Z" />
@@ -96,6 +104,7 @@ export const SUBJECT_ICONS = {
   },
   arts: {
     label: 'Visual Arts',
+    color: 'oklch(0.64 0.15 350)',
     Icon: svg(
       <>
         <path d="M12 3a9 9 0 1 0 0 18c1 0 1.6-.7 1.6-1.5 0-.5-.2-.8-.5-1.2-.3-.3-.5-.7-.5-1.2 0-.9.7-1.6 1.6-1.6H16a5 5 0 0 0 5-5c0-4-4-7.5-9-7.5Z" />
@@ -107,10 +116,12 @@ export const SUBJECT_ICONS = {
   },
   computing: {
     label: 'Computer Science',
+    color: 'oklch(0.58 0.12 240)',
     Icon: svg(<path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16" />),
   },
   languages: {
     label: 'Languages',
+    color: 'oklch(0.62 0.13 280)',
     Icon: svg(
       <>
         <path d="M4 5h8M8 3v2M10.5 5C9.5 9 7.5 12 4 14M6 9c1 2 3 4 5 5" />
@@ -120,6 +131,7 @@ export const SUBJECT_ICONS = {
   },
   psychology: {
     label: 'Psychology',
+    color: 'oklch(0.63 0.13 330)',
     Icon: svg(
       <>
         <path d="M12 5.5A3 3 0 0 0 6.2 6.6 3 3 0 0 0 4.5 12a3 3 0 0 0 1.8 4.9A3 3 0 0 0 12 18.5Z" />
@@ -130,6 +142,7 @@ export const SUBJECT_ICONS = {
   },
   music: {
     label: 'Music',
+    color: 'oklch(0.6 0.14 15)',
     Icon: svg(
       <>
         <path d="M9 18V5l11-2v13" />
@@ -140,6 +153,7 @@ export const SUBJECT_ICONS = {
   },
   tok: {
     label: 'Theory of Knowledge',
+    color: 'oklch(0.7 0.13 85)',
     Icon: svg(
       <>
         <path d="M9 18h6M10 21h4" />
@@ -149,47 +163,30 @@ export const SUBJECT_ICONS = {
   },
 }
 
-// The app's own levels, so a tile reads like a subtopic on the map rather
-// than an app icon. Spread so neighbours rarely share one.
-const STATUS = ['var(--status-mastered)', 'var(--status-proficient)', 'var(--status-developing)', 'var(--status-weak)', 'var(--status-fading)']
-
 /**
- * A subject's drawing on a quiet tile: the page's own surface and border,
- * the line in the muted text colour, and a small dot in one of the mastery
- * colours. Colour is the app's way of saying how well something is known,
- * so the tiles keep it to that dot instead of each wearing a brand colour.
+ * A subject's drawing on a rounded tile, faintly tinted in its own colour:
+ * the tint is a wash over the page's surface, not a fill, so a dozen of them
+ * together read as soft colour rather than a row of app icons.
  */
-export function SubjectTile({ name, size = 56, status = 0, radius = Math.round(size * 0.3), style }) {
+export function SubjectTile({ name, size = 56, radius = Math.round(size * 0.3), style }) {
   const s = SUBJECT_ICONS[name]
   if (!s) return null
-  const icon = Math.round(size * 0.42)
   return (
     <span
       title={s.label}
-      className="relative flex items-center justify-center border"
+      className="flex items-center justify-center border backdrop-blur-md"
       style={{
         width: size,
         height: size,
         borderRadius: radius,
-        color: 'var(--text-muted)',
+        color: s.color,
         borderColor: 'var(--border-strong)',
-        background: 'var(--surface)',
-        boxShadow: '0 1px 0 rgb(255 255 255 / 0.04) inset, 0 10px 24px -14px rgb(0 0 0 / 0.45)',
+        background: `color-mix(in oklab, ${s.color} 9%, color-mix(in oklab, var(--surface) 86%, transparent))`,
+        boxShadow: '0 10px 24px -14px rgb(0 0 0 / 0.45)',
         ...style,
       }}
     >
-      <s.Icon size={icon} />
-      <span
-        aria-hidden="true"
-        className="absolute rounded-full"
-        style={{
-          width: Math.max(5, Math.round(size * 0.1)),
-          height: Math.max(5, Math.round(size * 0.1)),
-          top: Math.round(size * 0.14),
-          right: Math.round(size * 0.14),
-          background: STATUS[status % STATUS.length],
-        }}
-      />
+      <s.Icon size={Math.round(size * 0.42)} />
     </span>
   )
 }

@@ -96,7 +96,7 @@ export default function FloatingSubjects() {
                 animationDelay: `-${(i * 1.7) % 6}s`,
               }}
             >
-              <SubjectTile name={name} size={far ? 44 : 58} status={i} style={far ? { opacity: 0.55 } : undefined} />
+              <SubjectTile name={name} size={far ? 44 : 58} style={far ? { opacity: 0.55 } : undefined} />
             </div>
           </div>
         </div>
@@ -113,7 +113,7 @@ export function FloatingSubjectsRow() {
       {row.map((name, i) => (
         <div key={name} className="float-in" style={{ animationDelay: `${400 + i * 70}ms` }}>
           <div className="float-drift" style={{ animationDuration: `${6 + i}s`, animationDelay: `-${i * 1.3}s` }}>
-            <SubjectTile name={name} size={44} status={i} />
+            <SubjectTile name={name} size={44} />
           </div>
         </div>
       ))}
