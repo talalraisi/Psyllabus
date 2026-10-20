@@ -293,7 +293,7 @@ function CommentRow({ h, open, onToggle, onShow, refFn }) {
 
 export default function DraftStudio({ subjects = [] }) {
   const [saved] = useState(() => (typeof window === 'undefined' ? {} : read()))
-  const [subject, setSubject] = useState(saved.subject && subjects.includes(saved.subject) ? saved.subject : subjects.find((s) => !/Creativity|CAS/.test(s)) || subjects[0] || '')
+  const [subject, setSubject] = useState(saved.subject && subjects.includes(saved.subject) ? saved.subject : subjects[0] || '')
   const [kind, setKind] = useState(saved.kind || 'ia')
   const [text, setText] = useState(saved.text || '')
   // For an exam paper: the question answered, and the extract for a Paper 1.

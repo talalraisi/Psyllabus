@@ -96,6 +96,11 @@ function Privacy() {
           </li>
           <li>
             {ar
+              ? 'عندما يختار حساب مجاني مادته المجانية: بصمة مشفّرة باتجاه واحد لبريده الإلكتروني، ولمعرّف عشوائي محفوظ على جهازك، ولعنوان شبكتك، حتى لا تُفتح الخطة المجانية مراراً بحسابات جديدة. لا يمكن تحويل هذه البصمات إلى أصلها، ولا يراها أحد، وتُحذف مع حسابك.'
+              : 'When a free account chooses its free subject: a one-way fingerprint of its email address, of a random identifier kept on your device, and of your network address, so the free plan cannot be claimed again and again with new accounts. These fingerprints cannot be turned back into the originals, nobody can view them, and they are deleted with your account.'}
+          </li>
+          <li>
+            {ar
               ? 'صورة الملف الشخصي، فقط إذا اخترت رفعها، وتظهر لك وحدك.'
               : 'A profile photo, only if you choose to upload one. It is shown only to you.'}
           </li>

@@ -78,6 +78,12 @@ function Cookies() {
               : 'today’s plan as it was first shown, so it does not reshuffle during the day, and what was last sent to your calendar.'}
           </li>
           <li>
+            <strong>psyllabus:device</strong>{' '}
+            {ar
+              ? 'معرّف عشوائي لهذا الجهاز، يُستخدم فقط عند اختيار المادة المجانية حتى لا يجمع جهاز واحد حسابات مجانية كثيرة. لا نحفظ منه إلا بصمة لا يمكن تحويلها إليه.'
+              : 'a random identifier for this device, used only when a free subject is chosen, so one device cannot collect many free accounts. Only a fingerprint of it, which cannot be turned back into it, is kept on our side.'}
+          </li>
+          <li>
             <strong>psyllabus:reminders-shown</strong>, <strong>psyllabus:study-heatmap-frame</strong>{' '}
             {ar
               ? 'التذكيرات التي عُرضت بالفعل حتى لا تتكرر، والفترة التي اخترتها في خريطة وقت المذاكرة.'

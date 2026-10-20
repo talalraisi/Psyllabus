@@ -65,7 +65,7 @@ function CopyLink({ text }) {
 }
 
 export default function IdeasStudio({ subjects = [], userId, onTalk }) {
-  const examined = subjects.filter((s) => !/Creativity|^CAS|Theory of Knowledge|Extended Essay/i.test(s))
+  const examined = subjects.filter((s) => !/Theory of Knowledge|Extended Essay/i.test(s))
   const [mode, setMode] = useState('research')
   const [subject, setSubject] = useState(examined[0] || subjects[0] || '')
   const [kind, setKind] = useState('ia')

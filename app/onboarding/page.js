@@ -10,6 +10,8 @@ import Logo from '@/components/Logo'
 import { splitLevel, coursesOf, defaultLevel } from '@/lib/course-levels'
 import { getCurrentUser } from '@/lib/auth'
 import { realismNote, curriculumOf } from '@/lib/curriculum'
+import { claimFreeSubject } from '@/lib/free-claim'
+import { invalidateProfile } from '@/lib/cache'
 import {
   IB_CORE_SUBJECTS,
   CORE_GRADES,
@@ -32,6 +34,7 @@ export default function Onboarding() {
   const [expandedGroup, setExpandedGroup] = useState(null)
   const [freePick, setFreePick] = useState('')
   const [savingPick, setSavingPick] = useState(false)
+  const [pickError, setPickError] = useState('')
   // Who this is about to be saved against, and whether that account is already
   // set up. Both are read once on arrival.
   const [account, setAccount] = useState(null)
@@ -281,12 +284,16 @@ export default function Onboarding() {
       router.push('/login')
       return
     }
-    // Chosen once. Nothing changes it back, which is what stops the free
-    // plan being cycled through every subject a quiz at a time.
-    await supabase
-      .from('profiles')
-      .update({ free_subject: freePick })
-      .eq('id', user.id)
+    // Chosen once, through the claim that also checks this is not a second
+    // free account for the same person (lib/free-claim.js).
+    setPickError('')
+    const res = await claimFreeSubject(supabase, freePick)
+    if (!res.ok && res.reason !== 'already') {
+      setPickError(res.error)
+      setSavingPick(false)
+      return
+    }
+    invalidateProfile(user.id)
     router.push('/dashboard')
   }
 
@@ -476,7 +483,7 @@ export default function Onboarding() {
               Select your subjects
             </h1>
             <p className="mt-3 text-[14.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              {curriculum === 'IB' && 'Pick the six subjects you actually take. Theory of Knowledge, the Extended Essay and CAS are added for you.'}
+              {curriculum === 'IB' && 'Pick the six subjects you actually take. Theory of Knowledge and the Extended Essay are added for you.'}
               {curriculum === 'AP' && 'Select the AP courses you are taking.'}
               {curriculum === 'A-Level' && 'Most students take 3-4 A-Level subjects.'}
             </p>
@@ -927,7 +934,7 @@ export default function Onboarding() {
             </div>
 
             <p className="t-caption mb-5">
-              TOK, the EE and CAS stay open whatever you pick.
+              TOK and the EE stay open whatever you pick.
             </p>
 
             <button
@@ -937,6 +944,11 @@ export default function Onboarding() {
             >
               {savingPick ? 'Setting up…' : 'Go to my dashboard'}
             </button>
+            {pickError && (
+              <p className="mt-3 text-center text-[13px]" role="alert" style={{ color: 'var(--status-weak)' }}>
+                {pickError}
+              </p>
+            )}
 
             <p className="t-caption mt-4 text-center">
               Have a school code? Add it in your profile and every subject opens.

@@ -115,7 +115,7 @@ function Preview() {
   // The signed-in frame every dashboard page uses, with the Syllabi drawer in it.
   if (view === 'layout') {
     return (
-      <DashboardLayout profile={{ ...PROFILE, full_name: 'Sample Student' }}>
+      <DashboardLayout profile={{ ...PROFILE, full_name: 'Sample Student', curriculum: 'IB', grad_year: '2028' }}>
         <div className="p-10">
           <p>Inside the dashboard frame.</p>
           <AskSyllabi subject="Physics SL" label="Open the drawer" autoSend={false} text="Hello" />

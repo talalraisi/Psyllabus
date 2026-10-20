@@ -13,7 +13,7 @@ import { groupByUnit, sortTopics, groupByTopic } from '@/lib/progress'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
 
 /**
- * Theory of knowledge, the extended essay, and CAS.
+ * Theory of knowledge and the extended essay.
  *
  * Every student takes all three, they decide three of the forty-five points
  * between them, and the app had nowhere to put them: they were filtered out of
@@ -30,10 +30,9 @@ import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
 const BLURB = {
   'Theory of Knowledge': 'Graded A–E. The exhibition and a 1,600-word essay.',
   'Extended Essay': 'Graded A–E. 4,000 words on a question you choose.',
-  'Creativity Activity Service': 'Not graded. Seven learning outcomes and a project.',
 }
 
-const ORDER = ['Theory of Knowledge', 'Extended Essay', 'Creativity Activity Service']
+const ORDER = ['Theory of Knowledge', 'Extended Essay']
 
 export default function CorePage() {
   const [profile, setProfile] = useState(null)
@@ -132,7 +131,7 @@ export default function CorePage() {
       <Page width="default">
         <PageHeader
           title="Diploma core"
-          subtitle="TOK and the extended essay are worth three points. CAS has to be finished."
+          subtitle="TOK and the extended essay are worth up to three points together."
         />
 
         <div className="stagger mb-10 grid gap-3 sm:grid-cols-3">

@@ -13,6 +13,7 @@ import { getSlugForSubject } from '@/lib/subject-map'
 import { progressKey, STATUS_LABELS } from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
+import { claimFreeSubject } from '@/lib/free-claim'
 import {
   isSubjectLocked,
   hasAllSubjects,
@@ -47,6 +48,7 @@ export default function SubjectsPage() {
     return () => stopLoading()
   }, [loading])
   const [switching, setSwitching] = useState('')
+  const [claimError, setClaimError] = useState('')
   const router = useRouter()
   const supabase = createClient()
 
@@ -105,13 +107,13 @@ export default function SubjectsPage() {
     if (!canSwitchFreeSubject(profile).allowed) return
 
     setSwitching(subject)
-    const { error } = await supabase
-      .from('profiles')
-      .update({ free_subject: subject })
-      .eq('id', profile.id)
-    if (!error) {
+    setClaimError('')
+    const res = await claimFreeSubject(supabase, subject)
+    if (res.ok) {
       invalidateProfile(profile.id)
       setProfile((p) => ({ ...p, free_subject: subject }))
+    } else {
+      setClaimError(res.error)
     }
     setSwitching('')
   }
@@ -256,6 +258,11 @@ export default function SubjectsPage() {
           title="My Subjects"
           subtitle={`Every topic and subtopic across your ${profile.curriculum} programme`}
         />
+        {claimError && (
+          <p className="mb-6 rounded-[12px] px-4 py-3 text-[13.5px]" role="alert" style={{ background: 'color-mix(in srgb, var(--status-weak) 12%, transparent)', color: 'var(--text-body)' }}>
+            {claimError}
+          </p>
+        )}
 
         <Section title="Subjects">
           {/* Said once, here, rather than on each of the five locked cards. */}
@@ -291,7 +298,7 @@ export default function SubjectsPage() {
         {core.length > 0 && (
           <div className="mt-12 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
             <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
-              TOK, the extended essay and CAS are tracked in{' '}
+              TOK and the extended essay are tracked in{' '}
               <Link
                 href="/dashboard/core"
                 className="font-medium underline underline-offset-2"

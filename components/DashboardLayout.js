@@ -32,67 +32,52 @@ import SyllabiMark from '@/components/SyllabiMark'
 import { SyllabiProvider } from '@/components/syllabi/SyllabiDrawer'
 import ThemeToggle from '@/components/ThemeToggle'
 
-const NAV_ITEMS = [
-  { href: '/dashboard', label: 'Dashboard', Icon: IconDashboard, match: (p) => p === '/dashboard' },
+/**
+ * The menu, in four groups instead of one list of eleven: the two places a
+ * student starts from, then studying, planning and seeing how it is going.
+ * The core page only shows for IB students, the only ones who have one.
+ */
+const NAV_GROUPS = [
   {
-    href: '/dashboard/subjects',
-    label: 'My Subjects',
-    Icon: IconSubjects,
-    match: (p) => p.startsWith('/dashboard/syllabus') || p === '/dashboard/subjects',
+    label: null,
+    items: [
+      { href: '/dashboard', label: 'Dashboard', Icon: IconDashboard, match: (p) => p === '/dashboard' },
+      {
+        href: '/dashboard/syllabi',
+        label: 'Syllabi',
+        Icon: ({ width, style }) => <SyllabiMark size={width} style={{ ...style, color: 'var(--brand)' }} />,
+        match: (p) => p.startsWith('/dashboard/syllabi'),
+      },
+    ],
   },
   {
-    href: '/dashboard/core',
-    label: 'Diploma Core',
-    Icon: IconSchool,
-    match: (p) => p === '/dashboard/core',
+    label: 'Study',
+    items: [
+      {
+        href: '/dashboard/subjects',
+        label: 'My Subjects',
+        Icon: IconSubjects,
+        match: (p) => p.startsWith('/dashboard/syllabus') || p === '/dashboard/subjects' || p === '/dashboard/map',
+      },
+      { href: '/dashboard/core', label: 'TOK & EE', Icon: IconSchool, match: (p) => p === '/dashboard/core', ibOnly: true },
+      { href: '/dashboard/flashcards', label: 'Flashcards', Icon: IconCards, match: (p) => p === '/dashboard/flashcards' },
+      { href: '/dashboard/test', label: 'Tests', Icon: IconTest, match: (p) => p === '/dashboard/test' || p.startsWith('/dashboard/quiz') },
+      { href: '/dashboard/mistakes', label: 'Redemption', Icon: IconReview, match: (p) => p === '/dashboard/mistakes' },
+    ],
   },
   {
-    href: '/dashboard/syllabi',
-    label: 'Syllabi',
-    Icon: ({ width, style }) => <SyllabiMark size={width} style={style} />,
-    match: (p) => p.startsWith('/dashboard/syllabi'),
+    label: 'Plan',
+    items: [
+      { href: '/dashboard/study-plan', label: 'Study Plan', Icon: IconStudyPlan, match: (p) => p === '/dashboard/study-plan' },
+      { href: '/dashboard/calendar', label: 'Calendar', Icon: IconCalendar, match: (p) => p === '/dashboard/calendar' },
+    ],
   },
   {
-    href: '/dashboard/flashcards',
-    label: 'Flashcards',
-    Icon: IconCards,
-    match: (p) => p === '/dashboard/flashcards',
-  },
-  {
-    href: '/dashboard/study-plan',
-    label: 'Study Plan',
-    Icon: IconStudyPlan,
-    match: (p) => p === '/dashboard/study-plan',
-  },
-  {
-    href: '/dashboard/test',
-    label: 'Build a Test',
-    Icon: IconTest,
-    match: (p) => p === '/dashboard/test' || p.startsWith('/dashboard/quiz'),
-  },
-  {
-    href: '/dashboard/calendar',
-    label: 'Calendar',
-    Icon: IconCalendar,
-    match: (p) => p === '/dashboard/calendar',
-  },
-  {
-    href: '/dashboard/prediction',
-    label: 'Predicted Grade',
-    Icon: IconTarget,
-    match: (p) => p === '/dashboard/prediction',
-  },
-  {
-    href: '/dashboard/progress',
     label: 'Progress',
-    Icon: IconProgress,
-    match: (p) => p === '/dashboard/progress' || p === '/dashboard/Heatmap',
-  },
-  {
-    href: '/dashboard/mistakes',
-    label: 'Redemption',
-    Icon: IconReview,
-    match: (p) => p === '/dashboard/mistakes',
+    items: [
+      { href: '/dashboard/progress', label: 'Progress', Icon: IconProgress, match: (p) => p === '/dashboard/progress' || p === '/dashboard/Heatmap' },
+      { href: '/dashboard/prediction', label: 'Predicted Grade', Icon: IconTarget, match: (p) => p === '/dashboard/prediction' },
+    ],
   },
 ]
 
@@ -139,6 +124,15 @@ export default function DashboardLayout({ children, profile }) {
     }
   }, [supabase])
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [accountOpen, setAccountOpen] = useState(false)
+
+  // The account menu closes on any click outside it.
+  useEffect(() => {
+    if (!accountOpen) return
+    const close = () => setAccountOpen(false)
+    document.addEventListener('click', close)
+    return () => document.removeEventListener('click', close)
+  }, [accountOpen])
   const [collapsed, setCollapsed] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
 
@@ -239,118 +233,145 @@ export default function DashboardLayout({ children, profile }) {
 
       <div className="mx-4 border-t border-[var(--border)]" />
 
-      <nav className="flex-1 overflow-y-auto px-3 pt-4" aria-label="Main">
-        {!compact && (
-          <p
-            className="px-3 pb-3 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
-            style={{ color: 'var(--text-faint)' }}
-          >
-            Menu
-          </p>
-        )}
-        <ul className="flex flex-col gap-0.5">
-          {NAV_ITEMS.map(({ href, label, Icon, match }) => {
-            const active = match(pathname)
-            return (
-              <li key={href}>
-                <Link
-                  href={href}
-                  aria-current={active ? 'page' : undefined}
-                  title={compact ? label : undefined}
-                  className={`relative flex items-center gap-3 rounded-[8px] py-2.5 text-[12.5px] transition-colors duration-150 ${
-                    compact ? 'justify-center px-0' : 'px-3'
-                  }`}
-                  style={{
-                    color: active ? 'var(--text)' : 'var(--text-muted)',
-                    fontWeight: active ? 600 : 500,
-                    background: active ? 'var(--surface-sunken)' : 'transparent',
-                  }}
-                >
-                  {active && !compact && (
-                    <span
-                      aria-hidden="true"
-                      className="absolute left-0 top-1/2 h-4 w-[2px] -translate-y-1/2 rounded-full"
-                      style={{ background: 'var(--brand)' }}
-                    />
-                  )}
-                  <Icon
-                    width={17}
-                    height={17}
-                    style={{ color: active ? 'var(--brand)' : 'var(--text-faint)' }}
-                  />
-                  {!compact && label}
-                </Link>
-              </li>
-            )
-          })}
-        </ul>
+      <nav className="flex-1 overflow-y-auto px-3 pb-3 pt-3" aria-label="Main">
+        {NAV_GROUPS.map((group, g) => {
+          const items = group.items.filter((item) => !item.ibOnly || !profile || profile.curriculum === 'IB')
+          if (!items.length) return null
+          return (
+            <div key={group.label || g} className={g ? 'mt-5' : ''}>
+              {group.label &&
+                (compact ? (
+                  <div aria-hidden="true" className="mx-3 mb-2 border-t" style={{ borderColor: 'var(--border)' }} />
+                ) : (
+                  <p className="px-3 pb-1.5 text-[10.5px] font-semibold uppercase tracking-[0.14em]" style={{ color: 'var(--text-faint)' }}>
+                    {group.label}
+                  </p>
+                ))}
+              <ul className="flex flex-col gap-px">
+                {items.map(({ href, label, Icon, match }) => {
+                  const active = match(pathname)
+                  return (
+                    <li key={href}>
+                      <Link
+                        href={href}
+                        aria-current={active ? 'page' : undefined}
+                        title={compact ? label : undefined}
+                        className={`relative flex items-center gap-3 rounded-[9px] py-2 text-[13px] transition-colors duration-150 hover:bg-[var(--surface-sunken)] ${
+                          compact ? 'justify-center px-0' : 'px-3'
+                        }`}
+                        style={{
+                          color: active ? 'var(--text)' : 'var(--text-muted)',
+                          fontWeight: active ? 600 : 500,
+                          background: active ? 'var(--surface-sunken)' : undefined,
+                        }}
+                      >
+                        {active && !compact && (
+                          <span
+                            aria-hidden="true"
+                            className="absolute left-0 top-1/2 h-4 w-[2px] -translate-y-1/2 rounded-full"
+                            style={{ background: 'var(--brand)' }}
+                          />
+                        )}
+                        <Icon width={17} height={17} style={{ color: active ? 'var(--brand)' : 'var(--text-faint)' }} />
+                        {!compact && label}
+                      </Link>
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+          )
+        })}
       </nav>
 
       <div className="mx-4 border-t border-[var(--border)]" />
 
-      <div className={compact ? 'p-2' : 'p-3'}>
-        {profile && (
-          <div className={`mb-2 flex items-center gap-3 rounded-[10px] ${compact ? 'justify-center p-1' : 'p-3'}`}>
-            <Avatar profile={profile} size={32} />
-            <div className={`min-w-0 ${compact ? 'hidden' : ''}`}>
-              <p className="truncate text-[13px] font-semibold text-[var(--text)]">
-                {profile.full_name || 'Student'}
-              </p>
-              {/* The e-mail, not the programme.
-                  Two accounts on one device can easily carry the same name —
-                  they did here — and "IB · Class of 2028" is true of both. The
-                  address is the only line that tells them apart, which is the
-                  whole question you are asking when you look at this block. */}
-              <p className="t-caption truncate" title={email || undefined}>
-                {email || `${profile.curriculum} · Class of ${profile.grad_year}`}
-              </p>
+      {/* You, and everything about your account behind one tap, so the menu
+          above keeps the room. */}
+      <div className={`relative ${compact ? 'p-2' : 'p-3'}`}>
+        {profile && !hasAllSubjects(profile) && !compact && (
+          <Link
+            href="/dashboard/profile#unlock"
+            className="mb-2 flex items-center justify-between gap-2 rounded-[10px] px-3 py-2 text-[12.5px] font-semibold transition-colors hover:brightness-110"
+            style={{ background: 'var(--brand-tint)', color: 'var(--brand)' }}
+          >
+            Unlock every subject
+            <IconChevronRight width={14} height={14} />
+          </Link>
+        )}
+
+        {accountOpen && (
+          <div
+            role="menu"
+            onClick={(e) => e.stopPropagation()}
+            className="pop-enter absolute bottom-full left-3 right-3 z-30 mb-1 rounded-[14px] border p-1.5 shadow-xl"
+            style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)', minWidth: compact ? 200 : undefined }}
+          >
+            <Link
+              href="/dashboard/profile"
+              role="menuitem"
+              className="flex items-center gap-3 rounded-[9px] px-3 py-2 text-[13px] font-medium text-[var(--text-body)] transition-colors hover:bg-[var(--surface-sunken)]"
+            >
+              <IconUser width={16} height={16} className="text-[var(--text-faint)]" />
+              Profile
+            </Link>
+            <div className="flex items-center justify-between gap-3 rounded-[9px] px-3 py-1.5 text-[13px] font-medium text-[var(--text-body)]">
+              Theme
+              <ThemeToggle />
+            </div>
+            <div className="my-1 border-t" style={{ borderColor: 'var(--border)' }} />
+            <button
+              role="menuitem"
+              onClick={handleLogout}
+              disabled={signingOut}
+              className="flex w-full items-center gap-3 rounded-[9px] px-3 py-2 text-[13px] font-medium text-[var(--text-body)] transition-colors hover:bg-[var(--surface-sunken)] disabled:opacity-50"
+            >
+              <IconLogout width={16} height={16} className="text-[var(--text-faint)]" />
+              {signingOut ? 'Signing out…' : 'Sign out'}
+            </button>
+            <div className="flex gap-3 px-3 pb-1 pt-2">
+              <Link href="/privacy?from=dashboard" className="t-caption hover:text-[var(--text-muted)]">
+                Privacy
+              </Link>
+              <Link href="/terms?from=dashboard" className="t-caption hover:text-[var(--text-muted)]">
+                Terms
+              </Link>
+              <Link href="/cookies?from=dashboard" className="t-caption hover:text-[var(--text-muted)]">
+                Cookies
+              </Link>
             </div>
           </div>
         )}
 
-        {profile && !hasAllSubjects(profile) && !compact && (
-          <Link
-            href="/dashboard/profile#unlock"
-            className="mb-3 ml-3 block border-l-2 py-1 pl-3"
-            style={{ borderColor: 'var(--brand)' }}
+        {profile && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              setAccountOpen((v) => !v)
+            }}
+            aria-haspopup="menu"
+            aria-expanded={accountOpen}
+            title={compact ? profile.full_name || 'Account' : undefined}
+            className={`flex w-full items-center gap-3 rounded-[10px] text-left transition-colors hover:bg-[var(--surface-sunken)] ${compact ? 'justify-center p-1' : 'p-2'}`}
+            style={accountOpen ? { background: 'var(--surface-sunken)' } : undefined}
           >
-            <p className="text-[13px] font-semibold text-[var(--text)]">{planLabel(profile)}</p>
-            <p className="t-caption">Have a school code? Unlock everything.</p>
-          </Link>
+            <Avatar profile={profile} size={32} />
+            <span className={`min-w-0 flex-1 ${compact ? 'hidden' : ''}`}>
+              <span className="block truncate text-[13px] font-semibold text-[var(--text)]">{profile.full_name || 'Student'}</span>
+              {/* The e-mail, not the programme: two accounts on one device can
+                  carry the same name, and the address tells them apart. */}
+              <span className="t-caption block truncate" title={email || undefined}>
+                {email || `${profile.curriculum} · Class of ${profile.grad_year}`}
+              </span>
+            </span>
+            {!compact && (
+              <span className="shrink-0 text-[var(--text-faint)]" style={{ transform: accountOpen ? 'rotate(-90deg)' : 'rotate(90deg)', transition: 'transform 150ms' }}>
+                <IconChevronRight width={14} height={14} />
+              </span>
+            )}
+          </button>
         )}
-
-        <Link
-          href="/dashboard/profile"
-          title={compact ? 'Profile' : undefined}
-          className={`control-md flex items-center gap-3 rounded-[8px] text-[12.5px] font-medium text-[var(--text-body)] transition-colors duration-150 hover:bg-[var(--surface-sunken)] ${
-            compact ? 'justify-center px-0' : 'px-3'
-          }`}
-        >
-          <IconUser width={17} height={17} className="text-[var(--text-faint)]" />
-          {!compact && 'Profile'}
-        </Link>
-
-        <button
-          onClick={handleLogout}
-          disabled={signingOut}
-          title={compact ? 'Sign out' : undefined}
-          className={`control-md flex w-full items-center gap-3 rounded-[8px] text-[12.5px] font-medium text-[var(--text-body)] transition-colors duration-150 hover:bg-[var(--surface-sunken)] disabled:opacity-50 ${
-            compact ? 'justify-center px-0' : 'px-3'
-          }`}
-        >
-          <IconLogout width={17} height={17} className="text-[var(--text-faint)]" />
-          {!compact && (signingOut ? 'Signing out…' : 'Sign out')}
-        </button>
-
-        <div className={`flex items-center gap-4 pt-3 ${compact ? 'hidden' : 'px-3'}`}>
-          <Link href="/privacy?from=dashboard" className="t-caption hover:text-[var(--text-muted)]">
-            Privacy
-          </Link>
-          <Link href="/terms?from=dashboard" className="t-caption hover:text-[var(--text-muted)]">
-            Terms
-          </Link>
-          <ThemeToggle className="ml-auto" />
-        </div>
       </div>
     </>
   )

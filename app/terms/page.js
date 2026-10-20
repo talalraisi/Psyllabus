@@ -161,8 +161,13 @@ function Terms() {
       <Clause n="8" title={ar ? 'الحسابات المجانية والمدفوعة' : 'Free and paid accounts'}>
         <p>
           {ar
-            ? 'تفتح الخطة المجانية مادة دراسية واحدة تختارها، بلا حد زمني ودون الحاجة إلى بطاقة. ويمكنك تغيير المادة، مع فترة انتظار بين تغيير وآخر.'
-            : 'The free plan opens one subject of your choosing, with no time limit and no card required. You can change which subject, subject to a waiting period between changes.'}
+            ? 'تفتح الخطة المجانية مادة دراسية واحدة تختارها مرة واحدة عند إعداد حسابك، وتبقى هي المادة المجانية، بلا حد زمني ودون الحاجة إلى بطاقة. ولفتح مواد أخرى يلزم الاشتراك.'
+            : 'The free plan opens one subject, which you choose once when you set up your account and which then stays your free subject, with no time limit and no card required. Opening other subjects needs a paid plan.'}
+        </p>
+        <p>
+          {ar
+            ? 'الخطة المجانية لشخص واحد بحساب واحد. ويُمنع إنشاء حسابات إضافية لفتح مواد أخرى مجاناً، ولنا أن نرفض فتح مادة مجانية لحساب يبدو مكرراً.'
+            : 'The free plan is for one person with one account. Creating extra accounts to open more subjects for free is not allowed, and we may decline to open a free subject on an account that appears to be a duplicate.'}
         </p>
         <p>
           {ar
