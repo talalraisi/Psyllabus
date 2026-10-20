@@ -42,6 +42,8 @@ const MAX_INPUT = 60000
 /** Everything except a draft is a sentence or two. */
 const MAX_SHORT = 2000
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 /** Every task answers as JSON the page lays out. */
 const SCHEMAS = { draft_feedback: DRAFT_REVIEW_SCHEMA, research_questions: RESEARCH_SCHEMA, study_advice: STUDY_SCHEMA }
 
@@ -201,5 +203,51 @@ export async function POST(request) {
       { status: 502 }
     )
   }
-  return NextResponse.json(review ? { review: parsed, remaining: claimed.remaining } : { result: parsed, remaining: claimed.remaining })
+  // Kept on the student's account, so a marking or a set of ideas is there
+  // to come back to (069-syllabi-saved.sql). Saved here rather than by the
+  // page, so it is kept even if they close the tab while it was working. A
+  // failure to save is logged and does not cost them the answer.
+  let saved = null
+  if (review) {
+    const draftId = UUID.test(body?.draft_id || '') ? body.draft_id : crypto.randomUUID()
+    const total = parsed.criteria.reduce((a, c) => a + c.score, 0)
+    const outOf = parsed.criteria.reduce((a, c) => a + c.max, 0)
+    const { data, error: saveError } = await supabase
+      .from('syllabi_marks')
+      .insert({
+        user_id: user.id,
+        draft_id: draftId,
+        subject: subject || null,
+        kind,
+        title: (text.trim().split('\n').find((l) => l.trim()) || 'Untitled draft').trim().slice(0, 160),
+        text,
+        review: parsed,
+        total,
+        out_of: outOf,
+        grade: parsed.grade_estimate.slice(0, 4) || null,
+      })
+      .select('id, draft_id, created_at')
+      .single()
+    if (saveError) console.error('syllabi save mark:', saveError.message)
+    saved = data || null
+  } else {
+    const { data, error: saveError } = await supabase
+      .from('syllabi_ideas')
+      .insert({
+        user_id: user.id,
+        mode: task === 'research_questions' ? 'research' : 'study',
+        subject: subject || null,
+        kind: task === 'research_questions' && kind !== 'tok' ? kind : null,
+        prompt: text.slice(0, 2000),
+        result: parsed,
+      })
+      .select('id, created_at')
+      .single()
+    if (saveError) console.error('syllabi save ideas:', saveError.message)
+    saved = data || null
+  }
+
+  return NextResponse.json(
+    review ? { review: parsed, saved, remaining: claimed.remaining } : { result: parsed, saved, remaining: claimed.remaining }
+  )
 }

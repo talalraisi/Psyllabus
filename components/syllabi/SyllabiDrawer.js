@@ -79,7 +79,7 @@ export function SyllabiProvider({ profile, children }) {
               <TutorChat
                 key={state.n}
                 compact
-                store="drawer"
+                source={state.label || null}
                 subjects={profile?.subjects || []}
                 initialSubject={state.subject || ''}
                 initialTopic={state.topic || ''}

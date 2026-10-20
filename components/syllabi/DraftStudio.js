@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { createClient } from '@/lib/supabase'
 import ScoreRing, { ringColour } from '@/components/ScoreRing'
 import SyllabiMark from '@/components/SyllabiMark'
 import { KINDS, rubricFor } from '@/lib/criteria'
@@ -20,8 +21,10 @@ import { Chevron, Copy, Check, Download, Collapse, Refresh, FileIcon } from '@/c
  * scrolls to it. Edit the text and the panel says the marks are out of date
  * until you mark it again.
  *
- * Kept in this tab only (sessionStorage): a refresh keeps the essay, closing
- * the tab or a shared school computer does not.
+ * Every marking is saved to the student's account by the route (syllabi_marks),
+ * grouped by draft, so My drafts lists them and "This draft over time" shows
+ * each redraft's score. The text being edited is also kept in this tab, so a
+ * refresh does not lose unmarked changes.
  */
 
 const STORE = 'psyllabus:draft-studio'
@@ -41,6 +44,103 @@ function read() {
   } catch {
     return {}
   }
+}
+
+const newId = () => (typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`)
+const shortDate = (at) => new Date(at).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
+
+/**
+ * Every draft this student has had marked, newest first: one entry per
+ * draft, with its latest marking and how far it has come since the first.
+ */
+function MyDrafts({ onOpen, onClose }) {
+  const [drafts, setDrafts] = useState(null)
+  const [confirming, setConfirming] = useState(null)
+
+  useEffect(() => {
+    let gone = false
+    const load = async () => {
+      const { data } = await createClient()
+        .from('syllabi_marks')
+        .select('id, draft_id, subject, kind, title, total, out_of, grade, created_at')
+        .order('created_at', { ascending: false })
+        .limit(300)
+      const byDraft = new Map()
+      for (const m of data || []) {
+        const d = byDraft.get(m.draft_id)
+        if (!d) byDraft.set(m.draft_id, { ...m, latest: m, first: m, count: 1 })
+        else {
+          d.first = m
+          d.count += 1
+        }
+      }
+      if (!gone) setDrafts([...byDraft.values()])
+    }
+    load()
+    return () => {
+      gone = true
+    }
+  }, [])
+
+  const remove = async (d) => {
+    const { error } = await createClient().from('syllabi_marks').delete().eq('draft_id', d.draft_id)
+    if (!error) setDrafts((list) => list.filter((x) => x.draft_id !== d.draft_id))
+  }
+
+  return (
+    <div className="pop-enter absolute right-3 top-[58px] z-40 flex max-h-[70vh] w-[min(26rem,calc(100%-1.5rem))] flex-col rounded-[18px] border shadow-2xl" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
+      <div className="flex items-center justify-between border-b px-4 py-3" style={{ borderColor: 'var(--border)' }}>
+        <p className="text-[14px] font-semibold">My drafts</p>
+        <button type="button" onClick={onClose} className="text-[12.5px] font-medium" style={{ color: 'var(--text-muted)' }}>
+          Close
+        </button>
+      </div>
+      <div className="overflow-y-auto p-2">
+        {drafts === null ? (
+          [0, 1, 2].map((i) => <div key={i} className="m-1 h-14 animate-pulse rounded-[12px]" style={{ background: 'var(--surface-sunken)' }} />)
+        ) : drafts.length === 0 ? (
+          <p className="px-3 py-6 text-center text-[13px]" style={{ color: 'var(--text-muted)' }}>
+            Every draft you get marked is kept here, with each marking.
+          </p>
+        ) : (
+          drafts.map((d) => {
+            const gain = d.latest.total - d.first.total
+            return (
+              <div key={d.draft_id} className="group relative">
+                <button type="button" onClick={() => onOpen(d.latest.id)} className="flex w-full items-center gap-3 rounded-[12px] px-2.5 py-2.5 pr-16 text-left transition-colors hover:bg-[var(--surface-sunken)]">
+                  <ScoreRing value={d.latest.total} max={d.latest.out_of || 1} size={40} stroke={3.5}>
+                    <span className="text-[11.5px] font-semibold">{d.latest.total}</span>
+                  </ScoreRing>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-[13.5px] font-medium">{d.title || 'Untitled draft'}</span>
+                    <span className="block truncate text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
+                      {shortName(d.subject || '')} · {KINDS.find((k) => k.key === d.kind)?.label} · {shortDate(d.latest.created_at)}
+                      {d.count > 1 && ` · ${d.count} markings`}
+                    </span>
+                  </span>
+                  {d.count > 1 && gain !== 0 && (
+                    <span className="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold tabular-nums" style={{ background: `color-mix(in srgb, ${gain > 0 ? 'var(--status-proficient)' : 'var(--status-weak)'} 16%, transparent)`, color: gain > 0 ? 'var(--status-proficient)' : 'var(--status-weak)' }}>
+                      {gain > 0 ? '+' : ''}
+                      {gain}
+                    </span>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => (confirming === d.draft_id ? remove(d) : setConfirming(d.draft_id))}
+                  onBlur={() => setConfirming(null)}
+                  className={`absolute right-2 top-1/2 -translate-y-1/2 rounded-[8px] px-2 py-1 text-[11.5px] font-semibold transition-opacity ${confirming === d.draft_id ? '' : 'opacity-0 group-hover:opacity-100 focus:opacity-100'}`}
+                  style={confirming === d.draft_id ? { background: 'var(--status-weak)', color: '#fff' } : { color: 'var(--text-faint)' }}
+                >
+                  {confirming === d.draft_id ? 'Delete all' : 'Delete'}
+                </button>
+              </div>
+            )
+          })
+        )}
+      </div>
+    </div>
+  )
 }
 
 const countWords = (t) => (t.trim() ? t.trim().split(/\s+/).length : 0)
@@ -198,6 +298,11 @@ export default function DraftStudio({ subjects = [] }) {
   const [review, setReview] = useState(saved.review || null)
   const [markedText, setMarkedText] = useState(saved.markedText || '')
   const [markedFor, setMarkedFor] = useState(saved.markedFor || '')
+  // Which draft this is (its markings share it) and which marking is showing.
+  const [draftId, setDraftId] = useState(saved.draftId || newId())
+  const [markId, setMarkId] = useState(saved.markId || null)
+  const [history, setHistory] = useState([])
+  const [drafts, setDraftsOpen] = useState(false)
   const [busy, setBusy] = useState(false)
   const [step, setStep] = useState(0)
   const [error, setError] = useState('')
@@ -216,11 +321,61 @@ export default function DraftStudio({ subjects = [] }) {
 
   useEffect(() => {
     try {
-      sessionStorage.setItem(STORE, JSON.stringify({ subject, kind, text, review, markedText, markedFor }))
+      sessionStorage.setItem(STORE, JSON.stringify({ subject, kind, text, review, markedText, markedFor, draftId, markId }))
     } catch {
       /* too big or blocked: it just will not survive a refresh */
     }
-  }, [subject, kind, text, review, markedText, markedFor])
+  }, [subject, kind, text, review, markedText, markedFor, draftId, markId])
+
+  // Every marking of this draft, oldest first, for the progress view.
+  useEffect(() => {
+    let gone = false
+    const load = async () => {
+      const { data } = await createClient()
+        .from('syllabi_marks')
+        .select('id, total, out_of, grade, created_at')
+        .eq('draft_id', draftId)
+        .order('created_at', { ascending: true })
+      if (!gone) setHistory(data || [])
+    }
+    load()
+    return () => {
+      gone = true
+    }
+  }, [draftId])
+
+  /** Open a saved marking: its text, its review, and the draft it belongs to. */
+  const openMark = useCallback(
+    async (id) => {
+      if (text !== markedText && text.trim() && !window.confirm('Open that marking? Edits you have not had marked will be replaced.')) return
+      const { data } = await createClient().from('syllabi_marks').select('id, draft_id, subject, kind, text, review').eq('id', id).maybeSingle()
+      if (!data) return
+      setDraftsOpen(false)
+      if (data.subject && subjects.includes(data.subject)) setSubject(data.subject)
+      setKind(data.kind)
+      setText(data.text)
+      setReview(data.review)
+      setMarkedText(data.text)
+      setMarkedFor(`${data.subject && subjects.includes(data.subject) ? data.subject : subject}|${data.kind}`)
+      setDraftId(data.draft_id)
+      setMarkId(data.id)
+      setActive(null)
+      setOnly(null)
+      setTab('marks')
+    },
+    [text, markedText, subjects, subject]
+  )
+
+  const newDraft = () => {
+    if (text.trim() && text !== markedText && !window.confirm('Start a new draft? Edits you have not had marked will be cleared.')) return
+    setText('')
+    setReview(null)
+    setMarkedText('')
+    setMarkedFor('')
+    setDraftId(newId())
+    setMarkId(null)
+    setDraftsOpen(false)
+  }
 
   // The reading messages turn over while it works.
   useEffect(() => {
@@ -275,7 +430,7 @@ export default function DraftStudio({ subjects = [] }) {
       const res = await fetch('/api/syllabi', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ task: 'draft_feedback', text: sentText, subject, kind }),
+        body: JSON.stringify({ task: 'draft_feedback', text: sentText, subject, kind, draft_id: draftId }),
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok || !data.review) {
@@ -285,6 +440,12 @@ export default function DraftStudio({ subjects = [] }) {
         setMarkedText(sentText)
         setMarkedFor(`${subject}|${kind}`)
         setRemaining(data.remaining ?? null)
+        if (data.saved) {
+          setMarkId(data.saved.id)
+          const total = data.review.criteria.reduce((a, c) => a + c.score, 0)
+          const out_of = data.review.criteria.reduce((a, c) => a + c.max, 0)
+          setHistory((h) => [...h, { id: data.saved.id, total, out_of, grade: data.review.grade_estimate, created_at: data.saved.created_at }])
+        }
         setActive(null)
         setOnly(null)
         setFilter('all')
@@ -472,6 +633,65 @@ export default function DraftStudio({ subjects = [] }) {
               <p className="rounded-[14px] px-4 py-3 text-[13.5px] leading-relaxed" style={{ background: 'var(--surface-sunken)', color: 'var(--text-body)' }}>
                 {review.overview}
               </p>
+            )}
+
+            {/* Every marking of this draft, so a redraft shows what it gained. */}
+            {history.length > 0 && (
+              <div>
+                <div className="flex items-baseline justify-between gap-3">
+                  <p className="text-[15px] font-semibold tracking-[-0.01em]">This draft over time</p>
+                  {history.length > 1 && (() => {
+                    const gain = history[history.length - 1].total - history[0].total
+                    return (
+                      <span className="text-[12.5px] font-semibold tabular-nums" style={{ color: gain >= 0 ? 'var(--status-proficient)' : 'var(--status-weak)' }}>
+                        {gain >= 0 ? '+' : ''}
+                        {gain} since the first marking
+                      </span>
+                    )
+                  })()}
+                </div>
+                {markId && history.length > 1 && markId !== history[history.length - 1].id && (
+                  <p className="mt-2 flex items-center justify-between gap-2 rounded-[10px] px-3 py-2 text-[12.5px]" style={{ background: 'color-mix(in srgb, var(--status-developing) 14%, transparent)' }}>
+                    <span>You are looking at an earlier marking.</span>
+                    <button type="button" onClick={() => openMark(history[history.length - 1].id)} className="font-semibold text-[var(--brand)] hover:underline">
+                      Open latest
+                    </button>
+                  </p>
+                )}
+                <div className="mt-3 flex h-[104px] items-end gap-2 overflow-x-auto pb-1">
+                  {history.map((h, i) => {
+                    const fraction = h.out_of ? h.total / h.out_of : 0
+                    const on = h.id === markId
+                    return (
+                      <button
+                        key={h.id}
+                        type="button"
+                        onClick={() => !on && openMark(h.id)}
+                        title={`${shortDate(h.created_at)}: ${h.total}/${h.out_of}${h.grade ? `, likely ${h.grade}` : ''}`}
+                        className="flex w-11 shrink-0 flex-col items-center justify-end gap-1"
+                      >
+                        <span className="text-[11px] font-semibold tabular-nums" style={{ color: on ? 'var(--text)' : 'var(--text-muted)' }}>
+                          {h.total}
+                        </span>
+                        <span
+                          className="w-full rounded-[6px] transition-[height] duration-500"
+                          style={{
+                            height: `${Math.max(8, fraction * 60)}px`,
+                            background: ringColour(fraction),
+                            opacity: on ? 1 : 0.45,
+                            outline: on ? '2px solid var(--text)' : 'none',
+                            outlineOffset: 2,
+                            animationDelay: `${i * 60}ms`,
+                          }}
+                        />
+                        <span className="text-[10px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
+                          {shortDate(h.created_at)}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
             )}
 
             <div>
@@ -789,7 +1009,8 @@ export default function DraftStudio({ subjects = [] }) {
   )
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[20px] border" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
+    <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[20px] border" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
+      {drafts && <MyDrafts onOpen={openMark} onClose={() => setDraftsOpen(false)} />}
       {/* The document bar. */}
       <header className="flex h-[54px] shrink-0 items-center gap-3 border-b px-4 md:px-5" style={{ borderColor: 'var(--border)' }}>
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px]" style={{ background: 'var(--surface-sunken)', color: 'var(--text-muted)' }}>
@@ -798,6 +1019,12 @@ export default function DraftStudio({ subjects = [] }) {
         <p className="min-w-0 flex-1 truncate text-[15.5px] font-medium tracking-[-0.01em]" title={title}>
           {title}
         </p>
+        <button type="button" onClick={() => setDraftsOpen((v) => !v)} aria-expanded={drafts} className="h-9 shrink-0 rounded-full border px-3 text-[12.5px] font-medium transition-colors hover:bg-[var(--surface-sunken)]" style={{ borderColor: 'var(--border-strong)' }}>
+          My drafts
+        </button>
+        <button type="button" onClick={newDraft} disabled={busy} className="hidden h-9 shrink-0 rounded-full px-3 text-[12.5px] font-medium transition-colors hover:bg-[var(--surface-sunken)] sm:block" style={{ color: 'var(--text-muted)' }}>
+          + New
+        </button>
         {review && (
           <span className="hidden items-center gap-1.5 text-[12.5px] font-medium sm:flex" style={{ color: stale ? 'var(--status-developing)' : 'var(--status-proficient)' }}>
             {stale ? '●' : <Check size={14} />}
@@ -873,11 +1100,7 @@ export default function DraftStudio({ subjects = [] }) {
             {text && (
               <button
                 type="button"
-                onClick={() => {
-                  setText('')
-                  setReview(null)
-                  setMarkedText('')
-                }}
+                onClick={newDraft}
                 disabled={busy}
                 className="h-8 rounded-[8px] px-2.5 text-[12.5px] font-medium transition-colors hover:bg-[var(--surface-sunken)]"
                 style={{ color: 'var(--text-muted)' }}

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { createClient } from '@/lib/supabase'
 import MathText from '@/components/MathText'
 import SyllabiMark from '@/components/SyllabiMark'
 import { subjectCode, shortName } from '@/lib/subject-short'
@@ -18,28 +19,14 @@ import { ArrowUp, Stop, Paperclip, Copy, Check, Chevron, FileIcon, LinkIcon, Clo
  * stop button really stops: the request is cancelled and so is the model
  * call behind it.
  *
- * The conversation is kept in this tab only (sessionStorage), per subject,
- * so a computer shared at school does not show the next student anything.
+ * Conversations are saved to the student's account as they go
+ * (syllabi_chats, 069-syllabi-saved.sql): the first answer creates the chat
+ * and every answer after it updates it. Files are not kept, only their names.
  */
 
 const MAX = 2000
 const LAST = 'psyllabus:tutor:last'
-
-function load(key) {
-  try {
-    return JSON.parse(sessionStorage.getItem(key) || '[]')
-  } catch {
-    return []
-  }
-}
-
-function save(key, messages) {
-  try {
-    sessionStorage.setItem(key, JSON.stringify(messages.slice(-40)))
-  } catch {
-    /* the conversation just will not survive a reload */
-  }
-}
+const KEEP = 60 // messages saved per chat
 
 function lastSubject(subjects) {
   try {
@@ -179,28 +166,36 @@ function Hub({ subjects, subject, onPick }) {
 }
 
 /**
+ * chat: a saved conversation to carry on with ({ id, subject, messages }).
+ * onSaved: told each time the conversation is saved, so a list can update.
+ * source: where it was opened from, kept with it ("Flashcard · Physics").
+ *
  * compact: the version in the Syllabi drawer, opened from elsewhere in the
- * app. It keeps its own conversations (store="drawer"), starts on whatever
- * it was opened about, and with autoSend asks the question straight away,
- * because the student pressed a button that already said what they wanted.
+ * app. It starts on whatever it was opened about, and with autoSend asks the
+ * question straight away, because the student pressed a button that already
+ * said what they wanted.
  */
 export default function TutorChat({
   subjects = [],
   topicsFor,
+  chat = null,
+  onSaved,
+  onNew,
+  source = null,
   initialSubject = '',
   initialInput = '',
   initialTopic = '',
   autoSend = false,
   compact = false,
-  store = 'tutor',
 }) {
-  const KEY = (s) => `psyllabus:${store}:${s || 'general'}`
   const [subject, setSubject] = useState(() => {
+    if (chat?.subject && subjects.includes(chat.subject)) return chat.subject
     if (initialSubject && subjects.includes(initialSubject)) return initialSubject
     return (typeof window !== 'undefined' && lastSubject(subjects)) || subjects[0] || ''
   })
   const [topic, setTopic] = useState(initialTopic)
-  const [messages, setMessages] = useState(() => (typeof window === 'undefined' || compact ? [] : load(KEY(subject))))
+  const [messages, setMessages] = useState(() => chat?.messages || [])
+  const chatId = useRef(chat?.id || null)
   const [input, setInput] = useState(initialInput)
   const [files, setFiles] = useState([])
   const [busy, setBusy] = useState(false)
@@ -269,7 +264,11 @@ export default function TutorChat({
     if (busy || s === subject) return
     setSubject(s)
     setTopic('')
-    setMessages(compact ? [] : load(KEY(s)))
+    // A different subject is a different conversation.
+    if (messages.length) {
+      chatId.current = null
+      setMessages([])
+    }
     setNotice(null)
     try {
       if (!compact) sessionStorage.setItem(LAST, s)
@@ -361,17 +360,42 @@ export default function TutorChat({
     sent.forEach((f) => f.preview && URL.revokeObjectURL(f.preview))
     const final = [...history, { role: 'assistant', content: answer || 'Stopped.' }]
     setMessages(final)
-    save(KEY(subject), final)
+    if (answer) await persist(final)
     abortRef.current = null
     setStreaming(false)
     setBusy(false)
     boxRef.current?.focus()
   }
 
+  /** Save the conversation to the account: created on the first answer, updated after. */
+  const persist = async (all) => {
+    const supabase = createClient()
+    const kept = all.slice(-KEEP).map(({ role, content, files: f }) => (f?.length ? { role, content, files: f } : { role, content }))
+    const title = (all.find((m) => m.role === 'user')?.content || 'Chat').replace(/\s+/g, ' ').trim().slice(0, 120)
+    const now = new Date().toISOString()
+    if (chatId.current) {
+      const { error } = await supabase.from('syllabi_chats').update({ messages: kept, updated_at: now }).eq('id', chatId.current)
+      if (!error) onSaved?.({ id: chatId.current, subject, title, source, updated_at: now })
+      return
+    }
+    const { data, error } = await supabase
+      .from('syllabi_chats')
+      .insert({ subject: subject || null, title, source, messages: kept })
+      .select('id, subject, title, source, updated_at')
+      .single()
+    if (data) {
+      chatId.current = data.id
+      onSaved?.(data)
+    } else if (error) {
+      console.error('syllabi chat save:', error.message)
+    }
+  }
+
   const clear = () => {
     if (busy) return
+    if (onNew) return onNew()
+    chatId.current = null
     setMessages([])
-    save(KEY(subject), [])
     setNotice(null)
   }
 

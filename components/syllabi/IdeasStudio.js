@@ -77,6 +77,33 @@ export default function IdeasStudio({ subjects = [], userId, onTalk }) {
   const [open, setOpen] = useState(null)
   const [remaining, setRemaining] = useState(null)
   const [progress, setProgress] = useState({ weak: [], strong: [] })
+  // Earlier results of this tool, kept on the account (069-syllabi-saved.sql).
+  const [saved, setSaved] = useState([])
+  const [confirming, setConfirming] = useState(null)
+
+  useEffect(() => {
+    if (!userId) return
+    let gone = false
+    const read = async () => {
+      const { data } = await createClient()
+        .from('syllabi_ideas')
+        .select('id, mode, subject, kind, prompt, result, created_at')
+        .eq('user_id', userId)
+        .eq('mode', mode)
+        .order('created_at', { ascending: false })
+        .limit(20)
+      if (!gone) setSaved(data || [])
+    }
+    read()
+    return () => {
+      gone = true
+    }
+  }, [mode, userId])
+
+  const removeSaved = async (item) => {
+    const { error } = await createClient().from('syllabi_ideas').delete().eq('id', item.id)
+    if (!error) setSaved((list) => list.filter((x) => x.id !== item.id))
+  }
 
   // What their own quizzes say about this subject, for study advice.
   useEffect(() => {
@@ -138,6 +165,9 @@ export default function IdeasStudio({ subjects = [], userId, onTalk }) {
       else {
         setResult(data.result)
         setRemaining(data.remaining ?? null)
+        if (data.saved) {
+          setSaved((list) => [{ id: data.saved.id, mode, subject, kind: mode === 'research' ? kind : null, prompt: message, result: data.result, created_at: data.saved.created_at }, ...list])
+        }
       }
     } catch {
       setError('Could not reach Syllabi. Check your connection.')
@@ -279,6 +309,53 @@ export default function IdeasStudio({ subjects = [], userId, onTalk }) {
           </p>
         )}
       </div>
+
+      {/* Earlier results, to come back to. */}
+      {saved.length > 0 && (
+        <div className="mt-5">
+          <p className="mb-2 text-[12.5px] font-medium" style={{ color: 'var(--text-muted)' }}>
+            Earlier
+          </p>
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {saved.map((item) => {
+              const label = item.result?.ideas?.[0]?.question || item.result?.headline || item.prompt || 'Saved'
+              const on = result === item.result
+              return (
+                <div key={item.id} className="group relative w-60 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setResult(item.result)
+                      setOpen(null)
+                      if (item.subject && subjects.includes(item.subject)) setSubject(item.subject)
+                      if (item.kind) setKind(item.kind)
+                    }}
+                    className="flex h-full w-full flex-col rounded-[14px] border p-3 text-left transition-colors hover:border-[var(--brand)]"
+                    style={{ borderColor: on ? 'var(--brand)' : 'var(--border)', background: on ? 'var(--brand-tint)' : 'var(--surface)' }}
+                  >
+                    <span className="text-[11px] font-semibold" style={{ color: 'var(--text-faint)' }}>
+                      {shortName(item.subject || '')} · {new Date(item.created_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
+                    </span>
+                    <span className="mt-1 line-clamp-2 text-[12.5px] leading-snug" style={{ color: 'var(--text-body)' }}>
+                      {label}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => (confirming === item.id ? removeSaved(item) : setConfirming(item.id))}
+                    onBlur={() => setConfirming(null)}
+                    aria-label="Delete"
+                    className={`absolute right-2 top-2 rounded-[6px] px-1.5 py-0.5 text-[10.5px] font-semibold transition-opacity ${confirming === item.id ? '' : 'opacity-0 group-hover:opacity-100 focus:opacity-100'}`}
+                    style={confirming === item.id ? { background: 'var(--status-weak)', color: '#fff' } : { color: 'var(--text-faint)', background: 'var(--surface-sunken)' }}
+                  >
+                    {confirming === item.id ? 'Delete' : '✕'}
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {/* While it thinks. */}
       {busy && (

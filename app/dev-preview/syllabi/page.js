@@ -20,6 +20,15 @@ import dynamic from 'next/dynamic'
 // Browser only, as on the real page, which draws these after the profile loads.
 const DraftStudio = dynamic(() => import('@/components/syllabi/DraftStudio'), { ssr: false })
 const TutorChat = dynamic(() => import('@/components/syllabi/TutorChat'), { ssr: false })
+const ChatHistory = dynamic(() => import('@/components/syllabi/ChatHistory'), { ssr: false })
+
+const DAY = 86400000
+const CHATS = [
+  { id: '1', subject: 'Physics SL', title: 'Why does a pendulum’s period not depend on mass?', source: null, updated_at: new Date().toISOString() },
+  { id: '2', subject: 'Math Analysis & Approaches HL', title: 'Chain rule practice question', source: 'Study plan · Maths AA', updated_at: new Date(Date.now() - DAY).toISOString() },
+  { id: '3', subject: 'Economics HL', title: 'Explain price elasticity of demand', source: 'Flashcard · Economics HL', updated_at: new Date(Date.now() - 3 * DAY).toISOString() },
+  { id: '4', subject: 'Computer Science SL', title: 'Binary search vs linear search', source: 'Quiz · Algorithms', updated_at: new Date(Date.now() - 20 * DAY).toISOString() },
+]
 import { SyllabiProvider, AskSyllabi } from '@/components/syllabi/SyllabiDrawer'
 import DashboardLayout from '@/components/DashboardLayout'
 
@@ -120,6 +129,16 @@ function Preview() {
       <div className="flex h-dvh flex-col p-4 md:p-6" style={{ background: 'var(--bg)' }}>
         {view === 'draft' && <DraftStudio subjects={SUBJECTS} />}
         {view === 'ask' && <TutorChat subjects={SUBJECTS} />}
+        {view === 'history' && (
+          <div className="flex min-h-0 flex-1 gap-6">
+            <aside className="flex w-60 shrink-0 flex-col">
+              <ChatHistory chats={CHATS} activeId="2" loading={false} onOpen={() => {}} onNew={() => {}} onDelete={() => {}} />
+            </aside>
+            <div className="flex min-h-0 flex-1 flex-col">
+              <TutorChat subjects={SUBJECTS} />
+            </div>
+          </div>
+        )}
         {view === 'drawer' && (
           <div className="flex flex-wrap gap-3">
             <AskSyllabi subject="Physics SL" topic="Kinematics" context="Physics SL · Kinematics" label="Why was I wrong?" text="I got this question wrong: a ball is thrown up at 12 m/s. What is its maximum height? My answer: 14.7 m. Correct: 7.3 m." />

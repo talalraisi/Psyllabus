@@ -11,7 +11,7 @@ function Privacy() {
   return (
     <LegalDoc
       titles={{ en: 'Privacy Policy', ar: 'سياسة الخصوصية' }}
-      updated={{ en: '19 October 2026', ar: '١٩ أكتوبر ٢٠٢٦' }}
+      updated={{ en: '20 October 2026', ar: '٢٠ أكتوبر ٢٠٢٦' }}
       lang={lang}
       setLang={setLang}
     >
@@ -91,8 +91,8 @@ function Privacy() {
           </li>
           <li>
             {ar
-              ? 'ما تسأل عنه Syllabi وما تلصقه فيه، وأي صور أو ملفات أو مسودات ترسلها إليه، وتُرسل إلى Anthropic لكتابة الإجابة. إذا أرفقت رابطاً، يفتح خادمنا تلك الصفحة ويرسل نصها معها. لا نحفظ المحادثة ولا الملفات ولا المسودات: تبقى في نافذة متصفحك فقط وتُمحى عند إغلاقها. نحتفظ فقط بعدد الطلبات وتكلفتها والمادة، لنطبّق الحد اليومي.'
-              : 'What you ask Syllabi, what you paste into it, and any photos, files or drafts you send it, which are sent to Anthropic to write the answer. If you include a link, our server opens that page and sends its text along. We do not save the conversation, files or drafts: they stay in your browser tab and are gone when you close it. We keep only a count of requests, their cost and the subject, to apply the daily limit.'}
+              ? 'ما تسأل عنه Syllabi وما تلصقه فيه، وأي صور أو ملفات أو مسودات ترسلها إليه، وتُرسل إلى Anthropic لكتابة الإجابة. إذا أرفقت رابطاً، يفتح خادمنا تلك الصفحة ويرسل نصها معها. تُحفظ محادثاتك مع Syllabi والمسودات التي قُيّمت مع ملاحظاتها والأفكار التي حفظتها في حسابك لتعود إليها. لا نحتفظ بالصور والملفات التي ترفقها، بل بأسمائها فقط. يمكنك حذف أي منها في أي وقت، وتُحذف جميعها مع حسابك. ونحتفظ أيضاً بعدد الطلبات وتكلفتها لنطبّق الحد اليومي.'
+              : 'What you ask Syllabi, what you paste into it, and any photos, files or drafts you send it, which are sent to Anthropic to write the answer. If you include a link, our server opens that page and sends its text along. Your Syllabi conversations, the drafts you have marked with their feedback, and your saved ideas are kept on your account so you can come back to them. Photos and files you attach are not kept, only their names. You can delete any of them at any time, and they are all deleted with your account. We also keep a count of requests and their cost, to apply the daily limit.'}
           </li>
           <li>
             {ar

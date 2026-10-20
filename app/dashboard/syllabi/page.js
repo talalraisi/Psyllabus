@@ -6,7 +6,7 @@
  * picked up and talked through, which opens Ask with the question written.
  */
 
-import { Suspense, useEffect, useMemo, useState } from 'react'
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
@@ -18,6 +18,7 @@ import { Page, PageLoading } from '@/components/PageShell'
 import TutorChat from '@/components/syllabi/TutorChat'
 import IdeasStudio from '@/components/syllabi/IdeasStudio'
 import DraftStudio from '@/components/syllabi/DraftStudio'
+import ChatHistory from '@/components/syllabi/ChatHistory'
 import { hasSyllabi } from '@/lib/access'
 
 /**
@@ -33,6 +34,17 @@ function Shell({ full, children }) {
   )
 }
 
+/** The chat open in this tab, so a refresh carries on with it. */
+const OPEN = 'psyllabus:tutor:open'
+const remember = (id) => {
+  try {
+    if (id) sessionStorage.setItem(OPEN, id)
+    else sessionStorage.removeItem(OPEN)
+  } catch {
+    /* it just will not reopen after a refresh */
+  }
+}
+
 const TABS = [
   ['ask', 'Ask'],
   ['draft', 'Draft feedback'],
@@ -45,6 +57,10 @@ function Syllabi() {
   const [rows, setRows] = useState([])
   const [tab, setTab] = useState(() => (TABS.some(([k]) => k === params.get('tab')) ? params.get('tab') : 'ask'))
   const [seed, setSeed] = useState({ n: 0, subject: '', text: '' })
+  const [chats, setChats] = useState([])
+  const [chatsLoading, setChatsLoading] = useState(true)
+  const [open, setOpen] = useState({ n: 0, chat: null })
+  const [historyOpen, setHistoryOpen] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -60,7 +76,24 @@ function Syllabi() {
         router.push('/onboarding')
         return
       }
-      setRows((await getSyllabus(supabase, p.subjects || [])) || [])
+      const [syllabus, { data: list }] = await Promise.all([
+        getSyllabus(supabase, p.subjects || []),
+        supabase.from('syllabi_chats').select('id, subject, title, source, updated_at').eq('user_id', user.id).order('updated_at', { ascending: false }).limit(100),
+      ])
+      setRows(syllabus || [])
+      setChats(list || [])
+      // Carry on with the chat that was open before a refresh.
+      let openId = null
+      try {
+        openId = sessionStorage.getItem(OPEN)
+      } catch {
+        /* none */
+      }
+      if (openId && (list || []).some((c) => c.id === openId)) {
+        const { data } = await supabase.from('syllabi_chats').select('id, subject, messages').eq('id', openId).maybeSingle()
+        if (data) setOpen({ n: 1, chat: data })
+      }
+      setChatsLoading(false)
       setProfile(p)
     }
     load()
@@ -75,6 +108,38 @@ function Syllabi() {
     }
     return out
   }, [rows])
+
+  const openChat = useCallback(
+    async (c) => {
+      setHistoryOpen(false)
+      const { data } = await supabase.from('syllabi_chats').select('id, subject, messages').eq('id', c.id).maybeSingle()
+      if (!data) return
+      remember(data.id)
+      setOpen((o) => ({ n: o.n + 1, chat: data }))
+    },
+    [supabase]
+  )
+
+  const newChat = useCallback(() => {
+    setHistoryOpen(false)
+    remember(null)
+    setOpen((o) => ({ n: o.n + 1, chat: null }))
+  }, [])
+
+  const saved = useCallback((meta) => {
+    remember(meta.id)
+    setChats((list) => [meta, ...list.filter((c) => c.id !== meta.id)])
+  }, [])
+
+  const removeChat = useCallback(
+    async (c) => {
+      const { error } = await supabase.from('syllabi_chats').delete().eq('id', c.id)
+      if (error) return
+      setChats((list) => list.filter((x) => x.id !== c.id))
+      if (open.chat?.id === c.id) newChat()
+    },
+    [supabase, open.chat, newChat]
+  )
 
   if (!profile) {
     return (
@@ -94,6 +159,17 @@ function Syllabi() {
       <Shell full={allowed && tab !== 'ideas'}>
         <div className="mb-4 flex shrink-0 flex-wrap items-center justify-between gap-3">
           <h1 className="flex items-center gap-2.5 text-[22px] font-semibold tracking-[-0.025em]">
+            {allowed && tab === 'ask' && (
+              <button
+                type="button"
+                onClick={() => setHistoryOpen((v) => !v)}
+                aria-expanded={historyOpen}
+                className="mr-1 flex h-9 items-center rounded-full border px-3 text-[12.5px] font-medium lg:hidden"
+                style={{ borderColor: 'var(--border-strong)' }}
+              >
+                Chats
+              </button>
+            )}
             <span className="flex h-8 w-8 items-center justify-center rounded-full" style={{ background: 'var(--brand)', color: '#fff' }}>
               <SyllabiMark size={15} />
             </span>
@@ -128,13 +204,29 @@ function Syllabi() {
             blurb="Ask Syllabi to explain a topic, read a photo of a question, set you practice and mark your answer, or mark your IA draft against the criteria."
           />
         ) : tab === 'ask' ? (
-          <TutorChat
-            key={seed.n}
-            subjects={subjects}
-            topicsFor={(s) => topicsBySubject[s] || []}
-            initialSubject={seed.subject}
-            initialInput={seed.text}
-          />
+          <div className="relative flex min-h-0 flex-1 gap-6">
+            {/* Saved chats: a column on a wide screen, a panel on a narrow one. */}
+            <aside className="hidden w-60 shrink-0 flex-col lg:flex">
+              <ChatHistory chats={chats} activeId={open.chat?.id} loading={chatsLoading} onOpen={openChat} onNew={newChat} onDelete={removeChat} />
+            </aside>
+            {historyOpen && (
+              <div className="pop-enter absolute inset-y-0 left-0 z-30 flex w-[min(20rem,85vw)] flex-col rounded-[18px] border p-3 shadow-2xl lg:hidden" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
+                <ChatHistory chats={chats} activeId={open.chat?.id} loading={chatsLoading} onOpen={openChat} onNew={newChat} onDelete={removeChat} />
+              </div>
+            )}
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+              <TutorChat
+                key={`${seed.n}-${open.n}`}
+                subjects={subjects}
+                topicsFor={(s) => topicsBySubject[s] || []}
+                chat={seed.n && !open.chat ? null : open.chat}
+                onSaved={saved}
+                onNew={newChat}
+                initialSubject={seed.subject}
+                initialInput={seed.text}
+              />
+            </div>
+          </div>
         ) : tab === 'draft' ? (
           <DraftStudio subjects={subjects} />
         ) : (
@@ -142,6 +234,8 @@ function Syllabi() {
             subjects={subjects}
             userId={profile.id}
             onTalk={({ subject, text }) => {
+              remember(null)
+              setOpen((o) => ({ n: o.n + 1, chat: null }))
               setSeed((s) => ({ n: s.n + 1, subject, text }))
               setTab('ask')
             }}
