@@ -314,13 +314,6 @@ export default async function Home() {
           </div>
         </Section>
 
-        {/* -------------------------------------------------------- subjects */}
-        <section className="px-5 py-16 md:px-8 md:py-24">
-          <Reveal>
-            <SubjectOrbit subjects={counts?.subjects ?? 173} />
-          </Reveal>
-        </section>
-
         {/* ------------------------------------------------------- features */}
         <Section label="Features" tint id="features">
           <Heading className="max-w-2xl">Three questions, and what answers each</Heading>
@@ -363,23 +356,13 @@ export default async function Home() {
 
 
         {/* ------------------------------------------------------------ cta */}
-        <Section>
-          <div className="mx-auto max-w-2xl text-center">
-            <Heading>Start with one subject. It stays free.</Heading>
-            <p className="mx-auto mt-5 max-w-lg text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-              One quiz is enough to fill in your first subtopic and start the plan.
-            </p>
-            <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-              <Link href="/signup" className="btn btn-solid control-lg">
-                Create a free account
-                <IconArrowRight width={16} height={16} />
-              </Link>
-              <Link href="/pricing" className="btn btn-outline control-lg">
-                See pricing
-              </Link>
-            </div>
-          </div>
-        </Section>
+        {/* The close: every subject in one orbit, with the way in. */}
+        <section className="px-5 py-16 md:px-8 md:py-24">
+          <Reveal>
+            <SubjectOrbit subjects={counts?.subjects ?? 173} />
+          </Reveal>
+        </section>
+
       </main>
 
       <footer className="border-t px-5 py-12 md:px-8" style={{ borderColor: 'var(--border)' }}>
