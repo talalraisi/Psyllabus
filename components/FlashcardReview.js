@@ -6,6 +6,7 @@ import { IconCheck, IconClose, IconArrowLeft, IconArrowRight } from '@/component
 import { displaySubtopic } from '@/lib/progress'
 import { SNOOZE_CHOICES } from '@/lib/flashcards'
 import CardMenu from '@/components/CardMenu'
+import { AskSyllabi } from '@/components/syllabi/SyllabiDrawer'
 
 /**
  * Full-screen flashcard review.
@@ -81,6 +82,8 @@ export default function FlashcardReview({ cards, onMark, onSnooze, onEdit, onDel
 
   useEffect(() => {
     const onKey = (e) => {
+      // Typing to Syllabi, or in any box, is not a shortcut.
+      if (e.target?.closest?.('input, textarea, select, [role="dialog"]')) return
       if (e.key === 'Escape') return onExit({ finished: false })
       if (missed) {
         // Waiting on "when should this come back?" — 1 to 4 answer it.
@@ -253,6 +256,18 @@ export default function FlashcardReview({ cards, onMark, onSnooze, onEdit, onDel
             <IconArrowRight width={18} height={18} />
           </button>
         </div>
+
+        {flipped && !missed && (
+          <div className="mt-3 flex justify-center">
+            <AskSyllabi
+              subject={card.subject}
+              topic={card.subtopic}
+              context={`Flashcard · ${card.subject}`}
+              label="Explain this card"
+              text={`Help me really understand this flashcard from ${card.subject}${card.subtopic ? ` (${displaySubtopic(card.subtopic)})` : ''}.\n\nFront: ${String(card.front).slice(0, 700)}\nBack: ${String(card.back).slice(0, 700)}\n\nExplain it simply, give me an example and a way to remember it, then ask me one quick question to check.`}
+            />
+          </div>
+        )}
 
         <p className="t-caption mt-3 hidden text-center md:block">
           {missed

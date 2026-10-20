@@ -33,6 +33,7 @@ import { getSyllabus, getProfile } from '@/lib/cache'
 import { paperById, typesForStyle } from '@/lib/papers'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 import { progressKey, HEAT_RANGES } from '@/lib/progress'
+import { AskSyllabi } from '@/components/syllabi/SyllabiDrawer'
 
 const PHASE = {
   loading: 'loading',
@@ -66,6 +67,32 @@ function questionAsText(question, { includeAnswer = false } = {}) {
     if (question.explanation) parts.push(question.explanation)
   }
   return parts.filter(Boolean).join('\n')
+}
+
+/**
+ * What Syllabi is asked when a student wants help with a question they have
+ * already answered: the question, what they put, and the right answer. Only
+ * ever offered after answering, so it cannot be used to get the answer first.
+ * Kept inside one message's length; a long extract is cut.
+ */
+function askAbout(question, given, correct) {
+  const picked = (question.options || []).find((o) => o.id === given)
+  const mine = picked ? `${picked.id}) ${picked.text}` : String(given ?? '').trim() || '(no answer)'
+  const right = (question.options || []).find((o) => o.id === question.correct_answer)
+  const answer = right ? `${right.id}) ${right.text}` : question.correct_answer
+  const body = questionAsText(question).slice(0, 1200)
+  return [
+    correct ? `I got this ${question.subject || ''} question right, but I want to understand it properly.` : `I got this ${question.subject || ''} question wrong.`,
+    '',
+    body,
+    '',
+    `My answer: ${mine}`.slice(0, 200),
+    `Correct answer: ${answer}`.slice(0, 200),
+    '',
+    correct
+      ? 'Explain why it is right and what the examiner is testing, then give me a harder one like it.'
+      : 'Explain where I went wrong and how to get it right next time, then give me a similar question to try.',
+  ].join('\n')
 }
 
 /** The whole paper, for pasting into notes or a revision doc. */
@@ -457,6 +484,8 @@ export default function QuizRunner({
       const typing =
         el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)
       if (e.metaKey || e.ctrlKey || e.altKey) return
+      // Talking to Syllabi in its drawer is not answering the quiz.
+      if (el?.closest?.('[role="dialog"]')) return
 
       const q = questions[currentIndex]
       if (!q) return
@@ -1197,6 +1226,15 @@ export default function QuizRunner({
               </p>
             )}
             <MarkScheme question={q} />
+            <div className="mt-4">
+              <AskSyllabi
+                subject={q.subject}
+                topic={q.subtopic}
+                context={`${q.subject} · ${q.subtopic || 'this question'}`}
+                label={revealed[q.id].correct ? 'Go deeper with Syllabi' : 'Why was I wrong?'}
+                text={askAbout(q, selected, revealed[q.id].correct)}
+              />
+            </div>
           </div>
         )}
 
@@ -1355,6 +1393,16 @@ export default function QuizRunner({
                   </p>
                 )}
                 <MarkScheme question={g.question} />
+                <div className="mt-3">
+                  <AskSyllabi
+                    size="xs"
+                    subject={g.question.subject}
+                    topic={g.question.subtopic}
+                    context={`${g.question.subject} · ${g.question.subtopic || 'this question'}`}
+                    label={g.correct ? 'Go deeper with Syllabi' : 'Why was I wrong?'}
+                    text={askAbout(g.question, g.selected, g.correct)}
+                  />
+                </div>
               </>
             )}
           </div>
@@ -1480,6 +1528,21 @@ export default function QuizRunner({
             <button onClick={retryWrong} className="btn btn-solid control-md">
               Redo the {wrong.length} you missed
             </button>
+          )}
+          {wrong.length > 0 && (
+            <AskSyllabi
+              subject={wrong[0].question.subject}
+              context={`Quiz results · ${wrong.length} missed`}
+              label="Go through them with Syllabi"
+              text={[
+                `I just finished a ${wrong[0].question.subject || ''} quiz and got ${wrong.length} wrong. Go through them with me one at a time: explain my mistake, then give me a similar question.`,
+                '',
+                ...wrong.slice(0, 4).map((g, i) => {
+                  const picked = (g.question.options || []).find((o) => o.id === g.selected)
+                  return `${i + 1}. ${String(g.question.stem || '').slice(0, 260)}\nMy answer: ${picked ? picked.text : g.selected ?? '(none)'} · Correct: ${g.question.correct_answer}`.slice(0, 380)
+                }),
+              ].join('\n')}
+            />
           )}
           <Link href={backHref} className="btn btn-quiet control-md">
             Done

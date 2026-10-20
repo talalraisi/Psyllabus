@@ -16,6 +16,7 @@ import CalendarConnections from '@/components/calendar/CalendarConnections'
 import TestSuggestions from '@/components/calendar/TestSuggestions'
 import TodoList from '@/components/TodoList'
 import { accessibleSubjects } from '@/lib/access'
+import { AskSyllabi } from '@/components/syllabi/SyllabiDrawer'
 import {
   EVENT_KINDS,
   KIND_LABEL,
@@ -451,6 +452,14 @@ export default function CalendarPage() {
                 {relativeDay(next[0].due_at)}
               </p>
             </div>
+            <div className="mt-4">
+              <AskSyllabi
+                subject={next[0].subject || ''}
+                context={`${KIND_LABEL[next[0].kind] || 'Calendar'} · ${next[0].title}`}
+                label="Prepare with Syllabi"
+                text={prepareText(next[0])}
+              />
+            </div>
           </div>
         )}
 
@@ -604,6 +613,17 @@ export default function CalendarPage() {
   )
 }
 
+/** What Syllabi is asked when a student wants help getting ready for something on the calendar. */
+function prepareText(event) {
+  const when = formatEventDate(event.due_at, event.all_day)
+  const what = `${KIND_LABEL[event.kind] || 'an event'}${event.subject ? ` in ${event.subject}` : ''}`
+  const notes = event.notes ? ` Notes: ${String(event.notes).slice(0, 300)}` : ''
+  if (event.kind === 'ia' || event.kind === 'deadline') {
+    return `I have "${event.title}" (${what}) due ${when}.${notes} Help me plan the work backwards from the deadline, step by step. Don't write any of it for me.`
+  }
+  return `I have ${what} on ${when}: "${event.title}".${notes} Make me a revision plan for the days until then, then start by quizzing me on the most likely topics, one question at a time.`
+}
+
 function EventRow({ event, onToggle, onRemove, showRelative = false }) {
   const days = daysUntil(event.due_at)
   const urgent = !event.completed && days >= 0 && days <= 3
@@ -639,6 +659,17 @@ function EventRow({ event, onToggle, onRemove, showRelative = false }) {
         </p>
         {event.notes && <p className="t-caption mt-0.5 truncate">{event.notes}</p>}
       </div>
+
+      {!event.completed && daysUntil(event.due_at) >= 0 && (
+        <AskSyllabi
+          size="xs"
+          className="hidden sm:inline-flex"
+          subject={event.subject || ''}
+          context={`${KIND_LABEL[event.kind] || 'Calendar'} · ${event.title}`}
+          label="Prepare"
+          text={prepareText(event)}
+        />
+      )}
 
       <div className="shrink-0 text-right">
         <p className="t-caption">{formatEventDate(event.due_at, event.all_day)}</p>

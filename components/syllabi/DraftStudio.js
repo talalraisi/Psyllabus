@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import Link from 'next/link'
 import ScoreRing, { ringColour } from '@/components/ScoreRing'
 import SyllabiMark from '@/components/SyllabiMark'
 import { KINDS, rubricFor } from '@/lib/criteria'
@@ -66,12 +65,18 @@ function asText(review, { subject, kind }) {
     `${total}/${outOf} · likely grade ${review.grade_estimate || '–'} (an estimate, not a mark)`,
     review.grade_note,
     '',
-    ...review.criteria.map((c) => `Criterion ${c.id} · ${c.name}: ${c.score}/${c.max}\n${c.comment}`),
+    review.overview || '',
+    '',
+    ...(review.examiner_comment ? ['Examiner’s comment:', review.examiner_comment, ''] : []),
+    ...review.criteria.map((c) => `Criterion ${c.id} · ${c.name}: ${c.score}/${c.max}\n${c.comment}${c.next_band ? `\nTo reach the next band: ${c.next_band}` : ''}`),
+    ...((review.sections || []).length ? ['', 'Section by section:', ...review.sections.map((x) => `- ${x.name} (${x.rating}): ${x.comment}`)] : []),
+    ...(review.writing ? ['', `Writing: ${review.writing}`] : []),
     '',
     'In the draft:',
-    ...review.highlights.map((h, i) => `${i + 1}. [${KIND[h.kind].label}${h.criterion ? ` · ${h.criterion}` : ''}] "${h.quote}"\n   ${h.comment}`),
+    ...review.highlights.map((h, i) => `${i + 1}. [${KIND[h.kind].label}${h.criterion ? ` · ${h.criterion}` : ''}] "${h.quote}"\n   ${h.comment}${h.how_to_fix ? `\n   ${h.kind === 'strength' ? 'Keep doing' : 'How to approach it'}: ${h.how_to_fix}` : ''}`),
     '',
     `Do this first: ${review.next_step}`,
+    ...((review.priorities || []).length ? ['', 'Priorities:', ...review.priorities.map((p, i) => `${i + 1}. ${p}`)] : []),
     ...(review.questions.length ? ['', 'Answer these in your next draft:', ...review.questions.map((q) => `- ${q}`)] : []),
   ]
   return lines.join('\n')
@@ -168,6 +173,14 @@ function CommentRow({ h, open, onToggle, onShow, refFn }) {
           <p className="text-[13.5px] leading-relaxed" style={{ color: 'var(--text)' }}>
             {h.comment}
           </p>
+          {h.how_to_fix && (
+            <p className="mt-2.5 rounded-[10px] px-3 py-2 text-[12.5px] leading-relaxed" style={{ background: 'var(--surface-sunken)', color: 'var(--text-body)' }}>
+              <span className="font-semibold" style={{ color: k.colour }}>
+                {h.kind === 'strength' ? 'Keep doing: ' : 'How to approach it: '}
+              </span>
+              {h.how_to_fix}
+            </p>
+          )}
           <button type="button" onClick={onShow} className="mt-2.5 text-[12.5px] font-medium text-[var(--brand)] hover:underline">
             Show in draft
           </button>
@@ -356,7 +369,7 @@ export default function DraftStudio({ subjects = [] }) {
           {READING[step]}…
         </p>
         <p className="mt-1 text-[12.5px]" style={{ color: 'var(--text-muted)' }}>
-          About half a minute.
+          About a minute. It reads every line.
         </p>
       </div>
     </div>
@@ -394,13 +407,14 @@ export default function DraftStudio({ subjects = [] }) {
         {[
           ['marks', 'Marks'],
           ['comments', `Comments · ${highlights.length}`],
+          ['report', 'Report'],
           ['next', 'Next steps'],
         ].map(([key, label]) => (
           <button
             key={key}
             type="button"
             onClick={() => setTab(key)}
-            className="relative px-3 py-3.5 text-[13px] font-medium transition-colors"
+            className="relative whitespace-nowrap px-2.5 py-3.5 text-[13px] font-medium transition-colors"
             style={{ color: tab === key ? 'var(--text)' : 'var(--text-muted)' }}
           >
             {label}
@@ -446,9 +460,15 @@ export default function DraftStudio({ subjects = [] }) {
               </div>
             </div>
 
+            {review.overview && (
+              <p className="rounded-[14px] px-4 py-3 text-[13.5px] leading-relaxed" style={{ background: 'var(--surface-sunken)', color: 'var(--text-body)' }}>
+                {review.overview}
+              </p>
+            )}
+
             <div>
               <p className="mb-2.5 text-[12.5px]" style={{ color: 'var(--text-muted)' }}>
-                By criterion
+                By criterion · tap one to read it
               </p>
               <div className="flex flex-wrap gap-2">
                 {review.criteria.map((c) => {
@@ -475,8 +495,8 @@ export default function DraftStudio({ subjects = [] }) {
                 {review.criteria
                   .filter((c) => !only || c.id === only)
                   .map((c) => (
-                    <div key={c.id} className="sy-rise rounded-[14px] border p-3.5" style={{ borderColor: 'var(--border)' }}>
-                      <div className="flex items-center gap-3">
+                    <div key={c.id} className="sy-rise rounded-[14px] border p-3.5" style={{ borderColor: only === c.id ? 'var(--border-strong)' : 'var(--border)' }}>
+                      <button type="button" onClick={() => setOnly(only === c.id ? null : c.id)} className="flex w-full items-center gap-3 text-left">
                         <ScoreRing value={c.score} max={c.max} size={38} stroke={3.5}>
                           <span className="text-[12px] font-semibold">{c.score}</span>
                         </ScoreRing>
@@ -486,11 +506,26 @@ export default function DraftStudio({ subjects = [] }) {
                           </p>
                           <p className="truncate text-[13.5px] font-medium">{c.name}</p>
                         </div>
-                      </div>
-                      {(only === c.id || review.criteria.length <= 2) && c.comment && (
-                        <p className="mt-2.5 text-[13px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-                          {c.comment}
-                        </p>
+                        <Chevron up={only === c.id} />
+                      </button>
+                      {(only === c.id || review.criteria.length <= 2) && (
+                        <div className="sy-rise">
+                          {c.comment && (
+                            <p className="mt-2.5 text-[13px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                              {c.comment}
+                            </p>
+                          )}
+                          {c.next_band && (
+                            <div className="mt-3 rounded-[10px] px-3 py-2.5" style={{ background: 'var(--brand-tint)' }}>
+                              <p className="text-[10.5px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'var(--brand)' }}>
+                                To reach the next band
+                              </p>
+                              <p className="mt-1 text-[12.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                                {c.next_band}
+                              </p>
+                            </div>
+                          )}
+                        </div>
                       )}
                     </div>
                   ))}
@@ -592,6 +627,60 @@ export default function DraftStudio({ subjects = [] }) {
           </div>
         )}
 
+        {tab === 'report' && (
+          <div key="report" className="sy-rise flex flex-col gap-6">
+            {review.examiner_comment && (
+              <div>
+                <p className="text-[15px] font-semibold tracking-[-0.01em]">Examiner’s comment</p>
+                <blockquote className="mt-3 border-l-[3px] pl-4 text-[13.5px] leading-[1.75]" style={{ borderColor: 'var(--brand)', color: 'var(--text-body)' }}>
+                  {review.examiner_comment}
+                </blockquote>
+              </div>
+            )}
+            {(review.sections || []).length > 0 && (
+              <div>
+                <p className="mb-3 text-[15px] font-semibold tracking-[-0.01em]">Section by section</p>
+                <ol className="flex flex-col gap-2">
+                  {review.sections.map((sec, i) => {
+                    const col = sec.rating === 'strong' ? 'var(--status-proficient)' : sec.rating === 'weak' ? 'var(--status-weak)' : 'var(--status-developing)'
+                    return (
+                      <li key={i} className="rounded-[14px] border p-3.5" style={{ borderColor: 'var(--border)' }}>
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="text-[13.5px] font-semibold">{sec.name}</p>
+                          <span className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize" style={{ background: `color-mix(in srgb, ${col} 18%, transparent)`, color: col }}>
+                            {sec.rating}
+                          </span>
+                        </div>
+                        <p className="mt-1.5 text-[13px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                          {sec.comment}
+                        </p>
+                      </li>
+                    )
+                  })}
+                </ol>
+              </div>
+            )}
+            {(review.writing || review.word_count_note) && (
+              <div>
+                <p className="text-[15px] font-semibold tracking-[-0.01em]">Writing</p>
+                {review.writing && (
+                  <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                    {review.writing}
+                  </p>
+                )}
+                {review.word_count_note && (
+                  <p className="mt-3 flex items-center gap-2 rounded-[10px] px-3 py-2 text-[12.5px]" style={{ background: 'var(--surface-sunken)', color: 'var(--text-muted)' }}>
+                    <span className="font-semibold tabular-nums" style={{ color: 'var(--text-body)' }}>
+                      {words.toLocaleString()} words
+                    </span>
+                    {review.word_count_note}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
         {tab === 'next' && (
           <div key="next" className="sy-rise flex flex-col gap-6">
             {review.next_step && (
@@ -600,6 +689,21 @@ export default function DraftStudio({ subjects = [] }) {
                   Do this first
                 </p>
                 <p className="mt-1.5 text-[14.5px] font-medium leading-relaxed">{review.next_step}</p>
+              </div>
+            )}
+            {(review.priorities || []).length > 0 && (
+              <div>
+                <p className="text-[15px] font-semibold tracking-[-0.01em]">Your priorities, in order</p>
+                <ol className="mt-3 flex flex-col gap-2">
+                  {review.priorities.map((p, i) => (
+                    <li key={i} className="flex gap-3 rounded-[12px] border px-3.5 py-3 text-[13.5px] leading-relaxed" style={{ borderColor: 'var(--border)' }}>
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold" style={{ background: i === 0 ? 'var(--brand)' : 'var(--surface-sunken)', color: i === 0 ? '#fff' : 'var(--text-muted)' }}>
+                        {i + 1}
+                      </span>
+                      <span style={{ color: 'var(--text-body)' }}>{p}</span>
+                    </li>
+                  ))}
+                </ol>
               </div>
             )}
             {review.questions.length > 0 && (
@@ -677,14 +781,12 @@ export default function DraftStudio({ subjects = [] }) {
   )
 
   return (
-    <div className="flex h-[calc(100dvh-56px)] flex-col md:h-dvh">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[20px] border" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
       {/* The document bar. */}
-      <header className="flex h-[60px] shrink-0 items-center gap-3 border-b px-4 md:px-6" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
-        <Link href="/dashboard/syllabi" aria-label="Back to Syllabi" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-[var(--surface-sunken)]" style={{ color: 'var(--text-muted)' }}>
-          <span style={{ transform: 'rotate(90deg)' }}>
-            <Chevron size={16} />
-          </span>
-        </Link>
+      <header className="flex h-[54px] shrink-0 items-center gap-3 border-b px-4 md:px-5" style={{ borderColor: 'var(--border)' }}>
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px]" style={{ background: 'var(--surface-sunken)', color: 'var(--text-muted)' }}>
+          <FileIcon size={15} />
+        </span>
         <p className="min-w-0 flex-1 truncate text-[15.5px] font-medium tracking-[-0.01em]" title={title}>
           {title}
         </p>
@@ -747,7 +849,7 @@ export default function DraftStudio({ subjects = [] }) {
         {/* The page. */}
         <section className="relative flex min-w-0 flex-1 flex-col">
           <div className="flex-1 overflow-y-auto">
-            <div className="mx-auto max-w-[780px] px-6 pb-24 pt-10 sm:px-14">
+            <div className="mx-auto max-w-[760px] px-6 pb-20 pt-8 sm:px-12">
               <HighlightEditor text={text} onChange={setText} parts={parts} active={active} show={show} onCaret={caret} markRefs={markRefs} disabled={busy} />
             </div>
           </div>
@@ -808,7 +910,7 @@ export default function DraftStudio({ subjects = [] }) {
         {/* The marks: beside the page on a wide screen, a sheet on a narrow one. */}
         {(panel || sheet) && (
           <aside
-            className={`${sheet ? 'fixed inset-x-0 bottom-0 top-[18vh] z-50 flex rounded-t-[22px] shadow-2xl' : 'hidden'} ${panel ? 'lg:static lg:z-auto lg:flex lg:rounded-none lg:shadow-none' : 'lg:hidden'} w-full flex-col border-l lg:w-[440px] lg:shrink-0`}
+            className={`${sheet ? 'fixed inset-x-0 bottom-0 top-[18vh] z-50 flex rounded-t-[22px] shadow-2xl' : 'hidden'} ${panel ? 'lg:static lg:z-auto lg:flex lg:rounded-none lg:shadow-none' : 'lg:hidden'} w-full flex-col border-l lg:w-[460px] lg:shrink-0`}
             style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
           >
             <div className="flex shrink-0 justify-center pt-2 lg:hidden">

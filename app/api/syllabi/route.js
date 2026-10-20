@@ -32,6 +32,8 @@ import { fromOurOwnSite, supabaseFor } from '@/lib/request-supabase'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
+// A full draft review can write for a minute or two.
+export const maxDuration = 300
 
 /** Longest draft accepted, in characters. An EE is about 25,000. */
 const MAX_INPUT = 60000
@@ -131,12 +133,15 @@ export async function POST(request) {
 
   let response
   try {
-    response = await anthropic.messages.create({
+    // Streamed, then collected: a long review would otherwise sit on one
+    // open request long enough to time out.
+    response = await anthropic.messages
+      .stream({
       model,
       // Thinking counts towards this, so it leaves room for the answer. With
       // the input caps above, it is what makes the claim's reservation a
       // ceiling (062-ai-limits.sql).
-      max_tokens: review ? 6000 : 3000,
+      max_tokens: review ? 12000 : 3000,
       // A draft comes back as JSON the page can lay out: marks per criterion
       // and highlights on the student's own sentences.
       output_config: { effort: 'medium', format: { type: 'json_schema', schema: SCHEMAS[task] } },
@@ -147,12 +152,14 @@ export async function POST(request) {
           content: text.trim() || 'No text provided.',
         },
       ],
-    })
+    }, { signal: request.signal })
+      .finalMessage()
   } catch (e) {
     // The student gets a sentence, not a stack trace; the log gets the detail.
     console.error('syllabi:', e?.message || e)
-    // Nothing came back, so nothing was spent.
-    await settle(supabase, claimed.id, model, null).catch(() => {})
+    // A page closed part-way may already have been charged, so that stays
+    // reserved; anything else failed before the model wrote a word.
+    await settle(supabase, claimed.id, model, request.signal.aborted ? undefined : null).catch(() => {})
     return NextResponse.json(
       { error: 'Syllabi could not answer that just now. Try again in a minute.' },
       { status: 502 }

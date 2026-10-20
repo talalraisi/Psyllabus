@@ -29,6 +29,7 @@ import TimerPill from '@/components/TimerPill'
 import { stopTimerForSignOut } from '@/lib/session-timer'
 import FeedbackButton from '@/components/FeedbackButton'
 import SyllabiMark from '@/components/SyllabiMark'
+import { SyllabiProvider } from '@/components/syllabi/SyllabiDrawer'
 import ThemeToggle from '@/components/ThemeToggle'
 
 const NAV_ITEMS = [
@@ -355,6 +356,8 @@ export default function DashboardLayout({ children, profile }) {
   )
 
   return (
+    // Syllabi can be opened from any page, about whatever is on it.
+    <SyllabiProvider profile={profile}>
     <div className="flex min-h-screen flex-col bg-[var(--bg)] md:flex-row">
       {/* Mobile bar */}
       <header className="sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-[var(--border)] bg-[var(--surface)] px-4 md:hidden">
@@ -409,8 +412,9 @@ export default function DashboardLayout({ children, profile }) {
 
       {/* On every signed-in page, because the page somebody is looking at when
           something goes wrong is the page they should be able to say so from. */}
-      {/* The draft studio has its own buttons in that corner. */}
-      {!pathname.startsWith('/dashboard/syllabi/draft') && <FeedbackButton />}
+      {/* Syllabi has its own buttons in that corner. */}
+      {!pathname.startsWith('/dashboard/syllabi') && <FeedbackButton />}
     </div>
+    </SyllabiProvider>
   )
 }

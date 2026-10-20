@@ -1,16 +1,13 @@
 'use client'
 
 /**
- * Syllabi: ask it anything, get a draft marked, or get ideas.
- *
- * Ask and Ideas live here; the draft studio has the screen to itself
- * (/dashboard/syllabi/draft). An idea can be picked up and talked through,
- * which opens Ask with the question already written.
+ * Syllabi: ask it anything, get a draft marked, or get ideas, with the three
+ * a tab apart. ?tab=draft or ?tab=ideas opens straight on one. An idea can be
+ * picked up and talked through, which opens Ask with the question written.
  */
 
-import { useEffect, useMemo, useState } from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { Suspense, useEffect, useMemo, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
 import { getProfile, getSyllabus } from '@/lib/cache'
@@ -20,6 +17,7 @@ import SyllabiMark from '@/components/SyllabiMark'
 import { Page, PageLoading } from '@/components/PageShell'
 import TutorChat from '@/components/syllabi/TutorChat'
 import IdeasStudio from '@/components/syllabi/IdeasStudio'
+import DraftStudio from '@/components/syllabi/DraftStudio'
 import { hasSyllabi } from '@/lib/access'
 
 /**
@@ -29,16 +27,23 @@ import { hasSyllabi } from '@/lib/access'
  */
 function Shell({ full, children }) {
   return full ? (
-    <div className="app-enter mx-auto flex h-[calc(100dvh-56px)] w-full max-w-6xl flex-col px-4 pb-[76px] pt-4 md:h-dvh md:px-10 md:pt-6 lg:pb-5">{children}</div>
+    <div className="app-enter mx-auto flex h-[calc(100dvh-56px)] w-full max-w-7xl flex-col px-4 pb-4 pt-4 md:h-dvh md:px-8 md:pb-5 md:pt-6">{children}</div>
   ) : (
     <Page width="wide">{children}</Page>
   )
 }
 
-export default function SyllabiPage() {
+const TABS = [
+  ['ask', 'Ask'],
+  ['draft', 'Draft feedback'],
+  ['ideas', 'Ideas'],
+]
+
+function Syllabi() {
+  const params = useSearchParams()
   const [profile, setProfile] = useState(null)
   const [rows, setRows] = useState([])
-  const [tab, setTab] = useState('ask')
+  const [tab, setTab] = useState(() => (TABS.some(([k]) => k === params.get('tab')) ? params.get('tab') : 'ask'))
   const [seed, setSeed] = useState({ n: 0, subject: '', text: '' })
   const router = useRouter()
   const supabase = createClient()
@@ -86,7 +91,7 @@ export default function SyllabiPage() {
 
   return (
     <DashboardLayout profile={profile}>
-      <Shell full={allowed && tab === 'ask'}>
+      <Shell full={allowed && tab !== 'ideas'}>
         <div className="mb-4 flex shrink-0 flex-wrap items-center justify-between gap-3">
           <h1 className="flex items-center gap-2.5 text-[22px] font-semibold tracking-[-0.025em]">
             <span className="flex h-8 w-8 items-center justify-center rounded-full" style={{ background: 'var(--brand)', color: '#fff' }}>
@@ -96,15 +101,22 @@ export default function SyllabiPage() {
           </h1>
           {allowed && (
             <nav className="flex rounded-full p-1" style={{ background: 'var(--surface-sunken)' }} aria-label="Syllabi tools">
-              <button type="button" onClick={() => setTab('ask')} aria-pressed={tab === 'ask'} className="rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors" style={tabStyle(tab === 'ask')}>
-                Ask
-              </button>
-              <Link href="/dashboard/syllabi/draft" className="rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors hover:text-[var(--text)]" style={tabStyle(false)}>
-                Draft feedback
-              </Link>
-              <button type="button" onClick={() => setTab('ideas')} aria-pressed={tab === 'ideas'} className="rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors" style={tabStyle(tab === 'ideas')}>
-                Ideas
-              </button>
+              {TABS.map(([key, label]) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => {
+                    setTab(key)
+                    // Kept in the address so a refresh stays on the same tool.
+                    window.history.replaceState(null, '', key === 'ask' ? '/dashboard/syllabi' : `/dashboard/syllabi?tab=${key}`)
+                  }}
+                  aria-pressed={tab === key}
+                  className="whitespace-nowrap rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors"
+                  style={tabStyle(tab === key)}
+                >
+                  {label}
+                </button>
+              ))}
             </nav>
           )}
         </div>
@@ -123,6 +135,8 @@ export default function SyllabiPage() {
             initialSubject={seed.subject}
             initialInput={seed.text}
           />
+        ) : tab === 'draft' ? (
+          <DraftStudio subjects={subjects} />
         ) : (
           <IdeasStudio
             subjects={subjects}
@@ -135,5 +149,13 @@ export default function SyllabiPage() {
         )}
       </Shell>
     </DashboardLayout>
+  )
+}
+
+export default function SyllabiPage() {
+  return (
+    <Suspense fallback={null}>
+      <Syllabi />
+    </Suspense>
   )
 }

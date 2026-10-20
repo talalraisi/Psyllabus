@@ -23,20 +23,19 @@ import { ArrowUp, Stop, Paperclip, Copy, Check, Chevron, FileIcon, LinkIcon, Clo
  */
 
 const MAX = 2000
-const KEY = (subject) => `psyllabus:tutor:${subject || 'general'}`
 const LAST = 'psyllabus:tutor:last'
 
-function load(subject) {
+function load(key) {
   try {
-    return JSON.parse(sessionStorage.getItem(KEY(subject)) || '[]')
+    return JSON.parse(sessionStorage.getItem(key) || '[]')
   } catch {
     return []
   }
 }
 
-function save(subject, messages) {
+function save(key, messages) {
   try {
-    sessionStorage.setItem(KEY(subject), JSON.stringify(messages.slice(-40)))
+    sessionStorage.setItem(key, JSON.stringify(messages.slice(-40)))
   } catch {
     /* the conversation just will not survive a reload */
   }
@@ -179,13 +178,29 @@ function Hub({ subjects, subject, onPick }) {
   )
 }
 
-export default function TutorChat({ subjects = [], topicsFor, initialSubject = '', initialInput = '' }) {
+/**
+ * compact: the version in the Syllabi drawer, opened from elsewhere in the
+ * app. It keeps its own conversations (store="drawer"), starts on whatever
+ * it was opened about, and with autoSend asks the question straight away,
+ * because the student pressed a button that already said what they wanted.
+ */
+export default function TutorChat({
+  subjects = [],
+  topicsFor,
+  initialSubject = '',
+  initialInput = '',
+  initialTopic = '',
+  autoSend = false,
+  compact = false,
+  store = 'tutor',
+}) {
+  const KEY = (s) => `psyllabus:${store}:${s || 'general'}`
   const [subject, setSubject] = useState(() => {
     if (initialSubject && subjects.includes(initialSubject)) return initialSubject
     return (typeof window !== 'undefined' && lastSubject(subjects)) || subjects[0] || ''
   })
-  const [topic, setTopic] = useState('')
-  const [messages, setMessages] = useState(() => (typeof window === 'undefined' ? [] : load(subject)))
+  const [topic, setTopic] = useState(initialTopic)
+  const [messages, setMessages] = useState(() => (typeof window === 'undefined' || compact ? [] : load(KEY(subject))))
   const [input, setInput] = useState(initialInput)
   const [files, setFiles] = useState([])
   const [busy, setBusy] = useState(false)
@@ -212,15 +227,30 @@ export default function TutorChat({ subjects = [], topicsFor, initialSubject = '
 
   useEffect(() => () => abortRef.current?.abort(), [])
 
+  // Opened by a button that already asked the question: ask it.
+  const asked = useRef(false)
+  useEffect(() => {
+    if (!autoSend || !initialInput) return
+    // The guard sits inside the timer: a cancelled first run (React runs
+    // effects twice in development) must not stop the second from asking.
+    const t = setTimeout(() => {
+      if (asked.current) return
+      asked.current = true
+      send(initialInput)
+    }, 150)
+    return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoSend, initialInput])
+
   // A question handed over from Ideas arrives already written: fit the box to it.
   useEffect(() => {
-    if (!initialInput || !boxRef.current) return
+    if (autoSend || !initialInput || !boxRef.current) return
     const el = boxRef.current
     el.style.height = 'auto'
     el.style.height = `${Math.min(200, el.scrollHeight)}px`
     el.focus()
     el.setSelectionRange(el.value.length, el.value.length)
-  }, [initialInput])
+  }, [autoSend, initialInput])
 
   useEffect(() => {
     if (!menu) return
@@ -239,10 +269,10 @@ export default function TutorChat({ subjects = [], topicsFor, initialSubject = '
     if (busy || s === subject) return
     setSubject(s)
     setTopic('')
-    setMessages(load(s))
+    setMessages(compact ? [] : load(KEY(s)))
     setNotice(null)
     try {
-      sessionStorage.setItem(LAST, s)
+      if (!compact) sessionStorage.setItem(LAST, s)
     } catch {
       /* fine */
     }
@@ -306,6 +336,7 @@ export default function TutorChat({ subjects = [], topicsFor, initialSubject = '
         setMessages(messages)
         setInput(question)
         setFiles(sent)
+        requestAnimationFrame(() => resize(boxRef.current))
         setNotice({
           text: data.code === 'not_configured' ? 'Syllabi is being switched on. Try again soon.' : data.error || 'That did not work.',
           upgrade: data.code === 'upgrade_required',
@@ -330,7 +361,7 @@ export default function TutorChat({ subjects = [], topicsFor, initialSubject = '
     sent.forEach((f) => f.preview && URL.revokeObjectURL(f.preview))
     const final = [...history, { role: 'assistant', content: answer || 'Stopped.' }]
     setMessages(final)
-    save(subject, final)
+    save(KEY(subject), final)
     abortRef.current = null
     setStreaming(false)
     setBusy(false)
@@ -340,7 +371,7 @@ export default function TutorChat({ subjects = [], topicsFor, initialSubject = '
   const clear = () => {
     if (busy) return
     setMessages([])
-    save(subject, [])
+    save(KEY(subject), [])
     setNotice(null)
   }
 
@@ -477,7 +508,12 @@ export default function TutorChat({ subjects = [], topicsFor, initialSubject = '
             </div>
           )}
 
-          {topics.length > 0 && (
+          {compact && topic && (
+            <span className="max-w-[12rem] truncate rounded-full px-2.5 py-1 text-[12px]" style={{ background: 'var(--surface-sunken)', color: 'var(--text-muted)' }} title={topic}>
+              About: {topic}
+            </span>
+          )}
+          {!compact && topics.length > 0 && (
             <span className="relative flex items-center">
               <select
                 value={topic}
@@ -569,7 +605,24 @@ export default function TutorChat({ subjects = [], topicsFor, initialSubject = '
         </div>
       )}
 
-      {empty ? (
+      {empty && compact ? (
+        <>
+          <div className="flex flex-1 flex-col items-center justify-center px-4 text-center">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full" style={{ background: 'var(--brand)', color: '#fff', boxShadow: '0 0 30px color-mix(in srgb, var(--brand) 40%, transparent)' }}>
+              <SyllabiMark size={18} />
+            </span>
+            <p className="mt-4 text-[17px] font-semibold tracking-[-0.015em]">Ask about {topic || shortName(subject) || 'anything'}</p>
+            <div className="mt-4 flex flex-wrap justify-center gap-2">
+              {starters.map((s) => (
+                <button key={s} type="button" onClick={() => send(s)} className="rounded-full border px-3 py-1.5 text-[12px] transition-colors hover:border-[var(--brand)] hover:text-[var(--brand)]" style={{ borderColor: 'var(--border-strong)', color: 'var(--text-muted)' }}>
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="pt-2">{composer}</div>
+        </>
+      ) : empty ? (
         <div className="flex flex-1 flex-col items-center justify-center pb-6">
           <div className="sy-rise">
             <Hub subjects={subjects} subject={subject} onPick={switchSubject} />
@@ -607,7 +660,7 @@ export default function TutorChat({ subjects = [], topicsFor, initialSubject = '
             }}
             className="flex-1 overflow-y-auto"
           >
-            <div className="mx-auto flex max-w-3xl flex-col gap-7 px-1 pb-6 pt-2">
+            <div className={`mx-auto flex flex-col gap-7 pb-6 pt-2 ${compact ? 'px-0.5' : 'max-w-3xl px-1'}`}>
               <div className="flex justify-end">
                 <button type="button" onClick={clear} disabled={busy} className="rounded-full px-3 py-1 text-[12px] font-medium transition-colors hover:bg-[var(--surface-sunken)] disabled:opacity-40" style={{ color: 'var(--text-faint)' }}>
                   New chat
@@ -658,7 +711,7 @@ export default function TutorChat({ subjects = [], topicsFor, initialSubject = '
               )}
             </div>
           </div>
-          <div className="mx-auto w-full max-w-3xl pt-2">
+          <div className={`mx-auto w-full pt-2 ${compact ? '' : 'max-w-3xl'}`}>
             {composer}
             <p className="mt-2 text-center text-[11px]" style={{ color: 'var(--text-faint)' }}>
               Syllabi can make mistakes. It coaches coursework and never writes it.

@@ -22,6 +22,7 @@ import SessionTimer from '@/components/SessionTimer'
 import { IconCheck } from '@/components/Icons'
 import { displaySubtopic } from '@/lib/progress'
 import { WEEKDAYS, rhythmOf } from '@/lib/study-plan'
+import { useSyllabi } from '@/components/syllabi/SyllabiDrawer'
 
 const KIND = {
   review: { label: 'Mistakes', color: 'var(--status-weak)' },
@@ -57,11 +58,37 @@ export const clock = (m) => {
   return `${((h + 11) % 12) + 1}:${String(m % 60).padStart(2, '0')}${h < 12 ? 'am' : 'pm'}`
 }
 
+/** What Syllabi is asked when a task on the plan is opened with it. */
+function teachMe(task) {
+  if (task.kind === 'review') {
+    return `I have ${task.subject} mistakes due back today. Quiz me on the kind of question I usually get wrong in ${task.subject}, one at a time, and mark each answer.`
+  }
+  const name = displaySubtopic(task.subtopic)
+  return task.kind === 'new' || task.status === 'not_started'
+    ? `Teach me ${name} in ${task.subject} from the start: the key idea, one worked example, then one quick question to check I have it.`
+    : `I need to strengthen ${name} in ${task.subject}. Find out what I'm missing with a couple of quick questions, then explain the part I get wrong.`
+}
+
 function TaskMenu({ task, tomorrow, onAdjust, onResources, done, close }) {
   const [picking, setPicking] = useState(false)
+  const syllabi = useSyllabi()
   const item = 'block w-full rounded-[8px] px-3 py-2 text-left text-[13px] hover:bg-[var(--surface-sunken)]'
   return (
     <div role="menu" className="absolute right-0 top-full z-20 mt-1 w-52 rounded-[12px] border p-1 shadow-lg" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
+      {syllabi.available && (
+        <button
+          role="menuitem"
+          type="button"
+          className={`${item} font-medium`}
+          style={{ color: 'var(--brand)' }}
+          onClick={() => {
+            syllabi.open({ subject: task.subject, topic: task.subtopic || '', text: teachMe(task), autoSend: true, label: `Study plan · ${task.subject}` })
+            close()
+          }}
+        >
+          Teach me with Syllabi
+        </button>
+      )}
       {task.subtopic && (
         <button role="menuitem" type="button" className={item} onClick={() => { onResources(task); close() }}>
           Resources
