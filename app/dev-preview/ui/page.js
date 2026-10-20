@@ -15,7 +15,7 @@ import { notFound } from 'next/navigation'
 import Calculator from '@/components/Calculator'
 import QuestionMenu from '@/components/QuestionMenu'
 import TodoList from '@/components/TodoList'
-import SubjectWeb from '@/components/SubjectWeb'
+import MapPreview from '@/components/map/MapPreview'
 import SubjectProgress from '@/components/SubjectProgress'
 
 const ENABLED = process.env.NODE_ENV !== 'production'
@@ -96,11 +96,10 @@ export default function UiPreview() {
         />
       </div>
 
-      <h1 className="mt-10 text-[22px] font-semibold">Subject web</h1>
-      {/* Wider than the rest of the page, because the map is the one thing
-          here that is about being able to read something small. */}
+      <h1 className="mt-10 text-[22px] font-semibold">Subject map</h1>
+      {/* The dashboard's still overview; the full map is /dev-preview/map. */}
       <div className="mt-4" style={{ width: 'min(96vw, 900px)' }}>
-        <SubjectWeb subject="Physics SL" rows={WEB_ROWS} onPickSubtopic={() => {}} />
+        <MapPreview subject="Physics SL" rows={WEB_ROWS} />
       </div>
 
       <h1 className="mt-10 text-[22px] font-semibold">To-do list</h1>

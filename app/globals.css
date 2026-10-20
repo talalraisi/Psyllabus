@@ -1531,3 +1531,16 @@ input[type='range'].slider:focus-visible::-moz-range-thumb {
 @media (prefers-reduced-motion: reduce) {
   .word-in, .word-out { animation: none; }
 }
+
+/* The subject map (components/map). */
+@keyframes map-node-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [style*='map-node-in'], [style*='sheet-up'] { animation: none !important; }
+}

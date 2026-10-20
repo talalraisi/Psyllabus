@@ -34,7 +34,7 @@ import { primeStudyDays, restDaysFor } from '@/lib/streak'
 import { StreakCard } from '@/components/Streak'
 import WaysToStudy from '@/components/WaysToStudy'
 import WelcomeTour, { tourDone, resetTour } from '@/components/WelcomeTour'
-import SubjectWeb from '@/components/SubjectWeb'
+import MapPreview from '@/components/map/MapPreview'
 
 function greeting(now) {
   const hour = now.getHours()
@@ -678,16 +678,7 @@ export default function Dashboard() {
           <div className={showMap ? 'grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:items-start' : ''}>
             {showMap && (
               <div className="min-w-0">
-                <SubjectWeb
-                  key={mapSubject}
-                  subject={mapSubject}
-                  rows={mapRows}
-                  onPickSubtopic={(row) =>
-                    router.push(
-                      `/dashboard/quiz?subject=${encodeURIComponent(row.subject)}&topic=${encodeURIComponent(row.topic)}&subtopic=${encodeURIComponent(row.subtopic)}&count=5&review=practice&back=/dashboard`
-                    )
-                  }
-                />
+                <MapPreview subject={mapSubject} rows={mapRows} />
                 <Link
                   href={`/dashboard/map?subject=${encodeURIComponent(mapSubject)}`}
                   className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-medium text-[var(--brand)] hover:underline"

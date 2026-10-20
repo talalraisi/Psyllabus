@@ -429,12 +429,7 @@ export default function DashboardLayout({ children, profile }) {
         {profile && (
           <div
             onClick={(e) => e.stopPropagation()}
-            className="overflow-hidden rounded-[14px] border transition-[background-color,border-color,box-shadow] duration-300"
-            style={{
-              borderColor: accountOpen ? 'var(--border-strong)' : 'transparent',
-              background: accountOpen ? 'var(--surface-sunken)' : 'transparent',
-              boxShadow: accountOpen ? '0 -12px 32px -20px rgb(0 0 0 / 0.5)' : 'none',
-            }}
+            className="overflow-hidden"
           >
             <button
               type="button"
@@ -469,15 +464,15 @@ export default function DashboardLayout({ children, profile }) {
                   style={{ opacity: accountOpen ? 1 : 0, transform: accountOpen ? 'none' : 'translateY(-6px)' }}
                 >
                   <div className="mx-1.5 mb-1.5 border-t" style={{ borderColor: 'var(--border)' }} />
-                  <Link href="/dashboard/profile" className="flex w-full items-center gap-3 rounded-[9px] px-3 py-2 text-[13px] font-medium text-[var(--text-body)] transition-colors hover:bg-[var(--surface)]">
+                  <Link href="/dashboard/profile" className="flex w-full items-center gap-3 rounded-[9px] px-3 py-2 text-[13px] font-medium text-[var(--text-body)] transition-colors hover:bg-[var(--surface-sunken)]">
                     <IconUser width={16} height={16} className="text-[var(--text-faint)]" />
-                    Profile settings
+                    Profile
                   </Link>
                   <button
                     type="button"
                     onClick={handleLogout}
                     disabled={signingOut}
-                    className="flex w-full items-center gap-3 rounded-[9px] px-3 py-2 text-[13px] font-medium text-[var(--text-body)] transition-colors hover:bg-[var(--surface)] disabled:opacity-50"
+                    className="flex w-full items-center gap-3 rounded-[9px] px-3 py-2 text-[13px] font-medium text-[var(--text-body)] transition-colors hover:bg-[var(--surface-sunken)] disabled:opacity-50"
                   >
                     <IconLogout width={16} height={16} className="text-[var(--text-faint)]" />
                     {signingOut ? 'Signing out…' : 'Sign out'}
@@ -591,7 +586,8 @@ export default function DashboardLayout({ children, profile }) {
       {/* On every signed-in page, because the page somebody is looking at when
           something goes wrong is the page they should be able to say so from. */}
       {/* Syllabi has its own buttons in that corner. */}
-      {!pathname.startsWith('/dashboard/syllabi') && <FeedbackButton />}
+      {/* The map has its own controls in that corner too. */}
+      {!pathname.startsWith('/dashboard/syllabi') && pathname !== '/dashboard/map' && <FeedbackButton />}
     </div>
     </SyllabiProvider>
   )

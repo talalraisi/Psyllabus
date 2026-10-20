@@ -78,6 +78,12 @@ function Cookies() {
               : 'today’s plan as it was first shown, so it does not reshuffle during the day, and what was last sent to your calendar.'}
           </li>
           <li>
+            <strong>psyllabus:map</strong>{' '}
+            {ar
+              ? 'كيف تركت خريطة المادة: أي اللوحات مفتوحة، وإظهار الروابط بين المواضيع.'
+              : 'how you left the subject map: which panels are open, and whether connections between topics are shown.'}
+          </li>
+          <li>
             <strong>psyllabus:tour:…</strong>{' '}
             {ar
               ? 'أنك أنهيت الجولة التعريفية أو تخطيتها، حتى لا تظهر لك مرة أخرى.'
