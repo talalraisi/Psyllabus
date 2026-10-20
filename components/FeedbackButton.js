@@ -7,6 +7,9 @@ import { getCurrentUser } from '@/lib/auth'
 import { IconClose, IconCheck } from '@/components/Icons'
 import { Spinner } from '@/components/PageShell'
 
+/** Enough to say what happened; the database holds the same line. */
+const MIN_CHARS = 50
+
 /**
  * The way back from a beta tester.
  *
@@ -54,7 +57,7 @@ export default function FeedbackButton() {
 
   const send = async () => {
     const text = message.trim()
-    if (!text || sending) return
+    if (text.length < MIN_CHARS || sending) return
     setSending(true)
     setError('')
 
@@ -165,10 +168,15 @@ export default function FeedbackButton() {
                 value={message}
                 maxLength={4000}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Say as much or as little as you like."
+                placeholder="What happened, or what would make it better?"
                 className="input w-full resize-y"
                 style={{ height: 'auto', padding: '10px 12px', lineHeight: 1.55 }}
               />
+              {message.trim().length < MIN_CHARS && (
+                <p className="mt-1.5 text-[12px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
+                  {MIN_CHARS - message.trim().length} more characters
+                </p>
+              )}
 
               {error && (
                 <p className="mt-2 text-[12.5px]" style={{ color: 'var(--danger)' }}>
@@ -178,7 +186,7 @@ export default function FeedbackButton() {
 
               <button
                 onClick={send}
-                disabled={!message.trim() || sending}
+                disabled={message.trim().length < MIN_CHARS || sending}
                 className="btn btn-solid control-md mt-3 w-full disabled:opacity-40"
               >
                 {sending && <Spinner size={14} />}

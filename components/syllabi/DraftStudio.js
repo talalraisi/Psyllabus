@@ -5,7 +5,7 @@ import ScoreRing, { ringColour } from '@/components/ScoreRing'
 import SyllabiMark from '@/components/SyllabiMark'
 import { KINDS, rubricFor } from '@/lib/criteria'
 import { segments } from '@/lib/draft-review'
-import { senseCheck, MIN_CHARS } from '@/lib/sense-check'
+import { senseCheck, MIN_WORDS } from '@/lib/sense-check'
 import { shortName } from '@/lib/subject-short'
 import { Chevron, Copy, Check, Download, Collapse, Refresh, FileIcon } from '@/components/syllabi/icons'
 
@@ -776,10 +776,10 @@ export default function DraftStudio({ subjects = [] }) {
         <button
           type="button"
           onClick={mark}
-          disabled={busy || text.trim().length < MIN_CHARS || !changed}
+          disabled={busy || words < MIN_WORDS || !changed}
           className="flex h-12 shrink-0 items-center gap-2 rounded-[14px] px-5 text-[15px] font-semibold transition-[transform,opacity] active:scale-[0.97] disabled:opacity-40"
           style={{ background: 'var(--text)', color: 'var(--bg)' }}
-          title={text.trim().length < MIN_CHARS ? `At least ${MIN_CHARS} characters` : undefined}
+          title={words < MIN_WORDS ? `At least ${MIN_WORDS} words` : undefined}
         >
           {review ? 'Re-mark' : 'Mark it'}
           <Refresh size={17} />
