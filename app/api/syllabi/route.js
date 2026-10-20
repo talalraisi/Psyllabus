@@ -3,6 +3,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { TASKS, DRAFT_REVIEW_SCHEMA } from '@/lib/syllabi-prompts'
 import { rubricFor } from '@/lib/criteria'
 import { cleanReview } from '@/lib/draft-review'
+import { senseCheck } from '@/lib/sense-check'
 import { RESEARCH_SCHEMA, STUDY_SCHEMA, cleanResearch, cleanStudy } from '@/lib/ideas'
 import { hasSyllabi } from '@/lib/access'
 import { MODELS, claim, settle } from '@/lib/ai-cost'
@@ -89,6 +90,13 @@ export async function POST(request) {
       { error: `That is longer than Syllabi reads in one go (${limit.toLocaleString()} characters).` },
       { status: 413 }
     )
+  }
+
+  // Nonsense is turned away here, for free, before it can cost a review or
+  // a place in the student's allowance.
+  if (task === 'draft_feedback') {
+    const why = senseCheck(text)
+    if (why) return NextResponse.json({ error: why, code: 'not_writing' }, { status: 422 })
   }
 
   const supabase = supabaseFor(request)

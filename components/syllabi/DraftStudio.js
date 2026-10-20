@@ -5,6 +5,7 @@ import ScoreRing, { ringColour } from '@/components/ScoreRing'
 import SyllabiMark from '@/components/SyllabiMark'
 import { KINDS, rubricFor } from '@/lib/criteria'
 import { segments } from '@/lib/draft-review'
+import { senseCheck } from '@/lib/sense-check'
 import { shortName } from '@/lib/subject-short'
 import { Chevron, Copy, Check, Download, Collapse, Refresh, FileIcon } from '@/components/syllabi/icons'
 
@@ -25,7 +26,6 @@ import { Chevron, Copy, Check, Download, Collapse, Refresh, FileIcon } from '@/c
 
 const STORE = 'psyllabus:draft-studio'
 const MAX = 60000
-const MIN_WORDS = 150
 
 const KIND = {
   issue: { colour: 'var(--status-weak)', label: 'Fix', plural: 'Fix' },
@@ -256,7 +256,15 @@ export default function DraftStudio({ subjects = [] }) {
   const barTotal = bar.reduce((a, [, w]) => a + w, 0) || 1
 
   const mark = async () => {
-    if (busy || words < MIN_WORDS) return
+    if (busy) return
+    // The same check the server makes, so nonsense never leaves the page.
+    const why = senseCheck(text)
+    if (why) {
+      setError(why)
+      setSheet(true)
+      setPanel(true)
+      return
+    }
     setBusy(true)
     setStep(0)
     setError('')
@@ -768,10 +776,10 @@ export default function DraftStudio({ subjects = [] }) {
         <button
           type="button"
           onClick={mark}
-          disabled={busy || words < MIN_WORDS || !changed}
+          disabled={busy || words < 150 || !changed}
           className="flex h-12 shrink-0 items-center gap-2 rounded-[14px] px-5 text-[15px] font-semibold transition-[transform,opacity] active:scale-[0.97] disabled:opacity-40"
           style={{ background: 'var(--text)', color: 'var(--bg)' }}
-          title={words < MIN_WORDS ? `At least ${MIN_WORDS} words` : undefined}
+          title={words < 150 ? `At least 150 words` : undefined}
         >
           {review ? 'Re-mark' : 'Mark it'}
           <Refresh size={17} />
