@@ -10,6 +10,8 @@ import { Reveal, ScrollBar, CountUp } from '@/components/marketing/scroll'
 import SiteNav from '@/components/marketing/SiteNav'
 import Roller from '@/components/marketing/Roller'
 import { FeatureModules } from '@/components/marketing/features'
+import FloatingSubjects, { FloatingSubjectsRow } from '@/components/marketing/FloatingSubjects'
+import SubjectOrbit from '@/components/marketing/SubjectOrbit'
 
 export const metadata = {
   title: 'Project Syllabus',
@@ -113,7 +115,8 @@ export default async function Home() {
             it and left the rest grey, which reads as a page that has not
             finished loading rather than one being restrained. min-h fills it
             and the content sits centred in what it fills. */}
-        <section className="ground relative flex min-h-[calc(100svh-4rem)] items-center px-5 py-20 md:px-8 md:py-28">
+        <section className="ground relative flex min-h-[calc(100svh-4rem)] items-center overflow-hidden px-5 py-20 md:px-8 md:py-28">
+          <FloatingSubjects />
           {/* No wash behind the headline. Two slow blooms lived here and they
               read as coloured spots on the page rather than as light — twice
               noticed, twice disliked, so they are gone rather than tuned. The
@@ -122,7 +125,7 @@ export default async function Home() {
           {/* w-full because the section is a flex row now: without it the inner
               div is sized to its content and mx-auto centres that, which pushed
               the headline a couple of hundred pixels right of the logo above it. */}
-          <div className="hero-in mx-auto w-full max-w-6xl">
+          <div className="hero-in relative z-10 mx-auto w-full max-w-6xl">
             <h1 className="max-w-3xl text-[clamp(2.6rem,6vw,4.6rem)] font-semibold leading-[0.98] tracking-[-0.038em]">
               Stop guessing.
               <br />
@@ -154,6 +157,8 @@ export default async function Home() {
                 See how it works
               </Link>
             </div>
+
+            <FloatingSubjectsRow />
           </div>
         </section>
 
@@ -185,6 +190,13 @@ export default async function Home() {
             </p>
           </Reveal>
         </Section>
+
+        {/* -------------------------------------------------------- subjects */}
+        <section className="px-5 py-16 md:px-8 md:py-24">
+          <Reveal>
+            <SubjectOrbit subjects={counts?.subjects ?? 173} />
+          </Reveal>
+        </section>
 
         {/* --------------------------------------------------- how it works */}
         <Section label="How it works" id="how-it-works">

@@ -423,56 +423,50 @@ export default function DashboardLayout({ children, profile }) {
           </Link>
         )}
 
-        {accountOpen && (
-          <div
-            role="menu"
-            onClick={(e) => e.stopPropagation()}
-            className="pop-enter absolute bottom-full left-2 right-2 z-30 mb-1 rounded-[14px] border p-1.5 shadow-xl"
-            style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
-          >
-            <Link
-              href="/dashboard/profile"
-              role="menuitem"
-              className="flex items-center gap-3 rounded-[9px] px-3 py-2 text-[13px] font-medium text-[var(--text-body)] transition-colors hover:bg-[var(--surface-sunken)]"
-            >
-              <IconUser width={16} height={16} className="text-[var(--text-faint)]" />
-              Profile
-            </Link>
-            <Link
-              href="/onboarding?edit=subjects"
-              role="menuitem"
-              className="flex items-center gap-3 rounded-[9px] px-3 py-2 text-[13px] font-medium text-[var(--text-body)] transition-colors hover:bg-[var(--surface-sunken)]"
-            >
-              <IconSubjects width={16} height={16} className="text-[var(--text-faint)]" />
-              Change subjects
-            </Link>
-            <div className="flex items-center justify-between gap-3 rounded-[9px] px-3 py-1.5 text-[13px] font-medium text-[var(--text-body)]">
-              Theme
-              <ThemeToggle />
-            </div>
-            <div className="my-1 border-t" style={{ borderColor: 'var(--border)' }} />
-            <button
-              role="menuitem"
-              onClick={handleLogout}
-              disabled={signingOut}
-              className="flex w-full items-center gap-3 rounded-[9px] px-3 py-2 text-[13px] font-medium text-[var(--text-body)] transition-colors hover:bg-[var(--surface-sunken)] disabled:opacity-50"
-            >
-              <IconLogout width={16} height={16} className="text-[var(--text-faint)]" />
-              {signingOut ? 'Signing out…' : 'Sign out'}
-            </button>
-            <div className="flex gap-3 px-3 pb-1 pt-2">
-              <Link href="/privacy?from=dashboard" className="t-caption hover:text-[var(--text-muted)]">
-                Privacy
-              </Link>
-              <Link href="/terms?from=dashboard" className="t-caption hover:text-[var(--text-muted)]">
-                Terms
-              </Link>
-              <Link href="/cookies?from=dashboard" className="t-caption hover:text-[var(--text-muted)]">
-                Cookies
-              </Link>
-            </div>
+        {/* Always there, so it can open and close with a movement rather
+            than appear: it grows up out of the name, and is inert while
+            folded away. */}
+        <div
+          role="menu"
+          aria-hidden={!accountOpen}
+          inert={!accountOpen || undefined}
+          onClick={(e) => e.stopPropagation()}
+          className="absolute bottom-full left-2 right-2 z-30 mb-1.5 origin-bottom rounded-[14px] border p-1.5 shadow-xl transition-[opacity,transform] duration-200"
+          style={{
+            borderColor: 'var(--border-strong)',
+            background: 'var(--surface)',
+            minWidth: 220,
+            opacity: accountOpen ? 1 : 0,
+            transform: accountOpen ? 'none' : 'translateY(8px) scale(0.96)',
+            transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
+            pointerEvents: accountOpen ? 'auto' : 'none',
+          }}
+        >
+          <Link href="/dashboard/profile" role="menuitem" className="flex w-full items-center gap-3 rounded-[9px] px-3 py-2 text-[13px] font-medium text-[var(--text-body)] transition-colors hover:bg-[var(--surface-sunken)]">
+            <IconUser width={16} height={16} className="text-[var(--text-faint)]" />
+            Profile settings
+          </Link>
+          <button role="menuitem" onClick={handleLogout} disabled={signingOut} className="flex w-full items-center gap-3 rounded-[9px] px-3 py-2 text-[13px] font-medium text-[var(--text-body)] transition-colors hover:bg-[var(--surface-sunken)] disabled:opacity-50">
+            <IconLogout width={16} height={16} className="text-[var(--text-faint)]" />
+            {signingOut ? 'Signing out…' : 'Sign out'}
+          </button>
+          <div className="my-1.5 border-t" style={{ borderColor: 'var(--border)' }} />
+          <div className="flex items-center justify-between gap-3 px-3 py-1 text-[12.5px] font-medium" style={{ color: 'var(--text-muted)' }}>
+            Theme
+            <ThemeToggle />
           </div>
-        )}
+          <div className="flex gap-3 px-3 pb-1 pt-2">
+            <Link href="/privacy?from=dashboard" className="t-caption hover:text-[var(--text-muted)]">
+              Privacy
+            </Link>
+            <Link href="/terms?from=dashboard" className="t-caption hover:text-[var(--text-muted)]">
+              Terms
+            </Link>
+            <Link href="/cookies?from=dashboard" className="t-caption hover:text-[var(--text-muted)]">
+              Cookies
+            </Link>
+          </div>
+        </div>
 
         {profile && (
           <button
@@ -498,7 +492,7 @@ export default function DashboardLayout({ children, profile }) {
             </span>
             <span
               className="shrink-0 text-[var(--text-faint)]"
-              style={{ transform: accountOpen ? 'rotate(-90deg)' : 'rotate(90deg)', transition: 'transform 150ms, opacity 150ms', opacity: open ? 1 : 0 }}
+              style={{ transform: accountOpen ? 'rotate(90deg)' : 'rotate(-90deg)', transition: 'transform 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 150ms', opacity: open ? 1 : 0 }}
             >
               <IconChevronRight width={14} height={14} />
             </span>
