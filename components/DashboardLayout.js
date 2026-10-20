@@ -58,8 +58,9 @@ const NAV_GROUPS = [
         href: '/dashboard/subjects',
         label: 'My Subjects',
         Icon: IconSubjects,
-        match: (p) => p.startsWith('/dashboard/syllabus') || p === '/dashboard/subjects' || p === '/dashboard/map',
+        match: (p) => p.startsWith('/dashboard/syllabus') || p === '/dashboard/subjects',
       },
+      { href: '/dashboard/map', label: 'Subject Map', Icon: IconOrbit, match: (p) => p === '/dashboard/map' },
       { href: '/dashboard/core', label: 'TOK & EE', Icon: IconSchool, match: (p) => p === '/dashboard/core', ibOnly: true },
       { href: '/dashboard/flashcards', label: 'Flashcards', Icon: IconCards, match: (p) => p === '/dashboard/flashcards' },
       { href: '/dashboard/test', label: 'Tests', Icon: IconTest, match: (p) => p === '/dashboard/test' || p.startsWith('/dashboard/quiz') },
@@ -81,6 +82,17 @@ const NAV_GROUPS = [
     ],
   },
 ]
+
+/** Two rings and a node: the subject map. */
+function IconOrbit({ width = 17, height = 17, style }) {
+  return (
+    <svg width={width} height={height} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" style={style} aria-hidden="true">
+      <circle cx="12" cy="12" r="8.5" />
+      <circle cx="12" cy="12" r="2.6" />
+      <circle cx="18" cy="6" r="2" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
 
 /**
  * The sidebar's state for this tab. Every page renders its own layout, so

@@ -195,7 +195,7 @@ export function StreakChip({ profile, expanded }) {
       </span>
       <span className="min-w-0 flex-1 whitespace-nowrap transition-opacity duration-150" style={{ opacity: expanded ? 1 : 0 }}>
         <span className="block text-[13px] font-semibold leading-tight tabular-nums" style={{ color: 'var(--text)' }}>
-          {s.current}-day streak
+          {s.current > 0 ? `${s.current}-day streak` : 'Start a streak'}
         </span>
         <span className="block truncate text-[11.5px] leading-tight" style={{ color: s.atRisk ? 'var(--flame)' : 'var(--text-faint)' }}>
           {line}

@@ -27,12 +27,14 @@ import {
 } from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
-import { hasAllSubjects, isSubjectLocked, accessibleSubjects } from '@/lib/access'
+import { hasAllSubjects, isSubjectLocked, accessibleSubjects, hasSyllabi, canUse } from '@/lib/access'
 import StudyHeatmap from '@/components/StudyHeatmap'
 import { studyIntervals, minutesPerDay } from '@/lib/study-time'
 import { primeStudyDays, restDaysFor } from '@/lib/streak'
 import { StreakCard } from '@/components/Streak'
 import WaysToStudy from '@/components/WaysToStudy'
+import WelcomeTour, { tourDone, resetTour } from '@/components/WelcomeTour'
+import SubjectWeb from '@/components/SubjectWeb'
 
 function greeting(now) {
   const hour = now.getHours()
@@ -132,7 +134,21 @@ export default function Dashboard() {
   // Minutes studied per local day for the past five years: quizzes and the
   // session timer, with any time covered by both counted once.
   const [studyDays, setStudyDays] = useState([])
+  // Every subtopic with its level, for the map.
+  const [items, setItems] = useState([])
+  const [mapSubject, setMapSubject] = useState('')
+  // Whether the study plan has been set up, and whether this account has
+  // been through the welcome tour on this device.
+  const [planReady, setPlanReady] = useState(false)
+  const [toured, setToured] = useState(true)
   const [loading, setLoading] = useState(true)
+
+  // Skipping the tour (inside it) puts the plan box in its place.
+  useEffect(() => {
+    const onTour = () => setToured(true)
+    window.addEventListener('psyllabus:tour', onTour)
+    return () => window.removeEventListener('psyllabus:tour', onTour)
+  }, [])
 
   // The top bar runs for as long as this page is fetching, not just while the
   // route is in flight. A page that has arrived but has no data yet is the
@@ -250,6 +266,12 @@ export default function Dashboard() {
       })
       const held = readSnapshot(profileData.id)
       const { plan, configured } = computePlan({ profile: profileData, ...inputs, snapshot: held, now: at })
+      setPlanReady(configured)
+      setItems(merged)
+      setToured(tourDone(profileData.id))
+      setMapSubject(
+        accessibleSubjects(profileData).find((x) => !IB_CORE_SUBJECTS.includes(x)) || ''
+      )
       if (configured) {
         const snap = snapshotFor(plan, held)
         if (snap) writeSnapshot(profileData.id, snap)
@@ -345,6 +367,15 @@ export default function Dashboard() {
     ? `/dashboard/syllabus/${getSlugForSubject(firstSubject)}`
     : '/dashboard/subjects'
 
+  // The map beside the subject list, for accounts that have it.
+  const mapRows = items.filter((r) => r.subject === mapSubject)
+  const showMap = canUse('subjectMap', profile) && mapRows.length > 0
+
+  // A free account with exactly one subject open: the only case where the
+  // dashboard points at a subject rather than at the plan.
+  const singleFree =
+    !premium && accessibleSubjects(profile).filter((x) => !IB_CORE_SUBJECTS.includes(x)).length === 1
+
   // Where a quick set of questions starts: the plan's next quizzable task, or
   // the first subject they can open.
   const studyFocus =
@@ -369,7 +400,18 @@ export default function Dashboard() {
             first thing. It has one now — the next subtopic to sit, or the
             first one if nothing has been sat yet — and everything else is
             reference underneath it. */}
-        {!hasActivity ? (
+        {!hasActivity && !toured ? (
+          <WelcomeTour
+            profile={profile}
+            firstName={firstName}
+            syllabi={hasSyllabi(profile)}
+            subjectHref={singleFree ? startHref : null}
+            subjectName={firstSubject}
+          />
+        ) : !hasActivity ? (
+          /* After the tour, the place to start is the plan: it knows what
+             to do first. A free account with one subject open can also go
+             straight to it, since there is only one place to go. */
           <section
             className="elev-lg mb-8 rounded-[16px] border p-6 sm:p-7"
             style={{ borderColor: 'var(--brand)', background: 'var(--brand-tint)' }}
@@ -378,61 +420,39 @@ export default function Dashboard() {
               className="text-[10.5px] font-semibold uppercase tracking-[0.16em]"
               style={{ color: 'var(--text-faint)' }}
             >
-              First time here
+              Start here
             </p>
             <h2 className="mt-3 text-[clamp(1.35rem,2.8vw,1.8rem)] font-semibold leading-tight tracking-[-0.028em]">
-              Nothing here is guessed. You prove it.
+              {planReady ? 'Your plan for today is ready' : 'Set up your study plan'}
             </h2>
             <p className="mt-2.5 max-w-lg text-[14px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-              Every colour on this dashboard comes from a quiz you have sat. Three steps and it
-              starts filling in.
+              {planReady
+                ? nextUp
+                  ? `First up: ${taskTitle(nextUp)}${nextUp.subject ? ` in ${nextUp.subject}` : ''}. Finish its quiz and the dashboard starts filling in.`
+                  : 'Open it to see what is on today.'
+                : 'Two minutes: when you are free and when your exams are. From then on it tells you what to study every day.'}
             </p>
-
-            <ol className="stagger mt-6 flex flex-col gap-3">
-              {[
-                [
-                  '1',
-                  'Open your syllabus',
-                  firstSubject
-                    ? `${firstSubject}, broken into topics, units and subtopics.`
-                    : 'Your subjects, broken into topics and subtopics.',
-                ],
-                // Not "five questions": a subtopic with three questions in
-                // the bank gives you three, and promising five and handing
-                // over two is a small lie the student notices immediately.
-                ['2', 'Sit a Quick 5', 'A short set on one subtopic, marked as you answer.'],
-                ['3', 'Watch it colour in', 'Right answers earn points. Points set the level. Nothing else does.'],
-              ].map(([n, title, detail]) => (
-                <li key={n} className="flex items-start gap-3">
-                  <span
-                    className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold"
-                    style={{ background: 'var(--brand)', color: '#fff' }}
-                  >
-                    {n}
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block text-[14px] font-medium">{title}</span>
-                    <span className="mt-0.5 block text-[13px]" style={{ color: 'var(--text-muted)' }}>
-                      {detail}
-                    </span>
-                  </span>
-                </li>
-              ))}
-            </ol>
-
             <div className="mt-7 flex flex-wrap items-center gap-3">
-              <Link href={startHref} className="btn btn-solid control-lg">
-                Open {firstSubject || 'my subjects'}
+              <Link href="/dashboard/study-plan" className="btn btn-solid control-lg">
+                {planReady ? "Open today's plan" : 'Set up my study plan'}
                 <IconArrowRight width={16} height={16} />
               </Link>
-              {nextUp?.subtopic && nextUp.quizzable && (
-                <Link
-                  href={`/dashboard/quiz?subject=${encodeURIComponent(nextUp.subject)}&topic=${encodeURIComponent(nextUp.topic)}&subtopic=${encodeURIComponent(nextUp.subtopic)}&count=5&review=practice&back=/dashboard`}
-                  className="btn btn-outline control-md"
-                >
-                  Or start with {displaySubtopic(nextUp.subtopic)}
+              {singleFree && (
+                <Link href={startHref} className="btn btn-outline control-md">
+                  Open {firstSubject}
                 </Link>
               )}
+              <button
+                type="button"
+                onClick={() => {
+                  resetTour(profile.id)
+                  setToured(false)
+                }}
+                className="text-[13px] font-medium underline-offset-2 hover:underline"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                Replay the tour
+              </button>
             </div>
           </section>
         ) : nextUp ? (
@@ -444,7 +464,7 @@ export default function Dashboard() {
               className="text-[10.5px] font-semibold uppercase tracking-[0.16em]"
               style={{ color: 'var(--text-faint)' }}
             >
-              {upNextDay ? `Next up · ${upNextDay}` : 'Next up'}
+              {upNextDay ? `From your plan · ${upNextDay}` : 'From your plan · next up'}
             </p>
 
             <h2 className="mt-3 text-[clamp(1.35rem,2.8vw,1.8rem)] font-semibold leading-tight tracking-[-0.028em]">
@@ -592,89 +612,108 @@ export default function Dashboard() {
           </Section>
         )}
 
-        <div className="grid gap-x-14 lg:grid-cols-2">
-          {/* Three, not nine. The queue lives on the study plan. */}
-          {queued.length > 0 && (
-            <Section
-              title="After that"
-              action={
-                <Link
-                  href="/dashboard/study-plan"
-                  className="text-[13px] font-medium text-[var(--brand)] hover:underline"
-                >
-                  Full plan
-                </Link>
-              }
-            >
-              <ul className="flex flex-col">
-                {queued.map((item) => (
-                  <li
-                    key={item.id}
-                    className="flex items-center gap-3 border-b py-3 last:border-b-0"
-                    style={{ borderColor: 'var(--border)' }}
-                  >
-                    <span
-                      className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_COLORS[item.status] || 'bg-[var(--status-weak)]'}`}
-                      aria-hidden="true"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-[11.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
-                        {item.start != null && !item.overflow ? `${clock(item.start)} · ` : ''}
-                        {item.subject}
-                      </p>
-                      <p className="mt-0.5 truncate text-[13.5px]" style={{ color: 'var(--text-body)' }}>
-                        {taskTitle(item)}
-                      </p>
-                    </div>
-                    <Link href={actionFor(item).href} className="btn btn-quiet control-sm shrink-0">
-                      {actionFor(item).label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </Section>
-          )}
-
+        {/* Three, not nine. The queue lives on the study plan. */}
+        {queued.length > 0 && (
           <Section
-            title="Your subjects"
+            title="After that"
             action={
-              <span className="flex items-center gap-4">
-                <Link
-                  href="/onboarding?edit=subjects"
-                  className="text-[13px] font-medium text-[var(--text-muted)] hover:text-[var(--text)] hover:underline"
-                >
-                  Change subjects
-                </Link>
-                <Link
-                  href="/dashboard/subjects"
-                  className="text-[13px] font-medium text-[var(--brand)] hover:underline"
-                >
-                  View all
-                </Link>
-              </span>
+              <Link
+                href="/dashboard/study-plan"
+                className="text-[13px] font-medium text-[var(--brand)] hover:underline"
+              >
+                Full plan
+              </Link>
             }
           >
             <ul className="flex flex-col">
-              {subjects.map((subject) => {
-                const locked = isSubjectLocked(subject, profile)
-                const pct = subjectStats[subject] ?? 0
-                const size = subjectSizes[subject] || 0
-                return (
-                  <li
-                    key={subject}
-                    className="border-b last:border-b-0"
-                    style={{ borderColor: 'var(--border)' }}
-                  >
-                    <Link
-                      href={
-                        locked
-                          ? '/dashboard/profile#unlock'
-                          : `/dashboard/syllabus/${getSlugForSubject(subject)}`
-                      }
-                      className="flex items-center gap-4 rounded-[10px] px-2 py-3 transition-colors duration-150 hover:bg-[var(--surface-sunken)]"
-                    >
+              {queued.map((item) => (
+                <li
+                  key={item.id}
+                  className="flex items-center gap-3 border-b py-3 last:border-b-0"
+                  style={{ borderColor: 'var(--border)' }}
+                >
+                  <span
+                    className={`h-1.5 w-1.5 shrink-0 rounded-full ${STATUS_COLORS[item.status] || 'bg-[var(--status-weak)]'}`}
+                    aria-hidden="true"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[11.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
+                      {item.start != null && !item.overflow ? `${clock(item.start)} · ` : ''}
+                      {item.subject}
+                    </p>
+                    <p className="mt-0.5 truncate text-[13.5px]" style={{ color: 'var(--text-body)' }}>
+                      {taskTitle(item)}
+                    </p>
+                  </div>
+                  <Link href={actionFor(item).href} className="btn btn-quiet control-sm shrink-0">
+                    {actionFor(item).label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </Section>
+        )}
+
+        {/* Your subjects, with the map of whichever one is picked beside
+            them: the list says how far, the map says where. */}
+        <Section
+          title="Your subjects"
+          action={
+            <span className="flex items-center gap-4">
+              <Link
+                href="/onboarding?edit=subjects"
+                className="text-[13px] font-medium text-[var(--text-muted)] hover:text-[var(--text)] hover:underline"
+              >
+                Change subjects
+              </Link>
+              <Link
+                href="/dashboard/subjects"
+                className="text-[13px] font-medium text-[var(--brand)] hover:underline"
+              >
+                View all
+              </Link>
+            </span>
+          }
+        >
+          <div className={showMap ? 'grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:items-start' : ''}>
+            {showMap && (
+              <div className="min-w-0">
+                <SubjectWeb
+                  key={mapSubject}
+                  subject={mapSubject}
+                  rows={mapRows}
+                  onPickSubtopic={(row) =>
+                    router.push(
+                      `/dashboard/quiz?subject=${encodeURIComponent(row.subject)}&topic=${encodeURIComponent(row.topic)}&subtopic=${encodeURIComponent(row.subtopic)}&count=5&review=practice&back=/dashboard`
+                    )
+                  }
+                />
+                <Link
+                  href={`/dashboard/map?subject=${encodeURIComponent(mapSubject)}`}
+                  className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-medium text-[var(--brand)] hover:underline"
+                >
+                  Open the full map
+                  <IconArrowRight width={13} height={13} />
+                </Link>
+              </div>
+            )}
+
+            <div className="min-w-0">
+              {showMap && (
+                <p className="mb-2 text-[12px]" style={{ color: 'var(--text-faint)' }}>
+                  Pick a subject to see its map.
+                </p>
+              )}
+              <ul className="flex flex-col">
+                {subjects.map((subject) => {
+                  const locked = isSubjectLocked(subject, profile)
+                  const pct = subjectStats[subject] ?? 0
+                  const size = subjectSizes[subject] || 0
+                  const picked = showMap && subject === mapSubject
+                  const inner = (
+                    <>
                       <span
-                        className="min-w-0 flex-1 truncate text-[13.5px] font-medium"
+                        className="min-w-0 flex-1 truncate text-left text-[13.5px] font-medium"
                         style={{ color: locked ? 'var(--text-faint)' : 'var(--text)' }}
                       >
                         {subject}
@@ -702,33 +741,67 @@ export default function Dashboard() {
                           </span>
                         </>
                       ) : (
-                        <span
-                          className="shrink-0 text-[12px] tabular-nums"
-                          style={{ color: 'var(--text-faint)' }}
-                        >
+                        <span className="shrink-0 text-[12px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
                           {size} subtopics
                         </span>
                       )}
-                    </Link>
-                  </li>
-                )
-              })}
-            </ul>
+                    </>
+                  )
+                  return (
+                    <li
+                      key={subject}
+                      className="flex items-center gap-1 border-b last:border-b-0"
+                      style={{ borderColor: 'var(--border)' }}
+                    >
+                      {showMap && !locked ? (
+                        <button
+                          type="button"
+                          onClick={() => setMapSubject(subject)}
+                          aria-pressed={picked}
+                          className="flex min-w-0 flex-1 items-center gap-4 rounded-[10px] px-2 py-3 transition-colors duration-150 hover:bg-[var(--surface-sunken)]"
+                          style={picked ? { background: 'var(--brand-tint)' } : undefined}
+                        >
+                          {inner}
+                        </button>
+                      ) : (
+                        <Link
+                          href={locked ? '/dashboard/profile#unlock' : `/dashboard/syllabus/${getSlugForSubject(subject)}`}
+                          className="flex min-w-0 flex-1 items-center gap-4 rounded-[10px] px-2 py-3 transition-colors duration-150 hover:bg-[var(--surface-sunken)]"
+                        >
+                          {inner}
+                        </Link>
+                      )}
+                      {showMap && !locked && (
+                        <Link
+                          href={`/dashboard/syllabus/${getSlugForSubject(subject)}`}
+                          aria-label={`Open ${subject}`}
+                          title="Open syllabus"
+                          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px] transition-colors hover:bg-[var(--surface-sunken)]"
+                          style={{ color: 'var(--text-faint)' }}
+                        >
+                          <IconChevronRight width={15} height={15} />
+                        </Link>
+                      )}
+                    </li>
+                  )
+                })}
+              </ul>
 
-            {!premium && subjects.length > 1 && (
-              <Link
-                href="/dashboard/profile#unlock"
-                className="mt-5 flex items-center gap-3 border-l-2 pl-4"
-                style={{ borderColor: 'var(--brand)' }}
-              >
-                <IconCheck width={15} height={15} className="shrink-0 text-[var(--brand)]" />
-                <span className="text-[13.5px]" style={{ color: 'var(--text-body)' }}>
-                  Have a school code? Unlock every subject free.
-                </span>
-              </Link>
-            )}
-          </Section>
-        </div>
+              {!premium && subjects.length > 1 && (
+                <Link
+                  href="/dashboard/profile#unlock"
+                  className="mt-5 flex items-center gap-3 border-l-2 pl-4"
+                  style={{ borderColor: 'var(--brand)' }}
+                >
+                  <IconCheck width={15} height={15} className="shrink-0 text-[var(--brand)]" />
+                  <span className="text-[13.5px]" style={{ color: 'var(--text-body)' }}>
+                    Have a school code? Unlock every subject free.
+                  </span>
+                </Link>
+              )}
+            </div>
+          </div>
+        </Section>
 
         <TodoList className="mb-12" title="To-do" compact limit={5} subjects={allSubjects} />
 

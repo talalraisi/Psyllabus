@@ -2,8 +2,8 @@
 
 import Link from 'next/link'
 import SyllabiMark from '@/components/SyllabiMark'
-import { IconTest, IconCards, IconCheck, IconSubjects, IconArrowRight } from '@/components/Icons'
-import { hasSyllabi } from '@/lib/access'
+import { IconTest, IconCards, IconCheck, IconReview, IconArrowRight } from '@/components/Icons'
+import { hasSyllabi, canUse } from '@/lib/access'
 import { getSlugForSubject } from '@/lib/subject-map'
 import { displaySubtopic } from '@/lib/progress'
 
@@ -22,6 +22,16 @@ function NoteIcon({ width = 20, height = 20, style }) {
     <svg width={width} height={height} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={style} aria-hidden="true">
       <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
       <path d="M14 3v5h5M9 13h6M9 17h4" />
+    </svg>
+  )
+}
+
+function OrbitIcon({ width = 20, height = 20, style }) {
+  return (
+    <svg width={width} height={height} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" style={style} aria-hidden="true">
+      <circle cx="12" cy="12" r="8.5" />
+      <circle cx="12" cy="12" r="2.6" />
+      <circle cx="18" cy="6" r="2" fill="currentColor" stroke="none" />
     </svg>
   )
 }
@@ -84,6 +94,21 @@ export default function WaysToStudy({ profile, focus }) {
       Icon: IconCheck,
     },
     {
+      key: 'map',
+      title: 'Subject Map',
+      line: 'Your whole course as an orbit. Tap a topic to quiz it.',
+      href: focus?.subject ? `/dashboard/map?subject=${encodeURIComponent(focus.subject)}` : '/dashboard/map',
+      Icon: OrbitIcon,
+      locked: !canUse('subjectMap', profile),
+    },
+    {
+      key: 'redemption',
+      title: 'Redemption',
+      line: 'The questions you got wrong, back when they are due.',
+      href: '/dashboard/mistakes',
+      Icon: IconReview,
+    },
+    {
       key: 'notes',
       title: 'Notes',
       line: 'Every topic and subtopic of your syllabus, with resources.',
@@ -102,7 +127,7 @@ export default function WaysToStudy({ profile, focus }) {
   ]
 
   return (
-    <ul className="stagger grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
+    <ul className="stagger grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4">
       {ways.map(({ key, title, line, href, Icon, locked, fresh }) => (
         <li key={key}>
           <Link

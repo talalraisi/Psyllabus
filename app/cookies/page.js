@@ -78,6 +78,12 @@ function Cookies() {
               : 'today’s plan as it was first shown, so it does not reshuffle during the day, and what was last sent to your calendar.'}
           </li>
           <li>
+            <strong>psyllabus:tour:…</strong>{' '}
+            {ar
+              ? 'أنك أنهيت الجولة التعريفية أو تخطيتها، حتى لا تظهر لك مرة أخرى.'
+              : 'that you finished or skipped the welcome tour, so it is not shown again.'}
+          </li>
+          <li>
             <strong>psyllabus:device</strong>{' '}
             {ar
               ? 'معرّف عشوائي لهذا الجهاز، يُستخدم فقط عند اختيار المادة المجانية حتى لا يجمع جهاز واحد حسابات مجانية كثيرة. لا نحفظ منه إلا بصمة لا يمكن تحويلها إليه.'
