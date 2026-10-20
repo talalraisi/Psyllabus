@@ -8,7 +8,7 @@ import { HOW_IT_WORKS, FEATURES, WHY, ANSWERS } from '@/components/marketing/con
 import { Heatmap, DecayDemo, PlanDemo } from '@/components/marketing/interactive'
 import { Reveal, ScrollBar, CountUp } from '@/components/marketing/scroll'
 import SiteNav from '@/components/marketing/SiteNav'
-import Roller from '@/components/marketing/Roller'
+import CurriculumSwitch from '@/components/marketing/CurriculumSwitch'
 import { FeatureModules } from '@/components/marketing/features'
 import FloatingSubjects, { FloatingSubjectsRow } from '@/components/marketing/FloatingSubjects'
 import SubjectOrbit from '@/components/marketing/SubjectOrbit'
@@ -132,13 +132,10 @@ export default async function Home() {
               <span style={{ color: 'var(--brand)' }}>Start progressing.</span>
             </h1>
 
-            {/* Named one at a time rather than listed. A reader is one person,
-                and "for students of A-Levels" speaks to them where a list asks
-                them to find themselves in it. It is also the only thing moving
-                on the first screen. */}
-            <p className="mt-6 text-[clamp(1.4rem,3.2vw,2.1rem)] font-semibold leading-tight tracking-[-0.028em]">
-              <span style={{ color: 'var(--text-muted)' }}>For students of </span>
-              <Roller words={['the IB Diploma', 'A-Levels', 'AP']} style={{ color: 'var(--brand)' }} />
+            {/* All three curricula in one small pill with a highlight that
+                glides between them (components/marketing/CurriculumSwitch). */}
+            <p className="mt-7">
+              <CurriculumSwitch />
             </p>
 
             <p
@@ -190,13 +187,6 @@ export default async function Home() {
             </p>
           </Reveal>
         </Section>
-
-        {/* -------------------------------------------------------- subjects */}
-        <section className="px-5 py-16 md:px-8 md:py-24">
-          <Reveal>
-            <SubjectOrbit subjects={counts?.subjects ?? 173} />
-          </Reveal>
-        </section>
 
         {/* --------------------------------------------------- how it works */}
         <Section label="How it works" id="how-it-works">
@@ -322,6 +312,13 @@ export default async function Home() {
             </p>
           </div>
         </Section>
+
+        {/* -------------------------------------------------------- subjects */}
+        <section className="px-5 py-16 md:px-8 md:py-24">
+          <Reveal>
+            <SubjectOrbit subjects={counts?.subjects ?? 173} />
+          </Reveal>
+        </section>
 
         {/* ------------------------------------------------------- features */}
         <Section label="Features" tint id="features">

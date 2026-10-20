@@ -2,7 +2,8 @@
 
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { IconMenu, IconChevronRight } from '@/components/Icons'
+import { IconMenu } from '@/components/Icons'
+import { Chevron } from '@/components/Select'
 
 /**
  * The top of the front page, with somewhere to go.
@@ -52,15 +53,7 @@ const MORE = [
  *  glyph, which is a font's idea of an arrow and never matches the weight of
  *  the word beside it. */
 function Caret({ open }) {
-  return (
-    <IconChevronRight
-      aria-hidden="true"
-      width={12}
-      height={12}
-      className="transition-transform duration-200"
-      style={{ transform: open ? 'rotate(-90deg)' : 'rotate(90deg)', opacity: 0.65 }}
-    />
-  )
+  return <Chevron open={open} style={{ opacity: 0.65 }} />
 }
 
 export default function SiteNav({ children }) {

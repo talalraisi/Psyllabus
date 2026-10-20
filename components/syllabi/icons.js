@@ -43,9 +43,21 @@ export const Check = ({ size = 15 }) => (
   </svg>
 )
 
-export const Chevron = ({ size = 14, up = false }) => (
-  <svg {...base(size)} style={{ transform: up ? 'rotate(180deg)' : undefined }}>
-    <path d="M6 9l6 6 6-6" />
+// The same light chevron as the app's dropdowns (components/Select.js).
+export const Chevron = ({ size = 10, up = false }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 12 12"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.6"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+    style={{ transform: up ? 'rotate(180deg)' : undefined, transition: 'transform 220ms cubic-bezier(0.16, 1, 0.3, 1)', flexShrink: 0, opacity: 0.7 }}
+  >
+    <path d="M2.5 4.5 6 8l3.5-3.5" />
   </svg>
 )
 

@@ -13,22 +13,24 @@ import { SubjectTile } from '@/components/marketing/SubjectIcons'
  * Nothing moves for anyone who has asked their system for less motion.
  */
 
-// Desktop: around the right of the hero, and the strips above and below the
-// headline. [subject, top %, left %, size]
+// Around the right of the hero and in the strips above and below the
+// headline, never on it. Two depths only, so the sizes read as distance
+// rather than as a jumble: near tiles are full size, far ones smaller and
+// fainter. [subject, top %, left %, far]
 const DESKTOP = [
-  ['physics', 12, 60, 72],
-  ['chemistry', 7, 80, 64],
-  ['maths', 27, 90, 76],
-  ['biology', 31, 70, 68],
-  ['economics', 52, 63, 64],
-  ['english', 50, 83, 72],
-  ['history', 72, 74, 66],
-  ['geography', 74, 92, 60],
-  ['arts', 88, 60, 62],
-  ['computing', 6, 42, 56],
-  ['languages', 90, 82, 58],
-  ['psychology', 90, 30, 54],
-  ['tok', 4, 18, 52],
+  ['physics', 14, 62, false],
+  ['maths', 25, 86, false],
+  ['biology', 41, 72, false],
+  ['english', 58, 88, false],
+  ['economics', 67, 63, false],
+  ['history', 84, 78, false],
+  ['chemistry', 6, 78, true],
+  ['geography', 40, 93, true],
+  ['computing', 8, 46, true],
+  ['arts', 89, 58, true],
+  ['languages', 91, 92, true],
+  ['psychology', 90, 30, true],
+  ['tok', 5, 22, true],
 ]
 
 const REACH = 170 // px within which a tile moves away
@@ -73,7 +75,7 @@ export default function FloatingSubjects() {
 
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 hidden overflow-hidden lg:block">
-      {DESKTOP.map(([name, top, left, size], i) => (
+      {DESKTOP.map(([name, top, left, far], i) => (
         <div
           key={name}
           ref={(el) => {
@@ -94,7 +96,7 @@ export default function FloatingSubjects() {
                 animationDelay: `-${(i * 1.7) % 6}s`,
               }}
             >
-              <SubjectTile name={name} size={size} icon={Math.round(size * 0.44)} />
+              <SubjectTile name={name} size={far ? 44 : 58} status={i} style={far ? { opacity: 0.55 } : undefined} />
             </div>
           </div>
         </div>
@@ -111,7 +113,7 @@ export function FloatingSubjectsRow() {
       {row.map((name, i) => (
         <div key={name} className="float-in" style={{ animationDelay: `${400 + i * 70}ms` }}>
           <div className="float-drift" style={{ animationDuration: `${6 + i}s`, animationDelay: `-${i * 1.3}s` }}>
-            <SubjectTile name={name} size={46} icon={21} />
+            <SubjectTile name={name} size={44} status={i} />
           </div>
         </div>
       ))}

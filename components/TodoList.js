@@ -6,6 +6,7 @@ import { getCurrentUser } from '@/lib/auth'
 import { IconCheck, IconClose, IconPlus } from '@/components/Icons'
 import { SkeletonLine } from '@/components/PageShell'
 import { parseTodoInput, bucketFor, BUCKET_LABELS, BUCKET_ORDER } from '@/lib/todo-parse'
+import Select from '@/components/Select'
 
 /**
  * The list of things that are not a test.
@@ -300,7 +301,7 @@ export default function TodoList({
           style={{ width: 150 }}
         />
         {subjects.length > 0 && (
-          <select
+          <Select
             value={todo.subject || ''}
             onChange={(e) => patch(todo, { subject: e.target.value || null })}
             aria-label="Subject"
@@ -313,7 +314,7 @@ export default function TodoList({
                 {subject}
               </option>
             ))}
-          </select>
+          </Select>
         )}
         <button
           onClick={() => patch(todo, { due_on: dayKey() })}

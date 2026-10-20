@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import { cardsFromNote } from '@/lib/flashcards'
 import { displaySubtopic } from '@/lib/progress'
+import Select from '@/components/Select'
 
 /** Text files we can read directly in the browser. */
 const READABLE = /\.(txt|md|markdown|csv|rtf)$/i
@@ -106,13 +107,13 @@ export default function NoteImport({ subject, subjects, savedNotes = [], onCards
       <div className="grid gap-4 sm:grid-cols-2">
         <label>
           <span className="t-overline">Subject</span>
-          <select value={subj} onChange={(e) => setSubj(e.target.value)} className="input mt-1">
+          <Select value={subj} onChange={(e) => setSubj(e.target.value)} className="input mt-1">
             {(subjects || []).map((s) => (
               <option key={s} value={s}>
                 {s}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
 
         <label>

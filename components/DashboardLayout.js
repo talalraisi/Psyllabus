@@ -21,7 +21,6 @@ import {
   IconLogout,
   IconMenu,
   IconClose,
-  IconChevronRight,
 } from '@/components/Icons'
 import { planLabel, hasAllSubjects } from '@/lib/access'
 import { clearCache } from '@/lib/cache'
@@ -32,6 +31,7 @@ import SyllabiMark from '@/components/SyllabiMark'
 import { SyllabiProvider } from '@/components/syllabi/SyllabiDrawer'
 import ThemeToggle from '@/components/ThemeToggle'
 import { StreakChip } from '@/components/Streak'
+import { Chevron } from '@/components/Select'
 
 /**
  * The menu, in four groups instead of one list of eleven: the two places a
@@ -267,8 +267,9 @@ export default function DashboardLayout({ children, profile }) {
   const sidebar = (open, mobile = false) => (
     <>
       <div className="relative flex h-[68px] shrink-0 items-center pl-[17px] pr-3">
-        {/* The mark alone in the rail and the full logo when open, by
-            clipping one image: the cap and P, then the word as it widens.
+        {/* The short mark in the rail and the full logo when open, by
+            clipping one image: the cap and "Ps" (the first third, cut just
+            before the Y), then the rest of the word as it widens.
             Above the fold on every page, so it loads eagerly with its aspect
             ratio declared. */}
         <Link href="/dashboard" className="inline-block shrink-0" aria-label="Dashboard">
@@ -282,8 +283,8 @@ export default function DashboardLayout({ children, profile }) {
               width: 86,
               maxWidth: 'none',
               clipPath: open
-                ? 'polygon(0 0, 100% 0, 100% 70%, 100% 70%, 100% 100%, 0 100%)'
-                : 'polygon(0 0, 33.5% 0, 33.5% 70%, 23.5% 70%, 23.5% 100%, 0 100%)',
+                ? 'polygon(0 0, 100% 0, 100% 100%, 100% 100%, 100% 100%, 0 100%)'
+                : 'polygon(0 0, 33.6% 0, 33.6% 100%, 33.6% 100%, 33.6% 100%, 0 100%)',
               transition: 'clip-path 220ms cubic-bezier(0.16, 1, 0.3, 1)',
             }}
           />
@@ -319,7 +320,9 @@ export default function DashboardLayout({ children, profile }) {
         {NAV_GROUPS.map((group, g) => {
           const items = group.items.filter((item) => !item.ibOnly || !profile || profile.curriculum === 'IB')
           if (!items.length) return null
-          const folded = group.label && closedGroups.includes(group.label)
+          // Folding is for the open menu. The rail always shows every icon:
+          // folded away there, a group left nothing but a rule.
+          const folded = open && group.label && closedGroups.includes(group.label)
           const holdsActive = items.some((item) => item.match(pathname))
           return (
             <div key={group.label || g} className={g ? 'mt-1' : ''}>
@@ -345,11 +348,7 @@ export default function DashboardLayout({ children, profile }) {
                       {group.label}
                       {folded && holdsActive && <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--brand)' }} />}
                     </span>
-                    <IconChevronRight
-                      width={13}
-                      height={13}
-                      style={{ transform: folded ? 'rotate(0deg)' : 'rotate(90deg)', transition: 'transform 180ms ease' }}
-                    />
+                    <Chevron open={!folded} style={{ transform: folded ? 'rotate(-90deg)' : 'none' }} />
                   </button>
                 </div>
               )}
@@ -423,80 +422,86 @@ export default function DashboardLayout({ children, profile }) {
           </Link>
         )}
 
-        {/* Always there, so it can open and close with a movement rather
-            than appear: it grows up out of the name, and is inert while
-            folded away. */}
-        <div
-          role="menu"
-          aria-hidden={!accountOpen}
-          inert={!accountOpen || undefined}
-          onClick={(e) => e.stopPropagation()}
-          className="absolute bottom-full left-2 right-2 z-30 mb-1.5 origin-bottom rounded-[14px] border p-1.5 shadow-xl transition-[opacity,transform] duration-200"
-          style={{
-            borderColor: 'var(--border-strong)',
-            background: 'var(--surface)',
-            minWidth: 220,
-            opacity: accountOpen ? 1 : 0,
-            transform: accountOpen ? 'none' : 'translateY(8px) scale(0.96)',
-            transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
-            pointerEvents: accountOpen ? 'auto' : 'none',
-          }}
-        >
-          <Link href="/dashboard/profile" role="menuitem" className="flex w-full items-center gap-3 rounded-[9px] px-3 py-2 text-[13px] font-medium text-[var(--text-body)] transition-colors hover:bg-[var(--surface-sunken)]">
-            <IconUser width={16} height={16} className="text-[var(--text-faint)]" />
-            Profile settings
-          </Link>
-          <button role="menuitem" onClick={handleLogout} disabled={signingOut} className="flex w-full items-center gap-3 rounded-[9px] px-3 py-2 text-[13px] font-medium text-[var(--text-body)] transition-colors hover:bg-[var(--surface-sunken)] disabled:opacity-50">
-            <IconLogout width={16} height={16} className="text-[var(--text-faint)]" />
-            {signingOut ? 'Signing out…' : 'Sign out'}
-          </button>
-          <div className="my-1.5 border-t" style={{ borderColor: 'var(--border)' }} />
-          <div className="flex items-center justify-between gap-3 px-3 py-1 text-[12.5px] font-medium" style={{ color: 'var(--text-muted)' }}>
-            Theme
-            <ThemeToggle />
-          </div>
-          <div className="flex gap-3 px-3 pb-1 pt-2">
-            <Link href="/privacy?from=dashboard" className="t-caption hover:text-[var(--text-muted)]">
-              Privacy
-            </Link>
-            <Link href="/terms?from=dashboard" className="t-caption hover:text-[var(--text-muted)]">
-              Terms
-            </Link>
-            <Link href="/cookies?from=dashboard" className="t-caption hover:text-[var(--text-muted)]">
-              Cookies
-            </Link>
-          </div>
-        </div>
-
+        {/* You, and everything about your account, in one panel. Opening it
+            does not pop a menu over the page: the whole panel grows upward
+            into the space above, your name riding up on top and the options
+            unfolding underneath it. The menu above gives up the room. */}
         {profile && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation()
-              setAccountOpen((v) => !v)
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="overflow-hidden rounded-[14px] border transition-[background-color,border-color,box-shadow] duration-300"
+            style={{
+              borderColor: accountOpen ? 'var(--border-strong)' : 'transparent',
+              background: accountOpen ? 'var(--surface-sunken)' : 'transparent',
+              boxShadow: accountOpen ? '0 -12px 32px -20px rgb(0 0 0 / 0.5)' : 'none',
             }}
-            aria-haspopup="menu"
-            aria-expanded={accountOpen}
-            title={open ? undefined : profile.full_name || 'Account'}
-            className="flex w-full items-center gap-3 overflow-hidden rounded-[10px] p-2 text-left transition-colors hover:bg-[var(--surface-sunken)]"
-            style={accountOpen ? { background: 'var(--surface-sunken)' } : undefined}
           >
-            <Avatar profile={profile} size={32} />
-            <span className="min-w-0 flex-1 transition-opacity duration-150" style={{ opacity: open ? 1 : 0 }}>
-              <span className="block truncate text-[13px] font-semibold text-[var(--text)]">{profile.full_name || 'Student'}</span>
-              {/* The e-mail, not the programme: two accounts on one device can
-                  carry the same name, and the address tells them apart. */}
-              <span className="t-caption block truncate" title={email || undefined}>
-                {email || `${profile.curriculum} · Class of ${profile.grad_year}`}
-              </span>
-            </span>
-            <span
-              className="shrink-0 text-[var(--text-faint)]"
-              style={{ transform: accountOpen ? 'rotate(90deg)' : 'rotate(-90deg)', transition: 'transform 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 150ms', opacity: open ? 1 : 0 }}
+            <button
+              type="button"
+              onClick={() => setAccountOpen((v) => !v)}
+              aria-expanded={accountOpen}
+              aria-controls="account-panel"
+              title={open ? undefined : profile.full_name || 'Account'}
+              className="flex w-full items-center gap-3 overflow-hidden rounded-[13px] p-2 text-left transition-colors hover:bg-[var(--surface-sunken)]"
             >
-              <IconChevronRight width={14} height={14} />
-            </span>
-          </button>
+              <Avatar profile={profile} size={32} />
+              <span className="min-w-0 flex-1 transition-opacity duration-150" style={{ opacity: open ? 1 : 0 }}>
+                <span className="block truncate text-[13px] font-semibold text-[var(--text)]">{profile.full_name || 'Student'}</span>
+                {/* The e-mail, not the programme: two accounts on one device can
+                    carry the same name, and the address tells them apart. */}
+                <span className="t-caption block truncate" title={email || undefined}>
+                  {email || `${profile.curriculum} · Class of ${profile.grad_year}`}
+                </span>
+              </span>
+              <span className="mr-1 text-[var(--text-faint)] transition-opacity duration-150" style={{ opacity: open ? 1 : 0 }}>
+                <Chevron open={!accountOpen} />
+              </span>
+            </button>
+
+            <div
+              id="account-panel"
+              className="grid transition-[grid-template-rows] duration-300"
+              style={{ gridTemplateRows: accountOpen ? '1fr' : '0fr', transitionTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)' }}
+            >
+              <div className="min-h-0 overflow-hidden" inert={!accountOpen || undefined}>
+                <div
+                  className="px-1.5 pb-1.5 transition-[opacity,transform] duration-300"
+                  style={{ opacity: accountOpen ? 1 : 0, transform: accountOpen ? 'none' : 'translateY(-6px)' }}
+                >
+                  <div className="mx-1.5 mb-1.5 border-t" style={{ borderColor: 'var(--border)' }} />
+                  <Link href="/dashboard/profile" className="flex w-full items-center gap-3 rounded-[9px] px-3 py-2 text-[13px] font-medium text-[var(--text-body)] transition-colors hover:bg-[var(--surface)]">
+                    <IconUser width={16} height={16} className="text-[var(--text-faint)]" />
+                    Profile settings
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    disabled={signingOut}
+                    className="flex w-full items-center gap-3 rounded-[9px] px-3 py-2 text-[13px] font-medium text-[var(--text-body)] transition-colors hover:bg-[var(--surface)] disabled:opacity-50"
+                  >
+                    <IconLogout width={16} height={16} className="text-[var(--text-faint)]" />
+                    {signingOut ? 'Signing out…' : 'Sign out'}
+                  </button>
+                  <div className="mx-1.5 my-1.5 border-t" style={{ borderColor: 'var(--border)' }} />
+                  <div className="flex items-center justify-between gap-3 px-3 py-1 text-[12.5px] font-medium" style={{ color: 'var(--text-muted)' }}>
+                    Theme
+                    <ThemeToggle />
+                  </div>
+                  <div className="flex gap-3 px-3 pb-1 pt-2">
+                    <Link href="/privacy?from=dashboard" className="t-caption hover:text-[var(--text-muted)]">
+                      Privacy
+                    </Link>
+                    <Link href="/terms?from=dashboard" className="t-caption hover:text-[var(--text-muted)]">
+                      Terms
+                    </Link>
+                    <Link href="/cookies?from=dashboard" className="t-caption hover:text-[var(--text-muted)]">
+                      Cookies
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </>

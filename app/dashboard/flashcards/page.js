@@ -20,6 +20,7 @@ import FlashcardTest from '@/components/FlashcardTest'
 import StudyMenu from '@/components/StudyMenu'
 import NoteImport from '@/components/NoteImport'
 import LockedPanel from '@/components/LockedPanel'
+import Select from '@/components/Select'
 
 /**
  * Flashcards.
@@ -713,7 +714,7 @@ export default function FlashcardsPage() {
                 <form onSubmit={saveCard} className="mt-5 grid gap-4 border-t border-[var(--border)] pt-5 sm:grid-cols-2">
                   <label>
                     <span className="t-overline">Subject</span>
-                    <select
+                    <Select
                       value={draft.subject}
                       onChange={(e) => setDraft({ ...draft, subject: e.target.value })}
                       className="input mt-1"
@@ -723,7 +724,7 @@ export default function FlashcardsPage() {
                           {s}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </label>
 
                   <label>

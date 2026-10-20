@@ -12,6 +12,7 @@
 
 import { useMemo, useState } from 'react'
 import { looksLikeTest } from '@/lib/test-detect'
+import Select from '@/components/Select'
 
 export default function TestSuggestions({ imported, events, connections, subjects, now, onAdd, onDismiss }) {
   const [subjectFor, setSubjectFor] = useState({})
@@ -50,7 +51,7 @@ export default function TestSuggestions({ imported, events, connections, subject
                   {row.all_day ? '' : ` · ${new Date(row.starts_at).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}`}
                 </p>
               </div>
-              <select
+              <Select
                 value={subject}
                 onChange={(e) => setSubjectFor((s) => ({ ...s, [row.event_uid]: e.target.value }))}
                 aria-label={`Subject for ${row.title}`}
@@ -62,7 +63,7 @@ export default function TestSuggestions({ imported, events, connections, subject
                     {s}
                   </option>
                 ))}
-              </select>
+              </Select>
               <div className="flex items-center gap-2">
                 <button
                   type="button"

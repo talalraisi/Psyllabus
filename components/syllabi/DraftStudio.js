@@ -9,6 +9,7 @@ import { segments } from '@/lib/draft-review'
 import { senseCheck, MIN_WORDS } from '@/lib/sense-check'
 import { shortName } from '@/lib/subject-short'
 import { Chevron, Copy, Check, Download, Collapse, Refresh, FileIcon } from '@/components/syllabi/icons'
+import Select from '@/components/Select'
 
 /**
  * The draft studio: a page to write on and a marker beside it.
@@ -1041,12 +1042,12 @@ export default function DraftStudio({ subjects = [] }) {
             {stale ? 'Edited' : 'Marked'}
           </span>
         )}
-        <select
+        <Select
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
           disabled={busy}
           aria-label="Subject"
-          className="hidden h-9 max-w-[13rem] cursor-pointer rounded-full border bg-transparent px-3 text-[13px] outline-none xl:block"
+          className="hidden h-9 max-w-[13rem] rounded-full border bg-transparent pl-3.5 pr-1.5 text-[13px] outline-none xl:flex"
           style={{ borderColor: 'var(--border-strong)' }}
         >
           {subjects.map((s) => (
@@ -1054,7 +1055,7 @@ export default function DraftStudio({ subjects = [] }) {
               {s}
             </option>
           ))}
-        </select>
+        </Select>
         <div className="hidden shrink-0 rounded-full p-0.5 xl:flex" style={{ background: 'var(--surface-sunken)' }}>
           {KINDS.map((k) => (
             <button
@@ -1074,20 +1075,20 @@ export default function DraftStudio({ subjects = [] }) {
 
       {/* What it is, on a phone. */}
       <div className="flex shrink-0 gap-2 border-b px-4 py-2 xl:hidden" style={{ borderColor: 'var(--border)' }}>
-        <select value={subject} onChange={(e) => setSubject(e.target.value)} disabled={busy} aria-label="Subject" className="h-9 min-w-0 flex-1 rounded-full border bg-transparent px-3 text-[16px] outline-none sm:max-w-[16rem] sm:flex-none sm:text-[13px]" style={{ borderColor: 'var(--border-strong)' }}>
+        <Select value={subject} onChange={(e) => setSubject(e.target.value)} disabled={busy} aria-label="Subject" className="h-9 min-w-0 flex-1 rounded-full border bg-transparent pl-3.5 pr-2 text-[14px] outline-none sm:max-w-[16rem] sm:flex-none sm:text-[13px]" style={{ borderColor: 'var(--border-strong)' }}>
           {subjects.map((s) => (
             <option key={s} value={s}>
               {s}
             </option>
           ))}
-        </select>
-        <select value={kind} onChange={(e) => setKind(e.target.value)} disabled={busy} aria-label="What it is" className="h-9 rounded-full border bg-transparent px-3 text-[16px] outline-none sm:text-[13px]" style={{ borderColor: 'var(--border-strong)' }}>
+        </Select>
+        <Select value={kind} onChange={(e) => setKind(e.target.value)} disabled={busy} aria-label="What it is" className="h-9 rounded-full border bg-transparent pl-3.5 pr-2 text-[14px] outline-none sm:text-[13px]" style={{ borderColor: 'var(--border-strong)' }}>
           {KINDS.map((k) => (
             <option key={k.key} value={k.key}>
               {k.label}
             </option>
           ))}
-        </select>
+        </Select>
       </div>
 
       <div className="relative flex min-h-0 flex-1">

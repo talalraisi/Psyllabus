@@ -7,6 +7,7 @@ import { buildEffectiveProgressMap } from '@/lib/decay'
 import { progressKey, displaySubtopic } from '@/lib/progress'
 import { shortName } from '@/lib/subject-short'
 import { ArrowUp, Copy, Check, Sparkle } from '@/components/syllabi/icons'
+import Select from '@/components/Select'
 
 /**
  * Two things Syllabi suggests rather than answers.
@@ -175,7 +176,7 @@ export default function IdeasStudio({ subjects = [], userId, onTalk }) {
     setBusy(false)
   }
 
-  const field = 'h-10 rounded-full border bg-transparent px-4 text-[16px] outline-none sm:text-[13.5px]'
+  const field = 'h-10 rounded-full border bg-transparent pl-4 pr-2.5 text-[14px] outline-none sm:text-[13.5px]'
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -210,13 +211,13 @@ export default function IdeasStudio({ subjects = [], userId, onTalk }) {
       {/* What to go on. */}
       <div key={mode} className="sy-rise mt-5 rounded-[20px] border p-5 sm:p-6" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
         <div className="flex flex-wrap gap-2">
-          <select value={subject} onChange={(e) => setSubject(e.target.value)} disabled={busy} aria-label="Subject" className={field} style={{ borderColor: 'var(--border-strong)' }}>
+          <Select value={subject} onChange={(e) => setSubject(e.target.value)} disabled={busy} aria-label="Subject" className={field} style={{ borderColor: 'var(--border-strong)' }}>
             {(mode === 'research' ? subjects : examined).map((s) => (
               <option key={s} value={s}>
                 {s}
               </option>
             ))}
-          </select>
+          </Select>
           {mode === 'research' && (
             <div className="flex rounded-full p-0.5" style={{ background: 'var(--surface-sunken)' }}>
               {[

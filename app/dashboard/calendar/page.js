@@ -30,6 +30,7 @@ import {
   groupByDay,
   upcoming,
 } from '@/lib/calendar'
+import Select from '@/components/Select'
 
 const emptyDraft = (dateKey) => ({
   title: '',
@@ -332,7 +333,7 @@ export default function CalendarPage() {
 
               <label>
                 <span className="t-overline">Type</span>
-                <select
+                <Select
                   value={draft.kind}
                   onChange={(e) => setDraft({ ...draft, kind: e.target.value })}
                   className="input mt-1"
@@ -342,12 +343,12 @@ export default function CalendarPage() {
                       {k.label}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
 
               <label>
                 <span className="t-overline">Subject</span>
-                <select
+                <Select
                   value={draft.subject}
                   onChange={(e) => setDraft({ ...draft, subject: e.target.value })}
                   className="input mt-1"
@@ -358,7 +359,7 @@ export default function CalendarPage() {
                       {s}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
 
               <label>
@@ -384,7 +385,7 @@ export default function CalendarPage() {
 
               <label className="sm:col-span-2">
                 <span className="t-overline">Remind me</span>
-                <select
+                <Select
                   value={draft.remind}
                   onChange={(e) => setDraft({ ...draft, remind: e.target.value })}
                   className="input mt-1"
@@ -394,7 +395,7 @@ export default function CalendarPage() {
                       {o.label}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
 
               <label className="sm:col-span-2">

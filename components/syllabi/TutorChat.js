@@ -7,6 +7,7 @@ import SyllabiMark from '@/components/SyllabiMark'
 import { subjectCode, shortName } from '@/lib/subject-short'
 import { prepare, linksIn, host, MAX_FILES, ACCEPT, FileProblem } from '@/components/syllabi/files'
 import { ArrowUp, Stop, Paperclip, Copy, Check, Chevron, FileIcon, LinkIcon, Close } from '@/components/syllabi/icons'
+import Select from '@/components/Select'
 
 /**
  * Asking Syllabi something.
@@ -538,26 +539,21 @@ export default function TutorChat({
             </span>
           )}
           {!compact && topics.length > 0 && (
-            <span className="relative flex items-center">
-              <select
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                disabled={busy}
-                aria-label="Topic"
-                className="h-9 max-w-[11rem] cursor-pointer appearance-none truncate rounded-full bg-transparent pl-2.5 pr-7 text-[13px] outline-none transition-colors hover:bg-[var(--surface-sunken)]"
-                style={{ color: topic ? 'var(--text-body)' : 'var(--text-faint)', fieldSizing: 'content' }}
-              >
-                <option value="">Any topic</option>
-                {topics.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
-                ))}
-              </select>
-              <span className="pointer-events-none absolute right-2.5" style={{ color: 'var(--text-faint)' }}>
-                <Chevron size={12} />
-              </span>
-            </span>
+            <Select
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              disabled={busy}
+              aria-label="Topic"
+              className="h-9 max-w-[13rem] rounded-full pl-3 pr-1.5 text-[13px] outline-none transition-colors hover:bg-[var(--surface-sunken)]"
+              style={{ color: topic ? 'var(--text-body)' : 'var(--text-faint)' }}
+            >
+              <option value="">Any topic</option>
+              {topics.map((t) => (
+                <option key={t} value={t}>
+                  {t}
+                </option>
+              ))}
+            </Select>
           )}
 
           <div className="flex-1" />
