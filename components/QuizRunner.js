@@ -34,6 +34,8 @@ import { paperById, typesForStyle } from '@/lib/papers'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 import { progressKey, HEAT_RANGES } from '@/lib/progress'
 import { AskSyllabi } from '@/components/syllabi/SyllabiDrawer'
+import { StreakLine } from '@/components/Streak'
+import { markStudied } from '@/lib/streak'
 
 const PHASE = {
   loading: 'loading',
@@ -665,6 +667,9 @@ export default function QuizRunner({
       })
       .select('id')
       .single()
+
+    // The streak and today's minutes, everywhere they show, read again.
+    if (attempt) markStudied()
 
     if (attempt) {
       await supabase.from('question_responses').insert(
@@ -1515,6 +1520,8 @@ export default function QuizRunner({
             </div>
           ))}
         </dl>
+
+        <StreakLine />
 
         {results.clearedFromBank > 0 && (
           <p className="mt-5 text-[14px]" style={{ color: 'var(--status-proficient)' }}>

@@ -60,10 +60,10 @@ function Cookies() {
         </p>
         <ul>
           <li>
-            <strong>psyllabus:theme</strong>, <strong>psyllabus:sidebar</strong>, <strong>psy:calc:degrees</strong>{' '}
+            <strong>psyllabus:theme</strong>, <strong>psyllabus:sidebar</strong>, <strong>psyllabus:sidebar-groups</strong>, <strong>psy:calc:degrees</strong>{' '}
             {ar
-              ? 'تفضيلاتك: الوضع الفاتح أو الداكن، وطيّ الشريط الجانبي، والدرجات أو الراديان في الآلة الحاسبة.'
-              : 'your preferences: light or dark theme, whether the sidebar is folded, and degrees or radians on the calculator.'}
+              ? 'تفضيلاتك: الوضع الفاتح أو الداكن، وتثبيت الشريط الجانبي والمجموعات المطويّة فيه، والدرجات أو الراديان في الآلة الحاسبة.'
+              : 'your preferences: light or dark theme, whether the sidebar is pinned open and which of its groups are folded, and degrees or radians on the calculator.'}
           </li>
           <li>
             <strong>psyllabus:session-timer</strong>, <strong>psyllabus:study-sessions-pending</strong>{' '}

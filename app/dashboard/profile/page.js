@@ -492,20 +492,14 @@ export default function ProfilePage() {
             ))}
           </ul>
 
-          {hasWork ? (
-            <p className="text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              Set for good, because everything you prove is filed under them. Get in touch if the list is wrong.
-            </p>
-          ) : (
-            <>
-              <p className="mb-5 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              Still changeable until your first quiz.
-              </p>
-              <Link href="/onboarding" className="btn btn-outline control-md">
-                Change my subjects
-              </Link>
-            </>
-          )}
+          <p className="mb-5 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+            {hasWork
+              ? 'Change them whenever you need. Your work stays with each subject: remove one and its progress is hidden, add it back and it returns.'
+              : 'Change them whenever you need.'}
+          </p>
+          <Link href="/onboarding?edit=subjects" className="btn btn-outline control-md">
+            Change my subjects
+          </Link>
         </Section>
 
         {/* Access */}

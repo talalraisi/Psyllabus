@@ -25,6 +25,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { dayKey } from '@/lib/study-time'
+import { runs } from '@/lib/streak'
 
 const FRAMES = [
   { key: '1M', name: '1 month', months: 1 },
@@ -124,22 +125,18 @@ function buildYears(byDay, years, today) {
   }
 }
 
-function summarise(byDay, start, today) {
+function summarise(byDay, start, today, rest) {
   let total = 0
   let active = 0
-  let longest = 0
-  let run = 0
   for (let d = start; d <= today; d = addDays(d, 1)) {
     const v = byDay.get(dayKey(d)) || 0
     total += v
-    if (v > 0) { active++; run++; longest = Math.max(longest, run) } else run = 0
+    if (v > 0) active++
   }
-  // Counted back from today, or from yesterday if today has nothing in it
-  // yet: at breakfast the evening's study has not happened, and a streak
-  // should not read zero for it.
-  let current = 0
-  let d = byDay.get(dayKey(today)) > 0 ? today : addDays(today, -1)
-  while (byDay.get(dayKey(d)) > 0) { current++; d = addDays(d, -1) }
+  // The same streak as the sidebar and the dashboard card (lib/streak.js):
+  // rest days on the plan bridge it, and today counts from yesterday until
+  // something is done.
+  const { longest, current } = runs(byDay, start, today, rest)
   return { total, active, longest, current }
 }
 
@@ -159,7 +156,7 @@ function savedFrame() {
   }
 }
 
-export default function StudyHeatmap({ data }) {
+export default function StudyHeatmap({ data, rest }) {
   // Both read in the first render on the client, so the card arrives at its
   // real size. Setting them from an effect drew a placeholder first and then
   // swapped in a card of a different height a frame later. On the server
@@ -185,7 +182,7 @@ export default function StudyHeatmap({ data }) {
     () => (today ? (spec.years ? buildYears(byDay, spec.years, today) : buildMonths(byDay, spec.months, today)) : null),
     [byDay, spec, today]
   )
-  const summary = useMemo(() => (model ? summarise(byDay, model.start, today) : null), [byDay, model, today])
+  const summary = useMemo(() => (model ? summarise(byDay, model.start, today, rest) : null), [byDay, model, today, rest])
   const ready = Boolean(model)
 
   // The rows' height, so the box around them can ease to it.

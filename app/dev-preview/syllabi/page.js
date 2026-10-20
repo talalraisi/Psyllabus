@@ -11,6 +11,8 @@
  *   ?view=draft   the draft studio, marked
  *   ?view=ask     the chat
  *   ?view=drawer  the buttons the rest of the app uses, and the drawer
+ *   ?view=layout  the signed-in frame
+ *   ?view=streak  the frame with the dashboard's streak and ways to study
  */
 
 import { Suspense, useState } from 'react'
@@ -31,6 +33,13 @@ const CHATS = [
 ]
 import { SyllabiProvider, AskSyllabi } from '@/components/syllabi/SyllabiDrawer'
 import DashboardLayout from '@/components/DashboardLayout'
+import { StreakCard } from '@/components/Streak'
+import WaysToStudy from '@/components/WaysToStudy'
+import { primeStudyDays } from '@/lib/streak'
+import { dayKey } from '@/lib/study-time'
+
+// Six days running with Friday, a rest day, bridged; and an older run of nine.
+const STUDY = [[0, 12], [1, 35], [2, 22], [3, 41], [5, 18], [6, 25], ...Array.from({ length: 9 }, (_, i) => [20 + i, 15 + i * 3])]
 
 const ENABLED = process.env.NODE_ENV !== 'production'
 const SUBJECTS = ['Physics SL', 'Math Analysis & Approaches HL', 'Computer Science SL', 'Economics HL', 'English A: Language & Literature SL']
@@ -109,8 +118,32 @@ function Preview() {
     }
     return true
   })
+  // Seeded before anything reads it; the streak loads after mount.
+  useState(() => {
+    if (typeof window === 'undefined' || view !== 'streak') return false
+    const now = new Date()
+    primeStudyDays(
+      'preview',
+      STUDY.map(([ago, value]) => ({ date: dayKey(new Date(now.getFullYear(), now.getMonth(), now.getDate() - ago)), value }))
+    )
+    return true
+  })
   if (!ENABLED) notFound()
   if (!ready) return null
+
+  if (view === 'streak') {
+    const profile = { ...PROFILE, id: 'preview', full_name: 'Sample Student', curriculum: 'IB', grad_year: '2028' }
+    return (
+      <DashboardLayout profile={profile}>
+        <div className="mx-auto max-w-[1180px] px-5 py-10 sm:px-8">
+          <h1 className="mb-8 text-[28px] font-semibold tracking-[-0.03em]">Good afternoon, Sample</h1>
+          <StreakCard profile={profile} cta={{ href: '#', label: 'Start: Simple harmonic motion' }} />
+          <h2 className="mb-4 text-[15px] font-semibold">Ways to study</h2>
+          <WaysToStudy profile={profile} focus={{ subject: 'Physics SL', topic: 'Oscillations', subtopic: 'Simple harmonic motion' }} />
+        </div>
+      </DashboardLayout>
+    )
+  }
 
   // The signed-in frame every dashboard page uses, with the Syllabi drawer in it.
   if (view === 'layout') {

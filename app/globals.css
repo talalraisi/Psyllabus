@@ -79,6 +79,8 @@
      same colour as every button on the page. ------------------------------- */
   --status-fading: oklch(0.60 0.07 240);      /* was mastered, slipping */
   --status-weak: oklch(0.56 0.16 32);        /* proven wrong */
+  --flame: oklch(0.7 0.17 55);               /* the study streak */
+  --flame-tint: oklch(0.7 0.17 55 / 0.12);
   --status-developing: oklch(0.62 0.14 78);  /* getting there */
   --status-proficient: oklch(0.56 0.13 158);  /* reliable */
   --status-mastered: oklch(0.52 0.11 285);    /* solid and recent */
@@ -201,6 +203,8 @@
 
   --status-fading: oklch(0.64 0.08 240);
   --status-weak: oklch(0.62 0.14 35);
+  --flame: oklch(0.78 0.15 62);
+  --flame-tint: oklch(0.78 0.15 62 / 0.14);
   --status-developing: oklch(0.68 0.12 75);
   --status-proficient: oklch(0.66 0.13 155);
   --status-mastered: oklch(0.62 0.14 285);
@@ -1454,4 +1458,21 @@ input[type='range'].slider:focus-visible::-moz-range-thumb {
 .sy-slide { animation: sy-slide 260ms cubic-bezier(0.16, 1, 0.3, 1); }
 @media (prefers-reduced-motion: reduce) {
   .sy-slide { animation: none; }
+}
+
+/* The streak flame: a small pop when the number goes up, and a slow
+   flicker while today is still to do. */
+@keyframes flame-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.28) rotate(-6deg); }
+  100% { transform: scale(1); }
+}
+@keyframes flame-flicker {
+  0%, 100% { opacity: 1; transform: translateY(0); }
+  50% { opacity: 0.55; transform: translateY(-1px); }
+}
+.flame-pop { animation: flame-pop 520ms cubic-bezier(0.16, 1, 0.3, 1); }
+.flame-flicker { animation: flame-flicker 1.8s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .flame-pop, .flame-flicker { animation: none; }
 }

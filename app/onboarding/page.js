@@ -44,6 +44,11 @@ export default function Onboarding() {
   const [guardianOk, setGuardianOk] = useState(false)
   const [termsOk, setTermsOk] = useState(false)
   const [alreadySetUp, setAlreadySetUp] = useState(false)
+  // Changing subjects later (?edit=subjects from Profile): the same picker,
+  // with the free subject held in place and no free-subject step after.
+  const [editing, setEditing] = useState(false)
+  const [keepFree, setKeepFree] = useState('')
+  const [skipFreePick, setSkipFreePick] = useState(false)
   const [checking, setChecking] = useState(true)
   // How much of each subject has questions in it, so nobody picks four empty
   // ones without being told.
@@ -86,6 +91,9 @@ export default function Onboarding() {
   const [levelFor, setLevelFor] = useState(null)
 
   const toggleSubject = (subject) => {
+    // A free account's free subject stays on its list (the database holds
+    // the same rule), or removing it would hand the free place to another.
+    if (editing && keepFree && subject === keepFree && selectedSubjects.includes(subject)) return
     if (selectedSubjects.includes(subject)) {
       setSelectedSubjects(selectedSubjects.filter(s => s !== subject))
       const newGrades = {...targetGrades}
@@ -144,7 +152,7 @@ export default function Onboarding() {
       }
       const { data: profile } = await supabase
         .from('profiles')
-        .select('subjects, curriculum, grad_year, target_grades')
+        .select('subjects, curriculum, grad_year, target_grades, free_subject, plan, is_admin, access_expires_at')
         .eq('id', user.id)
         .maybeSingle()
       if (cancelled) return
@@ -169,10 +177,16 @@ export default function Onboarding() {
       // the e-mail form, which records the wording as it goes.
       setNeedsConsent(!user.user_metadata?.guardian_consent_text)
       setAccount({ email: user.email, id: user.id })
-      setAlreadySetUp(subjects.length > 0 && hasWork)
-      // Coming back to change a list that is still changeable: start on the
-      // subjects rather than on the curriculum, with the old choices in place.
-      if (subjects.length > 0 && !hasWork) {
+      const edit = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('edit') === 'subjects'
+      const everything =
+        profile?.is_admin || ['basic', 'premium'].includes(profile?.plan) || (profile?.access_expires_at && new Date(profile.access_expires_at) > new Date())
+      setAlreadySetUp(subjects.length > 0 && hasWork && !edit)
+      // Coming back to change the list: start on the subjects rather than on
+      // the curriculum, with the old choices in place.
+      if (subjects.length > 0 && (!hasWork || edit)) {
+        setEditing(edit)
+        setKeepFree(everything ? '' : profile.free_subject || '')
+        setSkipFreePick(Boolean(everything || profile.free_subject))
         setCurriculum(profile.curriculum || '')
         setGradYear(profile.grad_year ? String(profile.grad_year) : '')
         setSelectedSubjects(subjects.filter((s) => !IB_CORE_SUBJECTS.includes(s)))
@@ -224,7 +238,14 @@ export default function Onboarding() {
       const coreSubjects = currentCurriculum?.core || []
       const allSubjects = [...selectedSubjects, ...coreSubjects]
 
-      const { error } = await supabase.from('profiles').upsert({
+      // Changing subjects later touches only the subject fields, never the
+      // name or the consent record.
+      const { error } = editing
+        ? await supabase
+            .from('profiles')
+            .update({ curriculum, grad_year: gradYear, subjects: allSubjects, target_grades: targetGrades, updated_at: new Date().toISOString() })
+            .eq('id', user.id)
+        : await supabase.from('profiles').upsert({
         id: user.id,
         full_name: user.user_metadata?.full_name || user.user_metadata?.name || null,
         // Carried from the sign-up form so the record sits on the profile, with
@@ -264,6 +285,13 @@ export default function Onboarding() {
       // picking later means picking repeatedly.
       if (unlocked) {
         router.push('/dashboard')
+        return
+      }
+
+      // A list being changed already has its free subject (or needs none).
+      if (skipFreePick) {
+        invalidateProfile(user.id)
+        router.push(editing ? '/dashboard/profile' : '/dashboard')
         return
       }
 
@@ -351,7 +379,11 @@ export default function Onboarding() {
           </button>
         </div>
         <p className="mt-8 text-[13px]" style={{ color: 'var(--text-faint)' }}>
-          To change subjects on this account, use Profile rather than this page.
+          Want different subjects?{' '}
+          <Link href="/onboarding?edit=subjects" className="font-medium underline underline-offset-2">
+            Change them here
+          </Link>
+          .
         </p>
       </div>
     )
@@ -491,8 +523,17 @@ export default function Onboarding() {
                 Two paragraphs of warning before anybody has chosen anything
                 is a wall, and a wall is what people click past. */}
             <p className="mt-4 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-              <strong className="font-semibold">This one is permanent.</strong> Everything you
-              prove later is filed under these subjects, so they cannot be changed afterwards.
+              {editing ? (
+                <>
+                  <strong className="font-semibold">Your work stays with each subject.</strong> Remove one and
+                  its progress is hidden; add it back and it all returns.{keepFree ? ` ${keepFree} is your free subject, so it stays.` : ''}
+                </>
+              ) : (
+                <>
+                  <strong className="font-semibold">Choose the subjects you actually take.</strong> You can change
+                  them later in Profile; your progress stays filed under each one.
+                </>
+              )}
             </p>
 
             {/* The count, as a row of slots that fill up. A student can see

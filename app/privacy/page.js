@@ -71,8 +71,8 @@ function Privacy() {
           </li>
           <li>
             {ar
-              ? 'إعدادات خطة المذاكرة: الأوقات المتاحة لك للمذاكرة، وطريقتك المفضلة في المذاكرة، ومواعيد اختباراتك، ومنطقتك الزمنية، لتوضع المذاكرة في أوقات صحيحة. المنطقة الزمنية ليست موقعك.'
-              : 'Your study plan settings: the times you are free to study, how you like to study, your exam dates and your time zone, so study is placed at the right times. A time zone is not your location.'}
+              ? 'إعدادات خطة المذاكرة: الأوقات المتاحة لك للمذاكرة، وطريقتك المفضلة في المذاكرة، ومواعيد اختباراتك، ومنطقتك الزمنية، وهدفك اليومي بالدقائق، لتوضع المذاكرة في أوقات صحيحة. المنطقة الزمنية ليست موقعك.'
+              : 'Your study plan settings: the times you are free to study, how you like to study, your exam dates, your time zone and your daily study goal in minutes, so study is placed at the right times. A time zone is not your location. Your streak is worked out from your study time each time it is shown and is not stored on its own.'}
           </li>
           <li>
             {ar

@@ -30,6 +30,9 @@ import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
 import { hasAllSubjects, isSubjectLocked, accessibleSubjects } from '@/lib/access'
 import StudyHeatmap from '@/components/StudyHeatmap'
 import { studyIntervals, minutesPerDay } from '@/lib/study-time'
+import { primeStudyDays, restDaysFor } from '@/lib/streak'
+import { StreakCard } from '@/components/Streak'
+import WaysToStudy from '@/components/WaysToStudy'
 
 function greeting(now) {
   const hour = now.getHours()
@@ -271,11 +274,12 @@ export default function Dashboard() {
       // Merged rather than added, because the timer is meant to keep running
       // through quizzes; split by the student's own calendar day. See
       // lib/study-time.js.
-      setStudyDays(
-        minutesPerDay(
-          studyIntervals({ attempts: attemptsResult?.data || [], sessions: sessionsResult?.data || [] })
-        )
+      const days = minutesPerDay(
+        studyIntervals({ attempts: attemptsResult?.data || [], sessions: sessionsResult?.data || [] })
       )
+      // The sidebar's streak reads the same days instead of fetching them again.
+      primeStudyDays(user.id, days)
+      setStudyDays(days)
       setSubjectStats(stats)
       setLoading(false)
     }
@@ -295,6 +299,7 @@ export default function Dashboard() {
   const subjects = allSubjects.filter((s) => !IB_CORE_SUBJECTS.includes(s))
   const core = allSubjects.filter((s) => IB_CORE_SUBJECTS.includes(s))
   const premium = hasAllSubjects(profile)
+  const restDays = restDaysFor(profile)
 
   // A student who has not been tested yet gets an orientation screen instead of
   // a wall of zeros. Metrics appear once there is something real to show.
@@ -339,6 +344,15 @@ export default function Dashboard() {
   const startHref = firstSubject
     ? `/dashboard/syllabus/${getSlugForSubject(firstSubject)}`
     : '/dashboard/subjects'
+
+  // Where a quick set of questions starts: the plan's next quizzable task, or
+  // the first subject they can open.
+  const studyFocus =
+    nextUp?.quizzable && nextUp.subject && nextUp.subtopic
+      ? { subject: nextUp.subject, topic: nextUp.topic, subtopic: nextUp.subtopic }
+      : firstSubject
+        ? { subject: firstSubject }
+        : null
 
   return (
     <DashboardLayout profile={profile}>
@@ -499,6 +513,17 @@ export default function Dashboard() {
           </section>
         )}
 
+        {/* Why come back tomorrow: the streak, today's goal and the week. */}
+        <StreakCard
+          profile={profile}
+          // A new account already has one big button above; this would be a second.
+          cta={hasActivity ? (nextUp ? { href: actionFor(nextUp).href, label: `Start: ${taskTitle(nextUp)}` } : { href: '/dashboard/test', label: 'Build a test' }) : null}
+        />
+
+        <Section title="Ways to study">
+          <WaysToStudy profile={profile} focus={studyFocus} />
+        </Section>
+
         {/* The numbers, once there are any. On a new account these are all
             zero, which says nothing and looks like a broken page. */}
         {/* Three cards, each of which is a thing you might act on, rather
@@ -562,7 +587,7 @@ export default function Dashboard() {
               className="rounded-[16px] border p-5 sm:p-6"
               style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
             >
-              <StudyHeatmap data={studyDays} />
+              <StudyHeatmap data={studyDays} rest={restDays} />
             </div>
           </Section>
         )}
@@ -613,12 +638,20 @@ export default function Dashboard() {
           <Section
             title="Your subjects"
             action={
-              <Link
-                href="/dashboard/subjects"
-                className="text-[13px] font-medium text-[var(--brand)] hover:underline"
-              >
-                View all
-              </Link>
+              <span className="flex items-center gap-4">
+                <Link
+                  href="/onboarding?edit=subjects"
+                  className="text-[13px] font-medium text-[var(--text-muted)] hover:text-[var(--text)] hover:underline"
+                >
+                  Change subjects
+                </Link>
+                <Link
+                  href="/dashboard/subjects"
+                  className="text-[13px] font-medium text-[var(--brand)] hover:underline"
+                >
+                  View all
+                </Link>
+              </span>
             }
           >
             <ul className="flex flex-col">

@@ -21,7 +21,7 @@ await c.query('set statement_timeout = 20000')
 await c.query('BEGIN')
 try {
   if (process.argv.includes('--with-migration')) {
-    for (const f of ['071-retire-cas.sql', '072-free-plan-guard.sql']) {
+    for (const f of ['071-retire-cas.sql', '072-free-plan-guard.sql', '073-subjects-changeable.sql']) {
       await c.query(readFileSync(new URL(`./${f}`, import.meta.url), 'utf8').replace(/^\s*(BEGIN|COMMIT);\s*$/gm, ''))
     }
   }
@@ -98,6 +98,16 @@ try {
   const r2 = await claim(paidAlias)
   const plans = (await c.query(`select plan from profiles where id in ($1, $2)`, [paid, paidAlias])).rows.map((r) => r.plan)
   check('accounts with every subject skip the checks', r1.ok && r2.ok, JSON.stringify({ r1, r2, plans }))
+
+  // Subjects can change, but a free account keeps its free subject.
+  const swap = await as(a, `update profiles set subjects = '["Physics SL","History HL"]' where id = $1 returning subjects`, [a])
+  check('a student with work can still change their subjects', !swap.error && JSON.stringify(swap.subjects || '').includes('History'), JSON.stringify(swap))
+  const drop = await as(a, `update profiles set subjects = '["History HL","Economics HL"]' where id = $1 returning subjects`, [a])
+  check('but a free account cannot remove its free subject', !!drop.error && /free subject/.test(drop.error), JSON.stringify(drop))
+  const junk = await as(a, `update profiles set subjects = $2::jsonb where id = $1`, [a, JSON.stringify(Array.from({ length: 20 }, (_, i) => `S${i}`))])
+  check('and the list stays a sensible size', !!junk.error)
+  const paidDrop = await as(paid, `update profiles set subjects = '["History HL"]' where id = $1 returning subjects`, [paid])
+  check('an account with every subject can change freely', !paidDrop.error, JSON.stringify(paidDrop))
 
   const stranger = await make('stranger@example.net')
   const read = await as(stranger, `select count(*)::int as n from free_claims`)
