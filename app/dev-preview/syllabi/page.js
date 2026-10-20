@@ -21,6 +21,7 @@ import dynamic from 'next/dynamic'
 const DraftStudio = dynamic(() => import('@/components/syllabi/DraftStudio'), { ssr: false })
 const TutorChat = dynamic(() => import('@/components/syllabi/TutorChat'), { ssr: false })
 import { SyllabiProvider, AskSyllabi } from '@/components/syllabi/SyllabiDrawer'
+import DashboardLayout from '@/components/DashboardLayout'
 
 const ENABLED = process.env.NODE_ENV !== 'production'
 const SUBJECTS = ['Physics SL', 'Math Analysis & Approaches HL', 'Computer Science SL', 'Economics HL', 'English A: Language & Literature SL']
@@ -101,6 +102,18 @@ function Preview() {
   })
   if (!ENABLED) notFound()
   if (!ready) return null
+
+  // The signed-in frame every dashboard page uses, with the Syllabi drawer in it.
+  if (view === 'layout') {
+    return (
+      <DashboardLayout profile={{ ...PROFILE, full_name: 'Sample Student' }}>
+        <div className="p-10">
+          <p>Inside the dashboard frame.</p>
+          <AskSyllabi subject="Physics SL" label="Open the drawer" autoSend={false} text="Hello" />
+        </div>
+      </DashboardLayout>
+    )
+  }
 
   return (
     <SyllabiProvider profile={PROFILE}>
