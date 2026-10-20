@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import ScoreRing, { ringColour } from '@/components/ScoreRing'
 import SyllabiMark from '@/components/SyllabiMark'
-import { KINDS, rubricFor } from '@/lib/criteria'
+import { KINDS, rubricFor, isPaper } from '@/lib/criteria'
 import { segments } from '@/lib/draft-review'
 import { senseCheck, MIN_WORDS } from '@/lib/sense-check'
 import { shortName } from '@/lib/subject-short'
@@ -157,13 +157,14 @@ function Impact({ level, colour }) {
 }
 
 /** The plain-text version of a review, for copying or saving. */
-function asText(review, { subject, kind }) {
+function asText(review, { subject, kind, question = '' }) {
   const total = review.criteria.reduce((a, c) => a + c.score, 0)
   const outOf = review.criteria.reduce((a, c) => a + c.max, 0)
   const lines = [
     `Syllabi feedback · ${subject} · ${KINDS.find((k) => k.key === kind)?.label}`,
     `${total}/${outOf} · likely grade ${review.grade_estimate || '–'} (an estimate, not a mark)`,
     review.grade_note,
+    ...(isPaper(kind) && question.trim() ? ['', `Question: ${question.trim()}`] : []),
     '',
     review.overview || '',
     '',
@@ -187,7 +188,7 @@ function asText(review, { subject, kind }) {
  * underneath has transparent text and the same metrics, so each mark sits
  * exactly under the words it belongs to.
  */
-function HighlightEditor({ text, onChange, parts, active, show, onCaret, markRefs, disabled }) {
+function HighlightEditor({ text, onChange, parts, active, show, onCaret, markRefs, disabled, placeholder = 'Paste or write your draft here.' }) {
   const boxRef = useRef(null)
   const metrics = 'whitespace-pre-wrap break-words text-[17px] leading-[2] tracking-[0.005em] sm:text-[16.5px]'
 
@@ -233,7 +234,7 @@ function HighlightEditor({ text, onChange, parts, active, show, onCaret, markRef
         onKeyUp={(e) => onCaret(e.currentTarget.selectionStart)}
         disabled={disabled}
         spellCheck
-        placeholder="Paste or write your draft here."
+        placeholder={placeholder}
         aria-label="Your draft"
         rows={12}
         className={`relative block min-h-[60vh] w-full resize-none overflow-hidden bg-transparent outline-none placeholder:text-[var(--text-faint)] disabled:opacity-70 ${metrics}`}
@@ -295,6 +296,9 @@ export default function DraftStudio({ subjects = [] }) {
   const [subject, setSubject] = useState(saved.subject && subjects.includes(saved.subject) ? saved.subject : subjects.find((s) => !/Creativity|CAS/.test(s)) || subjects[0] || '')
   const [kind, setKind] = useState(saved.kind || 'ia')
   const [text, setText] = useState(saved.text || '')
+  // For an exam paper: the question answered, and the extract for a Paper 1.
+  const [question, setQuestion] = useState(saved.question || '')
+  const [questionOpen, setQuestionOpen] = useState(!saved.question)
   const [review, setReview] = useState(saved.review || null)
   const [markedText, setMarkedText] = useState(saved.markedText || '')
   const [markedFor, setMarkedFor] = useState(saved.markedFor || '')
@@ -321,11 +325,11 @@ export default function DraftStudio({ subjects = [] }) {
 
   useEffect(() => {
     try {
-      sessionStorage.setItem(STORE, JSON.stringify({ subject, kind, text, review, markedText, markedFor, draftId, markId }))
+      sessionStorage.setItem(STORE, JSON.stringify({ subject, kind, text, question, review, markedText, markedFor, draftId, markId }))
     } catch {
       /* too big or blocked: it just will not survive a refresh */
     }
-  }, [subject, kind, text, review, markedText, markedFor, draftId, markId])
+  }, [subject, kind, text, question, review, markedText, markedFor, draftId, markId])
 
   // Every marking of this draft, oldest first, for the progress view.
   useEffect(() => {
@@ -348,7 +352,7 @@ export default function DraftStudio({ subjects = [] }) {
   const openMark = useCallback(
     async (id) => {
       if (text !== markedText && text.trim() && !window.confirm('Open that marking? Edits you have not had marked will be replaced.')) return
-      const { data } = await createClient().from('syllabi_marks').select('id, draft_id, subject, kind, text, review').eq('id', id).maybeSingle()
+      const { data } = await createClient().from('syllabi_marks').select('id, draft_id, subject, kind, text, question, review').eq('id', id).maybeSingle()
       if (!data) return
       setDraftsOpen(false)
       if (data.subject && subjects.includes(data.subject)) setSubject(data.subject)
@@ -356,7 +360,9 @@ export default function DraftStudio({ subjects = [] }) {
       setText(data.text)
       setReview(data.review)
       setMarkedText(data.text)
-      setMarkedFor(`${data.subject && subjects.includes(data.subject) ? data.subject : subject}|${data.kind}`)
+      setQuestion(data.question || '')
+      setQuestionOpen(false)
+      setMarkedFor(`${data.subject && subjects.includes(data.subject) ? data.subject : subject}|${data.kind}${isPaper(data.kind) ? `|${(data.question || '').trim()}` : ''}`)
       setDraftId(data.draft_id)
       setMarkId(data.id)
       setActive(null)
@@ -369,6 +375,8 @@ export default function DraftStudio({ subjects = [] }) {
   const newDraft = () => {
     if (text.trim() && text !== markedText && !window.confirm('Start a new draft? Edits you have not had marked will be cleared.')) return
     setText('')
+    setQuestion('')
+    setQuestionOpen(true)
     setReview(null)
     setMarkedText('')
     setMarkedFor('')
@@ -387,8 +395,10 @@ export default function DraftStudio({ subjects = [] }) {
   const words = countWords(text)
   const rubric = rubricFor(kind, subject)
   const stale = Boolean(review) && text !== markedText
+  // What a marking was for: re-marking is offered when any of it changes.
+  const forKey = `${subject}|${kind}${isPaper(kind) ? `|${question.trim()}` : ''}`
   // Marking again costs one of today's few, so only when something changed.
-  const changed = !review || stale || markedFor !== `${subject}|${kind}`
+  const changed = !review || stale || markedFor !== forKey
   const title = text.trim().split('\n').find((l) => l.trim())?.trim().slice(0, 90) || 'Untitled draft'
   const highlights = useMemo(() => (review?.highlights || []).map((h, n) => ({ ...h, n })), [review])
   const parts = useMemo(
@@ -430,7 +440,7 @@ export default function DraftStudio({ subjects = [] }) {
       const res = await fetch('/api/syllabi', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ task: 'draft_feedback', text: sentText, subject, kind, draft_id: draftId }),
+        body: JSON.stringify({ task: 'draft_feedback', text: sentText, subject, kind, draft_id: draftId, question: isPaper(kind) ? question : undefined }),
       })
       const data = await res.json().catch(() => ({}))
       if (!res.ok || !data.review) {
@@ -438,7 +448,7 @@ export default function DraftStudio({ subjects = [] }) {
       } else {
         setReview(data.review)
         setMarkedText(sentText)
-        setMarkedFor(`${subject}|${kind}`)
+        setMarkedFor(forKey)
         setRemaining(data.remaining ?? null)
         if (data.saved) {
           setMarkId(data.saved.id)
@@ -479,7 +489,7 @@ export default function DraftStudio({ subjects = [] }) {
     if (hit && hit.n !== active) openComment(hit.n)
   }
 
-  const exportText = review ? asText(review, { subject, kind }) : ''
+  const exportText = review ? asText(review, { subject, kind, question }) : ''
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(exportText)
@@ -1085,7 +1095,32 @@ export default function DraftStudio({ subjects = [] }) {
         <section className="relative flex min-w-0 flex-1 flex-col">
           <div className="flex-1 overflow-y-auto">
             <div className="mx-auto max-w-[760px] px-6 pb-20 pt-8 sm:px-12">
-              <HighlightEditor text={text} onChange={setText} parts={parts} active={active} show={show} onCaret={caret} markRefs={markRefs} disabled={busy} />
+              {isPaper(kind) && (
+                <div className="mb-7 rounded-[14px] border" style={{ borderColor: question.trim() ? 'var(--border)' : 'var(--brand)', background: 'var(--surface-sunken)' }}>
+                  <button type="button" onClick={() => setQuestionOpen((v) => !v)} aria-expanded={questionOpen} className="flex w-full items-center gap-3 px-4 py-3 text-left">
+                    <span className="text-[11px] font-semibold uppercase tracking-[0.12em]" style={{ color: 'var(--brand)' }}>
+                      Question
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-[13px]" style={{ color: question.trim() ? 'var(--text-body)' : 'var(--text-faint)' }}>
+                      {question.trim() ? question.trim().split('\n')[0] : kind === 'p1' ? 'Paste the question you answered, and the extract if there was one' : 'Paste the question you answered'}
+                    </span>
+                    <Chevron up={questionOpen} />
+                  </button>
+                  {questionOpen && (
+                    <textarea
+                      value={question}
+                      onChange={(e) => setQuestion(e.target.value.slice(0, 8000))}
+                      disabled={busy}
+                      rows={kind === 'p1' ? 7 : 3}
+                      placeholder={kind === 'p1' ? 'The question, then the text or extract it was about.' : 'The essay question, exactly as it was set.'}
+                      aria-label="The question you answered"
+                      className="block w-full resize-y border-t bg-transparent px-4 py-3 text-[16px] leading-relaxed outline-none placeholder:text-[var(--text-faint)] sm:text-[14px]"
+                      style={{ borderColor: 'var(--border)', color: 'var(--text-body)' }}
+                    />
+                  )}
+                </div>
+              )}
+              <HighlightEditor placeholder={isPaper(kind) ? 'Paste or write your answer here.' : undefined} text={text} onChange={setText} parts={parts} active={active} show={show} onCaret={caret} markRefs={markRefs} disabled={busy} />
             </div>
           </div>
           <footer className="flex h-12 shrink-0 items-center gap-1 border-t px-3" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>

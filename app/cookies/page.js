@@ -23,7 +23,7 @@ function Cookies() {
   return (
     <LegalDoc
       titles={{ en: 'Cookie Policy', ar: 'سياسة ملفات تعريف الارتباط' }}
-      updated={{ en: '8 September 2026', ar: '٨ سبتمبر ٢٠٢٦' }}
+      updated={{ en: '20 October 2026', ar: '٢٠ أكتوبر ٢٠٢٦' }}
       lang={lang}
       setLang={setLang}
     >
@@ -55,21 +55,58 @@ function Cookies() {
         </ul>
         <p>
           {ar
-            ? 'ويُخزَّن على جهازك أيضاً، دون إرساله إلى أي خادم:'
-            : 'Stored on your own device, and never sent to any server:'}
+            ? 'ويُخزَّن على جهازك، دون إرساله إلى أي خادم، ويبقى حتى تمسحه من متصفحك:'
+            : 'Stored on your own device and never sent to any server, kept until you clear it in your browser:'}
         </p>
         <ul>
           <li>
-            <strong>psyllabus:theme</strong>{' '}
+            <strong>psyllabus:theme</strong>, <strong>psyllabus:sidebar</strong>, <strong>psy:calc:degrees</strong>{' '}
             {ar
-              ? 'تفضيلك للوضع الفاتح أو الداكن.'
-              : 'whether you prefer the light or dark theme.'}
+              ? 'تفضيلاتك: الوضع الفاتح أو الداكن، وطيّ الشريط الجانبي، والدرجات أو الراديان في الآلة الحاسبة.'
+              : 'your preferences: light or dark theme, whether the sidebar is folded, and degrees or radians on the calculator.'}
           </li>
+          <li>
+            <strong>psyllabus:session-timer</strong>, <strong>psyllabus:study-sessions-pending</strong>{' '}
+            {ar
+              ? 'مؤقّت المذاكرة الجاري، وأي جلسة لم تُحفظ بعد إذا انقطع الاتصال، حتى تُرسل إلى حسابك.'
+              : 'a study timer that is running, and any session not yet saved because you were offline, until it reaches your account.'}
+          </li>
+          <li>
+            <strong>psyllabus:plan-today:…</strong>, <strong>psyllabus:plan-blocks:…</strong>{' '}
+            {ar
+              ? 'خطة اليوم كما عُرضت عليك أول مرة، حتى لا تتغير أثناء اليوم، وآخر ما أُرسل إلى تقويمك.'
+              : 'today’s plan as it was first shown, so it does not reshuffle during the day, and what was last sent to your calendar.'}
+          </li>
+          <li>
+            <strong>psyllabus:reminders-shown</strong>, <strong>psyllabus:study-heatmap-frame</strong>{' '}
+            {ar
+              ? 'التذكيرات التي عُرضت بالفعل حتى لا تتكرر، والفترة التي اخترتها في خريطة وقت المذاكرة.'
+              : 'which reminders you have already seen, so they are not repeated, and the time frame you picked on the study heatmap.'}
+          </li>
+        </ul>
+        <p>
+          {ar
+            ? 'ويُخزَّن على جهازك داخل التبويب فقط، ويُمحى عند إغلاقه:'
+            : 'Stored on your device for this tab only, and erased when you close it:'}
+        </p>
+        <ul>
           <li>
             <strong>psy:…</strong>{' '}
             {ar
-              ? 'نسخة مؤقتة من ملفك الشخصي والمنهج لتسريع التصفح. تُمحى عند إغلاق التبويب.'
-              : 'a short-lived copy of your profile and syllabus so pages open quickly. Erased when you close the tab.'}
+              ? 'نسخة مؤقتة من ملفك الشخصي والمنهج لتسريع التصفح.'
+              : 'a short-lived copy of your profile and syllabus so pages open quickly.'}
+          </li>
+          <li>
+            <strong>psyllabus:draft-studio</strong>, <strong>psyllabus:tutor:…</strong>{' '}
+            {ar
+              ? 'المسودة التي تحررها في Syllabi، والمادة والمحادثة المفتوحتان، حتى لا تفقدها عند تحديث الصفحة. أما محادثاتك وتقييماتك المحفوظة فتُخزَّن في حسابك لا على جهازك.'
+              : 'the draft you are editing in Syllabi and which subject and chat are open, so a refresh does not lose them. Your saved chats and markings are kept on your account, not on your device.'}
+          </li>
+          <li>
+            <strong>psyllabus_reloaded_after_error</strong>{' '}
+            {ar
+              ? 'علامة تمنع إعادة تحميل الصفحة أكثر من مرة بعد تحديث للتطبيق.'
+              : 'a marker that stops the page reloading more than once after an update to the app.'}
           </li>
         </ul>
       </Clause>

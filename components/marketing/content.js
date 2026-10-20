@@ -94,7 +94,7 @@ export const ANSWERS = [
   },
   {
     them: 'An AI explanation that contradicts your textbook',
-    us: 'Each wrong option carries the specific mistake that leads there, written with the question and checked with it. No chatbot improvising at the moment you are confused.',
+    us: 'Each wrong option carries the specific mistake that leads there, written with the question and checked with it, so the first explanation you see was checked, not improvised.',
   },
   {
     them: 'Free YouTube lessons resold behind a tier',

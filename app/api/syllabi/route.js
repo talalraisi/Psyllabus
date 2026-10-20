@@ -75,7 +75,10 @@ export async function POST(request) {
   }
 
   const { task, text = '' } = body || {}
-  const kind = ['ia', 'ee', 'tok'].includes(body?.kind) ? body.kind : 'ia'
+  const kind = ['ia', 'ee', 'tok', 'p1', 'p2'].includes(body?.kind) ? body.kind : 'ia'
+  // For an exam paper: the question answered, and any extract. Capped, and
+  // sent as material in the message, never in the instructions.
+  const question = task === 'draft_feedback' && (kind === 'p1' || kind === 'p2') ? short(body?.question, 8000) : ''
   const topic = short(body?.topic, 200)
   const interest = short(body?.interest, 1000)
   const weak = list(body?.weak)
@@ -137,7 +140,7 @@ export async function POST(request) {
 
   const review = task === 'draft_feedback'
   const rubric = review ? rubricFor(kind, subject) : null
-  const prompt = build({ kind, subject, topic, interest, weak, strong, rubric })
+  const prompt = build({ kind, subject, topic, interest, weak, strong, rubric, question })
   const anthropic = new Anthropic()
   const model = MODELS.writing
 
@@ -159,7 +162,7 @@ export async function POST(request) {
       messages: [
         {
           role: 'user',
-          content: text.trim() || 'No text provided.',
+          content: question ? `QUESTION / EXTRACT:\n${question}\n\n---\n\nSTUDENT ANSWER:\n${text.trim()}` : text.trim() || 'No text provided.',
         },
       ],
     }, { signal: request.signal })
@@ -221,6 +224,7 @@ export async function POST(request) {
         kind,
         title: (text.trim().split('\n').find((l) => l.trim()) || 'Untitled draft').trim().slice(0, 160),
         text,
+        question: question || null,
         review: parsed,
         total,
         out_of: outOf,

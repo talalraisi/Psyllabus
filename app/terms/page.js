@@ -11,7 +11,7 @@ function Terms() {
   return (
     <LegalDoc
       titles={{ en: 'Terms of Service', ar: 'شروط الاستخدام' }}
-      updated={{ en: '5 September 2026', ar: '٥ سبتمبر ٢٠٢٦' }}
+      updated={{ en: '20 October 2026', ar: '٢٠ أكتوبر ٢٠٢٦' }}
       lang={lang}
       setLang={setLang}
     >
@@ -64,6 +64,16 @@ function Terms() {
               ? 'مشاركة رمز اشتراك مدرستك مع أشخاص من خارجها.'
               : 'Share your school’s access code with anyone outside that school.'}
           </li>
+          <li>
+            {ar
+              ? 'تقديم أي شيء يكتبه Syllabi على أنه عملك، أو استخدامه للغش في امتحان.'
+              : 'Hand in anything Syllabi writes as your own work, or use it to cheat in an exam.'}
+          </li>
+          <li>
+            {ar
+              ? 'إغراق Syllabi أو زر الملاحظات بطلبات آلية أو لا معنى لها، أو محاولة جعل Syllabi يتجاهل قواعده أو ينتج محتوى ضاراً.'
+              : 'Flood Syllabi or the feedback button with automated or meaningless requests, or try to make Syllabi ignore its rules or produce harmful content.'}
+          </li>
         </ul>
         <p>
           {ar
@@ -105,7 +115,37 @@ function Terms() {
         </p>
       </Clause>
 
-      <Clause n="6" title={ar ? 'عدم الانتساب' : 'No affiliation'}>
+      <Clause n="6" title={ar ? 'Syllabi، المعلّم الذكي' : 'Syllabi, the AI tutor'}>
+        <p>
+          {ar
+            ? 'يستخدم Syllabi الذكاء الاصطناعي (Claude من Anthropic) للإجابة عن أسئلتك وشرح المواضيع وتقييم المسودات وإجابات الامتحانات. وقد يخطئ الذكاء الاصطناعي، فتحقق مما يقوله من ملاحظاتك أو كتابك أو معلمك.'
+            : 'Syllabi uses AI (Claude, from Anthropic) to answer your questions, explain topics, and mark drafts and exam answers. AI can be wrong, so check what it tells you against your notes, textbook or teacher.'}
+        </p>
+        <p>
+          {ar
+            ? 'الدرجات والتقديرات والملاحظات التي يعطيها Syllabi تقديرات لمساعدتك على التحسن. وهي ليست درجات رسمية، ولا تصدر عن البكالوريا الدولية أو أي جهة امتحانية، ولا تتنبأ بنتيجتك.'
+            : 'Marks, grade estimates and feedback from Syllabi are estimates to help you improve. They are not official marks, they do not come from the IB or any exam board, and they do not predict your result.'}
+        </p>
+        <p>
+          <strong>
+            {ar
+              ? 'النزاهة الأكاديمية مسؤوليتك. يعطيك Syllabi ملاحظات ولا يكتب عملك التقييمي. لا تقدّم ما يكتبه على أنه عملك، واذكر استخدامك له حيث تطلب مدرستك أو جهة الامتحان ذلك.'
+              : 'Academic integrity is your responsibility. Syllabi gives feedback and does not write assessed work for you. Do not hand in anything it writes as your own, and declare your use of it wherever your school or exam board requires.'}
+          </strong>
+        </p>
+        <p>
+          {ar
+            ? 'لكل حساب حد يومي لاستخدام Syllabi، وللخدمة كلها حد يومي، وقد يتوقف Syllabi مؤقتاً عند بلوغه. ويحق لنا تغيير هذه الحدود.'
+            : 'Each account has a daily allowance for Syllabi, and the service has an overall daily limit; Syllabi may pause when it is reached. These limits may change.'}
+        </p>
+        <p>
+          {ar
+            ? 'ما ترسله إلى Syllabi يبقى ملكك. وتمنحنا الإذن بمعالجته وإرساله إلى Anthropic فقط لتقديم Syllabi لك، ولا يُستخدم لتدريب نماذج الذكاء الاصطناعي. لا ترسل عمل غيرك أو مادة لا يحق لك مشاركتها.'
+            : 'What you send to Syllabi stays yours. You give us permission to process it, and to send it to Anthropic, only to provide Syllabi to you; it is not used to train AI models. Do not send someone else’s work or material you do not have the right to share.'}
+        </p>
+      </Clause>
+
+      <Clause n="7" title={ar ? 'عدم الانتساب' : 'No affiliation'}>
         <p>
           {ar
             ? 'Project Syllabus منتج مستقل. وهو غير منتسب إلى منظمة البكالوريا الدولية أو Cambridge Assessment أو Pearson Edexcel أو AQA أو OCR أو College Board، وغير معتمد أو مُصادق عليه من أي منها، ولا تربطه بها أي صفة رسمية.'
@@ -118,7 +158,7 @@ function Terms() {
         </p>
       </Clause>
 
-      <Clause n="7" title={ar ? 'الحسابات المجانية والمدفوعة' : 'Free and paid accounts'}>
+      <Clause n="8" title={ar ? 'الحسابات المجانية والمدفوعة' : 'Free and paid accounts'}>
         <p>
           {ar
             ? 'تفتح الخطة المجانية مادة دراسية واحدة تختارها، بلا حد زمني ودون الحاجة إلى بطاقة. ويمكنك تغيير المادة، مع فترة انتظار بين تغيير وآخر.'
@@ -131,7 +171,7 @@ function Terms() {
         </p>
       </Clause>
 
-      <Clause n="8" title={ar ? 'الإتاحة' : 'Availability'}>
+      <Clause n="9" title={ar ? 'الإتاحة' : 'Availability'}>
         <p>
           {ar
             ? 'تُقدَّم الخدمة «كما هي». ونسعى لإبقائها متاحة وموثوقة، لكننا لا نضمن عملها دون انقطاع، وقد تتغير الميزات أو تُزال.'
@@ -144,7 +184,7 @@ function Terms() {
         </p>
       </Clause>
 
-      <Clause n="9" title={ar ? 'حدود المسؤولية' : 'Limitation of liability'}>
+      <Clause n="10" title={ar ? 'حدود المسؤولية' : 'Limitation of liability'}>
         <p>
           {ar
             ? 'المنصة أداة للدراسة، ونتيجتك في الامتحان تعتمد عليك أنت. وفي حدود ما يسمح به القانون، لا نتحمل المسؤولية عن نتائج دراسية أو أي خسارة ناتجة عن الاعتماد على المنصة.'
@@ -152,7 +192,7 @@ function Terms() {
         </p>
       </Clause>
 
-      <Clause n="10" title={ar ? 'الخصوصية' : 'Privacy'}>
+      <Clause n="11" title={ar ? 'الخصوصية' : 'Privacy'}>
         <p>
           {ar
             ? 'توضّح سياسة الخصوصية البيانات التي نجمعها وسبب جمعها وحقوقك عليها، وهي جزء لا يتجزأ من هذه الشروط.'
@@ -160,7 +200,7 @@ function Terms() {
         </p>
       </Clause>
 
-      <Clause n="11" title={ar ? 'القانون الواجب التطبيق' : 'Governing law'}>
+      <Clause n="12" title={ar ? 'القانون الواجب التطبيق' : 'Governing law'}>
         <p>
           {ar
             ? 'تخضع هذه الشروط لقوانين سلطنة عُمان وتُفسَّر وفقاً لها، وتختص محاكم السلطنة بالنظر في أي نزاع ينشأ عنها.'
@@ -168,7 +208,7 @@ function Terms() {
         </p>
       </Clause>
 
-      <Clause n="12" title={ar ? 'التواصل' : 'Contact'}>
+      <Clause n="13" title={ar ? 'التواصل' : 'Contact'}>
         <p>
           {ar ? 'لأي استفسار بشأن هذه الشروط: ' : 'For any question about these terms: '}
           <a href={`mailto:${OPERATOR.dpoEmail}`}>{OPERATOR.dpoEmail}</a>

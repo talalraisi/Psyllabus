@@ -179,8 +179,13 @@ function Privacy() {
       <Clause n="8" title={ar ? 'من يستطيع رؤية نتائجك' : 'Who can see your results'}>
         <p>
           {ar
-            ? 'لا أحد سواك. لا توجد حسابات للمعلمين ولا لوحات تحكم للصفوف الدراسية، ولن توجد. وعندما تشتري مدرسة اشتراكاً، فإن ذلك يفتح المنصة لطلابها فقط ولا يمنحها أي شيء آخر.'
-            : 'Nobody but you. There are no teacher accounts and no class dashboards, and there will not be. When a school buys a licence, that unlocks the app for its students and gives the school nothing else.'}
+            ? 'لا أحد سواك. لا يرى المعلمون ولا المدارس نتائجك أو محادثاتك أو مسوداتك، ولا توجد لوحات تحكم للصفوف الدراسية. وعندما تشتري مدرسة اشتراكاً، فإن ذلك يفتح المنصة لطلابها فقط ولا يمنحها أي شيء آخر.'
+            : 'Nobody but you. Teachers and schools never see your results, your Syllabi chats or your drafts, and there are no class dashboards. When a school buys a licence, that unlocks the app for its students and gives the school nothing else.'}
+        </p>
+        <p>
+          {ar
+            ? 'الدرجات والتقديرات والملاحظات التي يعطيها Syllabi تقديرات آلية لمساعدتك على التحسن. وهي ليست قرارات بشأنك، ولا تُرسل إلى مدرستك أو أي جهة امتحانية، ولا تؤثر في أي شيء خارج حسابك.'
+            : 'Marks, grade estimates and feedback from Syllabi are automated estimates to help you improve. They are not decisions about you, they are not sent to your school or any exam board, and they affect nothing outside your own account.'}
         </p>
         <p>
           {ar

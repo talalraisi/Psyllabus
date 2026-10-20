@@ -283,7 +283,7 @@ export default function PricingPage() {
               ],
               [
                 'What is Syllabi?',
-                'It reads an IA, EE or TOK draft and tells you what an examiner would say, suggests research questions, and works out what to study from your own results. It comments on your work and never writes it.',
+                'Your tutor for every subject. Ask it anything, send a photo of a question or a link, and it explains, sets practice and marks your answers. It marks IA, EE and TOK drafts and Paper 1 and Paper 2 answers against the criteria with a likely grade, suggests research questions and plans your week. It keeps your chats and markings so you can see your progress, and it comments on your work but never writes it.',
               ],
               [
                 'Can I change subject on the free plan?',

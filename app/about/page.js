@@ -92,8 +92,8 @@ export default function AboutPage() {
           <Panel className="self-start">
             <Eyebrow>Your results belong to you</Eyebrow>
             <p className="mt-4 text-[14.5px] leading-[1.7]" style={{ color: 'var(--text-body)' }}>
-              There are no teacher accounts and no class dashboards, and there will not be. A school
-              licence unlocks the app for its students and does nothing else.
+              Teachers and schools never see your results, and there are no class dashboards. A
+              school licence unlocks the app for its students and does nothing else.
             </p>
             <p className="mt-3 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
               Nobody at your school can see how you are doing, and that is enforced by the database
