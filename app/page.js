@@ -17,7 +17,7 @@ import Everything from '@/components/marketing/Everything'
 export const metadata = {
   title: 'Project Syllabus',
   description:
-    'Made by students, for students. Project Syllabus maps your IB, A-Level or AP course topic by topic, tests what you know, plans what to study, and gives you Syllabi, an AI tutor that marks your drafts and turns your notes into flashcards.',
+    'Project Syllabus maps your IB, A-Level or AP course topic by topic, tests what you know, plans what to study, and gives you Syllabi, an AI tutor that marks your drafts and turns your notes into flashcards.',
 }
 
 /**
@@ -127,11 +127,6 @@ export default async function Home() {
               div is sized to its content and mx-auto centres that, which pushed
               the headline a couple of hundred pixels right of the logo above it. */}
           <div className="hero-in relative z-10 mx-auto w-full max-w-6xl">
-            {/* Who made it, first. */}
-            <p className="mb-6 inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[12.5px] font-semibold" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)', color: 'var(--text-body)' }}>
-              <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--brand)' }} />
-              Made by students, for students
-            </p>
             <h1 className="max-w-3xl text-[clamp(2.6rem,6vw,4.6rem)] font-semibold leading-[0.98] tracking-[-0.038em]">
               Stop guessing.
               <br />

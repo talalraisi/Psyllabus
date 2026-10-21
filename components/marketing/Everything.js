@@ -1,3 +1,7 @@
+'use client'
+
+import { useInView } from '@/components/marketing/scroll'
+
 /**
  * Everything the app does, on one screen of the landing page: twelve tiles,
  * each a thing a student can open today, said in one line. The feature tour
@@ -21,11 +25,23 @@ const ITEMS = [
   ['Analytics', 'Time by subject, accuracy, and when you focus best.', <svg key="i" {...P}><path d="M4 20V14M10 20V10M16 20v-5M22 20H2" /><path d="m4 9 6-4 6 4 5-4" /></svg>],
 ]
 
+/** The tiles fade up one after another once the grid is on screen. */
 export default function Everything() {
+  const [ref, seen] = useInView({ threshold: 0.15 })
   return (
-    <ul className="grid grid-cols-2 gap-2 sm:gap-2.5 lg:grid-cols-4">
-      {ITEMS.map(([title, line, icon]) => (
-        <li key={title} className="rounded-[16px] border p-3.5 sm:p-4" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
+    <ul ref={ref} className="grid grid-cols-2 gap-2 sm:gap-2.5 lg:grid-cols-4">
+      {ITEMS.map(([title, line, icon], i) => (
+        <li
+          key={title}
+          className="rounded-[16px] border p-3.5 sm:p-4"
+          style={{
+            borderColor: 'var(--border-strong)',
+            background: 'var(--surface)',
+            opacity: seen ? 1 : 0,
+            transform: seen ? 'none' : 'translateY(16px) scale(0.98)',
+            transition: `opacity 520ms ease ${i * 80}ms, transform 620ms cubic-bezier(0.16, 1, 0.3, 1) ${i * 80}ms`,
+          }}
+        >
           <span className="flex h-9 w-9 items-center justify-center rounded-[10px]" style={{ background: 'var(--brand-tint)', color: 'var(--brand)' }}>
             {icon}
           </span>

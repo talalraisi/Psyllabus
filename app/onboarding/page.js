@@ -2,13 +2,12 @@
 import { CURRICULUMS } from '@/lib/catalogue'
 import { useState, useEffect } from 'react'
 import { CONSENT_TEXT } from '@/lib/consent'
-import { getCoverage, coverageLabel, bestCoverage, COVERAGE_TONE } from '@/lib/coverage'
+import { getCoverage } from '@/lib/coverage'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import Select, { Chevron } from '@/components/Select'
+import Select from '@/components/Select'
 import Logo from '@/components/Logo'
-import PlanStep from '@/components/onboarding/PlanStep'
 import { splitLevel, coursesOf, defaultLevel } from '@/lib/course-levels'
 import { getCurrentUser } from '@/lib/auth'
 import { realismNote, curriculumOf } from '@/lib/curriculum'
@@ -425,7 +424,7 @@ export default function Onboarding() {
             on and how much is left. */}
         <div className="mb-12">
           <div className="flex gap-1.5">
-            {[1, 2, 3, 4, 5].map((n) => (
+            {[1, 2, 3, 4].map((n) => (
               <span
                 key={n}
                 className="h-1 flex-1 rounded-full transition-colors duration-300"
@@ -438,10 +437,10 @@ export default function Onboarding() {
               className="text-[10.5px] font-semibold uppercase tracking-[0.16em]"
               style={{ color: 'var(--text-faint)' }}
             >
-              {['Setup', 'Subjects', 'Goals', 'Plan', 'Start'][step - 1]}
+              {['Setup', 'Subjects', 'Goals', 'Start'][step - 1]}
             </p>
             <p className="text-[12px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
-              Step {step} of 5
+              Step {step} of 4
             </p>
           </div>
         </div>
@@ -583,111 +582,98 @@ export default function Onboarding() {
               className="input mb-4 h-11 rounded-full px-4 text-[16px] sm:text-[14px]"
             />
 
-            <div className="mb-8 flex flex-col gap-2.5">
+            {/* Every group in view, its subjects as pills. Tap to pick; a
+                course offered at two levels asks which, right in the pill. */}
+            <div className="mb-8 flex flex-col gap-6">
               {currentCurriculum.groups.map((group, gi) => {
                 const chosenHere = selectedSubjects.filter((s) => group.subjects.includes(s))
                 const q = subjectQuery.trim().toLowerCase()
-                const courses = coursesOf(group.subjects).filter((c) => !q || c.base.toLowerCase().includes(q))
-                if (q && !courses.length) return null
-                const open = Boolean(q) || openGroups.has(gi)
+                const all = coursesOf(group.subjects).filter((c) => !q || c.base.toLowerCase().includes(q))
+                if (q && !all.length) return null
+                const LIMIT = 12
+                const showAll = Boolean(q) || openGroups.has(gi) || all.length <= LIMIT + 2
+                const courses = showAll ? all : all.slice(0, LIMIT)
                 return (
-                  <section
-                    key={gi}
-                    className="overflow-hidden rounded-[16px] border transition-colors duration-200"
-                    style={{ borderColor: chosenHere.length ? 'color-mix(in oklab, var(--brand) 45%, var(--border-strong))' : 'var(--border-strong)', background: 'var(--surface)' }}
-                  >
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setOpenGroups((prev) => {
-                          const next = new Set(prev)
-                          next.has(gi) ? next.delete(gi) : next.add(gi)
-                          return next
-                        })
-                      }
-                      aria-expanded={open}
-                      className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-[var(--surface-sunken)]"
-                    >
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-[14px] font-semibold">{group.name}</span>
-                        <span className="mt-0.5 block truncate text-[12px]" style={{ color: chosenHere.length ? 'var(--brand)' : 'var(--text-faint)' }}>
-                          {chosenHere.length ? chosenHere.join(' · ') : group.required > 0 ? 'Usually one from here' : 'Optional'}
-                        </span>
-                      </span>
+                  <section key={gi}>
+                    <div className="mb-2.5 flex items-baseline justify-between gap-3">
+                      <h2 className="text-[13px] font-semibold" style={{ color: 'var(--text)' }}>
+                        {group.name}
+                      </h2>
                       {chosenHere.length > 0 && (
-                        <span className="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold tabular-nums" style={{ background: 'var(--brand)', color: '#fff' }}>
-                          {chosenHere.length}
+                        <span className="text-[11.5px] font-semibold tabular-nums" style={{ color: 'var(--brand)' }}>
+                          {chosenHere.length} chosen
                         </span>
                       )}
-                      <span className="shrink-0" style={{ color: 'var(--text-faint)' }}>
-                        <Chevron open={open} />
-                      </span>
-                    </button>
-
-                    {open && (
-                      <div className="grid grid-cols-1 gap-2 border-t px-4 py-4 sm:grid-cols-2" style={{ borderColor: 'var(--border)' }}>
-                        {courses.map((course) => {
-                          const chosen = [course.only, ...Object.values(course.levels)].find((f) => f && selectedSubjects.includes(f))
-                          const levels = Object.keys(course.levels)
-                          const single = course.only || (levels.length === 1 ? course.levels[levels[0]] : null)
-                          const asking = levelFor === course.base && !chosen && !single
-                          const empty = coverageLabel(chosen || single ? coverage[chosen || single] : bestCoverage(coverage, Object.values(course.levels))).label === 'No questions yet'
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {courses.map((course) => {
+                        const chosen = [course.only, ...Object.values(course.levels)].find((f) => f && selectedSubjects.includes(f))
+                        const levels = Object.keys(course.levels)
+                        const single = course.only || (levels.length === 1 ? course.levels[levels[0]] : null)
+                        const asking = levelFor === course.base && !chosen && !single
+                        const level = splitLevel(chosen || '').level
+                        if (asking) {
                           return (
-                            <div
-                              key={course.base}
-                              className="rounded-[12px] border transition-colors duration-150"
-                              style={{ borderColor: chosen || asking ? 'var(--brand)' : 'var(--border)', background: chosen ? 'var(--brand-tint)' : 'transparent' }}
-                            >
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  if (chosen) toggleSubject(chosen)
-                                  else if (single) toggleSubject(single)
-                                  else setLevelFor(asking ? null : course.base)
-                                }}
-                                aria-pressed={!!chosen}
-                                aria-expanded={single ? undefined : asking}
-                                className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left"
-                              >
-                                <span className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border" style={{ borderColor: chosen ? 'var(--brand)' : 'var(--border-strong)', background: chosen ? 'var(--brand)' : 'transparent', color: '#fff' }}>
-                                  {chosen && (
-                                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                                      <path d="m2.5 6.5 2.5 2.5 4.5-5" />
-                                    </svg>
-                                  )}
-                                </span>
-                                <span className="min-w-0 flex-1 truncate text-[13.5px] font-medium">{course.base}</span>
-                                {splitLevel(chosen || single || '').level && (
-                                  <span className="shrink-0 rounded-full px-2 py-0.5 text-[10.5px] font-semibold" style={chosen ? { background: 'var(--brand)', color: '#fff' } : { border: '1px solid var(--border-strong)', color: 'var(--text-faint)' }}>
-                                    {splitLevel(chosen || single).level}
-                                  </span>
-                                )}
-                                {empty && !chosen && (
-                                  <span className="shrink-0 text-[10.5px]" style={{ color: 'var(--text-faint)' }} title="Questions for this subject are still being written">
-                                    soon
-                                  </span>
-                                )}
-                              </button>
-                              {asking && (
-                                <div className="flex flex-wrap items-center gap-1.5 border-t px-3.5 py-2.5" style={{ borderColor: 'var(--border)' }}>
-                                  <span className="mr-1 text-[11.5px]" style={{ color: 'var(--text-muted)' }}>
-                                    Level
-                                  </span>
-                                  {levels.map((lv) => (
-                                    <button key={lv} type="button" onClick={() => pickLevel(course.levels[lv])} className="btn btn-outline control-sm">
-                                      {lv}
-                                    </button>
-                                  ))}
-                                  <button type="button" onClick={() => pickLevel(defaultLevel(course))} className="btn btn-quiet control-sm">
-                                    Not sure
+                            <span key={course.base} className="pop-enter inline-flex items-center gap-1 rounded-full border py-1 pl-3.5 pr-1 text-[13px] font-medium" style={{ borderColor: 'var(--brand)', background: 'var(--surface)' }}>
+                              {course.base}
+                              <span className="ml-1.5 flex gap-1">
+                                {levels.map((lv) => (
+                                  <button key={lv} type="button" onClick={() => pickLevel(course.levels[lv])} className="rounded-full px-2.5 py-1 text-[11.5px] font-bold transition-colors" style={{ background: 'var(--brand)', color: '#fff' }}>
+                                    {lv}
                                   </button>
-                                </div>
-                              )}
-                            </div>
+                                ))}
+                                <button type="button" onClick={() => pickLevel(defaultLevel(course))} className="rounded-full px-2.5 py-1 text-[11.5px] font-semibold transition-colors hover:bg-[var(--surface-sunken)]" style={{ color: 'var(--text-muted)' }}>
+                                  Not sure
+                                </button>
+                                <button type="button" onClick={() => setLevelFor(null)} aria-label="Cancel" className="flex h-7 w-7 items-center justify-center rounded-full text-[14px] transition-colors hover:bg-[var(--surface-sunken)]" style={{ color: 'var(--text-faint)' }}>
+                                  ×
+                                </button>
+                              </span>
+                            </span>
                           )
-                        })}
-                      </div>
-                    )}
+                        }
+                        return (
+                          <button
+                            key={course.base}
+                            type="button"
+                            onClick={() => {
+                              if (chosen) toggleSubject(chosen)
+                              else if (single) toggleSubject(single)
+                              else setLevelFor(course.base)
+                            }}
+                            aria-pressed={!!chosen}
+                            className="press inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-[13px] font-medium transition-colors duration-150"
+                            style={
+                              chosen
+                                ? { borderColor: 'var(--brand)', background: 'var(--brand)', color: '#fff' }
+                                : { borderColor: 'var(--border-strong)', background: 'var(--surface)', color: 'var(--text-body)' }
+                            }
+                          >
+                            {chosen && (
+                              <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                <path d="m2.5 6.5 2.5 2.5 4.5-5" />
+                              </svg>
+                            )}
+                            {course.base}
+                            {(level || splitLevel(single || '').level) && (
+                              <span className="text-[11px] font-bold" style={{ opacity: chosen ? 0.9 : 0.55 }}>
+                                {level || splitLevel(single).level}
+                              </span>
+                            )}
+                          </button>
+                        )
+                      })}
+                      {!showAll && (
+                        <button
+                          type="button"
+                          onClick={() => setOpenGroups((prev) => new Set(prev).add(gi))}
+                          className="rounded-full px-3.5 py-2 text-[13px] font-semibold transition-colors hover:bg-[var(--surface-sunken)]"
+                          style={{ color: 'var(--brand)' }}
+                        >
+                          Show all {all.length}
+                        </button>
+                      )}
+                    </div>
                   </section>
                 )
               })}
@@ -735,11 +721,16 @@ export default function Onboarding() {
               Where you honestly intend to land. Raise them whenever you get there.
             </p>
 
-            {/* What the two numbers are, said once, quietly. */}
+            {/* What the two numbers are, said once, quietly, then as the
+                column heads above the boxes. */}
             <p className="-mt-4 mb-5 text-[12.5px] leading-relaxed" style={{ color: 'oklch(0.8 0.09 85)' }}>
-              On the left, the grade you are predicted now, if you have one. On the right, the grade you are aiming for.
+              The grade you are predicted now, if your school has given you one, and the grade you are aiming for.
             </p>
-
+            <div className="flex items-center justify-end gap-2 pb-1 text-[11px] font-semibold uppercase tracking-[0.1em]" style={{ color: 'var(--text-faint)' }}>
+              <span className="w-[5.75rem] text-center">Predicted</span>
+              <span className="w-[14px]" />
+              <span className="w-[5.75rem] text-center">Target</span>
+            </div>
             <div className="mb-6 flex flex-col">
               {[...selectedSubjects, ...(isIB ? ['Theory of Knowledge', 'Extended Essay'] : [])].map((subject) => {
                 const core = subject === 'Theory of Knowledge' || subject === 'Extended Essay'
@@ -762,7 +753,7 @@ export default function Onboarding() {
                         className="h-10 w-[5.75rem] rounded-full border pl-3.5 pr-1.5 text-[13.5px] font-semibold tabular-nums"
                         style={{ borderColor: 'var(--border-strong)', color: predictedGrades[subject] ? 'var(--text)' : 'var(--text-faint)' }}
                       >
-                        <option value="">Now</option>
+                        <option value="">—</option>
                         {[...grades].reverse().map((g) => (
                           <option key={g} value={g}>
                             {g}
@@ -779,7 +770,7 @@ export default function Onboarding() {
                         className="h-10 w-[5.75rem] rounded-full border pl-3.5 pr-1.5 text-[13.5px] font-semibold tabular-nums"
                         style={{ borderColor: targetGrades[subject] ? 'var(--brand)' : 'var(--border-strong)', background: targetGrades[subject] ? 'var(--brand-tint)' : 'transparent', color: targetGrades[subject] ? 'var(--text)' : 'var(--text-faint)' }}
                       >
-                        <option value="">Target</option>
+                        <option value="">—</option>
                         {[...grades].reverse().map((g) => (
                           <option key={g} value={g}>
                             {g}
@@ -890,22 +881,8 @@ export default function Onboarding() {
           </div>
         )}
 
-        {/* Step 4, the plans: before the free subject, with a code box and
-            what free leaves out (components/onboarding/PlanStep). */}
+        {/* Step 4, the one subject a free account starts with */}
         {step === 4 && (
-          <PlanStep
-            supabase={supabase}
-            onFree={() => setStep(5)}
-            onUnlocked={async () => {
-              const user = await getCurrentUser(supabase)
-              if (user) invalidateProfile(user.id)
-              router.push('/dashboard')
-            }}
-          />
-        )}
-
-        {/* Step 5, the one subject a free account starts with */}
-        {step === 5 && (
           <div
             className="rounded-[14px] border p-6 md:p-9"
             style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
@@ -960,9 +937,9 @@ export default function Onboarding() {
               </p>
             )}
 
-            <button type="button" onClick={() => setStep(4)} className="t-caption mx-auto mt-4 block hover:underline">
-              Back to the plans, or use a code
-            </button>
+            <p className="t-caption mt-4 text-center">
+              Have a school code? Add it in your profile and every subject opens.
+            </p>
           </div>
         )}
         </div>
