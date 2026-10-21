@@ -20,6 +20,7 @@ import { STATUS_VAR } from '@/components/map/MapCanvas'
  *   Breadcrumbs    straight back to any level above
  *   ⌘K or /        search the whole subject
  *   Esc            deselect, then up a level
+ *   Center or 0    put the whole level back in view
  *
  * Every level remembers how it was left (where you had panned, how far you
  * had zoomed, what was selected and fanned out) and comes back that way.
@@ -215,12 +216,37 @@ export default function SubjectMap({ graph, subjects = [], onSubject, initialAt 
     [expandedId, fitFor, focusId]
   )
 
+  /**
+   * Keep the map on screen. Zoomed out, everything drawn stays in view;
+   * zoomed in, you can reach every edge of it and no further. It used to
+   * pan forever, and a flick could leave an empty screen with no way back.
+   */
+  const clamp = useCallback(
+    (v) => {
+      const { w, h } = size.current
+      if (!w) return v
+      const b = layout.bounds
+      const pad = 24
+      const k = Math.max(0.3, Math.min(2.4, v.k))
+      const range = (lo0, hi0, extent) => {
+        const a = pad - lo0 * k
+        const c = extent - pad - hi0 * k
+        return [Math.min(a, c), Math.max(a, c)]
+      }
+      const [x0, x1] = range(b.x0, b.x1, w)
+      const [y0, y1] = range(b.y0, b.y1, h)
+      return { k, x: Math.max(x0, Math.min(x1, v.x)), y: Math.max(y0, Math.min(y1, v.y)) }
+    },
+    [layout]
+  )
+  const onView = useCallback((v) => setView(clamp(v)), [clamp])
+
   const zoom = (f) => {
     const { w, h } = size.current
     setAnimating(!reduced())
     setView((v) => {
       const k = Math.max(0.3, Math.min(2.4, v.k * f))
-      return { k, x: w / 2 - ((w / 2 - v.x) / v.k) * k, y: h / 2 - ((h / 2 - v.y) / v.k) * k }
+      return clamp({ k, x: w / 2 - ((w / 2 - v.x) / v.k) * k, y: h / 2 - ((h / 2 - v.y) / v.k) * k })
     })
     setTimeout(() => setAnimating(false), 440)
   }
@@ -248,7 +274,7 @@ export default function SubjectMap({ graph, subjects = [], onSubject, initialAt 
         else if (focusId !== graph.rootId) travel(graph.nodes.get(focusId).parentId)
       } else if (e.key === '+' || e.key === '=') zoom(1.25)
       else if (e.key === '-') zoom(0.8)
-      else if (e.key === '0') fit()
+      else if (e.key === '0' || e.key.toLowerCase() === 'c') fit()
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
@@ -393,7 +419,7 @@ export default function SubjectMap({ graph, subjects = [], onSubject, initialAt 
             selectedId={selectedId}
             expandedId={expandedId}
             view={view}
-            onView={setView}
+            onView={onView}
             animating={animating}
             fade={fade}
             weakOnly={weakOnly}
@@ -407,24 +433,35 @@ export default function SubjectMap({ graph, subjects = [], onSubject, initialAt 
               setSelectedId(null)
             }}
             controls={
-              <div className="absolute bottom-4 right-4 flex flex-col overflow-hidden rounded-[12px] border" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
-                {[
-                  ['Zoom in', 1.25, <path key="a" d="M12 5v14M5 12h14" />],
-                  ['Zoom out', 0.8, <path key="b" d="M5 12h14" />],
-                  ['Fit to screen', 0, <path key="c" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />],
-                ].map(([label, f, d]) => (
-                  <button
-                    key={label}
-                    type="button"
-                    onClick={() => (f ? zoom(f) : fit())}
-                    aria-label={label}
-                    title={label}
-                    className="flex h-9 w-9 items-center justify-center border-b transition-colors last:border-b-0 hover:bg-[var(--surface-sunken)]"
-                    style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}
-                  >
-                    {svg(d, 15)}
-                  </button>
-                ))}
+              <div className="absolute bottom-4 right-4 flex flex-col items-end gap-2">
+                <button
+                  type="button"
+                  onClick={fit}
+                  title="Center the map (0)"
+                  className="flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-[12.5px] font-semibold shadow-sm transition-colors hover:bg-[var(--surface-sunken)]"
+                  style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)', color: 'var(--text-body)' }}
+                >
+                  {svg(<><circle cx="12" cy="12" r="3" /><path d="M12 2v4M12 18v4M2 12h4M18 12h4" /></>, 14)}
+                  Center
+                </button>
+                <div className="flex flex-col overflow-hidden rounded-[12px] border" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
+                  {[
+                    ['Zoom in', 1.25, <path key="a" d="M12 5v14M5 12h14" />],
+                    ['Zoom out', 0.8, <path key="b" d="M5 12h14" />],
+                  ].map(([label, f, d]) => (
+                    <button
+                      key={label}
+                      type="button"
+                      onClick={() => zoom(f)}
+                      aria-label={label}
+                      title={label}
+                      className="flex h-9 w-9 items-center justify-center border-b transition-colors last:border-b-0 hover:bg-[var(--surface-sunken)]"
+                      style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}
+                    >
+                      {svg(d, 15)}
+                    </button>
+                  ))}
+                </div>
               </div>
             }
           />
