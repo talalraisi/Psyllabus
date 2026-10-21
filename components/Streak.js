@@ -56,7 +56,7 @@ export function GoalRing({ value, max, size = 40, stroke = 4, children }) {
     <span className="relative inline-flex shrink-0 items-center justify-center" style={{ width: size, height: size }}>
       <svg width={size} height={size} aria-hidden="true" className="absolute inset-0">
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--border-strong)" strokeWidth={stroke} />
-        <circle
+        {filled > 0 && <circle
           cx={size / 2}
           cy={size / 2}
           r={r}
@@ -67,7 +67,7 @@ export function GoalRing({ value, max, size = 40, stroke = 4, children }) {
           strokeDasharray={`${c * filled} ${c}`}
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
           style={{ transition: 'stroke-dasharray 700ms cubic-bezier(0.16, 1, 0.3, 1)' }}
-        />
+        />}
       </svg>
       <span className="relative">{children}</span>
     </span>
@@ -166,47 +166,45 @@ function usePop(value) {
 export function StreakChip({ profile, expanded }) {
   const s = useStreak(profile)
   const pop = usePop(s?.current)
-  if (!s) return <div className="h-11" aria-hidden="true" />
+  if (!s) return <div className="h-12" aria-hidden="true" />
 
   const lit = s.current > 0
-  const line = s.goalMet
-    ? 'Goal reached today'
-    : s.atRisk
-      ? 'Study today to keep it'
-      : `${s.todayMinutes} of ${s.goal} min today`
+  const pct = Math.min(100, (s.todayMinutes / Math.max(1, s.goal)) * 100)
+  const title = lit ? `${s.current}-day streak` : 'Start a streak'
+  const line = s.goalMet ? 'Goal done today' : s.atRisk ? 'Study today to keep it' : `${s.todayMinutes} / ${s.goal} min today`
 
   return (
     <Link
       // No streak yet: the way to start one is today's plan. With one: the
       // full picture of what has been studied.
-      href={s.current > 0 ? '/dashboard/analytics' : '/dashboard/study-plan'}
-      title={expanded ? undefined : `${s.current}-day streak · ${line}`}
-      className="flex h-11 items-center gap-3 rounded-[10px] pl-[11px] pr-2 transition-colors hover:bg-[var(--surface-sunken)]"
-      style={{ background: s.atRisk ? 'var(--flame-tint)' : undefined }}
+      href={lit ? '/dashboard/analytics' : '/dashboard/study-plan'}
+      title={expanded ? undefined : `${title} · ${line}`}
+      className="flex h-12 items-center gap-3 rounded-[12px] pl-[7px] pr-2.5 transition-colors hover:bg-[var(--surface-sunken)]"
     >
-      <span className="relative flex w-[18px] shrink-0 justify-center">
-        <Flame key={pop} size={19} lit={lit} className={`${pop ? 'flame-pop' : ''} ${s.atRisk ? 'flame-flicker' : ''}`} style={{ color: 'var(--text-faint)' }} />
-        {!expanded && (
-          <span
-            className="absolute -bottom-2 -right-2.5 min-w-[16px] rounded-full px-1 text-center text-[10px] font-bold leading-[16px] tabular-nums"
-            style={{ background: lit ? 'var(--flame)' : 'var(--surface-sunken)', color: lit ? '#fff' : 'var(--text-faint)' }}
-          >
+      <span
+        className="relative flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-[8px]"
+        style={{ background: lit ? 'var(--flame-tint)' : 'var(--surface-sunken)', color: 'var(--text-faint)' }}
+      >
+        <Flame key={pop} size={16} lit={lit} className={`${pop ? 'flame-pop' : ''} ${s.atRisk ? 'flame-flicker' : ''}`} />
+        {!expanded && lit && (
+          <span className="absolute -bottom-1.5 -right-1.5 min-w-[15px] rounded-full px-1 text-center text-[9.5px] font-bold leading-[15px] tabular-nums" style={{ background: 'var(--flame)', color: '#1a1206' }}>
             {s.current}
           </span>
         )}
       </span>
-      <span className="min-w-0 flex-1 whitespace-nowrap transition-opacity duration-150" style={{ opacity: expanded ? 1 : 0 }}>
-        <span className="block text-[13px] font-semibold leading-tight tabular-nums" style={{ color: 'var(--text)' }}>
-          {s.current > 0 ? `${s.current}-day streak` : 'Start a streak'}
+      <span className="min-w-0 flex-1 transition-opacity duration-150" style={{ opacity: expanded ? 1 : 0 }}>
+        <span className="flex items-baseline justify-between gap-2">
+          <span className="truncate text-[13px] font-semibold leading-tight" style={{ color: 'var(--text)' }}>
+            {title}
+          </span>
+          <span className="shrink-0 text-[10.5px] tabular-nums" style={{ color: s.atRisk ? 'var(--flame)' : 'var(--text-faint)' }}>
+            {s.goalMet ? '✓' : `${s.todayMinutes}/${s.goal}m`}
+          </span>
         </span>
-        <span className="block truncate text-[11.5px] leading-tight" style={{ color: s.atRisk ? 'var(--flame)' : 'var(--text-faint)' }}>
-          {line}
+        <span className="mt-1.5 block h-[3px] overflow-hidden rounded-full" style={{ background: 'var(--border-strong)' }}>
+          <span className="block h-full rounded-full transition-[width] duration-700" style={{ width: `${pct}%`, background: 'var(--flame)' }} />
         </span>
-      </span>
-      <span className="transition-opacity duration-150" style={{ opacity: expanded ? 1 : 0 }}>
-        <GoalRing value={s.todayMinutes} max={s.goal} size={26} stroke={3}>
-          {s.goalMet && <span className="block h-1.5 w-1.5 rounded-full" style={{ background: 'var(--flame)' }} />}
-        </GoalRing>
+        <span className="sr-only">{line}</span>
       </span>
     </Link>
   )
@@ -214,168 +212,173 @@ export function StreakChip({ profile, expanded }) {
 
 /* ---------- The dashboard card ---------- */
 
-const DAY_STYLE = {
-  goal: { background: 'var(--flame)', borderColor: 'var(--flame)' },
-  studied: { background: 'var(--flame-tint)', borderColor: 'var(--flame)' },
-  rest: { background: 'transparent', borderColor: 'var(--border-strong)', borderStyle: 'dashed' },
-  missed: { background: 'transparent', borderColor: 'var(--border-strong)' },
-  today: { background: 'transparent', borderColor: 'var(--flame)', borderStyle: 'dashed' },
-}
-
 export function StreakCard({ profile, cta }) {
   const s = useStreak(profile)
   const pop = usePop(s?.current)
   const [picking, setPicking] = useState(false)
 
   if (!s) {
-    return <div id="streak" className="skeleton mb-10 h-[220px] rounded-[16px]" aria-hidden="true" />
+    return <div id="streak" className="skeleton mb-10 h-[200px] rounded-[18px]" aria-hidden="true" />
   }
 
   const { next, prev } = s.milestone
-  const toNext = next ? next - s.current : 0
+  const left = Math.max(0, s.goal - s.todayMinutes)
   const message = s.goalMet
-    ? `Daily goal done. ${s.current > 1 ? `That is ${s.current} days running.` : 'Come back tomorrow to start a streak.'}`
+    ? s.current > 1
+      ? `Goal done for today. That is ${s.current} days in a row.`
+      : 'Goal done for today. Come back tomorrow and the streak begins.'
     : s.studiedToday
-      ? `${s.goal - s.todayMinutes} more minute${s.goal - s.todayMinutes === 1 ? '' : 's'} to reach today's goal.`
+      ? `${left} more minute${left === 1 ? '' : 's'} and today's goal is done.`
       : s.atRisk
-        ? `Study today to keep your ${s.current}-day streak alive.`
+        ? `Study today to keep your ${s.current}-day streak.`
         : s.restToday
           ? 'A rest day on your plan. Your streak is safe either way.'
-          : 'Study for a minute today and a new streak starts.'
+          : 'A few minutes today starts a new streak.'
+  const top = Math.max(s.goal, ...s.week.map((d) => d.minutes))
 
   return (
     <section
       id="streak"
-      className="elev mb-10 scroll-mt-24 overflow-hidden rounded-[16px] border"
-      style={{ borderColor: s.atRisk ? 'var(--flame)' : 'var(--border-strong)', background: 'var(--surface)' }}
+      className="elev mb-10 scroll-mt-24 overflow-hidden rounded-[18px] border"
+      style={{ borderColor: s.atRisk ? 'color-mix(in oklab, var(--flame) 60%, var(--border-strong))' : 'var(--border-strong)', background: 'var(--surface)' }}
     >
-      <div className="grid gap-6 p-5 sm:p-6 md:grid-cols-[auto_1fr_auto] md:items-center md:gap-8">
-        {/* The number */}
-        <div className="flex items-center gap-4">
-          <span
-            className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[18px]"
-            style={{ background: s.current > 0 ? 'var(--flame-tint)' : 'var(--surface-sunken)', color: 'var(--text-faint)' }}
-          >
-            <Flame key={pop} size={36} lit={s.current > 0} className={`${pop ? 'flame-pop' : ''} ${s.atRisk ? 'flame-flicker' : ''}`} />
-          </span>
-          <div>
-            <p className="text-[34px] font-semibold leading-none tracking-[-0.03em] tabular-nums">{s.current}</p>
-            <p className="mt-1.5 text-[13px] font-medium">day streak</p>
-            <p className="mt-0.5 text-[12px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
-              Best {plural(s.longest, 'day')}
-            </p>
+      <div className="grid gap-6 p-5 sm:p-6 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:gap-10">
+        {/* The streak and today */}
+        <div className="flex flex-col">
+          <div className="flex items-center gap-3.5">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px]" style={{ background: s.current ? 'var(--flame-tint)' : 'var(--surface-sunken)', color: 'var(--text-faint)' }}>
+              <Flame key={pop} size={26} lit={s.current > 0} className={`${pop ? 'flame-pop' : ''} ${s.atRisk ? 'flame-flicker' : ''}`} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-[26px] font-semibold leading-none tracking-[-0.03em] tabular-nums">
+                {s.current}
+                <span className="ml-1.5 text-[14px] font-medium tracking-normal" style={{ color: 'var(--text-muted)' }}>
+                  day streak
+                </span>
+              </p>
+              <p className="mt-1 text-[12px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
+                Best {s.longest} · {(s.weekMinutes / 60).toFixed(1)}h this week
+              </p>
+            </div>
+            <div className="relative">
+              <button type="button" onClick={() => setPicking((v) => !v)} aria-expanded={picking} title="Change your daily goal" className="rounded-full transition-transform hover:scale-105">
+                <GoalRing value={s.todayMinutes} max={s.goal} size={58} stroke={5}>
+                  <span className="block text-center leading-none">
+                    <span className="block text-[14px] font-semibold tabular-nums">{s.todayMinutes}</span>
+                    <span className="block text-[9px]" style={{ color: 'var(--text-faint)' }}>
+                      /{s.goal}m
+                    </span>
+                  </span>
+                </GoalRing>
+              </button>
+              {picking && (
+                <div className="pop-enter absolute right-0 top-full z-20 mt-2 w-52 rounded-[14px] border p-2 shadow-xl" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
+                  <p className="px-1.5 pb-1.5 text-[11px] font-semibold" style={{ color: 'var(--text-muted)' }}>
+                    Daily goal
+                  </p>
+                  <div className="grid grid-cols-3 gap-1">
+                    {GOALS.map((g) => (
+                      <button
+                        key={g}
+                        type="button"
+                        onClick={() => {
+                          setPicking(false)
+                          saveGoal(profile.id, g)
+                        }}
+                        className="rounded-[8px] py-1.5 text-[12.5px] font-semibold tabular-nums transition-colors hover:bg-[var(--surface-sunken)]"
+                        style={g === s.goal ? { background: 'var(--flame)', color: '#1a1206' } : { color: 'var(--text-body)' }}
+                      >
+                        {g}m
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <p className="mt-5 text-[13.5px] leading-relaxed" style={{ color: s.atRisk ? 'var(--flame)' : 'var(--text-body)' }}>
+            {message}
+          </p>
+          <div className="mt-auto flex flex-wrap items-center gap-2 pt-4">
+            {cta && !s.goalMet && (
+              <Link href={cta.href} className="btn btn-solid control-sm">
+                {cta.label}
+              </Link>
+            )}
+            <Link href="/dashboard/analytics" className="btn btn-quiet control-sm">
+              See analytics
+            </Link>
           </div>
         </div>
 
-        {/* The week */}
-        <div className="min-w-0">
-          <ol className="grid grid-cols-7 gap-1.5 sm:gap-2.5">
+        {/* The week, as bars that fill towards the goal */}
+        <div>
+          <ol className="grid h-[104px] grid-cols-7 items-end gap-2 sm:h-[132px]">
+            {s.week.map((d) => {
+              const h = d.minutes ? Math.max(10, (d.minutes / top) * 100) : 0
+              return (
+                <li key={d.date} className="relative flex h-full flex-col justify-end" title={`${d.minutes} min`}>
+                  {/* The goal line, across every day */}
+                  <span className="pointer-events-none absolute inset-x-0 border-t border-dashed" style={{ bottom: `${(s.goal / top) * 100}%`, borderColor: 'var(--border-strong)' }} />
+                  <span
+                    className="relative flex w-full items-start justify-center rounded-[8px] transition-[height] duration-700"
+                    style={{
+                      height: d.minutes ? `${h}%` : '6px',
+                      background: d.state === 'goal' ? 'var(--flame)' : d.minutes ? 'color-mix(in oklab, var(--flame) 40%, var(--surface-sunken))' : d.state === 'rest' ? 'transparent' : 'var(--surface-sunken)',
+                      border: d.state === 'rest' ? '1px dashed var(--border-strong)' : d.isToday && !d.minutes ? '1px dashed var(--flame)' : 'none',
+                    }}
+                  >
+                    {d.state === 'goal' && h > 26 && <Flame size={13} lit={false} style={{ color: '#1a1206', marginTop: 6 }} />}
+                  </span>
+                </li>
+              )
+            })}
+          </ol>
+          <ol className="mt-2 grid grid-cols-7 gap-2 text-center">
             {s.week.map((d) => (
-              <li key={d.date} className="flex flex-col items-center gap-1.5" title={`${d.minutes} min`}>
-                <span className="text-[11px] font-medium" style={{ color: d.isToday ? 'var(--text)' : 'var(--text-faint)' }}>
+              <li key={d.date}>
+                <span className="block text-[11px] font-semibold" style={{ color: d.isToday ? 'var(--text)' : 'var(--text-faint)' }}>
                   {d.isToday ? 'Today' : WEEKDAY_LETTER[d.weekday]}
                 </span>
-                <span
-                  className="flex h-9 w-9 items-center justify-center rounded-full border-2 transition-colors"
-                  style={DAY_STYLE[d.state]}
-                >
-                  {d.state === 'goal' && <Flame size={16} lit={false} style={{ color: '#fff' }} />}
-                  {d.state === 'studied' && <Flame size={15} />}
-                  {d.state === 'rest' && <span className="text-[9.5px] font-semibold uppercase" style={{ color: 'var(--text-faint)' }}>rest</span>}
-                </span>
-                <span className="text-[10.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
-                  {d.minutes ? `${d.minutes}m` : '·'}
+                <span className="block text-[10.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
+                  {d.state === 'rest' && !d.minutes ? 'rest' : d.minutes ? `${d.minutes}m` : '·'}
                 </span>
               </li>
             ))}
           </ol>
-          <p className="mt-4 text-[13.5px]" style={{ color: s.atRisk ? 'var(--flame)' : 'var(--text-body)' }}>
-            {message}
-          </p>
-          {cta && !s.studiedToday && (
-            <Link href={cta.href} className="btn btn-solid control-md mt-3 inline-flex">
-              {cta.label}
-            </Link>
-          )}
-        </div>
-
-        {/* Today's goal */}
-        <div className="flex items-center gap-4 md:flex-col md:gap-2">
-          <GoalRing value={s.todayMinutes} max={s.goal} size={92} stroke={8}>
-            <span className="block text-center">
-              <span className="block text-[22px] font-semibold leading-none tabular-nums">{s.todayMinutes}</span>
-              <span className="mt-0.5 block text-[11px]" style={{ color: 'var(--text-faint)' }}>
-                of {s.goal} min
-              </span>
-            </span>
-          </GoalRing>
-          <div className="relative md:text-center">
-            <button
-              type="button"
-              onClick={() => setPicking((v) => !v)}
-              aria-expanded={picking}
-              className="rounded-full px-3 py-1 text-[12px] font-medium transition-colors hover:bg-[var(--surface-sunken)]"
-              style={{ color: 'var(--text-muted)' }}
-            >
-              Daily goal · {s.goal} min
-            </button>
-            {picking && (
-              <div className="pop-enter absolute right-0 z-20 mt-1 flex gap-1 rounded-[12px] border p-1.5 shadow-xl md:left-1/2 md:right-auto md:-translate-x-1/2" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
-                {GOALS.map((g) => (
-                  <button
-                    key={g}
-                    type="button"
-                    onClick={() => {
-                      setPicking(false)
-                      saveGoal(profile.id, g)
-                    }}
-                    className="rounded-[8px] px-2.5 py-1.5 text-[12.5px] font-semibold tabular-nums transition-colors hover:bg-[var(--surface-sunken)]"
-                    style={g === s.goal ? { background: 'var(--flame)', color: '#fff' } : { color: 'var(--text-body)' }}
-                  >
-                    {g}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
         </div>
       </div>
 
-      {/* Milestones */}
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-3 border-t px-5 py-4 sm:px-6" style={{ borderColor: 'var(--border)', background: 'var(--surface-sunken)' }}>
-        <div className="min-w-[180px] flex-1">
-          <p className="text-[12.5px] font-medium" style={{ color: 'var(--text-body)' }}>
-            {next
-              ? `${plural(toNext, 'more day')} to a ${next}-day streak${s.milestone.reached.includes(next) ? '' : ' and a new badge'}`
-              : 'Every badge earned. Legend.'}
-          </p>
-          {next && (
-            <span className="mt-2 block h-1.5 overflow-hidden rounded-full" style={{ background: 'var(--border-strong)' }}>
-              <span
-                className="block h-full rounded-full transition-[width] duration-700"
-                style={{ width: `${((s.current - prev) / (next - prev)) * 100}%`, background: 'var(--flame)' }}
-              />
-            </span>
+      {/* The next badge */}
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t px-5 py-3.5 sm:px-6" style={{ borderColor: 'var(--border)' }}>
+        <span className="text-[12.5px]" style={{ color: 'var(--text-muted)' }}>
+          {next ? (
+            <>
+              <strong className="font-semibold" style={{ color: 'var(--text)' }}>
+                {next - s.current} more day{next - s.current === 1 ? '' : 's'}
+              </strong>{' '}
+              to a {next}-day streak
+            </>
+          ) : (
+            'Every badge earned.'
           )}
-        </div>
-        <ul className="flex flex-wrap gap-1.5" aria-label="Streak badges">
-          {MILESTONES.map((m) => {
-            const got = s.milestone.reached.includes(m)
-            return (
-              <li
-                key={m}
-                title={got ? `${m}-day streak reached` : `Reach a ${m}-day streak`}
-                className="flex h-7 min-w-[34px] items-center justify-center gap-0.5 rounded-full px-2 text-[11px] font-bold tabular-nums"
-                style={got ? { background: 'var(--flame)', color: '#fff' } : { background: 'var(--surface)', color: 'var(--text-faint)', border: '1px solid var(--border-strong)' }}
-              >
-                {m}
-              </li>
-            )
-          })}
-        </ul>
-        <p className="text-[12px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
-          {Math.round(s.weekMinutes / 6) / 10}h this week · {s.goalDays}/7 goals
-        </p>
+        </span>
+        {next && (
+          <span className="h-1.5 min-w-[6rem] flex-1 overflow-hidden rounded-full" style={{ background: 'var(--border-strong)' }}>
+            <span className="block h-full rounded-full transition-[width] duration-700" style={{ width: `${((s.current - prev) / (next - prev)) * 100}%`, background: 'var(--flame)' }} />
+          </span>
+        )}
+        <span className="flex gap-1" aria-label={`Badges earned: ${s.milestone.reached.join(', ') || 'none yet'}`}>
+          {MILESTONES.map((m) => (
+            <span
+              key={m}
+              title={s.milestone.reached.includes(m) ? `${m}-day streak reached` : `Reach a ${m}-day streak`}
+              className="h-2 w-2 rounded-full"
+              style={{ background: s.milestone.reached.includes(m) ? 'var(--flame)' : 'var(--border-strong)' }}
+            />
+          ))}
+        </span>
       </div>
     </section>
   )

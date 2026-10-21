@@ -35,6 +35,13 @@ function sample(weekStart) {
       ends_at: football ? at(day, 19, 30) : at(day, 16, 45),
     })
   }
+  // A busy Saturday the way the plan really fills one: twenty-five minute
+  // blocks, subjects interleaved, and (as the bug wrote them) each twice.
+  const subjects = ['Arabic B HL: Vocabulary', 'English A: Language & Literature SL: Texts', 'Economics HL: Elasticity', 'Arabic B HL: Grammar']
+  for (let k = 0; k < 12; k++) {
+    const b = { title: subjects[k % subjects.length], subject: subjects[k % subjects.length].split(':')[0], starts_at: at(6, 10, 25 * k), ends_at: at(6, 10, 25 * k + 22) }
+    blocks.push(b, { ...b })
+  }
   const events = [
     { id: 'e1', title: 'Physics test', kind: 'test', due_at: at(3, 23, 59), all_day: true, completed: false },
     { id: 'e2', title: 'Econ IA draft', kind: 'deadline', due_at: at(4, 8, 0), all_day: false, completed: false },

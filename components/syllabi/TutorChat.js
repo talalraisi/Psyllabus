@@ -176,6 +176,31 @@ function Hub({ subjects, subject, onPick }) {
  * question straight away, because the student pressed a button that already
  * said what they wanted.
  */
+/** Answers that are the app saying it failed, which can be asked again. */
+const FAILED = /^(Syllabi could not answer just now|Could not reach Syllabi|Syllabi lost the connection)|The connection dropped\.$/
+
+/**
+ * What the student sent. A long one, like a whole question sent in from a
+ * quiz, folds to a few lines so the answer is what you see first.
+ */
+function UserBubble({ text, compact }) {
+  const [open, setOpen] = useState(false)
+  const long = text.length > 220 || text.split('\n').length > 5
+  return (
+    <div
+      className={`max-w-[88%] rounded-[20px] rounded-br-[6px] px-4 py-2.5 leading-relaxed ${compact ? 'text-[13.5px]' : 'text-[15px]'}`}
+      style={{ background: 'var(--surface-sunken)', color: 'var(--text)' }}
+    >
+      <p className={`whitespace-pre-wrap ${long && !open ? 'line-clamp-4' : ''}`}>{text}</p>
+      {long && (
+        <button type="button" onClick={() => setOpen((v) => !v)} className="mt-1 text-[12px] font-semibold" style={{ color: 'var(--text-muted)' }}>
+          {open ? 'Show less' : 'Show all'}
+        </button>
+      )}
+    </div>
+  )
+}
+
 export default function TutorChat({
   subjects = [],
   topicsFor,
@@ -299,12 +324,14 @@ export default function TutorChat({
       return now.filter((f) => f.id !== id)
     })
 
-  const send = async (text) => {
+  // `base` is the conversation to answer from: normally all of it, but a
+  // retry answers from just before the attempt that failed.
+  const send = async (text, base = messages) => {
     const question = (text ?? input).trim()
     if ((!question && !files.length) || busy) return
     const asked = question || 'Have a look at this.'
     const sent = files
-    const history = [...messages, { role: 'user', content: asked, files: sent.map((f) => ({ name: f.name, kind: f.kind })) }]
+    const history = [...base, { role: 'user', content: asked, files: sent.map((f) => ({ name: f.name, kind: f.kind })) }]
     setMessages([...history, { role: 'assistant', content: '' }])
     setInput('')
     setFiles([])
@@ -333,7 +360,7 @@ export default function TutorChat({
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        setMessages(messages)
+        setMessages(base)
         setInput(question)
         setFiles(sent)
         requestAnimationFrame(() => resize(boxRef.current))
@@ -699,20 +726,28 @@ export default function TutorChat({
                         ))}
                       </div>
                     )}
-                    <div className="max-w-[85%] whitespace-pre-wrap rounded-[20px] rounded-br-[6px] px-4 py-2.5 text-[15px] leading-relaxed" style={{ background: 'var(--surface-sunken)', color: 'var(--text)' }}>
-                      {m.content}
-                    </div>
+                    <UserBubble text={m.content} compact={compact} />
                   </div>
                 ) : (
                   <div key={i} className="sy-rise group flex gap-3">
                     <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full" style={{ background: 'var(--brand)', color: '#fff' }}>
                       <SyllabiMark size={13} />
                     </span>
-                    <div className="min-w-0 flex-1 text-[15px] leading-[1.7]" style={{ color: 'var(--text-body)' }}>
+                    <div className={`min-w-0 flex-1 leading-[1.7] ${compact ? 'text-[14px]' : 'text-[15px]'}`} style={{ color: 'var(--text-body)' }}>
                       {m.content ? (
                         <>
                           <Answer text={m.content} streaming={streaming && i === messages.length - 1} />
-                          {!(busy && i === messages.length - 1) && (
+                          {!busy && FAILED.test(m.content) && messages[i - 1]?.role === 'user' && (
+                            <button
+                              type="button"
+                              onClick={() => send(messages[i - 1].content, messages.slice(0, i - 1))}
+                              className="mt-2 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12.5px] font-semibold transition-colors hover:bg-[var(--surface-sunken)]"
+                              style={{ borderColor: 'var(--border-strong)', color: 'var(--text)' }}
+                            >
+                              ↻ Try again
+                            </button>
+                          )}
+                          {!(busy && i === messages.length - 1) && !FAILED.test(m.content) && (
                             <div className="mt-2 -ml-2 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
                               <CopyButton text={m.content} />
                             </div>

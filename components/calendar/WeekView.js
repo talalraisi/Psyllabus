@@ -82,9 +82,36 @@ export default function WeekView({ weekStart, today, busy = [], blocks = [], eve
         for (const p of onDays(days, b.starts_at, b.ends_at)) timed[p.i].push({ ...p, layer: 'life', title: b.title || 'Busy' })
       }
     }
+    // The plan's blocks, each once, and back-to-back ones joined into one
+    // study session: the plan interleaves subjects every twenty minutes or
+    // so, and drawn one by one that was a column of tiny cut-off chips.
+    const seen = new Set()
+    const study = days.map(() => [])
     for (const b of blocks) {
-      for (const p of onDays(days, b.starts_at, b.ends_at)) timed[p.i].push({ ...p, layer: 'study', title: b.title })
+      const key = `${b.starts_at}|${b.ends_at}|${b.title}`
+      if (seen.has(key)) continue
+      seen.add(key)
+      for (const p of onDays(days, b.starts_at, b.ends_at)) study[p.i].push({ ...p, title: b.title, subject: b.subject || b.title.split(':')[0] })
     }
+    study.forEach((list, i) => {
+      list.sort((a, b) => a.from - b.from)
+      let cur = null
+      for (const p of list) {
+        if (cur && p.from - cur.to <= 10) {
+          cur.to = Math.max(cur.to, p.to)
+          cur.items.push(p)
+        } else {
+          cur = { i, from: p.from, to: p.to, layer: 'study', items: [p] }
+          timed[i].push(cur)
+        }
+      }
+      for (const x of timed[i]) {
+        if (x.layer !== 'study') continue
+        const subjects = [...new Set(x.items.map((it) => it.subject))]
+        x.subjects = subjects
+        x.title = x.items.length === 1 ? x.items[0].title : `Study · ${subjects.join(', ')}`
+      }
+    })
     for (const e of events) {
       if (e.completed) continue
       if (e.all_day) {
@@ -223,8 +250,8 @@ export default function WeekView({ weekStart, today, busy = [], blocks = [], eve
                   return (
                     <div
                       key={n}
-                      title={`${clock(Math.round(x.from))}–${clock(Math.round(x.to))} ${x.title}`}
-                      className="absolute overflow-hidden rounded-[5px] px-1 py-0.5 text-[10.5px] leading-tight"
+                      title={x.items?.length > 1 ? x.items.map((it) => `${clock(Math.round(it.from))} ${it.title}`).join('\n') : `${clock(Math.round(x.from))}–${clock(Math.round(x.to))} ${x.title}`}
+                      className="absolute overflow-hidden rounded-[7px] px-1.5 py-1 text-[10.5px] leading-tight"
                       style={{
                         ...style,
                         top: (from - START) * PX + 1,
@@ -233,8 +260,29 @@ export default function WeekView({ weekStart, today, busy = [], blocks = [], eve
                         width: `calc(${100 / x.lanes}% - 4px)`,
                       }}
                     >
-                      <span className="block truncate font-medium">{x.title}</span>
-                      {(to - from) * PX > 26 && <span className="block truncate tabular-nums opacity-80">{clock(Math.round(x.from))}</span>}
+                      {x.layer === 'study' && x.items?.length > 1 ? (
+                        <>
+                          <span className="block truncate font-semibold">Study</span>
+                          <span className="block truncate tabular-nums opacity-80">
+                            {clock(Math.round(x.from))}–{clock(Math.round(x.to))}
+                          </span>
+                          {(to - from) * PX > 48 && (
+                            <span className="mt-1 flex flex-col gap-0.5">
+                              {x.subjects.slice(0, Math.max(1, Math.floor(((to - from) * PX - 40) / 14))).map((sub) => (
+                                <span key={sub} className="flex items-center gap-1 truncate opacity-90">
+                                  <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: 'var(--brand)' }} />
+                                  <span className="truncate">{sub}</span>
+                                </span>
+                              ))}
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <span className="block truncate font-medium">{x.title}</span>
+                          {(to - from) * PX > 26 && <span className="block truncate tabular-nums opacity-80">{clock(Math.round(x.from))}</span>}
+                        </>
+                      )}
                     </div>
                   )
                 })}

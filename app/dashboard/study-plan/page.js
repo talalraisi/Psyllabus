@@ -10,7 +10,7 @@
  * and records the student's own edits, which always win over the plan.
  */
 
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
 import { getProfile } from '@/lib/cache'
@@ -45,6 +45,8 @@ const fmt = (m) => (m >= 60 ? `${Math.floor(m / 60)}h ${String(m % 60).padStart(
 
 export default function StudyPlanPage() {
   const [profile, setProfile] = useState(null)
+  // The calendar write in flight, so a second one waits for it.
+  const writingBlocks = useRef(null)
   const [items, setItems] = useState([])
   const [effective, setEffective] = useState({})
   const [details, setDetails] = useState({})
@@ -182,17 +184,23 @@ export default function StudyPlanPage() {
       /* write anyway */
     }
     if (previous === signature) return
+    // One write at a time from this tab, and a block that is already there
+    // is skipped rather than added twice (076-plan-blocks-once.sql), so two
+    // writes racing can no longer double every block.
     const write = async () => {
+      if (writingBlocks.current) await writingBlocks.current
       const { error } = await supabase.from('plan_blocks').delete().gte('day', plan.days[0].date)
       if (error) return
-      if (rows.length && (await supabase.from('plan_blocks').insert(rows)).error) return
+      if (rows.length && (await supabase.from('plan_blocks').upsert(rows, { onConflict: 'user_id,starts_at,ends_at,title', ignoreDuplicates: true })).error) return
       try {
         localStorage.setItem(BLOCKS(profile.id), signature)
       } catch {
         /* rewritten next time, harmlessly */
       }
     }
-    write()
+    writingBlocks.current = write().finally(() => {
+      writingBlocks.current = null
+    })
   }, [plan, profile, configured, supabase])
 
   // The student's time zone, so their subscribed calendar puts all-day tests

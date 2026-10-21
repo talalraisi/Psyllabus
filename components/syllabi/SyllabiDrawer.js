@@ -50,13 +50,16 @@ export function SyllabiProvider({ profile, children }) {
       {available && state && (
         <>
           <div className="fixed inset-0 z-[55] sm:hidden" style={{ background: 'rgb(0 0 0 / 0.4)' }} onClick={close} aria-hidden="true" />
+          {/* A floating panel in the corner on a wide screen, so the page it
+              was opened about stays in view beside it; a sheet from the
+              bottom on a phone. It used to be a full-height wall. */}
           <aside
             role="dialog"
             aria-label="Syllabi"
-            className="sy-slide fixed inset-y-0 right-0 z-[60] flex w-full flex-col border-l shadow-2xl sm:w-[440px]"
-            style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+            className="sy-panel fixed inset-x-0 bottom-0 z-[60] flex h-[86dvh] flex-col overflow-hidden rounded-t-[24px] border shadow-2xl sm:inset-x-auto sm:bottom-5 sm:right-5 sm:h-[min(620px,calc(100dvh-2.5rem))] sm:w-[400px] sm:rounded-[24px]"
+            style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)', boxShadow: '0 30px 80px -20px rgb(0 0 0 / 0.6)' }}
           >
-            <header className="flex h-14 shrink-0 items-center gap-2.5 border-b px-4" style={{ borderColor: 'var(--border)' }}>
+            <header className="flex h-[52px] shrink-0 items-center gap-2.5 border-b px-3.5" style={{ borderColor: 'var(--border)' }}>
               <span className="flex h-7 w-7 items-center justify-center rounded-full" style={{ background: 'var(--brand)', color: '#fff' }}>
                 <SyllabiMark size={13} />
               </span>
@@ -75,7 +78,7 @@ export function SyllabiProvider({ profile, children }) {
                 <Close size={13} />
               </button>
             </header>
-            <div className="flex min-h-0 flex-1 flex-col px-3 pb-3 pt-2">
+            <div className="flex min-h-0 flex-1 flex-col px-3 pb-2.5 pt-1">
               <TutorChat
                 key={state.n}
                 compact
