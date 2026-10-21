@@ -49,6 +49,8 @@ export default function SyllabusPage() {
   const [expandedTopics, setExpandedTopics] = useState({})
   const [progressDetail, setProgressDetail] = useState({})
   const [hasQuestions, setHasQuestions] = useState(false)
+  // subtopic → lesson id, for the subtopics that have a lesson.
+  const [lessonIds, setLessonIds] = useState({})
   const [drawerItem, setDrawerItem] = useState(null)
   const [papersOpen, setPapersOpen] = useState(false)
 
@@ -86,7 +88,7 @@ export default function SyllabusPage() {
 
       setSubjectName(resolved)
 
-      const [syllabus, { data: userProgress }, { count: questionCount }] =
+      const [syllabus, { data: userProgress }, { count: questionCount }, { data: lessonRows }] =
         await Promise.all([
           getSyllabus(supabase, [resolved]),
           supabase
@@ -99,6 +101,9 @@ export default function SyllabusPage() {
             .select('id', { count: 'exact', head: true })
             .eq('subject', resolved)
             .eq('verified', true),
+          // Only the checked ones are readable, so a subtopic without a
+          // finished lesson simply has no button.
+          supabase.from('lessons').select('id, subtopic').eq('subject', resolved),
         ])
 
       const progressMap = buildProgressMap(userProgress)
@@ -106,6 +111,7 @@ export default function SyllabusPage() {
       setProgress(progressMap)
       setProgressDetail(buildProgressDetailMap(userProgress))
       setHasQuestions((questionCount || 0) > 0)
+      setLessonIds(Object.fromEntries((lessonRows || []).map((l) => [l.subtopic, l.id])))
 
       // Everything starts closed. A syllabus is 40 to 300 subtopics, and
       // dropping all of them on the page at once means scrolling past nine
@@ -353,6 +359,14 @@ export default function SyllabusPage() {
                               >
                                 Resources
                               </button>
+                              {lessonIds[item.subtopic] && (
+                                <Link
+                                  href={`/dashboard/lesson/${lessonIds[item.subtopic]}?back=${encodeURIComponent(slugPath)}`}
+                                  className="btn btn-quiet control-sm"
+                                >
+                                  Lesson
+                                </Link>
+                              )}
                               {/* Five questions, marked as you go. The long
                                   version is a click further on, in the test
                                   builder; this is the one that gets done. */}

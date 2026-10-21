@@ -1,0 +1,353 @@
+{
+ "id": "preview",
+ "subject": "Physics SL",
+ "topic": "A. Space, time and motion",
+ "subtopic": "Work done by a force",
+ "minutes": 10,
+ "body": {
+  "intro": "Work is the transfer of energy by a force that moves something, and it links forces, motion and energy in one idea. It lets you solve many kinematics problems without using time or acceleration, and it is central to IB mechanics.",
+  "sections": [
+   {
+    "heading": "Work is energy transferred by a force",
+    "body": "When a force moves an object, the force does work. Work is the energy transferred to or from the object by that force. It is measured in joules, where 1 J = 1 N m. Only the part of the force along the displacement does work, so for a constant force $W = Fs\\cos\\theta$, where $s$ is the displacement and $\\theta$ is the angle between the force and the displacement. If the force is along the motion, $\\theta = 0$ and $W = Fs$. If the force is at right angles to the motion, as with a centripetal force, $\\cos 90^\\circ = 0$ so no work is done. If the force opposes the motion, $\\theta = 180^\\circ$ and the work is negative, meaning energy is removed from the object. Friction usually does negative work.",
+    "figure": {
+     "kind": "none",
+     "alt": ""
+    },
+    "check": {
+     "type": "short_answer",
+     "stem": "A constant force of 20 N acts at 60° to the direction in which a box moves. The box moves 3.0 m. Calculate the work done by the force, in J.",
+     "options": [],
+     "correct_answer": "30",
+     "accepted_answers": [
+      "30",
+      "30.0"
+     ],
+     "answer_kind": "numeric",
+     "feedback_right": "Correct: W = 20 × 3.0 × cos 60° = 30 J.",
+     "feedback_wrong": "Only the component of force along the displacement counts, so multiply by cos 60° = 0.50. W = 20 × 3.0 × 0.50 = 30 J. Using 60 J means leaving out the cos θ."
+    }
+   },
+   {
+    "heading": "Work and kinetic energy",
+    "body": "The work done by the resultant force on an object equals the change in its energy. If the only change is in speed, then $W_{net} = \\Delta E_k$. Kinetic energy is $E_k = \\frac{1}{2}mv^2$, which can also be written $E_k = \\frac{p^2}{2m}$ where $p = mv$. A positive net work speeds the object up, and a negative net work slows it down. Note that kinetic energy depends on $v^2$, so doubling the speed quadruples the kinetic energy. This work-energy link means that you can find a final speed directly from a force and a distance, without finding the acceleration or the time. Always use the resultant force, or add up the work done by each force including friction.",
+    "figure": {
+     "kind": "none",
+     "alt": ""
+    },
+    "check": {
+     "type": "mcq",
+     "stem": "A resultant force does 25 J of work on a 2.0 kg trolley that starts from rest. What is the final speed of the trolley?",
+     "options": [
+      {
+       "id": "a",
+       "text": "12.5 m s^-1",
+       "why_wrong": "This takes v = W/m = 25/2.0 and ignores that kinetic energy is ½mv²."
+      },
+      {
+       "id": "b",
+       "text": "5.0 m s^-1",
+       "why_wrong": ""
+      },
+      {
+       "id": "c",
+       "text": "25 m s^-1",
+       "why_wrong": "This stops at v² = 25 and does not take the square root."
+      },
+      {
+       "id": "d",
+       "text": "3.5 m s^-1",
+       "why_wrong": "This uses E_k = mv² without the ½, so v² = 12.5."
+      }
+     ],
+     "correct_answer": "b",
+     "accepted_answers": [],
+     "answer_kind": "none",
+     "feedback_right": "Yes: ½ × 2.0 × v² = 25 gives v² = 25, so v = 5.0 m s^-1.",
+     "feedback_wrong": "Set the work equal to the gain in kinetic energy: 25 = ½ × 2.0 × v². This gives v² = 25, so v = 5.0 m s^-1."
+    }
+   },
+   {
+    "heading": "Mechanical energy and its conservation",
+    "body": "Mechanical energy is the sum of kinetic energy, gravitational potential energy and elastic potential energy. Near the Earth's surface the change in gravitational potential energy is $\\Delta E_p = mg\\Delta h$. For a spring that obeys Hooke's law, the elastic potential energy is $E_H = \\frac{1}{2}k(\\Delta x)^2$, where $k$ is the spring constant and $\\Delta x$ is the extension or compression. When there is no friction or other resistive force, total mechanical energy is conserved, and work is simply the energy transformed from one mechanical form to another. For example, a falling object loses $E_p$ and gains the same amount of $E_k$. If friction or air resistance acts, the change in total mechanical energy equals the work done by that non-conservative force, and the energy is transferred to thermal energy.",
+    "figure": {
+     "kind": "none",
+     "alt": ""
+    },
+    "check": {
+     "type": "short_answer",
+     "stem": "A ball is dropped from rest from a height of 5.0 m. Ignoring air resistance, calculate its speed just before it lands, in m s^-1. Use g = 9.81 m s^-2.",
+     "options": [],
+     "correct_answer": "9.9",
+     "accepted_answers": [
+      "9.9",
+      "9.90"
+     ],
+     "answer_kind": "numeric",
+     "feedback_right": "Correct: mgh = ½mv² gives v = √(2 × 9.81 × 5.0) = 9.9 m s^-1.",
+     "feedback_wrong": "Equate the loss in E_p to the gain in E_k: mgh = ½mv², so v = √(2gh) = √(98.1) = 9.9 m s^-1. The mass cancels, so you do not need it."
+    }
+   },
+   {
+    "heading": "Power",
+    "body": "Power is the rate at which work is done, or the rate at which energy is transferred: $P = \\frac{\\Delta W}{\\Delta t}$. Its unit is the watt, where 1 W = 1 J s^-1. When a constant force $F$ moves an object at constant speed $v$ along the force, the work in time $\\Delta t$ is $F v \\Delta t$, so $P = Fv$. This explains why a vehicle needs more power to travel faster against the same resistive force. For a motor lifting a load at constant speed, the force equals the weight, so $P = mgv$, or equivalently $P = \\frac{mg\\Delta h}{\\Delta t}$. Make sure that you use the force in the direction of the velocity.",
+    "figure": {
+     "kind": "none",
+     "alt": ""
+    },
+    "check": {
+     "type": "short_answer",
+     "stem": "A car travels at a constant 20 m s^-1 against a total resistive force of 500 N. Calculate the power developed by the engine to drive the car, in W.",
+     "options": [],
+     "correct_answer": "10000",
+     "accepted_answers": [
+      "10000",
+      "10 000",
+      "1.0 x 10^4"
+     ],
+     "answer_kind": "numeric",
+     "feedback_right": "Correct: at constant speed the driving force is 500 N, so P = Fv = 500 × 20 = 10 000 W.",
+     "feedback_wrong": "At constant speed the driving force equals the resistive force, 500 N. Then P = Fv = 500 × 20 = 10 000 W. Dividing 500 by 20 gives the wrong quantity."
+    }
+   },
+   {
+    "heading": "Efficiency, Sankey diagrams and fuels",
+    "body": "No device turns all its input energy into useful output. Energy is always conserved, but some of it is transferred to the surroundings, usually as thermal energy. Efficiency measures how well a device does this: $\\eta = \\frac{\\text{useful work out}}{\\text{total work in}} = \\frac{\\text{useful power out}}{\\text{total power in}}$. It has no unit and is never more than 1. A Sankey diagram shows the energy transfers as arrows whose widths are proportional to the amounts of energy. The input arrow splits into a useful arrow and a wasted arrow, and the total width stays the same. Fuels are compared using their energy density, which is the energy released per unit volume or mass, for example in MJ kg^-1. Energy released = energy density × mass of fuel.",
+    "figure": {
+     "kind": "none",
+     "alt": ""
+    },
+    "check": {
+     "type": "mcq",
+     "stem": "A fuel has an energy density of 40 MJ kg^-1. How much energy is released when 0.50 kg of the fuel is completely used?",
+     "options": [
+      {
+       "id": "a",
+       "text": "80 MJ",
+       "why_wrong": "This divides 40 by 0.50 instead of multiplying."
+      },
+      {
+       "id": "b",
+       "text": "40 MJ",
+       "why_wrong": "This gives the energy for 1 kg and ignores the mass."
+      },
+      {
+       "id": "c",
+       "text": "20 MJ",
+       "why_wrong": ""
+      },
+      {
+       "id": "d",
+       "text": "0.0125 MJ",
+       "why_wrong": "This divides 0.50 by 40, inverting the relationship."
+      }
+     ],
+     "correct_answer": "c",
+     "accepted_answers": [],
+     "answer_kind": "none",
+     "feedback_right": "Yes: energy = 40 × 0.50 = 20 MJ.",
+     "feedback_wrong": "Energy density is energy per kilogram, so multiply by the mass: 40 MJ kg^-1 × 0.50 kg = 20 MJ."
+    }
+   }
+  ],
+  "worked_example": {
+   "problem": "A 10 kg crate, initially at rest on a rough horizontal floor, is pulled 5.0 m by a rope. The rope exerts a constant force of 40 N at 30° above the horizontal. A constant frictional force of 20 N opposes the motion. Determine the speed of the crate after 5.0 m.",
+   "steps": [
+    "Work done by the rope: W = Fs cos θ = 40 × 5.0 × cos 30° = 173 J.",
+    "Work done by friction: it acts opposite to the motion, so W = -20 × 5.0 = -100 J.",
+    "Net work = 173 - 100 = 73 J (more precisely 73.2 J).",
+    "Net work equals the change in kinetic energy: 73.2 = ½ × 10 × v² - 0.",
+    "v² = 2 × 73.2 / 10 = 14.6, so v = 3.8 m s^-1."
+   ],
+   "answer": "3.8 m s^-1"
+  },
+  "mistakes": [
+   "Forgetting the cos θ factor and using the full force when it is at an angle. Fix: use only the component of the force along the displacement, W = Fs cos θ.",
+   "Treating the work done by friction as positive. Fix: friction opposes the motion, so θ = 180° and its work is negative.",
+   "Using E_k = mv² or forgetting to square the speed. Fix: write E_k = ½mv² and take the square root at the end when solving for v.",
+   "Quoting efficiency as more than 1 or with a unit, or dividing the input by the output. Fix: efficiency = useful output / total input, and it has no unit."
+  ],
+  "key_terms": [
+   {
+    "term": "Work",
+    "definition": "The energy transferred by a force when it moves an object, W = Fs cos θ, measured in joules."
+   },
+   {
+    "term": "Joule",
+    "definition": "The energy transferred when a force of 1 N moves an object 1 m in the direction of the force."
+   },
+   {
+    "term": "Kinetic energy",
+    "definition": "The energy an object has because of its motion, E_k = ½mv² = p²/2m."
+   },
+   {
+    "term": "Gravitational potential energy",
+    "definition": "The energy stored by an object because of its position in a gravitational field; near the Earth, ΔE_p = mgΔh."
+   },
+   {
+    "term": "Elastic potential energy",
+    "definition": "The energy stored in a deformed spring or elastic object, E_H = ½k(Δx)²."
+   },
+   {
+    "term": "Mechanical energy",
+    "definition": "The sum of kinetic, gravitational potential and elastic potential energy of a system."
+   },
+   {
+    "term": "Conservation of energy",
+    "definition": "Energy cannot be created or destroyed, only transferred from one form to another."
+   },
+   {
+    "term": "Power",
+    "definition": "The rate of doing work or transferring energy, P = ΔW/Δt = Fv, measured in watts."
+   },
+   {
+    "term": "Efficiency",
+    "definition": "The ratio of useful work (or power) out to total work (or power) in; it has no unit."
+   },
+   {
+    "term": "Sankey diagram",
+    "definition": "A diagram showing energy transfers using arrows whose widths are proportional to the energy transferred."
+   },
+   {
+    "term": "Energy density",
+    "definition": "The energy released per unit mass or volume of a fuel."
+   }
+  ]
+ },
+ "outcomes": [
+  {
+   "statement": "Calculate the work done by a constant force acting at an angle to the displacement, using W = Fs cos θ.",
+   "check": {
+    "type": "short_answer",
+    "stem": "A constant force of 50 N acts at 60° to the displacement of an object. The object moves 4.0 m. Calculate the work done by the force, in J.",
+    "options": [],
+    "correct_answer": "100",
+    "accepted_answers": [
+     "100",
+     "100.0"
+    ],
+    "answer_kind": "numeric",
+    "feedback_right": "Correct: W = 50 × 4.0 × cos 60° = 100 J.",
+    "feedback_wrong": "Use W = Fs cos θ = 50 × 4.0 × 0.50 = 100 J. A value of 200 J comes from leaving out cos θ."
+   }
+  },
+  {
+   "statement": "Determine the work done by the resultant force from the change in kinetic energy of a system.",
+   "check": {
+    "type": "mcq",
+    "stem": "A car of mass 1000 kg speeds up from 10 m s^-1 to 20 m s^-1. What is the work done by the resultant force on the car?",
+    "options": [
+     {
+      "id": "a",
+      "text": "50 000 J",
+      "why_wrong": "This uses ½m(Δv)² with Δv = 10 m s^-1, instead of the difference of the kinetic energies."
+     },
+     {
+      "id": "b",
+      "text": "200 000 J",
+      "why_wrong": "This is only the final kinetic energy, ½ × 1000 × 20², and ignores the initial kinetic energy."
+     },
+     {
+      "id": "c",
+      "text": "300 000 J",
+      "why_wrong": "This forgets the ½ in the kinetic energy, 1000 × (400 - 100)."
+     },
+     {
+      "id": "d",
+      "text": "150 000 J",
+      "why_wrong": ""
+     }
+    ],
+    "correct_answer": "d",
+    "accepted_answers": [],
+    "answer_kind": "none",
+    "feedback_right": "Yes: W = ½ × 1000 × (20² - 10²) = 150 000 J.",
+    "feedback_wrong": "Work done by the resultant force equals the change in kinetic energy: ½ × 1000 × (400 - 100) = 150 000 J. Subtract the kinetic energies, not the speeds."
+   }
+  },
+  {
+   "statement": "Calculate a speed using conservation of mechanical energy when elastic potential energy is transformed into kinetic energy.",
+   "check": {
+    "type": "mcq",
+    "stem": "A spring with k = 400 N m^-1 is compressed by 0.050 m and then launches a ball of mass 0.020 kg along a frictionless horizontal surface. What is the speed of the ball as it leaves the spring?",
+    "options": [
+     {
+      "id": "a",
+      "text": "50 m s^-1",
+      "why_wrong": "This stops at v² = 50 and does not take the square root."
+     },
+     {
+      "id": "b",
+      "text": "5.0 m s^-1",
+      "why_wrong": "This omits the ½ in the spring energy, 0.50 J → 1.0 J is not used; it instead drops the ½ from the kinetic energy, giving v² = 25."
+     },
+     {
+      "id": "c",
+      "text": "10 m s^-1",
+      "why_wrong": "This omits the ½ from the spring energy, using kx² = 1.0 J."
+     },
+     {
+      "id": "d",
+      "text": "7.1 m s^-1",
+      "why_wrong": ""
+     }
+    ],
+    "correct_answer": "d",
+    "accepted_answers": [],
+    "answer_kind": "none",
+    "feedback_right": "Yes: ½ × 400 × 0.050² = 0.50 J = ½ × 0.020 × v², so v = 7.1 m s^-1.",
+    "feedback_wrong": "Equate the elastic energy ½kΔx² = 0.50 J to the kinetic energy ½mv². This gives v² = 50, so v = 7.1 m s^-1."
+   }
+  },
+  {
+   "statement": "Calculate the power developed when work is done at a steady rate.",
+   "check": {
+    "type": "short_answer",
+    "stem": "A motor lifts a 10 kg load through a height of 4.0 m at constant speed in 5.0 s. Calculate the useful power output of the motor, in W. Use g = 9.81 m s^-2.",
+    "options": [],
+    "correct_answer": "78.5",
+    "accepted_answers": [
+     "78.5",
+     "78.48"
+    ],
+    "answer_kind": "numeric",
+    "feedback_right": "Correct: P = mgΔh/Δt = 10 × 9.81 × 4.0 / 5.0 = 78.5 W.",
+    "feedback_wrong": "Work done = mgΔh = 10 × 9.81 × 4.0 = 392 J. Power is work divided by time: 392 / 5.0 = 78.5 W."
+   }
+  },
+  {
+   "statement": "Calculate the efficiency of a device from its energy or power input and useful output.",
+   "check": {
+    "type": "mcq",
+    "stem": "A motor takes 40 W of electrical power in and gives out 30 W of useful mechanical power. What is its efficiency?",
+    "options": [
+     {
+      "id": "a",
+      "text": "0.25",
+      "why_wrong": "This is the wasted power divided by the input, 10/40, not the useful fraction."
+     },
+     {
+      "id": "b",
+      "text": "1.33",
+      "why_wrong": "This inverts the ratio, input divided by useful output."
+     },
+     {
+      "id": "c",
+      "text": "0.75",
+      "why_wrong": ""
+     },
+     {
+      "id": "d",
+      "text": "0.43",
+      "why_wrong": "This divides useful output by the sum of the useful and input power, 30/70."
+     }
+    ],
+    "correct_answer": "c",
+    "accepted_answers": [],
+    "answer_kind": "none",
+    "feedback_right": "Yes: efficiency = 30/40 = 0.75.",
+    "feedback_wrong": "Efficiency = useful power out / total power in = 30/40 = 0.75. It is never greater than 1."
+   }
+  }
+ ]
+}

@@ -15,7 +15,7 @@ import QuestionStimulus from '@/components/QuestionStimulus'
 import ReportQuestion from '@/components/ReportQuestion'
 import { EmptyState } from '@/components/PageShell'
 import { IconCheck, IconClose } from '@/components/Icons'
-import { gradeAnswer } from '@/lib/grading'
+import { gradeAnswer, feedbackFor } from '@/lib/grading'
 import { createClient } from '@/lib/supabase'
 import {
   statusFromPoints,
@@ -1265,9 +1265,9 @@ export default function QuizRunner({
             >
               {revealed[q.id].correct ? 'Correct' : 'Not right'}
             </p>
-            {!revealed[q.id].correct && q.option_feedback?.[selected] && (
+            {!revealed[q.id].correct && feedbackFor(q, selected) && (
               <p className="mt-1.5 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-                {q.option_feedback[selected]}
+                <MathText>{feedbackFor(q, selected)}</MathText>
               </p>
             )}
             {q.explanation && (
@@ -1423,15 +1423,17 @@ export default function QuizRunner({
 
             {expanded && (
               <>
-                {g.question.option_feedback?.[g.selected] && (
+                {!g.correct && feedbackFor(g.question, g.selected) && (
                   <p
                     className="mt-2 text-[13.5px] leading-relaxed"
                     style={{ color: 'var(--status-weak)' }}
                   >
                     <span className="font-semibold">
-                      You picked {String(g.selected).toUpperCase()}.
+                      {g.question.question_type === 'short_answer'
+                        ? `You wrote ${String(g.selected).slice(0, 40)}.`
+                        : `You picked ${String(g.selected).toUpperCase()}.`}
                     </span>{' '}
-                    {g.question.option_feedback[g.selected]}
+                    <MathText>{feedbackFor(g.question, g.selected)}</MathText>
                   </p>
                 )}
                 {g.question.explanation && (

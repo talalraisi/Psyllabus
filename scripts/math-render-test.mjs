@@ -56,6 +56,22 @@ check('an unknown command survives', flat('$\\weird{x}$').includes('\\weird'))
 check('an unclosed brace does not eat the string', flat('x^{2').includes('2'))
 check('empty and null are safe', flat('') === '' && flat(null) === '' && flat(undefined) === '')
 
+// What the lesson writer produces.
+check('trig functions are words', flat('$W = Fs\\cos\\theta$') === 'W = Fs cos θ')
+check('a degree after a power', flat('$\\cos 90^\\circ = 0$') === 'cos 90° = 0')
+check('a plain variable in dollars is maths', flat('where $s$ is the displacement') === 'where s is the displacement')
+check('a formula without powers is maths', flat('so $W = Fs$ here') === 'so W = Fs here')
+check('a number in dollars loses its dollars', flat('a mass of $3.0$ kg') === 'a mass of 3.0 kg')
+check('text inside maths', flat('$v = 3\\text{ m s}^{-1}$') === 'v = 3 m s⁻¹')
+check('thin spaces', flat('$5\\,\\text{kg}$') === '5 kg')
+check('left and right brackets', flat('$\\left(x+1\\right)$') === '(x+1)')
+check('a vector accent', flat('$\\vec{F}$') === 'F\u20d7')
+check('a mean bar', flat('$\\bar{x}$') === 'x\u0304')
+check('real numbers', flat('$x \\in \\mathbb{R}$') === 'x ∈ ℝ')
+check('log with an index', flat('$\\log_2 8$').startsWith('log_(2)'))
+check('a percent sign', flat('$50\\%$') === '50%')
+check('money with words is still money', flat('It costs $40 and then $50 more') === 'It costs $40 and then $50 more')
+
 // Units, which look like maths but are not.
 check('units with a caret still work', flat('12 m s^-1') === '12 m s⁻¹')
 

@@ -45,3 +45,12 @@ ios/
 android/
 merge-backup-*.json
 codes-*.csv
+
+# IB subject guide text is IB copyright: kept on this machine, never committed
+# (the repository is public).
+guides/*.txt
+guides/ib/
+!guides/sources.txt
+
+# Content pipeline state, reports and spend ledger (scripts/build-content.mjs)
+content-runs/

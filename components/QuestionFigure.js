@@ -9,17 +9,21 @@
  * something that looks plausible in the response and renders as a tangle, and
  * nobody finds out until a student is sitting in front of it.
  *
- * Four kinds, chosen because they cover most of what an exam actually shows:
+ * The kinds, chosen because they cover most of what an exam actually shows:
  *
  *   plot     a function or a physical relationship, drawn from points
  *   bar      categories against values, which is most of economics
  *   scatter  measured data, optionally with a line through it
  *   table    the data-based question, where the numbers are the figure
+ *   circuit  a supply, series components and parallel branches (figures/)
+ *   forces   a free-body diagram on nothing, flat ground or a slope
  *
  * Anything else renders as nothing rather than as a guess.
  */
 
 import { figureIsUsable } from '@/lib/figures'
+import CircuitFigure from '@/components/figures/CircuitFigure'
+import ForcesFigure from '@/components/figures/ForcesFigure'
 
 export { figureIsUsable }
 
@@ -270,7 +274,7 @@ function Table({ figure }) {
   )
 }
 
-const KINDS = { plot: Plot, scatter: Scatter, bar: Bars, table: Table }
+const KINDS = { plot: Plot, scatter: Scatter, bar: Bars, table: Table, circuit: CircuitFigure, forces: ForcesFigure }
 
 export default function QuestionFigure({ figure }) {
   // The same guard the generator uses, so a figure that would render as an
