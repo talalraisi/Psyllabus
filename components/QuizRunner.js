@@ -233,6 +233,8 @@ export default function QuizRunner({
           .eq('user_id', user.id)
           .lte('next_review_at', new Date().toISOString())
         if (subjects?.length) query = query.in('questions.subject', subjects)
+        // Redemption can start a review of one subtopic's mistakes.
+        if (subtopics?.length) query = query.in('questions.subtopic', subtopics)
 
         const { data: rows } = await query
           .order('next_review_at', { ascending: true })

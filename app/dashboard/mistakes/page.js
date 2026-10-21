@@ -5,101 +5,23 @@ import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
 import { getProfile } from '@/lib/cache'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
-import { displaySubtopic } from '@/lib/progress'
-import { IconChevronRight } from '@/components/Icons'
-import { Page, PageHeader, EmptyState, PageLoading } from '@/components/PageShell'
-import CountUp from '@/components/CountUp'
+import { PageLoading } from '@/components/PageShell'
 import { startLoading, stopLoading } from '@/components/LoadingBar'
+import { RedemptionView } from '@/components/Redemption'
 
-const DAY = 24 * 60 * 60 * 1000
-
-/** Three correct recalls and a question leaves the bank. */
-const REVIEWS_TO_CLEAR = 3
-
-/** Which shelf a question sits on, and in what order the shelves read. */
-const BUCKETS = [
-  { key: 'now', label: 'Due now', hint: 'Waiting for you.' },
-  { key: 'tomorrow', label: 'Tomorrow', hint: null },
-  { key: 'week', label: 'Later this week', hint: null },
-  { key: 'later', label: 'Further out', hint: null },
-]
-
-function bucketFor(nextReviewAt, now) {
-  const diff = new Date(nextReviewAt).getTime() - now
-  if (diff <= 0) return 'now'
-  if (diff <= DAY) return 'tomorrow'
-  if (diff <= 7 * DAY) return 'week'
-  return 'later'
-}
-
-function relativeDue(nextReviewAt, now = Date.now()) {
-  const diff = new Date(nextReviewAt).getTime() - now
-  if (diff <= 0) return 'Due now'
-  const days = Math.ceil(diff / (24 * 60 * 60 * 1000))
-  return days === 1 ? 'Tomorrow' : days <= 7 ? `In ${days} days` : `In ${Math.round(days / 7)} weeks`
-}
-
-/**
- * Three correct reviews, as three lights.
- *
- * The number that matters here is not how many questions are in the bank, it
- * is how close each one is to leaving it — and "1/3" is a fraction to parse
- * while three lights is a glance. A filled one glows; the empty ones sit
- * there waiting, which is the whole feeling of the page.
- */
-function ClearDots({ count = 0, size = 8 }) {
-  return (
-    <span
-      className="flex shrink-0 items-center gap-1.5"
-      title={`${count} of ${REVIEWS_TO_CLEAR} correct reviews`}
-      aria-label={`${count} of ${REVIEWS_TO_CLEAR} correct reviews`}
-    >
-      {Array.from({ length: REVIEWS_TO_CLEAR }).map((_, i) => {
-        const lit = i < count
-        return (
-          <span
-            key={i}
-            className="rounded-full transition-all duration-300"
-            style={{
-              width: size,
-              height: size,
-              background: lit ? 'var(--status-proficient)' : 'transparent',
-              border: lit ? 'none' : '1.5px solid var(--border-strong)',
-              boxShadow: lit
-                ? '0 0 0 3px color-mix(in oklab, var(--status-proficient) 18%, transparent)'
-                : 'none',
-            }}
-          />
-        )
-      })}
-    </span>
-  )
-}
-
+/** Redemption: loads the bank, and components/Redemption.js lays it out. */
 export default function MistakeBankPage() {
   const [profile, setProfile] = useState(null)
-  const [picked, setPicked] = useState([])
-  // Folded state per shelf. Absent means open, so the page still shows its
-  // contents the first time you arrive.
-  const [openBuckets, setOpenBuckets] = useState({})
   const [mistakes, setMistakes] = useState([])
   /**
-   * The clock, read once when the data arrives rather than on every render.
-   *
-   * `Date.now()` in the body of a component is a different answer each time
-   * it runs, which is the definition of an impure render: the server and the
-   * browser disagree about which reviews are due, and React calls that a
-   * hydration mismatch. Read alongside the rows it is used to filter, so
-   * "due" means due as of the moment this page loaded.
+   * The clock, read once when the data arrives rather than on every render,
+   * so "due" means due as of the moment this page loaded and the server and
+   * browser never disagree about it.
    */
   const [loadedAt, setLoadedAt] = useState(null)
   const [loading, setLoading] = useState(true)
 
-  // The top bar runs for as long as this page is fetching, not just while the
-  // route is in flight. A page that has arrived but has no data yet is the
-  // part that feels broken.
   useEffect(() => {
     if (!loading) return
     startLoading()
@@ -115,9 +37,7 @@ export default function MistakeBankPage() {
         router.push('/login')
         return
       }
-
       const profileData = await getProfile(supabase, user.id, { onFresh: setProfile })
-
       if (!profileData) {
         router.push('/onboarding')
         return
@@ -145,219 +65,9 @@ export default function MistakeBankPage() {
     )
   }
 
-  const now = loadedAt ?? 0
-  const due = mistakes.filter((m) => new Date(m.next_review_at).getTime() <= now)
-
-  const bySubject = mistakes.reduce((acc, m) => {
-    const subject = m.questions.subject || 'Other'
-    ;(acc[subject] ||= []).push(m)
-    return acc
-  }, {})
-
-  const subjects = Object.keys(bySubject).sort()
-  // Nothing picked means everything, which is the state you want on arrival:
-  // the page should not make you choose before it shows you anything.
-  const scope = picked.length ? picked : subjects
-  const inScope = mistakes.filter((m) => scope.includes(m.questions.subject || 'Other'))
-  // Questions with at least one correct review behind them: the part of the
-  // bank that is on its way out rather than sitting still.
-  const clearing = inScope.filter((m) => (m.review_count || 0) > 0).length
-  const dueInScope = inScope.filter((m) => new Date(m.next_review_at).getTime() <= now)
-
-  const toggle = (subject) =>
-    setPicked((prev) =>
-      prev.includes(subject) ? prev.filter((s) => s !== subject) : [...prev, subject]
-    )
-
-  const reviewHref =
-    picked.length && picked.length < subjects.length
-      ? `/dashboard/quiz?mode=mistakes&subjects=${encodeURIComponent(picked.join('~~'))}&back=/dashboard/mistakes`
-      : '/dashboard/quiz?mode=mistakes&back=/dashboard/mistakes'
-
   return (
     <DashboardLayout profile={profile}>
-      <Page width="default">
-        <PageHeader title="Redemption" />
-
-        {mistakes.length === 0 ? (
-          <EmptyState
-            title="Nothing to redeem yet"
-            description="Questions you get wrong come back here until you have them three times running."
-          />
-        ) : (
-          <>
-            {/* Pick the subjects to work on. The review button follows the
-                picker, so "only Physics tonight" is one tap rather than a
-                different page. */}
-            {subjects.length > 1 && (
-              <div className="mb-10 flex flex-wrap items-center gap-2">
-                <button
-                  onClick={() => setPicked([])}
-                  aria-pressed={picked.length === 0}
-                  className={`${picked.length === 0 ? 'btn btn-solid control-sm' : 'btn btn-outline control-sm'}`}
-                >
-                  All subjects
-                </button>
-                {subjects.map((subject) => {
-                  const dueHere = bySubject[subject].filter(
-                    (m) => new Date(m.next_review_at).getTime() <= now
-                  ).length
-                  const on = picked.includes(subject)
-                  return (
-                    <button
-                      key={subject}
-                      onClick={() => toggle(subject)}
-                      aria-pressed={on}
-                      className={`${on ? 'btn btn-solid control-sm' : 'btn btn-outline control-sm'}`}
-                    >
-                      {subject}
-                      <span className="ml-2 tabular-nums opacity-60">
-                        {dueHere > 0 ? `${dueHere} due` : bySubject[subject].length}
-                      </span>
-                    </button>
-                  )
-                })}
-              </div>
-            )}
-
-            {/* What is waiting, and the one thing to do about it. */}
-            <section
-              className="mb-9 rounded-[16px] border p-6"
-              style={{
-                borderColor: dueInScope.length ? 'var(--brand)' : 'var(--border-strong)',
-                background: dueInScope.length ? 'var(--brand-tint)' : 'var(--surface)',
-              }}
-            >
-              <div className="flex flex-wrap items-end justify-between gap-5">
-                <div className="min-w-0">
-                  <p
-                    className="text-[10.5px] font-semibold uppercase tracking-[0.16em]"
-                    style={{ color: 'var(--text-faint)' }}
-                  >
-                    {dueInScope.length ? 'Waiting for you' : 'Nothing due'}
-                  </p>
-                  <p className="mt-2 text-[clamp(1.9rem,4vw,2.4rem)] font-semibold leading-none tracking-[-0.03em] tabular-nums">
-                    <CountUp value={dueInScope.length} />
-                    <span className="ml-2 text-[14px] font-medium" style={{ color: 'var(--text-muted)' }}>
-                      of {inScope.length} in the bank
-                    </span>
-                  </p>
-                  <p className="mt-2.5 text-[13px]" style={{ color: 'var(--text-muted)' }}>
-                    {clearing > 0
-                      ? `${clearing} on their way out. Three in a row clears one for good.`
-                      : 'Three correct in a row clears a question for good.'}
-                  </p>
-                </div>
-
-                {dueInScope.length > 0 && (
-                  <Link href={reviewHref} className="btn btn-solid control-lg shrink-0">
-                    Redeem {dueInScope.length}
-                  </Link>
-                )}
-              </div>
-
-              {/* How much of the bank is part-cleared, as one bar. */}
-              {inScope.length > 0 && (
-                <div
-                  className="mt-6 flex h-1.5 overflow-hidden rounded-full"
-                  style={{ background: 'var(--border-strong)' }}
-                >
-                  <span
-                    className="bar-fill h-full"
-                    style={{
-                      width: `${(clearing / inScope.length) * 100}%`,
-                      background: 'var(--status-proficient)',
-                    }}
-                  />
-                </div>
-              )}
-            </section>
-
-            <div className="flex flex-col">
-              {BUCKETS.map(({ key, label, hint }) => {
-                const items = inScope.filter(
-                  (m) => bucketFor(m.next_review_at, now) === key
-                )
-                if (!items.length) return null
-                const isOpen = openBuckets[key] !== false // open unless folded
-
-                return (
-                  <section
-                    key={key}
-                    className="border-t last:border-b"
-                    style={{ borderColor: 'var(--border)' }}
-                  >
-                    <button
-                      onClick={() => setOpenBuckets((prev) => ({ ...prev, [key]: !isOpen }))}
-                      aria-expanded={isOpen}
-                      className="flex w-full items-center gap-3 py-3.5 text-left"
-                    >
-                      <IconChevronRight
-                        width={13}
-                        height={13}
-                        className={`shrink-0 transition-transform duration-150 ${isOpen ? 'rotate-90' : ''}`}
-                        style={{ color: 'var(--text-faint)' }}
-                      />
-                      <span
-                        className="text-[13.5px] font-medium"
-                        style={{ color: key === 'now' ? 'var(--status-fading)' : 'var(--text)' }}
-                      >
-                        {label}
-                      </span>
-                      {hint && (
-                        <span className="hidden text-[12px] sm:block" style={{ color: 'var(--text-faint)' }}>
-                          {hint}
-                        </span>
-                      )}
-                      <span
-                        className="ml-auto shrink-0 text-[12px] tabular-nums"
-                        style={{ color: 'var(--text-faint)' }}
-                      >
-                        {items.length}
-                      </span>
-                    </button>
-
-                    {isOpen && (
-                      <ul className="stagger flex flex-col pb-2 pl-6">
-                        {items.map((m) => (
-                          <li
-                            key={m.id}
-                            className="flex items-center gap-4 border-t py-3.5"
-                            style={{ borderColor: 'var(--border)' }}
-                          >
-                            <ClearDots count={m.review_count || 0} />
-
-                            <div className="min-w-0 flex-1">
-                              <p className="truncate text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
-                                {m.questions.subject} · {displaySubtopic(m.questions.subtopic)}
-                              </p>
-                              <p
-                                className="mt-0.5 truncate text-[13.5px]"
-                                style={{ color: 'var(--text-body)' }}
-                              >
-                                {m.questions.stem}
-                              </p>
-                            </div>
-
-                            <span
-                              className="w-[74px] shrink-0 text-right text-[12.5px] font-medium tabular-nums"
-                              style={{
-                                color: key === 'now' ? 'var(--status-fading)' : 'var(--text-muted)',
-                              }}
-                            >
-                              {relativeDue(m.next_review_at, now)}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </section>
-                )
-              })}
-            </div>
-          </>
-        )}
-      </Page>
+      <RedemptionView mistakes={mistakes} now={loadedAt ?? 0} />
     </DashboardLayout>
   )
 }

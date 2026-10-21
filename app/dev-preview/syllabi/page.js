@@ -13,6 +13,7 @@
  *   ?view=drawer  the buttons the rest of the app uses, and the drawer
  *   ?view=layout  the signed-in frame
  *   ?view=streak  the frame with the dashboard's streak and ways to study
+ *   ?view=redemption  the Redemption page with sample questions
  */
 
 import { Suspense, useState } from 'react'
@@ -35,6 +36,7 @@ import { SyllabiProvider, AskSyllabi } from '@/components/syllabi/SyllabiDrawer'
 import DashboardLayout from '@/components/DashboardLayout'
 import { StreakCard } from '@/components/Streak'
 import WaysToStudy from '@/components/WaysToStudy'
+import { RedemptionView } from '@/components/Redemption'
 import { primeStudyDays } from '@/lib/streak'
 import { dayKey } from '@/lib/study-time'
 
@@ -130,6 +132,32 @@ function Preview() {
   })
   if (!ENABLED) notFound()
   if (!ready) return null
+
+  if (view === 'redemption') {
+    const NOW = Date.UTC(2026, 9, 21, 12)
+    const H = 3600000
+    const q = (i, subject, subtopic, stem, review_count, hours) => ({ id: String(i), review_count, next_review_at: new Date(NOW + hours * H).toISOString(), questions: { subject, subtopic, stem } })
+    const sample = [
+      q(1, 'Physics SL', 'Simple harmonic motion', 'A mass on a spring oscillates with period 0.8 s. What is its angular frequency?', 0, -5),
+      q(2, 'Physics SL', 'Simple harmonic motion', 'At which point in its oscillation is the acceleration of a pendulum bob greatest?', 1, -2),
+      q(3, 'Physics SL', 'Simple harmonic motion', 'Doubling the amplitude of a simple harmonic oscillator changes its period by what factor?', 2, 20),
+      q(4, 'Physics SL', 'Simple harmonic motion', 'Sketch how kinetic energy varies with displacement for a body in SHM.', 0, -1),
+      q(5, 'Physics SL', 'Simple harmonic motion', 'Explain why the period of a simple pendulum does not depend on the mass of the bob.', 1, 70),
+      q(6, 'Physics SL', 'Thermal energy transfers', 'Why does a metal spoon feel colder than a wooden one at the same temperature?', 0, -3),
+      q(7, 'Physics SL', 'Thermal energy transfers', 'Calculate the energy needed to melt 0.25 kg of ice at 0 °C.', 2, 200),
+      q(8, 'Economics HL', 'Price elasticity of demand', 'If PED is -0.4 and price rises by 10%, what happens to total revenue?', 0, -6),
+      q(9, 'Economics HL', 'Price elasticity of demand', 'Why is the demand for petrol relatively inelastic in the short run?', 1, 10),
+      q(10, 'Economics HL', 'Market failure: externalities', 'Draw and explain a negative externality of production diagram.', 0, -4),
+      q(11, 'Economics HL', 'Market failure: externalities', 'Evaluate a carbon tax as a response to negative externalities.', 2, 120),
+      q(12, 'Biology HL', 'Cell membranes', 'Explain why phospholipids form a bilayer in water.', 1, -1),
+      q(13, 'Biology HL', 'Cell membranes', 'Distinguish between facilitated diffusion and active transport.', 0, 30),
+    ]
+    return (
+      <DashboardLayout profile={{ ...PROFILE, id: 'preview', full_name: 'Sample Student', curriculum: 'IB', grad_year: '2028' }}>
+        <RedemptionView mistakes={sample} now={NOW} />
+      </DashboardLayout>
+    )
+  }
 
   if (view === 'streak') {
     const profile = { ...PROFILE, id: 'preview', full_name: 'Sample Student', curriculum: 'IB', grad_year: '2028' }
