@@ -57,8 +57,8 @@ function Boxes({ cards, compact = false }) {
         ))}
       </div>
       <div className="mt-1.5 flex gap-1.5">
-        {BOX_LABEL.map((l) => (
-          <span key={l} className="flex-1 truncate text-center text-[10px]" style={{ color: 'var(--text-faint)' }}>
+        {BOX_LABEL.map((l, i) => (
+          <span key={i} className="flex-1 truncate text-center text-[10px]" style={{ color: 'var(--text-faint)' }}>
             {l}
           </span>
         ))}

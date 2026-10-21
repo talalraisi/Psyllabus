@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import { IconArrowRight } from '@/components/Icons'
 
 /**
@@ -29,26 +29,37 @@ function Icon({ k }) {
   return <svg {...p}><path d="M9 4h6M10 4v5l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V4" /></svg>
 }
 
+/* The remembered mode, read through useSyncExternalStore so the server and the
+   first client render agree (both the default) and the saved one follows. */
+const listeners = new Set()
+const subscribe = (fn) => {
+  listeners.add(fn)
+  return () => listeners.delete(fn)
+}
+const readSaved = () => {
+  try {
+    return localStorage.getItem(KEY)
+  } catch {
+    return null
+  }
+}
+
 export default function StudyMenu({ count, primary = 'flip', verb = 'Review', onStart, compact = false }) {
   const available = MODES.filter((m) => !m.min || count >= m.min)
-  const [mode, setMode] = useState(() => {
-    try {
-      const saved = typeof window !== 'undefined' && localStorage.getItem(KEY)
-      if (saved && available.some((m) => m.key === saved)) return saved
-    } catch {
-      // Not remembered; the default stands.
-    }
-    return primary
-  })
+  const saved = useSyncExternalStore(subscribe, readSaved, () => null)
+  // Picked this visit, which holds even where storage is blocked.
+  const [picked, setPicked] = useState(null)
+  const mode = picked || (available.some((m) => m.key === saved) ? saved : primary)
   const current = available.find((m) => m.key === mode) || available[0]
 
   const pick = (k) => {
-    setMode(k)
+    setPicked(k)
     try {
       localStorage.setItem(KEY, k)
     } catch {
-      // As above.
+      // Not remembered; this visit still has it.
     }
+    listeners.forEach((fn) => fn())
   }
 
   return (

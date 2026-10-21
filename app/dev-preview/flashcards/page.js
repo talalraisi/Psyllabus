@@ -10,6 +10,8 @@ import { notFound } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 import FlashcardsView from '@/components/flashcards/FlashcardsView'
 import FlashcardReview from '@/components/FlashcardReview'
+import FlashcardWrite from '@/components/FlashcardWrite'
+import FlashcardTest from '@/components/FlashcardTest'
 
 const ENABLED = process.env.NODE_ENV !== 'production'
 const DAY = 86400000
@@ -36,7 +38,13 @@ export default function FlashcardsPreview() {
   return (
     <DashboardLayout profile={profile}>
       {session ? (
-        <FlashcardReview cards={session} onMark={() => {}} onDelete={() => {}} onExit={() => setSession(null)} />
+        session.mode === 'test' ? (
+          <FlashcardTest cards={session.cards} onMark={() => {}} onExit={() => setSession(null)} />
+        ) : session.mode === 'write' || session.mode === 'blank' ? (
+          <FlashcardWrite cards={session.cards} mode={session.mode} onMark={() => {}} onDelete={() => {}} onExit={() => setSession(null)} />
+        ) : (
+          <FlashcardReview cards={session.cards} onMark={() => {}} onDelete={() => {}} onExit={() => setSession(null)} />
+        )
       ) : (
         <FlashcardsView
           cards={cards}
@@ -44,7 +52,7 @@ export default function FlashcardsPreview() {
           notes={[]}
           subjects={profile.subjects}
           syllabi
-          onReview={(pool) => setSession(pool)}
+          onReview={(pool, mode = 'flip') => setSession({ cards: pool, mode })}
           onAdd={async (list) => (setCards((c) => [...list.map((x, i) => ({ ...x, id: `n${Date.now()}${i}`, box: 0, due_at: c[0]?.due_at })), ...c]), true)}
           onEdit={async (card, patch) => (setCards((c) => c.map((x) => (x.id === card.id ? { ...x, ...patch } : x))), true)}
           onDelete={(card) => setCards((c) => c.filter((x) => x.id !== card.id))}

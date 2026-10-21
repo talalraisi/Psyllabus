@@ -4,8 +4,9 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import MathText from '@/components/MathText'
 import { IconCheck, IconClose, IconArrowLeft, IconArrowRight } from '@/components/Icons'
 import { displaySubtopic } from '@/lib/progress'
-import { requeue, AGAIN_AFTER } from '@/lib/flashcards'
+import { requeue, shuffleCards } from '@/lib/flashcards'
 import CardMenu from '@/components/CardMenu'
+import AgainChoice, { againFromKey } from '@/components/flashcards/AgainChoice'
 import { AskSyllabi } from '@/components/syllabi/SyllabiDrawer'
 
 /**
@@ -16,11 +17,16 @@ import { AskSyllabi } from '@/components/syllabi/SyllabiDrawer'
  * over rather than swapping panels, because turning is what makes it read as
  * one object with two sides.
  *
- * Missing a card stops the session to ask when it should come back, and
- * nothing else moves until that is answered: no flipping, no going to
- * another card. Before, the arrows still worked, so you could wander off
- * mid-question, every card you landed on shook as if you had missed it too,
- * and the answer you then gave was filed against the wrong card.
+ * The deck is shuffled, and it loops. Reaching the last card deals the deck
+ * again in a new order rather than ending, so the order is never something
+ * you can learn instead of the cards, and the session lasts as long as the
+ * student wants it to. "End" is how it stops.
+ *
+ * Missing a card asks when it should come back, and nothing else moves until
+ * that is answered: no flipping, no going to another card. Before, the
+ * arrows still worked, so you could wander off mid-question, every card you
+ * landed on shook as if you had missed it too, and the answer you then gave
+ * was filed against the wrong card.
  *
  * A card is marked once. Going back to one you have answered shows what you
  * said rather than offering the buttons again, so one card cannot be counted
@@ -30,7 +36,9 @@ import { AskSyllabi } from '@/components/syllabi/SyllabiDrawer'
  * to 4 to choose when a missed card returns.
  */
 export default function FlashcardReview({ cards, onMark, onEdit, onDelete, onExit }) {
-  const [queue, setQueue] = useState(cards)
+  const [queue, setQueue] = useState(() => shuffleCards(cards))
+  // Where each round starts in the queue. A round is one pass through the deck.
+  const [rounds, setRounds] = useState([0])
   const [index, setIndex] = useState(0)
   const [flipped, setFlipped] = useState(false)
   // A missed card waits here until it is told when to come back.
@@ -38,39 +46,47 @@ export default function FlashcardReview({ cards, onMark, onEdit, onDelete, onExi
   // What was said about each position in the queue: 'right' or 'wrong'.
   const [answered, setAnswered] = useState({})
   const [direction, setDirection] = useState('next')
-  const [finished, setFinished] = useState(false)
+  const [summary, setSummary] = useState(false)
   const containerRef = useRef(null)
 
   const card = queue[index]
   const verdict = answered[index]
   const atStart = index === 0
-  const atEnd = index >= queue.length - 1
   const right = Object.values(answered).filter((v) => v === 'right').length
   const wrong = Object.values(answered).filter((v) => v === 'wrong').length
+
+  const round = rounds.filter((start) => start <= index).length
+  const roundStart = rounds[round - 1]
+  const roundEnd = rounds[round] ?? queue.length
+
+  /** One card on. Past the last card, the deck is dealt again. */
+  const advance = useCallback(
+    (list = queue) => {
+      setDirection('next')
+      if (index < list.length - 1) {
+        setFlipped(Boolean(answered[index + 1]))
+        setQueue(list)
+      } else {
+        setFlipped(false)
+        setQueue([...list, ...shuffleCards(cards, list[index])])
+        setRounds((r) => [...r, list.length])
+      }
+      setIndex(index + 1)
+    },
+    [queue, index, answered, cards]
+  )
 
   const go = useCallback(
     (delta) => {
       if (missed) return
-      const next = Math.min(queue.length - 1, Math.max(0, index + delta))
+      if (delta > 0) return advance()
+      const next = Math.max(0, index + delta)
       if (next === index) return
-      setDirection(delta > 0 ? 'next' : 'prev')
+      setDirection('prev')
       setFlipped(Boolean(answered[next]))
       setIndex(next)
     },
-    [missed, queue.length, index, answered]
-  )
-
-  const advance = useCallback(
-    (length = queue.length) => {
-      if (index < length - 1) {
-        setDirection('next')
-        setFlipped(Boolean(answered[index + 1]))
-        setIndex(index + 1)
-      } else {
-        setFinished(true)
-      }
-    },
-    [index, queue.length, answered]
+    [missed, index, answered, advance]
   )
 
   const mark = useCallback(
@@ -78,38 +94,45 @@ export default function FlashcardReview({ cards, onMark, onEdit, onDelete, onExi
       if (!card || verdict) return
       onMark(card, correct)
       setAnswered((a) => ({ ...a, [index]: correct ? 'right' : 'wrong' }))
-      // Right moves on. Wrong stays on the answer for a moment's reading and
-      // the card goes back into the pile a few cards on.
+      // Right moves on. Wrong stays on the answer and asks when to bring it back.
       if (correct) advance()
-      else {
-        setQueue((q) => requeue(q, index, card))
-        setMissed(card)
-      }
+      else setMissed(card)
     },
     [card, verdict, onMark, index, advance]
   )
 
-  /** Past a missed card, once its answer has been read. */
-  const onward = useCallback(() => {
-    setMissed(null)
-    advance()
-  }, [advance])
+  /** The missed card goes back in where the student asked, and on we go. */
+  const again = useCallback(
+    (choice) => {
+      if (!missed) return
+      const next = requeue(queue, index, missed, choice)
+      setMissed(null)
+      advance(next)
+    },
+    [missed, queue, index, advance]
+  )
 
   const flip = useCallback(() => {
     if (verdict) return
     setFlipped((f) => !f)
   }, [verdict])
 
+  const end = useCallback(() => {
+    if (right + wrong === 0) return onExit({ finished: false })
+    setSummary(true)
+  }, [right, wrong, onExit])
+
   useEffect(() => {
     const onKey = (e) => {
       // Typing to Syllabi, or in any box, is not a shortcut.
       if (e.target?.closest?.('input, textarea, select, [role="menu"]')) return
       if (e.key === 'Escape') return onExit({ finished: false })
-      if (finished) return
+      if (summary) return
       if (missed) {
-        if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight') {
+        const choice = againFromKey(e.key)
+        if (choice) {
           e.preventDefault()
-          onward()
+          again(choice)
         }
         return
       }
@@ -124,7 +147,7 @@ export default function FlashcardReview({ cards, onMark, onEdit, onDelete, onExi
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [go, mark, flip, flipped, onExit, missed, onward, finished])
+  }, [go, mark, flip, flipped, onExit, missed, again, summary])
 
   // Keep the page behind from scrolling under the overlay.
   useEffect(() => {
@@ -136,7 +159,7 @@ export default function FlashcardReview({ cards, onMark, onEdit, onDelete, onExi
   }, [])
 
   if (!card) return null
-  const progress = queue.length ? (Object.keys(answered).length / queue.length) * 100 : 0
+  const progress = ((index - roundStart + (verdict ? 1 : 0)) / Math.max(1, roundEnd - roundStart)) * 100
 
   return (
     <div ref={containerRef} tabIndex={-1} className="fixed inset-0 z-50 flex flex-col bg-[var(--bg)]" role="dialog" aria-modal="true" aria-label="Flashcard review">
@@ -148,8 +171,9 @@ export default function FlashcardReview({ cards, onMark, onEdit, onDelete, onExi
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-5 py-3">
           <p className="flex items-center gap-3 text-[13px] tabular-nums" style={{ color: 'var(--text-muted)' }}>
             <span className="font-semibold" style={{ color: 'var(--text)' }}>
-              {Math.min(index + 1, queue.length)} / {queue.length}
+              {index - roundStart + 1} / {roundEnd - roundStart}
             </span>
+            {round > 1 && <span>Round {round}</span>}
             {right + wrong > 0 && (
               <>
                 <span className="inline-flex items-center gap-1" style={{ color: 'var(--status-proficient)' }}>
@@ -161,18 +185,18 @@ export default function FlashcardReview({ cards, onMark, onEdit, onDelete, onExi
               </>
             )}
           </p>
-          <button onClick={() => onExit({ finished: false })} className="btn btn-quiet control-sm">
+          <button onClick={end} className="btn btn-quiet control-sm">
             <IconClose width={14} height={14} />
             End
           </button>
         </div>
       </div>
 
-      {finished ? (
+      {summary ? (
         <div className="flex flex-1 items-center justify-center p-6">
           <div className="pop-enter w-full max-w-md rounded-[22px] border p-8 text-center" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
             <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em]" style={{ color: 'var(--text-faint)' }}>
-              Session done
+              This session
             </p>
             <p className="mt-3 text-[40px] font-semibold leading-none tracking-[-0.03em] tabular-nums">
               {right}
@@ -182,11 +206,16 @@ export default function FlashcardReview({ cards, onMark, onEdit, onDelete, onExi
               </span>
             </p>
             <p className="mt-2 text-[14px]" style={{ color: 'var(--text-muted)' }}>
-              {wrong ? `${wrong} to come back to. They are scheduled.` : 'Every one right. They move further out.'}
+              {wrong ? `${wrong} missed. Those come up more often from now on.` : 'Every one right.'}
             </p>
-            <button onClick={() => onExit({ finished: true })} className="btn btn-solid control-lg mt-7 w-full">
-              Done
-            </button>
+            <div className="mt-7 flex gap-2">
+              <button onClick={() => setSummary(false)} className="btn btn-outline control-lg flex-1">
+                Keep going
+              </button>
+              <button onClick={() => onExit({ finished: true })} className="btn btn-solid control-lg flex-1">
+                Done
+              </button>
+            </div>
           </div>
         </div>
       ) : (
@@ -232,7 +261,7 @@ export default function FlashcardReview({ cards, onMark, onEdit, onDelete, onExi
                     </div>
                     {verdict && !missed && (
                       <p className="mt-4 text-[13px] font-medium" style={{ color: verdict === 'right' ? 'var(--status-proficient)' : 'var(--status-weak)' }}>
-                        {verdict === 'right' ? 'You got this one.' : 'You missed this one. It is scheduled to come back.'}
+                        {verdict === 'right' ? 'You got this one.' : 'You missed this one.'}
                       </p>
                     )}
                   </div>
@@ -244,14 +273,7 @@ export default function FlashcardReview({ cards, onMark, onEdit, onDelete, onExi
           {/* Controls */}
           <div className="shrink-0 border-t border-[var(--border)] bg-[var(--surface)] p-4">
             {missed ? (
-              <div className="verdict-in mx-auto flex max-w-2xl flex-wrap items-center justify-center gap-3 text-center">
-                <p className="text-[13.5px]" style={{ color: 'var(--text-body)' }}>
-                  It comes back in {AGAIN_AFTER} cards.
-                </p>
-                <button onClick={onward} className="btn btn-solid control-md">
-                  Next card
-                </button>
-              </div>
+              <AgainChoice onChoose={again} />
             ) : (
               <div className="mx-auto flex max-w-4xl items-center gap-2">
                 <button onClick={() => go(-1)} disabled={atStart} aria-label="Previous card" className="btn btn-quiet control-lg w-12 shrink-0 px-0 disabled:opacity-30">
@@ -260,7 +282,7 @@ export default function FlashcardReview({ cards, onMark, onEdit, onDelete, onExi
 
                 {verdict ? (
                   <button onClick={() => advance()} className="btn btn-outline control-lg flex-1">
-                    {atEnd ? 'Finish' : 'Next card'}
+                    Next card
                   </button>
                 ) : flipped ? (
                   <>
@@ -279,7 +301,7 @@ export default function FlashcardReview({ cards, onMark, onEdit, onDelete, onExi
                   </button>
                 )}
 
-                <button onClick={() => go(1)} disabled={atEnd} aria-label="Next card" className="btn btn-quiet control-lg w-12 shrink-0 px-0 disabled:opacity-30">
+                <button onClick={() => go(1)} aria-label="Next card" className="btn btn-quiet control-lg w-12 shrink-0 px-0">
                   <IconArrowRight width={18} height={18} />
                 </button>
               </div>
@@ -298,7 +320,7 @@ export default function FlashcardReview({ cards, onMark, onEdit, onDelete, onExi
             )}
 
             <p className="t-caption mt-3 hidden text-center md:block">
-              {missed ? 'Enter for the next card' : 'Space to flip · arrows to move · 1 missed, 2 got it · Esc to leave'}
+              {missed ? '1 soon · 2 in a bit · 3 later · 4 at the end' : 'Space to flip · arrows to move · 1 missed, 2 got it · Esc to leave'}
             </p>
           </div>
         </>

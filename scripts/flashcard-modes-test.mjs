@@ -4,6 +4,7 @@
  * test built from four cards must not offer the same option twice.
  */
 import { checkWritten, makeBlank, buildTest, scoreTest } from '../lib/flashcard-modes.js'
+import { AGAIN_CHOICES, requeue, shuffleCards } from '../lib/flashcards.js'
 
 let failed = 0
 const check = (name, ok) => {
@@ -33,6 +34,56 @@ check('empty is wrong and not close', (() => {
   return !r.correct && !r.close
 })())
 check('nothing to match against is wrong', !checkWritten('x', '').correct)
+
+// ---- marking on meaning, not on spelling it the same way ------------------
+const right = (g, e) => checkWritten(g, e).correct
+const wrongMark = (g, e) => !checkWritten(g, e).correct && !checkWritten(g, e).close
+check('"the" and "a" do not matter', right('a mitochondrion', 'the mitochondrion'))
+check('punctuation does not matter', right('ATP!', 'ATP'))
+check('plurals and tense', right('it accelerates', 'accelerating'))
+check('word order', right('energy kinetic', 'kinetic energy'))
+check('hyphens', right('cross section', 'cross-section'))
+check('British and American spelling', right('ionize', 'ionise'))
+check('a number is a number', right('0.5', '1/2'))
+check('a number with its unit', right('9.81 m/s^2', '9.81'))
+check('a wrong number is wrong', wrongMark('9.1', '9.81'))
+check('a unit is not split into two answers', wrongMark('s', '10 m/s'))
+check('the same idea in other words', right('temperature rises', 'temperature increases'))
+check('a definition in your own words', right(
+  'it is the rate at which velocity changes',
+  'Acceleration is the rate of change of velocity'
+))
+check('the opposite is wrong', wrongMark('temperature decreases', 'temperature increases'))
+check('increase is not decrease even though they look alike', wrongMark('decreases', 'increases'))
+check('hypotonic is not hypertonic', wrongMark('hypotonic', 'hypertonic'))
+check('a negation flips the answer', wrongMark('is not conserved', 'is conserved'))
+check('an aside in brackets is optional', right('DNA polymerase', 'DNA polymerase (adds nucleotides)'))
+check('words on the front are not asked for', right('newton', 'The SI unit of force is the newton') === false && checkWritten('newton', 'The SI unit of force is the newton', 'What is the SI unit of force?').correct)
+check('half the key words is partial, not right', (() => {
+  const r = checkWritten('kinetic energy', 'kinetic energy and momentum')
+  return !r.correct && r.partial
+})())
+check('one word of a two-word answer is not right', !right('kinetic', 'kinetic energy'))
+check('a list of every word you know is not an answer', !right(
+  'mitosis meiosis osmosis diffusion respiration photosynthesis transpiration translocation velocity',
+  'velocity'
+))
+
+// ---- coming back, and the order of a round --------------------------------
+const q = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r']
+const soon = AGAIN_CHOICES.find((c) => c.key === 'soon')
+const end = AGAIN_CHOICES.find((c) => c.key === 'end')
+check('"soon" lands within a few cards', [0, 0.5, 0.99].every((r) => {
+  const at = requeue(q, 0, 'X', soon, () => r).indexOf('X')
+  return at >= 2 && at <= 4
+}))
+check('"soon" is not always the same place', requeue(q, 0, 'X', soon, () => 0).indexOf('X') !== requeue(q, 0, 'X', soon, () => 0.99).indexOf('X'))
+check('"at the end" goes last', requeue(q, 3, 'X', end).at(-1) === 'X')
+check('requeue near the end does not fall off', requeue(['a', 'b'], 1, 'X', AGAIN_CHOICES[2]).at(-1) === 'X')
+const shuffled = shuffleCards(q)
+check('a shuffle keeps every card', shuffled.length === q.length && q.every((c) => shuffled.includes(c)))
+check('shuffles differ', new Set(Array.from({ length: 6 }, () => shuffleCards(q).join(''))).size > 1)
+check('a new round does not start on the card the last ended on', Array.from({ length: 30 }, () => shuffleCards(['a', 'b', 'c'], 'a')[0]).every((c) => c !== 'a'))
 
 // ---- fill in the blank -----------------------------------------------------
 const blank = makeBlank({
