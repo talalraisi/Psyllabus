@@ -22,12 +22,13 @@ function QuizPageInner() {
   const subtopic = searchParams.get('subtopic') || ''
   const mode = searchParams.get('mode') || 'subtopic'
   const backHref = searchParams.get('back') || '/dashboard'
-  const count = parseInt(searchParams.get('count') || '0', 10) || undefined
+  // A hundred at most, however the length was asked for.
+  const count = Math.min(100, parseInt(searchParams.get('count') || '0', 10)) || undefined
   const topicsParam = searchParams.get('topics')
   const topics = topicsParam ? topicsParam.split('~~') : undefined
   const subjectsParam = searchParams.get('subjects')
   const subjects = subjectsParam ? subjectsParam.split('~~') : undefined
-  const timed = searchParams.get('timed') === '1'
+  const timed = searchParams.get('timed') === '1' && searchParams.get('sit') !== 'test' && searchParams.get('sit') !== 'practice'
   const focus = searchParams.get('focus') || null
   const difficulty = searchParams.get('difficulty') || null
   const level = searchParams.get('level') || null
@@ -39,8 +40,21 @@ function QuizPageInner() {
   // limit all silently did nothing.
   const subtopicsParam = searchParams.get('subtopics')
   const subtopics = subtopicsParam ? subtopicsParam.split('~~') : undefined
-  const review = searchParams.get('review') || 'exam'
-  const hintsAllowed = searchParams.get('hints') !== '0'
+  /**
+   * How it is sat: exam (countdown, marked at the end, no hints), test
+   * (stopwatch, marked at the end, timings on the results) or practice (no
+   * clock, marked as you go). Older links say it with review and timed.
+   */
+  const sitParam = searchParams.get('sit')
+  const sit = ['exam', 'test', 'practice'].includes(sitParam)
+    ? sitParam
+    : searchParams.get('review') === 'practice'
+      ? 'practice'
+      : searchParams.get('timed') === '1'
+        ? 'exam'
+        : null
+  const review = sit === 'practice' ? 'practice' : sit ? 'exam' : searchParams.get('review') || 'exam'
+  const hintsAllowed = sit ? sit === 'practice' : searchParams.get('hints') !== '0'
   const minutes = parseInt(searchParams.get('minutes') || '0', 10) || null
 
   useEffect(() => {
@@ -105,6 +119,7 @@ function QuizPageInner() {
           order={order}
           subtopics={subtopics}
           review={review}
+          sit={sit}
           hintsAllowed={hintsAllowed}
           minutes={minutes}
           backHref={backHref}

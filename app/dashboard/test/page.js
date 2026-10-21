@@ -105,17 +105,13 @@ export default function TestBuilderPage() {
   const [unitBySubtopic, setUnitBySubtopic] = useState({})
   // 'questions' | 'marks' | 'minutes' — how the length is counted out.
   const [lengthMetric, setLengthMetric] = useState('questions')
-  const [review, setReview] = useState('practice')
-  // Hints follow exam mode rather than having a switch of their own: a real
-  // paper has no hint button, and two toggles for one idea is how a builder
-  // becomes a settings page.
-  const hintsAllowed = review !== 'exam'
+  // 'practice' | 'test' | 'exam': how the paper is sat (components/TestBuilder).
+  const [sit, setSit] = useState('practice')
   const [length, setLength] = useState(20)
   // Exam conditions are part of Basic, so a free account builds untimed papers
   // and is told why rather than finding the switch dead.
-  const [timedWanted, setTimedWanted] = useState(true)
   const canTime = canUse('timedPapers', profile)
-  const timed = canTime && timedWanted
+  const timed = canTime && sit === 'exam'
   const [qtype, setQtype] = useState('all')
   const [order, setOrder] = useState('mixed')
   // A length you typed, and a limit you chose. Both are optional: leaving them
@@ -334,7 +330,8 @@ export default function TestBuilderPage() {
     }
     return eligible.length
   }
-  const actualLength = lengthFromMetric()
+  // A hundred questions at most, however the length is counted.
+  const actualLength = Math.min(100, lengthFromMetric())
 
   /** What this paper is drawn from, in one line. */
   const scopeLabel = [
@@ -411,10 +408,9 @@ export default function TestBuilderPage() {
       topics: selected.join('~~'),
       back: '/dashboard/test',
     })
+    params.set('sit', timed || sit !== 'exam' ? sit : 'test')
     if (timed) params.set('timed', '1')
     if (effectiveSubtopics) params.set('subtopics', effectiveSubtopics.join('~~'))
-    if (review !== 'exam') params.set('review', review)
-    if (!hintsAllowed) params.set('hints', '0')
     if (qtype !== 'all') params.set('qtype', qtype)
     if (order !== 'mixed') params.set('order', order)
     if (timed && typedMinutes) params.set('minutes', String(typedMinutes))
@@ -505,12 +501,11 @@ export default function TestBuilderPage() {
           onCustomLength={setCustomLength}
           timed={timed}
           canTime={canTime}
-          onTimed={setTimedWanted}
           customMinutes={customMinutes}
           onCustomMinutes={setCustomMinutes}
           budgetMinutes={budgetMinutes}
-          review={review}
-          onReview={setReview}
+          sit={sit}
+          onSit={setSit}
           paper={{
             canStart,
             actualLength,

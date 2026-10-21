@@ -1554,3 +1554,18 @@ input[type='range'].slider:focus-visible::-moz-range-thumb {
 @media (prefers-reduced-motion: reduce) {
   .sy-panel { animation: none; }
 }
+
+/* Syllabi docked beside the page (components/syllabi/SyllabiDrawer): the
+   page moves over for it on a wide screen rather than sitting under it. */
+@media (min-width: 1024px) {
+  main { transition: margin-right 280ms cubic-bezier(0.16, 1, 0.3, 1); }
+  html.sy-docked main { margin-right: 372px; }
+  html.sy-docked .sy-panel { transform-origin: right center; }
+}
+@keyframes sy-panel-side {
+  from { opacity: 0; transform: translateX(28px); }
+  to { opacity: 1; transform: none; }
+}
+@media (min-width: 1024px) {
+  .sy-panel { animation-name: sy-panel-side; }
+}

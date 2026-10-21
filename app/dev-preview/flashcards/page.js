@@ -36,7 +36,7 @@ export default function FlashcardsPreview() {
   return (
     <DashboardLayout profile={profile}>
       {session ? (
-        <FlashcardReview cards={session} onMark={() => {}} onSnooze={() => {}} onDelete={() => {}} onExit={() => setSession(null)} />
+        <FlashcardReview cards={session} onMark={() => {}} onDelete={() => {}} onExit={() => setSession(null)} />
       ) : (
         <FlashcardsView
           cards={cards}

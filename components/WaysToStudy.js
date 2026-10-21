@@ -82,7 +82,7 @@ export default function WaysToStudy({ profile, focus }) {
     {
       key: 'flashcards',
       title: 'Flashcards',
-      line: 'Spaced cards that come back right before you forget.',
+      line: 'Your own cards, studied whenever you like.',
       href: '/dashboard/flashcards',
       Icon: IconCards,
     },

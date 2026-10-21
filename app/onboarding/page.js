@@ -6,6 +6,7 @@ import { getCoverage, coverageLabel, bestCoverage, COVERAGE_TONE } from '@/lib/c
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Select, { Chevron } from '@/components/Select'
 import Logo from '@/components/Logo'
 import { splitLevel, coursesOf, defaultLevel } from '@/lib/course-levels'
 import { getCurrentUser } from '@/lib/auth'
@@ -30,8 +31,14 @@ export default function Onboarding() {
   const [gradYear, setGradYear] = useState('')
   const [selectedSubjects, setSelectedSubjects] = useState([])
   const [targetGrades, setTargetGrades] = useState({})
+  // The grade predicted now, where the student has one. Optional.
+  const [predictedGrades, setPredictedGrades] = useState({})
   const [loading, setLoading] = useState(false)
-  const [expandedGroup, setExpandedGroup] = useState(null)
+  // Groups open in the picker. Several can be open, and none closes by
+  // itself: picking one subject used to fold the group and jump on, which
+  // lost anyone taking two from the same group.
+  const [openGroups, setOpenGroups] = useState(() => new Set([0]))
+  const [subjectQuery, setSubjectQuery] = useState('')
   const [freePick, setFreePick] = useState('')
   const [savingPick, setSavingPick] = useState(false)
   const [pickError, setPickError] = useState('')
@@ -66,19 +73,6 @@ export default function Onboarding() {
     : selectedSubjects.length > 0
 
   /**
-   * Picking the last subject a group needs closes it.
-   *
-   * Six groups open one at a time, and the student had to notice they were
-   * finished and press the header again. The accordion can see that for
-   * itself.
-   */
-  const closeGroupIfSatisfied = (group, gi, nextSelected) => {
-    if (!group || !group.required) return
-    const chosen = nextSelected.filter((s) => group.subjects.includes(s)).length
-    if (chosen >= group.required && expandedGroup === gi) setExpandedGroup(null)
-  }
-
-  /**
    * Choosing a course, then choosing its level.
    *
    * The list used to be "Biology HL" and "Biology SL" as two unrelated
@@ -100,10 +94,7 @@ export default function Onboarding() {
       delete newGrades[subject]
       setTargetGrades(newGrades)
     } else if (!currentCurriculum || selectedSubjects.length < currentCurriculum.maxSubjects) {
-      const next = [...selectedSubjects, subject]
-      setSelectedSubjects(next)
-      const gi = currentCurriculum?.groups?.findIndex((g) => g.subjects.includes(subject))
-      if (gi != null && gi >= 0) closeGroupIfSatisfied(currentCurriculum.groups[gi], gi, next)
+      setSelectedSubjects([...selectedSubjects, subject])
     }
   }
 
@@ -114,6 +105,12 @@ export default function Onboarding() {
 
   const setGrade = (subject, grade) => {
     setTargetGrades({...targetGrades, [subject]: grade})
+  }
+  const setPredicted = (subject, grade) => {
+    const next = { ...predictedGrades }
+    if (grade) next[subject] = grade
+    else delete next[subject]
+    setPredictedGrades(next)
   }
 
   const isIB = curriculum === 'IB'
@@ -152,7 +149,7 @@ export default function Onboarding() {
       }
       const { data: profile } = await supabase
         .from('profiles')
-        .select('subjects, curriculum, grad_year, target_grades, free_subject, plan, is_admin, access_expires_at')
+        .select('subjects, curriculum, grad_year, target_grades, predicted_grades, free_subject, plan, is_admin, access_expires_at')
         .eq('id', user.id)
         .maybeSingle()
       if (cancelled) return
@@ -191,6 +188,7 @@ export default function Onboarding() {
         setGradYear(profile.grad_year ? String(profile.grad_year) : '')
         setSelectedSubjects(subjects.filter((s) => !IB_CORE_SUBJECTS.includes(s)))
         setTargetGrades(profile.target_grades || {})
+        setPredictedGrades(profile.predicted_grades || {})
         setStep(2)
       }
       setChecking(false)
@@ -243,7 +241,7 @@ export default function Onboarding() {
       const { error } = editing
         ? await supabase
             .from('profiles')
-            .update({ curriculum, grad_year: gradYear, subjects: allSubjects, target_grades: targetGrades, updated_at: new Date().toISOString() })
+            .update({ curriculum, grad_year: gradYear, subjects: allSubjects, target_grades: targetGrades, predicted_grades: predictedGrades, updated_at: new Date().toISOString() })
             .eq('id', user.id)
         : await supabase.from('profiles').upsert({
         id: user.id,
@@ -262,6 +260,7 @@ export default function Onboarding() {
         grad_year: gradYear,
         subjects: allSubjects,
         target_grades: targetGrades,
+        predicted_grades: predictedGrades,
         updated_at: new Date().toISOString()
       })
 
@@ -556,189 +555,142 @@ export default function Onboarding() {
               </span>
             </div>
 
-            <div className="stagger mb-8 flex flex-col gap-2">
+            {/* Your picks, removable, so nothing chosen is ever out of sight. */}
+            {selectedSubjects.length > 0 && (
+              <div className="mb-5 flex flex-wrap gap-1.5">
+                {selectedSubjects.map((s) => {
+                  const locked = editing && keepFree && s === keepFree
+                  return (
+                    <span key={s} className="inline-flex items-center gap-1.5 rounded-full py-1 pl-3 pr-1.5 text-[12.5px] font-medium" style={{ background: 'var(--brand-tint)', color: 'var(--text)' }}>
+                      {s}
+                      {!locked && (
+                        <button type="button" onClick={() => toggleSubject(s)} aria-label={`Remove ${s}`} className="flex h-5 w-5 items-center justify-center rounded-full text-[13px] leading-none transition-colors hover:bg-[var(--surface)]" style={{ color: 'var(--text-muted)' }}>
+                          ×
+                        </button>
+                      )}
+                    </span>
+                  )
+                })}
+              </div>
+            )}
+
+            <input
+              value={subjectQuery}
+              onChange={(e) => setSubjectQuery(e.target.value)}
+              placeholder="Search for a subject"
+              aria-label="Search for a subject"
+              className="input mb-4 h-11 rounded-full px-4 text-[16px] sm:text-[14px]"
+            />
+
+            <div className="mb-8 flex flex-col gap-2.5">
               {currentCurriculum.groups.map((group, gi) => {
                 const chosenHere = selectedSubjects.filter((s) => group.subjects.includes(s))
-                const satisfied = chosenHere.length >= (group.required || 0)
-                const open = expandedGroup === gi
+                const q = subjectQuery.trim().toLowerCase()
+                const courses = coursesOf(group.subjects).filter((c) => !q || c.base.toLowerCase().includes(q))
+                if (q && !courses.length) return null
+                const open = Boolean(q) || openGroups.has(gi)
                 return (
-                <div
-                  key={gi}
-                  className="overflow-hidden rounded-[12px] border transition-colors duration-200"
-                  style={{
-                    borderColor: open
-                      ? 'var(--brand)'
-                      : chosenHere.length
-                        ? 'var(--border-hover)'
-                        : 'var(--border)',
-                    background: chosenHere.length ? 'var(--surface)' : 'transparent',
-                  }}
-                >
-                  <button
-                    onClick={() => setExpandedGroup(open ? null : gi)}
-                    aria-expanded={open}
-                    className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-[var(--surface-sunken)]"
+                  <section
+                    key={gi}
+                    className="overflow-hidden rounded-[16px] border transition-colors duration-200"
+                    style={{ borderColor: chosenHere.length ? 'color-mix(in oklab, var(--brand) 45%, var(--border-strong))' : 'var(--border-strong)', background: 'var(--surface)' }}
                   >
-                    {/* Done, or how many this group still wants. */}
-                    <span
-                      className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[10px] font-semibold"
-                      style={{
-                        borderColor: satisfied && chosenHere.length ? 'var(--brand)' : 'var(--border-strong)',
-                        background: satisfied && chosenHere.length ? 'var(--brand)' : 'transparent',
-                        color: satisfied && chosenHere.length ? '#fff' : 'var(--text-faint)',
-                      }}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setOpenGroups((prev) => {
+                          const next = new Set(prev)
+                          next.has(gi) ? next.delete(gi) : next.add(gi)
+                          return next
+                        })
+                      }
+                      aria-expanded={open}
+                      className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-[var(--surface-sunken)]"
                     >
-                      {satisfied && chosenHere.length ? '✓' : (group.required || 0) - chosenHere.length || ''}
-                    </span>
-
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-[14px] font-medium">{group.name}</span>
-                      <span className="mt-0.5 block text-[12px]" style={{ color: 'var(--text-faint)' }}>
-                        {chosenHere.length
-                          ? chosenHere.join(' · ')
-                          : group.required > 0
-                            ? `Pick ${group.required}`
-                            : 'Optional'}
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-[14px] font-semibold">{group.name}</span>
+                        <span className="mt-0.5 block truncate text-[12px]" style={{ color: chosenHere.length ? 'var(--brand)' : 'var(--text-faint)' }}>
+                          {chosenHere.length ? chosenHere.join(' · ') : group.required > 0 ? 'Usually one from here' : 'Optional'}
+                        </span>
                       </span>
-                    </span>
+                      {chosenHere.length > 0 && (
+                        <span className="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold tabular-nums" style={{ background: 'var(--brand)', color: '#fff' }}>
+                          {chosenHere.length}
+                        </span>
+                      )}
+                      <span className="shrink-0" style={{ color: 'var(--text-faint)' }}>
+                        <Chevron open={open} />
+                      </span>
+                    </button>
 
-                    <span
-                      className="shrink-0 text-[12px] transition-transform duration-200"
-                      style={{ color: 'var(--text-faint)', transform: open ? 'rotate(180deg)' : 'none' }}
-                    >
-                      ▾
-                    </span>
-                  </button>
-
-                  {open && (
-                    <div className="pop-enter grid grid-cols-1 gap-2 px-4 pb-4 sm:grid-cols-2">
-                      {coursesOf(group.subjects).map((course) => {
-                        // Which of this course's levels, if any, is already in.
-                        const chosen = [course.only, ...Object.values(course.levels)].find(
-                          (f) => f && selectedSubjects.includes(f)
-                        )
-                        const levels = Object.keys(course.levels)
-                        // Offered at one level, or at none: there is no
-                        // question to ask, so it is a plain choice. Only the
-                        // forty courses that are genuinely both get asked.
-                        const single = course.only || (levels.length === 1 ? course.levels[levels[0]] : null)
-                        const asking = levelFor === course.base && !chosen && !single
-                        // Once a level is chosen it is that level's coverage;
-                        // before that, the best of the levels on offer, so a
-                        // course with questions at SL and none at HL does not
-                        // read as empty.
-                        const cov = coverageLabel(
-                          chosen || single
-                            ? coverage[chosen || single]
-                            : bestCoverage(coverage, Object.values(course.levels))
-                        )
-
-                        return (
-                          // One box per course. The level chooser lives
-                          // inside it rather than under it, because a panel
-                          // that grows the grid row leaves a hole beside it
-                          // the size of the panel.
-                          <div
-                            key={course.base}
-                            className={`rounded-[10px] border transition-colors duration-150
-                        ${chosen ? 'chip-active' : asking ? 'border-[var(--brand)]' : 'chip hover:border-border-strong'}`}
-                          >
-                            <button
-                              onClick={() => {
-                                if (chosen) toggleSubject(chosen)
-                                else if (single) toggleSubject(single)
-                                else setLevelFor(asking ? null : course.base)
-                              }}
-                              aria-pressed={!!chosen}
-                              aria-expanded={single ? undefined : asking}
-                              className="press block w-full px-3.5 py-2.5 text-left"
+                    {open && (
+                      <div className="grid grid-cols-1 gap-2 border-t px-4 py-4 sm:grid-cols-2" style={{ borderColor: 'var(--border)' }}>
+                        {courses.map((course) => {
+                          const chosen = [course.only, ...Object.values(course.levels)].find((f) => f && selectedSubjects.includes(f))
+                          const levels = Object.keys(course.levels)
+                          const single = course.only || (levels.length === 1 ? course.levels[levels[0]] : null)
+                          const asking = levelFor === course.base && !chosen && !single
+                          const empty = coverageLabel(chosen || single ? coverage[chosen || single] : bestCoverage(coverage, Object.values(course.levels))).label === 'No questions yet'
+                          return (
+                            <div
+                              key={course.base}
+                              className="rounded-[12px] border transition-colors duration-150"
+                              style={{ borderColor: chosen || asking ? 'var(--brand)' : 'var(--border)', background: chosen ? 'var(--brand-tint)' : 'transparent' }}
                             >
-                              <span className="flex items-baseline gap-1.5">
-                                <span className="block text-[12.5px] font-medium">{course.base}</span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (chosen) toggleSubject(chosen)
+                                  else if (single) toggleSubject(single)
+                                  else setLevelFor(asking ? null : course.base)
+                                }}
+                                aria-pressed={!!chosen}
+                                aria-expanded={single ? undefined : asking}
+                                className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left"
+                              >
+                                <span className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border" style={{ borderColor: chosen ? 'var(--brand)' : 'var(--border-strong)', background: chosen ? 'var(--brand)' : 'transparent', color: '#fff' }}>
+                                  {chosen && (
+                                    <svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                      <path d="m2.5 6.5 2.5 2.5 4.5-5" />
+                                    </svg>
+                                  )}
+                                </span>
+                                <span className="min-w-0 flex-1 truncate text-[13.5px] font-medium">{course.base}</span>
                                 {splitLevel(chosen || single || '').level && (
-                                  <span
-                                    className="rounded-full px-1.5 text-[10px] font-semibold"
-                                    style={
-                                      chosen
-                                        ? { background: 'var(--brand)', color: '#fff' }
-                                        : { border: '1px solid var(--border-strong)', color: 'var(--text-faint)' }
-                                    }
-                                  >
+                                  <span className="shrink-0 rounded-full px-2 py-0.5 text-[10.5px] font-semibold" style={chosen ? { background: 'var(--brand)', color: '#fff' } : { border: '1px solid var(--border-strong)', color: 'var(--text-faint)' }}>
                                     {splitLevel(chosen || single).level}
                                   </span>
                                 )}
-                              </span>
-                              {/* Said before the choice, not after it. A subject
-                                  with nothing in it is still the right subject to
-                                  take — it just will not do anything yet, and
-                                  finding that out afterwards is what makes a
-                                  product look broken rather than early. */}
-                              <span
-                                className="mt-0.5 block text-[10.5px]"
-                                style={{ color: COVERAGE_TONE[cov.tone] }}
-                              >
-                                {cov.label}
-                              </span>
-                            </button>
-
-                            {/* Asked only once the course is picked, and only
-                                where there is a choice to make. */}
-                            {asking && (
-                              <div
-                                className="px-3.5 pb-2.5"
-                                style={{ borderTop: '1px solid var(--border)' }}
-                              >
-                                <p className="mb-1.5 mt-2 text-[10.5px]" style={{ color: 'var(--text-muted)' }}>
-                                  Taking it at
-                                </p>
-                                <div className="flex flex-wrap gap-1.5">
+                                {empty && !chosen && (
+                                  <span className="shrink-0 text-[10.5px]" style={{ color: 'var(--text-faint)' }} title="Questions for this subject are still being written">
+                                    soon
+                                  </span>
+                                )}
+                              </button>
+                              {asking && (
+                                <div className="flex flex-wrap items-center gap-1.5 border-t px-3.5 py-2.5" style={{ borderColor: 'var(--border)' }}>
+                                  <span className="mr-1 text-[11.5px]" style={{ color: 'var(--text-muted)' }}>
+                                    Level
+                                  </span>
                                   {levels.map((lv) => (
-                                    <button
-                                      key={lv}
-                                      onClick={() => pickLevel(course.levels[lv])}
-                                      className="btn btn-outline control-sm"
-                                    >
+                                    <button key={lv} type="button" onClick={() => pickLevel(course.levels[lv])} className="btn btn-outline control-sm">
                                       {lv}
                                     </button>
                                   ))}
-                                  {/* Most people in week one have not been
-                                      told. SL is the smaller of the two and
-                                      HL contains it, so it is the guess that
-                                      cannot show you something that is not
-                                      yours. */}
-                                  <button
-                                    onClick={() => pickLevel(defaultLevel(course))}
-                                    className="btn btn-quiet control-sm"
-                                  >
+                                  <button type="button" onClick={() => pickLevel(defaultLevel(course))} className="btn btn-quiet control-sm">
                                     Not sure
                                   </button>
                                 </div>
-                              </div>
-                            )}
-                          </div>
-                        )
-                      })}
-                    </div>
-                  )}
-                </div>
+                              )}
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </section>
                 )
               })}
             </div>
-
-            {selectedSubjects.length > 0 && (
-              <div className="mb-7 border-t pt-5" style={{ borderColor: 'var(--border)' }}>
-                <p className="section-label mb-3">
-                  Your subjects
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {selectedSubjects.map(s => (
-                    <span key={s} className="chip text-text text-xs">
-                      {s}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {/* The DP core is compulsory, so it is shown as included rather than offered. */}
             {isIB && coreSubjects.length > 0 && (
@@ -782,59 +734,61 @@ export default function Onboarding() {
               Where you honestly intend to land. Raise them whenever you get there.
             </p>
 
-            <div className="stagger mb-6 flex flex-col">
-              {selectedSubjects.map((subject) => (
-                <div
-                  key={subject}
-                  className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b py-3"
-                  style={{ borderColor: 'var(--border)' }}
-                >
-                  <p className="min-w-[10rem] flex-1 text-[14px] font-medium">{subject}</p>
-                  <div className="flex gap-1.5">
-                    {currentCurriculum.grades.map((grade) => (
-                      <button
-                        key={grade}
-                        onClick={() => setGrade(subject, grade)}
-                        aria-pressed={targetGrades[subject] === grade}
-                        className={`press h-9 w-9 rounded-full border text-[13px] font-semibold transition-colors duration-150
-                      ${targetGrades[subject] === grade ? 'chip-active' : 'chip hover:border-border-strong'}`}
-                      >
-                        {grade}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ))}
+            {/* What the two numbers are, said once, quietly. */}
+            <p className="-mt-4 mb-5 text-[12.5px] leading-relaxed" style={{ color: 'oklch(0.8 0.09 85)' }}>
+              On the left, the grade you are predicted now, if you have one. On the right, the grade you are aiming for.
+            </p>
 
-              {/* TOK and EE are graded A-E and combine for up to 3 bonus points. */}
-              {isIB &&
-                ['Theory of Knowledge', 'Extended Essay'].map((component) => (
-                  <div
-                    key={component}
-                    className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b py-3"
-                    style={{ borderColor: 'var(--border)' }}
-                  >
-                    <p className="min-w-[10rem] flex-1 text-[14px] font-medium">
-                      {component}
-                      <span className="ml-2 text-[12px] font-normal" style={{ color: 'var(--text-faint)' }}>
-                        A–E
-                      </span>
+            <div className="mb-6 flex flex-col">
+              {[...selectedSubjects, ...(isIB ? ['Theory of Knowledge', 'Extended Essay'] : [])].map((subject) => {
+                const core = subject === 'Theory of Knowledge' || subject === 'Extended Essay'
+                const grades = core ? CORE_GRADES : currentCurriculum.grades
+                return (
+                  <div key={subject} className="flex flex-wrap items-center gap-x-4 gap-y-2.5 border-b py-3.5" style={{ borderColor: 'var(--border)' }}>
+                    <p className="min-w-[9rem] flex-1 text-[14px] font-medium">
+                      {subject}
+                      {core && (
+                        <span className="ml-2 text-[12px] font-normal" style={{ color: 'var(--text-faint)' }}>
+                          A–E
+                        </span>
+                      )}
                     </p>
-                    <div className="flex gap-1.5">
-                      {CORE_GRADES.map((grade) => (
-                        <button
-                          key={grade}
-                          onClick={() => setGrade(component, grade)}
-                          aria-pressed={targetGrades[component] === grade}
-                          className={`press h-9 w-9 rounded-full border text-[13px] font-semibold transition-colors duration-150
-                      ${targetGrades[component] === grade ? 'chip-active' : 'chip hover:border-border-strong'}`}
-                        >
-                          {grade}
-                        </button>
-                      ))}
+                    <div className="flex items-center gap-2">
+                      <Select
+                        value={predictedGrades[subject] || ''}
+                        onChange={(e) => setPredicted(subject, e.target.value)}
+                        aria-label={`${subject}: predicted now`}
+                        className="h-10 w-[5.75rem] rounded-full border pl-3.5 pr-1.5 text-[13.5px] font-semibold tabular-nums"
+                        style={{ borderColor: 'var(--border-strong)', color: predictedGrades[subject] ? 'var(--text)' : 'var(--text-faint)' }}
+                      >
+                        <option value="">Now</option>
+                        {[...grades].reverse().map((g) => (
+                          <option key={g} value={g}>
+                            {g}
+                          </option>
+                        ))}
+                      </Select>
+                      <svg width="14" height="14" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ color: 'var(--text-faint)' }}>
+                        <path d="m4.5 2.5 3.5 3.5-3.5 3.5" />
+                      </svg>
+                      <Select
+                        value={targetGrades[subject] || ''}
+                        onChange={(e) => setGrade(subject, e.target.value)}
+                        aria-label={`${subject}: target`}
+                        className="h-10 w-[5.75rem] rounded-full border pl-3.5 pr-1.5 text-[13.5px] font-semibold tabular-nums"
+                        style={{ borderColor: targetGrades[subject] ? 'var(--brand)' : 'var(--border-strong)', background: targetGrades[subject] ? 'var(--brand-tint)' : 'transparent', color: targetGrades[subject] ? 'var(--text)' : 'var(--text-faint)' }}
+                      >
+                        <option value="">Target</option>
+                        {[...grades].reverse().map((g) => (
+                          <option key={g} value={g}>
+                            {g}
+                          </option>
+                        ))}
+                      </Select>
                     </div>
                   </div>
-                ))}
+                )
+              })}
             </div>
 
             {/* Live Diploma total */}

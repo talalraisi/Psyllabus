@@ -3,9 +3,9 @@
 import { useMemo, useState } from 'react'
 import MathText from '@/components/MathText'
 import { Page, PageHeader } from '@/components/PageShell'
-import { IconArrowLeft, IconArrowRight, IconPlus } from '@/components/Icons'
+import { IconArrowLeft, IconPlus } from '@/components/Icons'
 import { displaySubtopic } from '@/lib/progress'
-import { isDue, dueLabel, MAX_BOX } from '@/lib/flashcards'
+import { levelOf, studyOrder, MAX_BOX } from '@/lib/flashcards'
 import StudyMenu from '@/components/StudyMenu'
 import LockedPanel from '@/components/LockedPanel'
 import Select from '@/components/Select'
@@ -15,7 +15,7 @@ import CardMaker from '@/components/flashcards/CardMaker'
  * The flashcards page, laid out.
  *
  *   Make cards      upload notes, paste them, or write one (CardMaker)
- *   Today           what is due, one button to start, and the boxes: every
+ *   Your cards      how many, one button to study, and the boxes: every
  *                   card's place in its spacing, so a student can see the
  *                   deck moving out as they learn it
  *   Your decks      one card per subject
@@ -25,7 +25,8 @@ import CardMaker from '@/components/flashcards/CardMaker'
  * search, twelve at a time, each editable in place.
  */
 
-const BOX_LABEL = ['New', '1 day', '3 days', '1 week', '2 weeks', '5 weeks']
+// From never answered to known: each right answer moves a card one along.
+const BOX_LABEL = ['New', 'Learning', 'Learning', 'Familiar', 'Familiar', 'Known']
 const PAGE = 12
 
 function Boxes({ cards, compact = false }) {
@@ -70,7 +71,6 @@ function CardTile({ card, onEdit, onDelete }) {
   const [editing, setEditing] = useState(false)
   const [front, setFront] = useState(card.front)
   const [back, setBack] = useState(card.back)
-  const due = isDue(card)
 
   if (editing) {
     return (
@@ -116,8 +116,8 @@ function CardTile({ card, onEdit, onDelete }) {
             <span key={i} className="h-1.5 w-2.5 rounded-full" style={{ background: i < (card.box || 0) ? 'var(--brand)' : 'var(--border-strong)' }} />
           ))}
         </span>
-        <span className="text-[11.5px] font-medium" style={{ color: due ? 'var(--brand)' : 'var(--text-faint)' }}>
-          {dueLabel(card)}
+        <span className="text-[11.5px] font-medium" style={{ color: 'var(--text-faint)' }}>
+          {levelOf(card)}
         </span>
         {card.source === 'syllabi' && (
           <span className="text-[10.5px]" style={{ color: 'var(--text-faint)' }}>
@@ -145,17 +145,15 @@ export default function FlashcardsView({ cards, presets = [], presetsLocked, not
   const [making, setMaking] = useState(null) // null | 'upload' | 'paste' | 'write'
   const [openPreset, setOpenPreset] = useState(null)
 
-  const due = useMemo(() => cards.filter(isDue), [cards])
+  const known = (list) => list.filter((c) => (c.box || 0) >= MAX_BOX).length
 
   const decks = useMemo(() => {
     const map = new Map()
     for (const c of cards) {
-      if (!map.has(c.subject)) map.set(c.subject, { subject: c.subject, cards: [], due: 0 })
-      const d = map.get(c.subject)
-      d.cards.push(c)
-      if (isDue(c)) d.due++
+      if (!map.has(c.subject)) map.set(c.subject, { subject: c.subject, cards: [] })
+      map.get(c.subject).cards.push(c)
     }
-    return [...map.values()].sort((a, b) => b.due - a.due || a.subject.localeCompare(b.subject))
+    return [...map.values()].sort((a, b) => b.cards.length - a.cards.length || a.subject.localeCompare(b.subject))
   }, [cards])
 
   // Ready-made decks not yet fully taken, by subject.
@@ -206,7 +204,6 @@ export default function FlashcardsView({ cards, presets = [], presetsLocked, not
     const subs = [...new Set(all.map((c) => c.subtopic || ''))].sort()
     const q = query.trim().toLowerCase()
     const list = all.filter((c) => (!subtopic || (c.subtopic || '') === subtopic) && (!q || `${c.front} ${c.back}`.toLowerCase().includes(q)))
-    const dueHere = list.filter(isDue)
     return (
       <Page width="default">
         <button onClick={() => setDeck(null)} className="mb-4 flex items-center gap-1.5 text-[13px] font-medium" style={{ color: 'var(--brand)' }}>
@@ -215,7 +212,7 @@ export default function FlashcardsView({ cards, presets = [], presetsLocked, not
         </button>
         <PageHeader
           title={deck}
-          subtitle={`${all.length} card${all.length === 1 ? '' : 's'} · ${all.filter(isDue).length ? `${all.filter(isDue).length} due now` : 'nothing due'}`}
+          subtitle={`${all.length} card${all.length === 1 ? '' : 's'} · ${known(all)} known`}
           action={
             <div className="flex flex-wrap items-center gap-2">
               <button onClick={() => setMaking(making ? null : syllabi ? 'upload' : 'paste')} className="btn btn-outline control-md">
@@ -225,10 +222,10 @@ export default function FlashcardsView({ cards, presets = [], presetsLocked, not
               {list.length > 0 && (
                 <StudyMenu
                   count={list.length}
-                  primary={dueHere.length ? 'flip' : 'write'}
-                  verb={dueHere.length ? 'Review' : 'Study'}
+                  primary="flip"
+                  verb="Study"
                   compact
-                  onStart={(mode) => onReview(dueHere.length && mode === 'flip' ? dueHere : list, !dueHere.length || mode !== 'flip', mode)}
+                  onStart={(mode) => onReview(studyOrder(list), mode)}
                 />
               )}
             </div>
@@ -277,7 +274,7 @@ export default function FlashcardsView({ cards, presets = [], presetsLocked, not
     <Page width="default">
       <PageHeader
         title="Flashcards"
-        subtitle="Spaced cards that come back right before you forget them."
+        subtitle="Your own cards, from your notes or written yourself. Study them whenever you like."
         action={
           !making && (
             <button onClick={() => setMaking(syllabi ? 'upload' : 'paste')} className="btn btn-outline control-md">
@@ -319,36 +316,29 @@ export default function FlashcardsView({ cards, presets = [], presetsLocked, not
           </div>
         </section>
       ) : cards.length > 0 ? (
-        /* Today */
-        <section className="elev-lg mb-10 overflow-hidden rounded-[20px] border" style={{ borderColor: due.length ? 'var(--brand)' : 'var(--border-strong)', background: 'var(--surface)' }}>
+        /* Your cards */
+        <section className="elev-lg mb-10 overflow-hidden rounded-[20px] border" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
           <div className="grid gap-6 p-6 sm:p-7 md:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] md:items-center">
             <div>
               <p className="text-[10.5px] font-semibold uppercase tracking-[0.16em]" style={{ color: 'var(--text-faint)' }}>
-                {due.length ? 'Due today' : 'All caught up'}
+                Your cards
               </p>
               <p className="mt-2 text-[clamp(2.2rem,5vw,2.9rem)] font-semibold leading-none tracking-[-0.035em] tabular-nums">
-                {due.length}
+                {cards.length}
                 <span className="ml-2.5 text-[14px] font-medium tracking-normal" style={{ color: 'var(--text-muted)' }}>
-                  of {cards.length} cards
+                  {known(cards)} known
                 </span>
               </p>
               <p className="mt-2.5 max-w-sm text-[13px]" style={{ color: 'var(--text-muted)' }}>
-                {due.length ? 'Each one you get right moves a box to the right and comes back later.' : 'Nothing is due. Practising now keeps them warm without moving their schedule.'}
+                Study whenever you like. The ones you know least come first, and every right answer moves a card one step towards known.
               </p>
               <div className="mt-5">
-                {due.length ? (
-                  <StudyMenu count={due.length} primary="flip" verb="Review" onStart={(mode) => onReview(due, mode !== 'flip', mode)} />
-                ) : (
-                  <button onClick={() => onReview(cards.slice(0, 10), true)} className="btn btn-outline control-md">
-                    Practise anyway
-                    <IconArrowRight width={15} height={15} />
-                  </button>
-                )}
+                <StudyMenu count={cards.length} primary="flip" verb="Study" onStart={(mode) => onReview(studyOrder(cards), mode)} />
               </div>
             </div>
             <div className="rounded-[16px] p-4" style={{ background: 'var(--surface-sunken)' }}>
               <p className="mb-3 text-[11.5px] font-semibold" style={{ color: 'var(--text-muted)' }}>
-                Where your cards are
+                How well you know them
               </p>
               <Boxes cards={cards} />
             </div>
@@ -366,9 +356,9 @@ export default function FlashcardsView({ cards, presets = [], presetsLocked, not
                 <button onClick={() => open(d.subject)} className="elev lift flex h-full w-full flex-col rounded-[16px] border p-5 text-left" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
                   <span className="flex items-start justify-between gap-2">
                     <span className="text-[14.5px] font-semibold leading-snug tracking-[-0.01em]">{d.subject}</span>
-                    {d.due > 0 && (
+                    {known(d.cards) > 0 && (
                       <span className="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold tabular-nums" style={{ background: 'var(--brand-tint)', color: 'var(--brand)' }}>
-                        {d.due} due
+                        {known(d.cards)} known
                       </span>
                     )}
                   </span>

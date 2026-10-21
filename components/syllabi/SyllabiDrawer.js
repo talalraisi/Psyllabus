@@ -35,6 +35,15 @@ export function SyllabiProvider({ profile, children }) {
   }, [])
   const close = useCallback(() => setState(null), [])
 
+  // On a wide screen the panel docks to the right and the page moves over
+  // for it (html.sy-docked in globals.css), so a quiz question and its
+  // answers stay in full view beside the chat instead of under it.
+  useEffect(() => {
+    if (!state) return
+    document.documentElement.classList.add('sy-docked')
+    return () => document.documentElement.classList.remove('sy-docked')
+  }, [state])
+
   useEffect(() => {
     if (!state) return
     const onKey = (e) => {
@@ -49,15 +58,14 @@ export function SyllabiProvider({ profile, children }) {
       {children}
       {available && state && (
         <>
-          <div className="fixed inset-0 z-[55] sm:hidden" style={{ background: 'rgb(0 0 0 / 0.4)' }} onClick={close} aria-hidden="true" />
-          {/* A floating panel in the corner on a wide screen, so the page it
-              was opened about stays in view beside it; a sheet from the
-              bottom on a phone. It used to be a full-height wall. */}
+          <div className="fixed inset-0 z-[55] lg:hidden" style={{ background: 'rgb(0 0 0 / 0.4)' }} onClick={close} aria-hidden="true" />
+          {/* Docked beside the page on a wide screen (the page makes room for
+              it), a sheet from the bottom on a phone. */}
           <aside
             role="dialog"
             aria-label="Syllabi"
-            className="sy-panel fixed inset-x-0 bottom-0 z-[60] flex h-[86dvh] flex-col overflow-hidden rounded-t-[24px] border shadow-2xl sm:inset-x-auto sm:bottom-5 sm:right-5 sm:h-[min(620px,calc(100dvh-2.5rem))] sm:w-[400px] sm:rounded-[24px]"
-            style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)', boxShadow: '0 30px 80px -20px rgb(0 0 0 / 0.6)' }}
+            className="sy-panel fixed inset-x-0 bottom-0 z-[60] flex h-[78dvh] flex-col overflow-hidden rounded-t-[22px] border shadow-2xl lg:inset-x-auto lg:bottom-3 lg:right-3 lg:top-3 lg:h-auto lg:w-[360px] lg:rounded-[20px] lg:shadow-xl"
+            style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
           >
             <header className="flex h-[52px] shrink-0 items-center gap-2.5 border-b px-3.5" style={{ borderColor: 'var(--border)' }}>
               <span className="flex h-7 w-7 items-center justify-center rounded-full" style={{ background: 'var(--brand)', color: '#fff' }}>

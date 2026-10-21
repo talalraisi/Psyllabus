@@ -6,7 +6,7 @@ import CardMenu from '@/components/CardMenu'
 import { IconCheck, IconClose } from '@/components/Icons'
 import { displaySubtopic } from '@/lib/progress'
 import { checkWritten, makeBlank } from '@/lib/flashcard-modes'
-import { SNOOZE_CHOICES } from '@/lib/flashcards'
+import { requeue, AGAIN_AFTER } from '@/lib/flashcards'
 
 /**
  * Write the answer, rather than tell yourself you knew it.
@@ -23,7 +23,7 @@ import { SNOOZE_CHOICES } from '@/lib/flashcards'
  * thing: the gentler version of the same question, and the right one for a
  * card met ten minutes ago.
  */
-export default function FlashcardWrite({ cards, mode = 'write', onMark, onSnooze, onEdit, onDelete, onExit }) {
+export default function FlashcardWrite({ cards, mode = 'write', onMark, onEdit, onDelete, onExit }) {
   const [queue, setQueue] = useState(cards)
   const [index, setIndex] = useState(0)
   const [value, setValue] = useState('')
@@ -49,6 +49,8 @@ export default function FlashcardWrite({ cards, mode = 'write', onMark, onSnooze
     const credit = r.correct || r.close
     setTally((t) => ({ right: t.right + (credit ? 1 : 0), wrong: t.wrong + (credit ? 0 : 1) }))
     onMark?.(card, credit)
+    // Missed: it goes back into the pile a few cards on.
+    if (!credit) setQueue((q) => requeue(q, index, card))
   }
 
   const advance = () => {
@@ -56,13 +58,6 @@ export default function FlashcardWrite({ cards, mode = 'write', onMark, onSnooze
     setIndex((i) => i + 1)
     setValue('')
     setResult(null)
-  }
-
-  /** Wrong answers choose when to come back, and short ones come back here. */
-  const snooze = (minutes) => {
-    onSnooze?.(card, minutes)
-    if (minutes <= 10) setQueue((q) => [...q, card])
-    advance()
   }
 
   const skip = () => {
@@ -76,9 +71,6 @@ export default function FlashcardWrite({ cards, mode = 'write', onMark, onSnooze
     const onKey = (e) => {
       if (e.key === 'Escape') return onExit({ finished: false, tally })
       if (e.key !== 'Enter') return
-      // A wrong answer is waiting on a decision about when to see it again,
-      // so Enter must not skip past the question being asked.
-      if (result && !result.correct && !result.close) return
       e.preventDefault()
       if (result) advance()
       else submit()
@@ -184,35 +176,16 @@ export default function FlashcardWrite({ cards, mode = 'write', onMark, onSnooze
             )}
           </div>
 
-          {result && !wrong && (
+          {result && (
             <button onClick={advance} className="btn btn-solid control-md verdict-in mt-5">
               {atEnd ? 'Finish' : 'Next'}
             </button>
           )}
 
-          {/* A wrong answer decides when it comes back. The boxes are measured
-              in days, which is right for a card you got right and useless for
-              one still on the screen. */}
           {wrong && (
-            <div className="verdict-in mt-6">
-              <p className="mb-2.5 text-[13px]" style={{ color: 'var(--text-body)' }}>
-                When should this come back?
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {SNOOZE_CHOICES.map((c) => (
-                  <button
-                    key={c.minutes}
-                    onClick={() => snooze(c.minutes)}
-                    className="btn btn-outline control-sm"
-                  >
-                    {c.label}
-                  </button>
-                ))}
-              </div>
-              <p className="mt-2.5 text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
-                Anything up to ten minutes comes back before this session ends.
-              </p>
-            </div>
+            <p className="verdict-in mt-3 text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
+              It comes back in {AGAIN_AFTER} cards.
+            </p>
           )}
         </div>
       </div>

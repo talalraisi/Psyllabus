@@ -128,7 +128,6 @@ export default function SubjectsPage() {
 
   const all = profile.subjects || []
   const subjects = all.filter((s) => !IB_CORE_SUBJECTS.includes(s))
-  const core = all.filter((s) => IB_CORE_SUBJECTS.includes(s))
 
   const canSwitch = canSwitchFreeSubject(profile)
   const freeSubjectName = freeSubject(profile)
@@ -293,23 +292,6 @@ export default function SubjectsPage() {
 
         </Section>
 
-        {/* The core is not a subject you revise, it is work with deadlines,
-            so it lives on its own page rather than among the six. */}
-        {core.length > 0 && (
-          <div className="mt-12 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
-            <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
-              TOK and the extended essay are tracked in{' '}
-              <Link
-                href="/dashboard/core"
-                className="font-medium underline underline-offset-2"
-                style={{ color: 'var(--text)' }}
-              >
-                Diploma Core
-              </Link>
-              .
-            </p>
-          </div>
-        )}
       </Page>
     </DashboardLayout>
   )

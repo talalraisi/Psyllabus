@@ -9,7 +9,7 @@ import DashboardLayout from '@/components/DashboardLayout'
 import { PageLoading } from '@/components/PageShell'
 import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { accessibleSubjects, canUse, hasSyllabi } from '@/lib/access'
-import { scheduleAfter, snoozeAfter, isDue } from '@/lib/flashcards'
+import { scheduleAfter } from '@/lib/flashcards'
 import FlashcardReview from '@/components/FlashcardReview'
 import FlashcardWrite from '@/components/FlashcardWrite'
 import FlashcardTest from '@/components/FlashcardTest'
@@ -57,7 +57,7 @@ export default function FlashcardsPage() {
     const usable = accessibleSubjects(profileData)
 
     const [{ data: cardRows }, { data: noteRows }, { data: presetRows }] = await Promise.all([
-      supabase.from('flashcards').select('*').eq('user_id', user.id).order('due_at', { ascending: true }),
+      supabase.from('flashcards').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
       supabase.from('notes').select('id, subject, subtopic, body').eq('user_id', user.id).order('updated_at', { ascending: false }),
       // Only the verified ones are readable at all.
       usable.length
@@ -77,14 +77,13 @@ export default function FlashcardsPage() {
   /* ----------------------------------------------------------------- review */
 
   /**
-   * Start a session. Flip is right for a card you have never seen; write,
-   * blank and test are for a deck you think you know, where flipping stops
-   * telling you anything true. `cramming` studies cards that are not due
-   * without moving their schedule.
+   * Start a session on the cards given, in the order given (the views pass
+   * them least-known first). Flip is right for a card you have never seen;
+   * write, blank and test are for a deck you think you know.
    */
-  const review = (pool, cramming = false, mode = 'flip') => {
+  const review = (pool, mode = 'flip') => {
     if (!pool.length) return
-    setReviewing({ cards: [...pool].sort(() => Math.random() - 0.5), cramming, mode })
+    setReviewing({ cards: pool, mode })
   }
 
   const markCard = async (card, correct) => {
@@ -104,18 +103,7 @@ export default function FlashcardsPage() {
       if (data) setCards((prev) => [data, ...prev])
       return
     }
-    // Cramming a card that is not due should not drag its real schedule
-    // around: the night before a test is not new evidence about next month.
-    if (reviewing?.cramming && !isDue(card)) return
     const patch = scheduleAfter(card, correct)
-    setCards((prev) => prev.map((c) => (c.id === card.id ? { ...c, ...patch } : c)))
-    await supabase.from('flashcards').update(patch).eq('id', card.id)
-  }
-
-  /** "Ask me again in five minutes": only the due date moves, never the box. */
-  const snoozeCard = async (card, minutes) => {
-    if (!card?.id || card.preset) return
-    const patch = snoozeAfter(card, minutes)
     setCards((prev) => prev.map((c) => (c.id === card.id ? { ...c, ...patch } : c)))
     await supabase.from('flashcards').update(patch).eq('id', card.id)
   }
@@ -175,11 +163,11 @@ export default function FlashcardsPage() {
     return (
       <DashboardLayout profile={profile}>
         {reviewing.mode === 'flip' ? (
-          <FlashcardReview cards={reviewing.cards} onMark={markCard} onSnooze={snoozeCard} onDelete={deleteCard} onExit={exit} />
+          <FlashcardReview cards={reviewing.cards} onMark={markCard} onDelete={deleteCard} onExit={exit} />
         ) : reviewing.mode === 'test' ? (
           <FlashcardTest cards={reviewing.cards} onMark={markCard} onExit={exit} />
         ) : (
-          <FlashcardWrite cards={reviewing.cards} mode={reviewing.mode} onMark={markCard} onSnooze={snoozeCard} onDelete={deleteCard} onExit={exit} />
+          <FlashcardWrite cards={reviewing.cards} mode={reviewing.mode} onMark={markCard} onDelete={deleteCard} onExit={exit} />
         )}
       </DashboardLayout>
     )

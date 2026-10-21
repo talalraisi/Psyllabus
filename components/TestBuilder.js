@@ -182,7 +182,7 @@ export default function TestBuilder({
   lengthMetric, onLengthMetric, lengthPresets, lengthUnit,
   length, onLength, customLength, onCustomLength,
   timed, onTimed, customMinutes, onCustomMinutes, budgetMinutes,
-  review, onReview, canTime = true,
+  sit = 'practice', onSit, canTime = true,
   paper, onStart,
 }) {
   const [step, setStep] = useState(0)
@@ -545,23 +545,35 @@ export default function TestBuilder({
       )}
 
       {STEPS[step].key === 'sit' && (
-        <Question title="How do you want to sit it?" hint="Untimed to learn, timed to rehearse.">
-          <div className="flex flex-col gap-3">
+        <Question title="How do you want to sit it?" hint="Three ways, from learning as you go to the real thing.">
+          <div className="flex flex-col gap-2.5">
+            <Option
+              on={sit === 'practice'}
+              onClick={() => onSit('practice')}
+              title="Practice"
+              meta="No clock"
+              hint="Each answer is marked the moment you give it, with the working and a hint if you want one. Ask Syllabi under any question. Learn as you go."
+            />
+            <Option
+              on={sit === 'test'}
+              onClick={() => onSit('test')}
+              title="Test"
+              meta="Stopwatch"
+              hint="A clock runs while you work and everything is marked at the end, with how long each question and each mark took you."
+            />
             {canTime ? (
-              <Toggle
-                on={timed}
-                onClick={() => onTimed(!timed)}
-                label="Exam conditions"
-                hint="A countdown and live marks-per-minute pacing."
+              <Option
+                on={sit === 'exam'}
+                onClick={() => onSit('exam')}
+                title="Exam"
+                meta="Countdown"
+                hint="The real thing: a time limit, no hints, nothing marked until you hand it in."
               />
             ) : (
-              <UpgradeRow
-                label="Exam conditions"
-                hint="A countdown and live marks-per-minute pacing, the way the real paper runs."
-              />
+              <UpgradeRow label="Exam" hint="A countdown, no hints and nothing marked until the end, the way the real paper runs." />
             )}
-            {timed && (
-              <label className="flex flex-wrap items-center gap-2 pl-5">
+            {sit === 'exam' && canTime && (
+              <label className="flex flex-wrap items-center gap-2 pl-1 pt-1">
                 <span className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
                   Time limit
                 </span>
@@ -579,16 +591,6 @@ export default function TestBuilder({
                 </span>
               </label>
             )}
-            {/* One switch, stated the way round people think about it.
-                Marking as you go is what practice is; exam mode is the thing
-                you deliberately turn on. */}
-            <Toggle
-              on={review === 'exam'}
-              onClick={() => onReview(review === 'exam' ? 'practice' : 'exam')}
-              label="Exam mode"
-              hint="Nothing marked until you finish. No hints."
-            />
-
           </div>
 
           {/* The paper, once there is one. Last screen rather than a sidebar. */}
@@ -681,8 +683,8 @@ export default function TestBuilder({
           </button>
         ) : (
           <button onClick={onStart} disabled={!paper.canStart} className="btn btn-solid control-lg disabled:opacity-40">
-            {timed && <IconClock width={16} height={16} />}
-            Start {timed ? 'timed test' : 'test'}
+            {sit !== 'practice' && <IconClock width={16} height={16} />}
+            Start {sit === 'exam' ? 'exam' : sit === 'test' ? 'test' : 'practice'}
           </button>
         )}
       </div>

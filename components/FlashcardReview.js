@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import MathText from '@/components/MathText'
 import { IconCheck, IconClose, IconArrowLeft, IconArrowRight } from '@/components/Icons'
 import { displaySubtopic } from '@/lib/progress'
-import { SNOOZE_CHOICES } from '@/lib/flashcards'
+import { requeue, AGAIN_AFTER } from '@/lib/flashcards'
 import CardMenu from '@/components/CardMenu'
 import { AskSyllabi } from '@/components/syllabi/SyllabiDrawer'
 
@@ -29,7 +29,7 @@ import { AskSyllabi } from '@/components/syllabi/SyllabiDrawer'
  * Keyboard: space or up to flip, arrows to move, 1 missed, 2 got it, and 1
  * to 4 to choose when a missed card returns.
  */
-export default function FlashcardReview({ cards, onMark, onSnooze, onEdit, onDelete, onExit }) {
+export default function FlashcardReview({ cards, onMark, onEdit, onDelete, onExit }) {
   const [queue, setQueue] = useState(cards)
   const [index, setIndex] = useState(0)
   const [flipped, setFlipped] = useState(false)
@@ -75,34 +75,30 @@ export default function FlashcardReview({ cards, onMark, onSnooze, onEdit, onDel
 
   const mark = useCallback(
     (correct) => {
-      if (!card || missed || verdict) return
+      if (!card || verdict) return
       onMark(card, correct)
       setAnswered((a) => ({ ...a, [index]: correct ? 'right' : 'wrong' }))
-      // Getting it right is also a decision to move on. Getting it wrong
-      // stops to ask when it should come back.
+      // Right moves on. Wrong stays on the answer for a moment's reading and
+      // the card goes back into the pile a few cards on.
       if (correct) advance()
-      else setMissed(card)
+      else {
+        setQueue((q) => requeue(q, index, card))
+        setMissed(card)
+      }
     },
-    [card, missed, verdict, onMark, index, advance]
+    [card, verdict, onMark, index, advance]
   )
 
-  /** A missed card chooses its own interval; short ones rejoin this session. */
-  const snooze = useCallback(
-    (minutes) => {
-      if (!missed) return
-      onSnooze?.(missed, minutes)
-      const length = minutes <= 10 ? queue.length + 1 : queue.length
-      if (minutes <= 10) setQueue((q) => [...q, missed])
-      setMissed(null)
-      advance(length)
-    },
-    [missed, onSnooze, queue.length, advance]
-  )
+  /** Past a missed card, once its answer has been read. */
+  const onward = useCallback(() => {
+    setMissed(null)
+    advance()
+  }, [advance])
 
   const flip = useCallback(() => {
-    if (missed || verdict) return
+    if (verdict) return
     setFlipped((f) => !f)
-  }, [missed, verdict])
+  }, [verdict])
 
   useEffect(() => {
     const onKey = (e) => {
@@ -111,10 +107,9 @@ export default function FlashcardReview({ cards, onMark, onSnooze, onEdit, onDel
       if (e.key === 'Escape') return onExit({ finished: false })
       if (finished) return
       if (missed) {
-        const n = Number(e.key)
-        if (n >= 1 && n <= SNOOZE_CHOICES.length) {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight') {
           e.preventDefault()
-          snooze(SNOOZE_CHOICES[n - 1].minutes)
+          onward()
         }
         return
       }
@@ -129,7 +124,7 @@ export default function FlashcardReview({ cards, onMark, onSnooze, onEdit, onDel
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [go, mark, flip, flipped, onExit, missed, snooze, finished])
+  }, [go, mark, flip, flipped, onExit, missed, onward, finished])
 
   // Keep the page behind from scrolling under the overlay.
   useEffect(() => {
@@ -249,20 +244,13 @@ export default function FlashcardReview({ cards, onMark, onSnooze, onEdit, onDel
           {/* Controls */}
           <div className="shrink-0 border-t border-[var(--border)] bg-[var(--surface)] p-4">
             {missed ? (
-              <div className="verdict-in mx-auto max-w-2xl text-center">
-                <p className="text-[13.5px] font-medium" style={{ color: 'var(--text)' }}>
-                  When should this one come back?
+              <div className="verdict-in mx-auto flex max-w-2xl flex-wrap items-center justify-center gap-3 text-center">
+                <p className="text-[13.5px]" style={{ color: 'var(--text-body)' }}>
+                  It comes back in {AGAIN_AFTER} cards.
                 </p>
-                <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  {SNOOZE_CHOICES.map((c, i) => (
-                    <button key={c.minutes} onClick={() => snooze(c.minutes)} className="btn btn-outline control-md justify-between">
-                      {c.label}
-                      <kbd className="hidden rounded-[5px] border px-1.5 text-[10.5px] sm:inline" style={{ borderColor: 'var(--border-strong)', color: 'var(--text-faint)' }}>
-                        {i + 1}
-                      </kbd>
-                    </button>
-                  ))}
-                </div>
+                <button onClick={onward} className="btn btn-solid control-md">
+                  Next card
+                </button>
               </div>
             ) : (
               <div className="mx-auto flex max-w-4xl items-center gap-2">
@@ -310,7 +298,7 @@ export default function FlashcardReview({ cards, onMark, onSnooze, onEdit, onDel
             )}
 
             <p className="t-caption mt-3 hidden text-center md:block">
-              {missed ? 'Press 1 to 4 to choose. Nothing else moves until you do.' : 'Space to flip · arrows to move · 1 missed, 2 got it · Esc to leave'}
+              {missed ? 'Enter for the next card' : 'Space to flip · arrows to move · 1 missed, 2 got it · Esc to leave'}
             </p>
           </div>
         </>

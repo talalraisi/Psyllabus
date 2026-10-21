@@ -175,6 +175,12 @@ export default function QuizRunner({
   subtopics = null,
   /** 'exam' marks at the end; 'practice' marks each question as you go. */
   review = 'exam',
+  /**
+   * How it is being sat, from the test builder: 'exam' (a countdown, marked
+   * at the end), 'test' (a stopwatch, marked at the end, with the time each
+   * question and mark took), or 'practice' (no clock, marked as you go).
+   */
+  sit = null,
   hintsAllowed = true,
   level = null,
   paper = null,
@@ -206,6 +212,14 @@ export default function QuizRunner({
 
   // A paper is sat under exam conditions by definition.
   const timed = mode === 'mock' || mode === 'paper' || timedProp
+  // Test mode's stopwatch: seconds since the paper started.
+  const [watch, setWatch] = useState(0)
+  useEffect(() => {
+    if (phase !== PHASE.quiz || sit !== 'test') return
+    const t0 = Date.now()
+    const id = setInterval(() => setWatch(Math.floor((Date.now() - t0) / 1000)), 1000)
+    return () => clearInterval(id)
+  }, [phase, sit])
   const [curriculumId, setCurriculumId] = useState('IB')
   const paperDefinition = mode === 'paper' && paper ? paperById(subject, curriculumId, paper) : null
   const timeLimitRef = useRef(null)
@@ -414,7 +428,7 @@ export default function QuizRunner({
        * told off, and this is supposed to be the part that clears your record.
        */
       let redeemed = []
-      if (mode !== 'mistakes' && mode !== 'paper' && drawn.length >= 4) {
+      if (mode !== 'mistakes' && mode !== 'paper' && drawn.length >= 6) {
         const { data: dueRows } = await supabase
           .from('mistakes')
           .select('question_id, next_review_at, review_count, questions(*)')
@@ -437,19 +451,18 @@ export default function QuizRunner({
         }
       }
 
+      /**
+       * Redemption questions are spaced out, never first and never close
+       * together: the sixth question at the earliest, then at least five
+       * more before the next. Shuffled in anywhere, one could land straight
+       * after a question on the same thing, which reads as being asked twice.
+       */
       let withRedemption = drawn
       if (redeemed.length) {
-        withRedemption = shuffle([
-          ...drawn.slice(0, target - redeemed.length),
-          ...redeemed.map((r) => r.questions),
-        ])
-        // A paper asked for rising or falling difficulty keeps that shape;
-        // the redemption questions take their place within it.
-        if (order === 'rising') {
-          withRedemption.sort((a, b) => (a.difficulty ?? 0.5) - (b.difficulty ?? 0.5))
-        } else if (order === 'falling') {
-          withRedemption.sort((a, b) => (b.difficulty ?? 0.5) - (a.difficulty ?? 0.5))
-        }
+        withRedemption = [...drawn.slice(0, target - redeemed.length)]
+        redeemed.forEach((r, k) => {
+          withRedemption.splice(Math.min(withRedemption.length, 5 + k * 6), 0, r.questions)
+        })
       }
 
       setRedemptionIds(new Set(redeemed.map((r) => r.question_id)))
@@ -1033,6 +1046,23 @@ export default function QuizRunner({
       )
     }
 
+    if (!timed && sit === 'test') {
+      const marksDone = questions.filter(isAnswered).reduce((n, x) => n + (x.marks || 1), 0)
+      paceBlock = (
+        <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+          <span className="flex items-baseline gap-2">
+            <span className="text-[20px] font-semibold leading-none tracking-[-0.02em] tabular-nums">{formatClock(watch)}</span>
+            <span className="text-[11.5px] font-medium" style={{ color: 'var(--text-faint)' }}>
+              elapsed
+            </span>
+          </span>
+          <span className="text-[12.5px] tabular-nums" style={{ color: 'var(--text-muted)' }}>
+            {marksDone ? `${formatClock(Math.round(watch / marksDone))} per mark so far` : 'Timing every question'}
+          </span>
+        </div>
+      )
+    }
+
     return (
       <div>
         {/* Where you are, as a rail rather than a sentence. Every question is
@@ -1202,6 +1232,19 @@ export default function QuizRunner({
           </div>
         )}
 
+        {/* Help while you work, in practice and test. Not in an exam. */}
+        {(sit === 'practice' || sit === 'test') && !(review === 'practice' && revealed[q.id]) && (
+          <div className="mt-5">
+            <AskSyllabi
+              subject={q.subject}
+              topic={q.subtopic}
+              context={`${q.subject} · ${q.subtopic || 'this question'}`}
+              label="Ask Syllabi"
+              text={`Help me think through this ${q.subject} question. Give me a nudge and ask me what I would do next, but do not just give me the answer.\n\n${String(q.stem || '').slice(0, 1500)}${Array.isArray(q.options) && q.options.length ? `\n\n${q.options.map((o) => `${o.id}) ${o.text}`).join('\n')}` : ''}`}
+            />
+          </div>
+        )}
+
         {/* What you got, and why, right here rather than at the end. */}
         {review === 'practice' && revealed[q.id] && (
           <div
@@ -1350,7 +1393,7 @@ export default function QuizRunner({
       ['Score', `${results.score}/${results.total}`],
       ['Accuracy', `${pct}%`],
       ['Points', pointsEarned ? `+${pointsEarned.toFixed(2)}` : '0'],
-      timed ? ['Time', formatClock(results.elapsed)] : null,
+      timed || sit === 'test' ? ['Time', formatClock(results.elapsed)] : null,
     ].filter(Boolean)
 
     const QuestionRow = ({ g, expanded }) => (
@@ -1522,6 +1565,48 @@ export default function QuizRunner({
             </div>
           ))}
         </dl>
+
+        {/* Test mode: where the time went, question by question. */}
+        {sit === 'test' && (() => {
+          const rows = results.graded.map((g, i) => ({ n: i + 1, g, secs: Math.round(g.timeSpent || 0), marks: g.question.marks || 1 }))
+          const total = rows.reduce((n, r) => n + r.secs, 0)
+          const marks = rows.reduce((n, r) => n + r.marks, 0)
+          const slowest = Math.max(1, ...rows.map((r) => r.secs))
+          return (
+            <section className="mt-8 rounded-[16px] border p-5" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
+              <div className="mb-4 flex flex-wrap gap-x-8 gap-y-2">
+                {[
+                  ['Per question', formatClock(Math.round(total / Math.max(1, rows.length)))],
+                  ['Per mark', formatClock(Math.round(total / Math.max(1, marks)))],
+                  ['Slowest', `Q${rows.find((r) => r.secs === slowest)?.n ?? 1} · ${formatClock(slowest)}`],
+                ].map(([l, v]) => (
+                  <div key={l}>
+                    <p className="text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
+                      {l}
+                    </p>
+                    <p className="mt-0.5 text-[17px] font-semibold tabular-nums">{v}</p>
+                  </div>
+                ))}
+              </div>
+              <ul className="flex flex-col gap-1.5">
+                {rows.map((r) => (
+                  <li key={r.n} className="grid grid-cols-[2.25rem_minmax(0,1fr)_4.5rem_5.5rem] items-center gap-3 text-[12.5px]">
+                    <span className="flex items-center gap-1.5 tabular-nums" style={{ color: 'var(--text-muted)' }}>
+                      <span className="h-1.5 w-1.5 rounded-full" style={{ background: r.g.correct ? 'var(--status-proficient)' : 'var(--status-weak)' }} />Q{r.n}
+                    </span>
+                    <span className="h-2 overflow-hidden rounded-full" style={{ background: 'var(--surface-sunken)' }}>
+                      <span className="block h-full rounded-full" style={{ width: `${(r.secs / slowest) * 100}%`, background: r.g.correct ? 'var(--brand)' : 'var(--status-weak)' }} />
+                    </span>
+                    <span className="text-right font-semibold tabular-nums">{formatClock(r.secs)}</span>
+                    <span className="text-right tabular-nums" style={{ color: 'var(--text-faint)' }}>
+                      {formatClock(Math.round(r.secs / r.marks))}/mark
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        })()}
 
         <StreakLine />
 
