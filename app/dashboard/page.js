@@ -602,7 +602,14 @@ export default function Dashboard() {
             new account says nothing and looks like a broken page, the same
             reason the cards above wait for activity. */}
         {studyDays.length > 0 && (
-          <Section title="Time studied">
+          <Section
+            title="Time studied"
+            action={
+              <Link href="/dashboard/analytics" className="text-[13px] font-medium text-[var(--brand)] hover:underline">
+                See analytics
+              </Link>
+            }
+          >
             <div
               className="rounded-[16px] border p-5 sm:p-6"
               style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}

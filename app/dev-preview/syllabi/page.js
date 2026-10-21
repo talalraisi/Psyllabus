@@ -104,6 +104,31 @@ const REVIEW = {
   next_step: 'Work out the uncertainty in the gradient and use it to judge your value of g.',
 }
 
+/** The chat list with folders, all in this tab's memory. */
+function HistoryPreview() {
+  const [chats, setChats] = useState(() => CHATS.map((c, i) => ({ ...c, folder_id: i === 1 ? 'f1' : null })))
+  const [folders, setFolders] = useState([{ id: 'f1', name: 'Maths revision' }, { id: 'f2', name: 'IA ideas' }])
+  return (
+    <ChatHistory
+      chats={chats}
+      folders={folders}
+      activeId="2"
+      loading={false}
+      onOpen={() => {}}
+      onNew={() => {}}
+      onDelete={(c) => setChats((l) => l.filter((x) => x.id !== c.id))}
+      onMove={(c, f) => setChats((l) => l.map((x) => (x.id === c.id ? { ...x, folder_id: f } : x)))}
+      onCreateFolder={async (name) => {
+        const id = `f${folders.length + 1}${name.length}`
+        setFolders((f) => [...f, { id, name }])
+        return id
+      }}
+      onRenameFolder={(f, name) => setFolders((l) => l.map((x) => (x.id === f.id ? { ...x, name } : x)))}
+      onDeleteFolder={(f) => (setFolders((l) => l.filter((x) => x.id !== f.id)), setChats((l) => l.map((x) => (x.folder_id === f.id ? { ...x, folder_id: null } : x))))}
+    />
+  )
+}
+
 function Preview() {
   const view = useSearchParams().get('view') || 'draft'
   // Seeded once, before the studio first reads its storage.
@@ -191,9 +216,9 @@ function Preview() {
         {view === 'draft' && <DraftStudio subjects={SUBJECTS} />}
         {view === 'ask' && <TutorChat subjects={SUBJECTS} />}
         {view === 'history' && (
-          <div className="flex min-h-0 flex-1 gap-6">
-            <aside className="flex w-60 shrink-0 flex-col">
-              <ChatHistory chats={CHATS} activeId="2" loading={false} onOpen={() => {}} onNew={() => {}} onDelete={() => {}} />
+          <div className="flex min-h-0 flex-1 gap-5">
+            <aside className="flex w-64 shrink-0 flex-col border-r pr-5" style={{ borderColor: 'var(--border)' }}>
+              <HistoryPreview />
             </aside>
             <div className="flex min-h-0 flex-1 flex-col">
               <TutorChat subjects={SUBJECTS} />

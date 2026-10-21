@@ -78,10 +78,21 @@ const NAV_GROUPS = [
     label: 'Progress',
     items: [
       { href: '/dashboard/progress', label: 'Progress', Icon: IconProgress, match: (p) => p === '/dashboard/progress' || p === '/dashboard/Heatmap' },
+      { href: '/dashboard/analytics', label: 'Analytics', Icon: IconAnalytics, match: (p) => p === '/dashboard/analytics' },
       { href: '/dashboard/prediction', label: 'Predicted Grade', Icon: IconTarget, match: (p) => p === '/dashboard/prediction' },
     ],
   },
 ]
+
+/** Bars and a trend line: analytics. */
+function IconAnalytics({ width = 17, height = 17, style }) {
+  return (
+    <svg width={width} height={height} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={style} aria-hidden="true">
+      <path d="M4 20V14M10 20V10M16 20v-5M22 20H2" />
+      <path d="m4 9 6-4 6 4 5-4" />
+    </svg>
+  )
+}
 
 /** Two rings and a node: the subject map. */
 function IconOrbit({ width = 17, height = 17, style }) {

@@ -226,7 +226,8 @@ export default function FlashcardsView({ cards, presets = [], presetsLocked, not
                 <StudyMenu
                   count={list.length}
                   primary={dueHere.length ? 'flip' : 'write'}
-                  label={dueHere.length ? `Review ${dueHere.length}` : `Study ${list.length}`}
+                  verb={dueHere.length ? 'Review' : 'Study'}
+                  compact
                   onStart={(mode) => onReview(dueHere.length && mode === 'flip' ? dueHere : list, !dueHere.length || mode !== 'flip', mode)}
                 />
               )}
@@ -332,14 +333,14 @@ export default function FlashcardsView({ cards, presets = [], presetsLocked, not
                 </span>
               </p>
               <p className="mt-2.5 max-w-sm text-[13px]" style={{ color: 'var(--text-muted)' }}>
-                {due.length ? 'Each one you get right moves a box to the right and comes back later.' : 'Nothing is due. A quick ten keeps them warm without moving their schedule.'}
+                {due.length ? 'Each one you get right moves a box to the right and comes back later.' : 'Nothing is due. Practising now keeps them warm without moving their schedule.'}
               </p>
               <div className="mt-5">
                 {due.length ? (
-                  <StudyMenu count={due.length} primary="flip" label={`Review ${due.length}`} onStart={(mode) => onReview(due, mode !== 'flip', mode)} />
+                  <StudyMenu count={due.length} primary="flip" verb="Review" onStart={(mode) => onReview(due, mode !== 'flip', mode)} />
                 ) : (
                   <button onClick={() => onReview(cards.slice(0, 10), true)} className="btn btn-outline control-md">
-                    Quick 10
+                    Practise anyway
                     <IconArrowRight width={15} height={15} />
                   </button>
                 )}

@@ -177,7 +177,9 @@ export function StreakChip({ profile, expanded }) {
 
   return (
     <Link
-      href="/dashboard#streak"
+      // No streak yet: the way to start one is today's plan. With one: the
+      // full picture of what has been studied.
+      href={s.current > 0 ? '/dashboard/analytics' : '/dashboard/study-plan'}
       title={expanded ? undefined : `${s.current}-day streak · ${line}`}
       className="flex h-11 items-center gap-3 rounded-[10px] pl-[11px] pr-2 transition-colors hover:bg-[var(--surface-sunken)]"
       style={{ background: s.atRisk ? 'var(--flame-tint)' : undefined }}

@@ -433,7 +433,7 @@ export default function SubjectMap({ graph, subjects = [], onSubject, initialAt 
               setSelectedId(null)
             }}
             controls={
-              <div className="absolute bottom-4 right-4 flex flex-col items-end gap-2">
+              <div data-ui className="absolute bottom-4 right-4 flex flex-col items-end gap-2">
                 <button
                   type="button"
                   onClick={fit}

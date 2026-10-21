@@ -270,7 +270,13 @@ export default function MapCanvas({
       drag.current = null
       return
     }
-    if (e.target.closest('[data-node]')) return
+    // Nodes, the zoom and Center buttons and the minimap handle their own
+    // presses. Starting a drag on them captured the pointer, so the release
+    // landed on the map instead and the button never saw its click.
+    if (e.target.closest('[data-node], [data-ui], button, a')) {
+      pointers.current.delete(e.pointerId)
+      return
+    }
     drag.current = { x: e.clientX, y: e.clientY, view: viewRef.current, moved: false }
     e.currentTarget.setPointerCapture?.(e.pointerId)
   }
@@ -300,7 +306,7 @@ export default function MapCanvas({
     if (pointers.current.size < 2) pinch.current = null
     const d = drag.current
     drag.current = null
-    if (d && !d.moved && !e.target.closest('[data-node]')) onBackground?.()
+    if (d && !d.moved && !e.target.closest('[data-node], [data-ui], button, a')) onBackground?.()
   }
 
   // Connections, lifted to whatever is drawn at this level.
@@ -443,6 +449,7 @@ function Minimap({ layout, graph, view, size, onView }) {
   const vh = (size.h / view.k) * s
   return (
     <svg
+      data-ui
       width={W}
       height={H}
       className="absolute bottom-4 left-4 hidden rounded-[12px] border md:block"

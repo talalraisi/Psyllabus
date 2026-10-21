@@ -58,6 +58,7 @@ function Syllabi() {
   const [tab, setTab] = useState(() => (TABS.some(([k]) => k === params.get('tab')) ? params.get('tab') : 'ask'))
   const [seed, setSeed] = useState({ n: 0, subject: '', text: '' })
   const [chats, setChats] = useState([])
+  const [folders, setFolders] = useState([])
   const [chatsLoading, setChatsLoading] = useState(true)
   const [open, setOpen] = useState({ n: 0, chat: null })
   const [historyOpen, setHistoryOpen] = useState(false)
@@ -76,12 +77,14 @@ function Syllabi() {
         router.push('/onboarding')
         return
       }
-      const [syllabus, { data: list }] = await Promise.all([
+      const [syllabus, { data: list }, { data: folderRows }] = await Promise.all([
         getSyllabus(supabase, p.subjects || []),
-        supabase.from('syllabi_chats').select('id, subject, title, source, updated_at').eq('user_id', user.id).order('updated_at', { ascending: false }).limit(100),
+        supabase.from('syllabi_chats').select('id, subject, title, source, updated_at, folder_id').eq('user_id', user.id).order('updated_at', { ascending: false }).limit(200),
+        supabase.from('syllabi_folders').select('id, name, created_at').eq('user_id', user.id).order('created_at'),
       ])
       setRows(syllabus || [])
       setChats(list || [])
+      setFolders(folderRows || [])
       // Carry on with the chat that was open before a refresh.
       let openId = null
       try {
@@ -128,8 +131,46 @@ function Syllabi() {
 
   const saved = useCallback((meta) => {
     remember(meta.id)
-    setChats((list) => [meta, ...list.filter((c) => c.id !== meta.id)])
+    // A chat keeps its folder as it is saved.
+    setChats((list) => [{ ...meta, folder_id: list.find((c) => c.id === meta.id)?.folder_id ?? null }, ...list.filter((c) => c.id !== meta.id)])
   }, [])
+
+  /* Folders: made, renamed and removed by the student; a chat moves between them. */
+  const createFolder = useCallback(
+    async (name) => {
+      const { data, error } = await supabase.from('syllabi_folders').insert({ name }).select('id, name, created_at').single()
+      if (error || !data) return null
+      setFolders((f) => [...f, data])
+      return data.id
+    },
+    [supabase]
+  )
+  const renameFolder = useCallback(
+    async (folder, name) => {
+      setFolders((f) => f.map((x) => (x.id === folder.id ? { ...x, name } : x)))
+      const { error } = await supabase.from('syllabi_folders').update({ name }).eq('id', folder.id)
+      if (error) setFolders((f) => f.map((x) => (x.id === folder.id ? folder : x)))
+    },
+    [supabase]
+  )
+  const deleteFolder = useCallback(
+    async (folder) => {
+      const { error } = await supabase.from('syllabi_folders').delete().eq('id', folder.id)
+      if (error) return
+      setFolders((f) => f.filter((x) => x.id !== folder.id))
+      // Its chats stay; the database lets go of the folder for them.
+      setChats((list) => list.map((c) => (c.folder_id === folder.id ? { ...c, folder_id: null } : c)))
+    },
+    [supabase]
+  )
+  const moveChat = useCallback(
+    async (chat, folderId) => {
+      setChats((list) => list.map((c) => (c.id === chat.id ? { ...c, folder_id: folderId } : c)))
+      const { error } = await supabase.from('syllabi_chats').update({ folder_id: folderId }).eq('id', chat.id)
+      if (error) setChats((list) => list.map((c) => (c.id === chat.id ? { ...c, folder_id: chat.folder_id } : c)))
+    },
+    [supabase]
+  )
 
   const removeChat = useCallback(
     async (c) => {
@@ -204,14 +245,15 @@ function Syllabi() {
             blurb="Ask Syllabi to explain a topic, read a photo of a question, set you practice and mark your answer, or mark your IA draft against the criteria."
           />
         ) : tab === 'ask' ? (
-          <div className="relative flex min-h-0 flex-1 gap-6">
+          <div className="relative flex min-h-0 flex-1 gap-5">
             {/* Saved chats: a column on a wide screen, a panel on a narrow one. */}
-            <aside className="hidden w-60 shrink-0 flex-col lg:flex">
-              <ChatHistory chats={chats} activeId={open.chat?.id} loading={chatsLoading} onOpen={openChat} onNew={newChat} onDelete={removeChat} />
+            {/* A line between the saved chats and the conversation. */}
+            <aside className="hidden w-64 shrink-0 flex-col border-r pr-5 lg:flex" style={{ borderColor: 'var(--border)' }}>
+              <ChatHistory chats={chats} folders={folders} activeId={open.chat?.id} loading={chatsLoading} onOpen={openChat} onNew={newChat} onDelete={removeChat} onMove={moveChat} onCreateFolder={createFolder} onRenameFolder={renameFolder} onDeleteFolder={deleteFolder} />
             </aside>
             {historyOpen && (
               <div className="pop-enter absolute inset-y-0 left-0 z-30 flex w-[min(20rem,85vw)] flex-col rounded-[18px] border p-3 shadow-2xl lg:hidden" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
-                <ChatHistory chats={chats} activeId={open.chat?.id} loading={chatsLoading} onOpen={openChat} onNew={newChat} onDelete={removeChat} />
+                <ChatHistory chats={chats} folders={folders} activeId={open.chat?.id} loading={chatsLoading} onOpen={openChat} onNew={newChat} onDelete={removeChat} onMove={moveChat} onCreateFolder={createFolder} onRenameFolder={renameFolder} onDeleteFolder={deleteFolder} />
               </div>
             )}
             <div className="flex min-h-0 min-w-0 flex-1 flex-col">
