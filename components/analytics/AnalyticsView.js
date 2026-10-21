@@ -267,31 +267,47 @@ export default function AnalyticsView({ attempts, sessions, progress = [], profi
           </div>
 
           {/* Streak */}
-          <Card title="Streak" aside={`${a.studiedDays} of ${a.rangeDays} days studied`}>
-            <div className="flex flex-col gap-6 md:flex-row md:items-center">
-              <div className="flex shrink-0 items-center gap-4">
-                <span className="flex h-14 w-14 items-center justify-center rounded-[16px]" style={{ background: streak.current ? 'var(--flame-tint)' : 'var(--surface-sunken)', color: 'var(--text-faint)' }}>
-                  <Flame size={30} lit={streak.current > 0} />
-                </span>
+          <Card title="Streak">
+            <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <div className="col-span-2 flex items-center gap-3.5 rounded-[16px] p-3.5 sm:col-span-1" style={{ background: streak.current ? 'var(--flame-tint)' : 'var(--surface-sunken)' }}>
+                <Flame size={28} lit={streak.current > 0} style={{ color: 'var(--text-faint)' }} />
                 <div>
-                  <p className="text-[26px] font-semibold leading-none tabular-nums">{streak.current}</p>
-                  <p className="mt-1 text-[12.5px]" style={{ color: 'var(--text-muted)' }}>
-                    day streak · best {streak.longest}
+                  <p className="text-[22px] font-semibold leading-none tabular-nums">
+                    {streak.current}
+                    <span className="ml-1.5 text-[12.5px] font-medium" style={{ color: 'var(--text-muted)' }}>
+                      day{streak.current === 1 ? '' : 's'}
+                    </span>
+                  </p>
+                  <p className="mt-1 text-[11.5px]" style={{ color: 'var(--text-muted)' }}>
+                    {streak.current ? 'Current streak' : streak.studiedToday ? 'Started today' : 'Study today to start one'}
                   </p>
                 </div>
               </div>
-              <div className="min-w-0 flex-1">
-                <Calendar days={a.days} from={a.from} end={a.end} goal={streak.goal} />
-                <p className="flex flex-wrap items-center gap-3 text-[11px]" style={{ color: 'var(--text-faint)' }}>
-                  <span className="flex items-center gap-1.5">
-                    <span className="h-2.5 w-2.5 rounded-[3px]" style={{ background: 'color-mix(in oklab, var(--flame) 45%, var(--surface-sunken))' }} /> Studied
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <span className="h-2.5 w-2.5 rounded-[3px]" style={{ background: 'var(--flame)' }} /> Daily goal reached
-                  </span>
-                </p>
-              </div>
+              {[
+                [`${streak.longest}`, 'Best streak'],
+                [`${a.studiedDays}/${a.rangeDays}`, 'Days studied'],
+                [`${Object.values(a.days).filter((m) => m >= streak.goal).length}`, `Days at your ${streak.goal} min goal`],
+              ].map(([v, l]) => (
+                <div key={l} className="rounded-[16px] p-3.5" style={{ background: 'var(--surface-sunken)' }}>
+                  <p className="text-[22px] font-semibold leading-none tabular-nums">{v}</p>
+                  <p className="mt-1 truncate text-[11.5px]" style={{ color: 'var(--text-muted)' }}>
+                    {l}
+                  </p>
+                </div>
+              ))}
             </div>
+            <Calendar days={a.days} from={a.from} end={a.end} goal={streak.goal} />
+            <p className="mt-1 flex flex-wrap items-center gap-4 text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
+              <span className="flex items-center gap-1.5">
+                <span className="h-3 w-3 rounded-[4px]" style={{ background: 'var(--surface-sunken)', border: '1px solid var(--border)' }} /> No study
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="h-3 w-3 rounded-[4px]" style={{ background: 'color-mix(in oklab, var(--flame) 42%, var(--surface-sunken))' }} /> Studied
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span className="h-3 w-3 rounded-[4px]" style={{ background: 'var(--flame)' }} /> Goal reached
+              </span>
+            </p>
           </Card>
 
           {/* What */}

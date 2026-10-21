@@ -273,39 +273,103 @@ export function HeatGrid({ grid }) {
 
 /* ---------- The streak, as a calendar ---------- */
 
+const WEEKDAY = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
+const pad2 = (n) => String(n).padStart(2, '0')
+const keyOf = (d) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`
+
+/**
+ * Days studied, as calendars you can read: a week is seven tiles with the
+ * date and the minutes; anything longer is real months, Monday first, side
+ * by side and stretched to the width. Days outside the period are greyed
+ * rather than left out, so every month keeps its shape.
+ */
 export function Calendar({ days, from, end, goal = 20 }) {
   const [hover, setHover] = useState(null)
-  // Whole weeks, Monday first, covering the range.
-  const start = new Date(from)
-  const back = (start.getDay() + 6) % 7
-  const first = new Date(start.getFullYear(), start.getMonth(), start.getDate() - back)
-  const cells = []
-  for (let d = new Date(first); d.getTime() < end; d = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1)) {
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-    cells.push({ key, date: new Date(d), minutes: days[key] || 0, inRange: d.getTime() >= from })
+  const today = end - 1
+  const tone = (m) => (m <= 0 ? 'var(--surface-sunken)' : m >= goal ? 'var(--flame)' : 'color-mix(in oklab, var(--flame) 42%, var(--surface-sunken))')
+  const ink = (m) => (m >= goal ? '#1a1206' : m > 0 ? 'var(--text)' : 'var(--text-faint)')
+
+  // A week: seven tiles.
+  if (end - from <= 8 * 86400000) {
+    const list = []
+    for (let t = from; t < end; t = new Date(new Date(t).getFullYear(), new Date(t).getMonth(), new Date(t).getDate() + 1).getTime()) list.push(new Date(t))
+    return (
+      <div className="grid grid-cols-7 gap-2">
+        {list.map((d) => {
+          const m = days[keyOf(d)] || 0
+          return (
+            <div key={keyOf(d)} className="flex flex-col items-center gap-1.5 rounded-[14px] px-1 py-3 text-center" style={{ background: tone(m) }} title={`${m ? hm(m) : 'No study'}`}>
+              <span className="text-[10.5px] font-semibold uppercase tracking-[0.08em]" style={{ color: ink(m), opacity: 0.75 }}>
+                {d.toLocaleDateString(undefined, { weekday: 'short' })}
+              </span>
+              <span className="text-[18px] font-semibold leading-none tabular-nums" style={{ color: ink(m) }}>
+                {d.getDate()}
+              </span>
+              <span className="text-[11px] font-medium tabular-nums" style={{ color: ink(m), opacity: 0.8 }}>
+                {m ? hm(m) : '—'}
+              </span>
+            </div>
+          )
+        })}
+      </div>
+    )
   }
-  const weeks = []
-  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7))
-  const tone = (m) => (m <= 0 ? 'var(--surface-sunken)' : m >= goal ? 'var(--flame)' : 'color-mix(in oklab, var(--flame) 45%, var(--surface-sunken))')
+
+  // Longer: every month the period touches.
+  const months = []
+  const first = new Date(from)
+  for (let d = new Date(first.getFullYear(), first.getMonth(), 1); d.getTime() < end; d = new Date(d.getFullYear(), d.getMonth() + 1, 1)) months.push(d)
+  const small = months.length > 4
+
   return (
     <div>
-      <div className="flex gap-[3px] overflow-x-auto pb-1">
-        {weeks.map((w, i) => (
-          <div key={i} className="flex shrink-0 flex-col gap-[3px]">
-            {w.map((c) => (
-              <span
-                key={c.key}
-                className="h-3.5 w-3.5 rounded-[4px] sm:h-4 sm:w-4"
-                style={{ background: c.inRange ? tone(c.minutes) : 'transparent', outline: hover?.key === c.key ? '1.5px solid var(--text)' : 'none' }}
-                onPointerEnter={() => c.inRange && setHover(c)}
-                onPointerLeave={() => setHover(null)}
-              />
-            ))}
-          </div>
-        ))}
+      <div className="grid gap-x-5 gap-y-6" style={{ gridTemplateColumns: `repeat(auto-fit, minmax(${small ? 150 : 210}px, 1fr))` }}>
+        {months.map((m0) => {
+          const lead = (m0.getDay() + 6) % 7
+          const count = new Date(m0.getFullYear(), m0.getMonth() + 1, 0).getDate()
+          const cells = [...Array(lead).fill(null), ...Array.from({ length: count }, (_, i) => new Date(m0.getFullYear(), m0.getMonth(), i + 1))]
+          return (
+            <div key={keyOf(m0)}>
+              <p className="mb-2 text-[12px] font-semibold" style={{ color: 'var(--text-muted)' }}>
+                {m0.toLocaleDateString(undefined, { month: 'long', year: months.length > 12 || m0.getFullYear() !== new Date(today).getFullYear() ? 'numeric' : undefined })}
+              </p>
+              <div className="grid grid-cols-7 gap-[3px]">
+                {WEEKDAY.map((w, i) => (
+                  <span key={i} className="pb-0.5 text-center text-[9.5px] font-medium" style={{ color: 'var(--text-faint)' }}>
+                    {w}
+                  </span>
+                ))}
+                {cells.map((d, i) => {
+                  if (!d) return <span key={`e${i}`} />
+                  const t = d.getTime()
+                  const inside = t >= from && t <= today
+                  const m = inside ? days[keyOf(d)] || 0 : 0
+                  const on = hover?.key === keyOf(d)
+                  return (
+                    <span
+                      key={keyOf(d)}
+                      className="flex aspect-square items-center justify-center rounded-[5px] text-[9.5px] font-medium tabular-nums transition-[outline-color]"
+                      style={{
+                        background: inside ? tone(m) : 'transparent',
+                        color: inside ? ink(m) : 'var(--text-faint)',
+                        opacity: inside ? 1 : 0.35,
+                        outline: on ? '1.5px solid var(--text)' : '1.5px solid transparent',
+                        outlineOffset: 1,
+                      }}
+                      onPointerEnter={() => inside && setHover({ key: keyOf(d), date: d, minutes: m })}
+                      onPointerLeave={() => setHover(null)}
+                    >
+                      {small ? '' : d.getDate()}
+                    </span>
+                  )
+                })}
+              </div>
+            </div>
+          )
+        })}
       </div>
-      <p className="mt-2 h-4 text-[11.5px]" style={{ color: 'var(--text-muted)' }}>
-        {hover ? `${hover.date.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })} · ${hover.minutes ? hm(hover.minutes) : 'no study'}` : ''}
+      <p className="mt-3 h-4 text-[12px]" style={{ color: 'var(--text-muted)' }}>
+        {hover ? `${hover.date.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })} · ${hover.minutes ? hm(hover.minutes) : 'no study'}` : ''}
       </p>
     </div>
   )
