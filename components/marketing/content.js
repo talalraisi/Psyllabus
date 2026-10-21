@@ -63,7 +63,7 @@ export const WHY = [
 export const FAQ = [
   {
     q: 'What is Project Syllabus?',
-    a: 'A study tracker for students taking the IB Diploma, A-Levels or AP exams. It lays out every topic and subtopic of your official course, works out which parts you are weak on by testing you, and tells you what to study today. Built in Muscat, Oman by an IB Diploma student.',
+    a: 'A study app for students taking the IB Diploma, A-Levels or AP, made by students for students. It lays out every topic and subtopic of your course, works out which parts you are weak on by testing you, builds your study plan, and gives you Syllabi, an AI tutor that marks drafts and turns your notes into flashcards. Built in Muscat, Oman by an IB Diploma student.',
   },
   {
     q: 'How is it different from a revision app or flashcards?',
@@ -84,6 +84,18 @@ export const FAQ = [
   {
     q: 'How do school codes work, and what stops one leaking?',
     a: 'A school buys one code for a year group and students type it in once. Each code has a redemption limit, so it cannot quietly become a public unlock, and no card is involved for the student.',
+  },
+  {
+    q: 'What is Syllabi?',
+    a: 'The AI tutor inside the app, on Premium. Ask it about anything on your course, send photos, PDFs or links, get your IA, EE, TOK and Paper 1 and 2 answers marked on the criteria, and turn your notes into flashcards. It coaches rather than writes: it will not do your coursework for you.',
+  },
+  {
+    q: 'What does it cost?',
+    a: 'One subject is free, for good, with no card. Basic opens every subject you take; Premium adds Syllabi and the subject map. Yearly plans cost ten months for twelve. If your school or a friend gave you a code, it can open Premium for a while or for good.',
+  },
+  {
+    q: 'Who made it?',
+    a: 'Students. It started as one IB Diploma student’s answer to revision apps that ask you how confident you feel, and it is built with feedback from classmates sitting the same exams. That is also why the prices are what a student can actually say yes to.',
   },
 ]
 
@@ -243,5 +255,65 @@ export const FEATURE_DETAIL = [
       'Three quizzes is labelled low confidence, not a forecast',
     ],
     limit: 'It predicts from what you have been tested on here. It is a measurement of your evidence so far, not a forecast of results day.',
+  },
+  {
+    label: 'Syllabi',
+    detail: [
+      'Syllabi is a tutor that has your course in front of it: your subjects, your topics and the subtopic you are on. Ask it anything, send a photo of a question you are stuck on, a page of your notes or a link, and it explains the way your exam expects, then asks you something back to check it landed.',
+      'It is a coach, not a ghostwriter. It will not write your IA, essay or coursework, and it says so. Every request goes through daily limits and checks before it reaches the model, which is how a student project can offer it at all.',
+    ],
+    title: 'A tutor that knows your syllabus',
+    lede: 'Questions, photos, PDFs and links, answered for your course.',
+    how: [
+      'Knows your subject, topic and subtopic',
+      'Reads photos, PDFs and web pages you send it',
+      'Explains, then checks you understood',
+    ],
+    limit: 'It can be wrong, like any AI, and it never writes coursework for you. Premium only, with a daily allowance.',
+  },
+  {
+    label: 'Marking',
+    detail: [
+      'Paste a draft of your IA, Extended Essay or TOK essay, or a Paper 1 or Paper 2 answer with its question, and Syllabi marks it against the published criteria for that piece: a mark per criterion, what earned it, and what the next band would need.',
+      'Your own sentences are highlighted where they help or hurt, and every marking is kept, so you can see a draft improve from one version to the next.',
+    ],
+    title: 'Drafts and answers, marked',
+    lede: 'Criterion by criterion, with your own sentences highlighted.',
+    how: [
+      'IA, EE, TOK, and Paper 1 and 2 answers',
+      'A mark and a reason for every criterion',
+      'Every version kept, so you can see the change',
+    ],
+    limit: 'An estimate from the criteria, not your teacher’s mark or the IB’s. Use it to improve a draft, not to predict a result.',
+  },
+  {
+    label: 'Cards',
+    detail: [
+      'Upload up to three photos of handwritten notes, PDFs or text files, or paste your notes, and Syllabi writes flashcards from exactly what is in them: definitions, facts, formulas, steps. Nothing it was not given.',
+      'The cards land in a list to check first. Edit any of them, untick the ones you do not want, then keep the rest. Your own cards are studied whenever you like, the ones you know least first.',
+    ],
+    title: 'Your notes, as flashcards',
+    lede: 'Photos, PDFs or pasted notes in; cards you can check out.',
+    how: [
+      'Photos of handwriting, PDFs and text files',
+      'Only what is in your notes, nothing invented',
+      'Checked and edited by you before they are kept',
+    ],
+    limit: 'Blurry photos make thin cards. Pasting “term: definition” lines works for free without Syllabi.',
+  },
+  {
+    label: 'Streaks',
+    detail: [
+      'Set a daily goal in minutes and keep a streak. Any study counts towards the streak, a quiz or the timer, and rest days on your plan never break it. The goal is what a good day looks like, not the price of keeping the streak.',
+      'The analytics page shows the rest: time by subject, a week to a year at a time, your accuracy over time and by subject, when in the week you study best, how long your focus sessions run, and what you have covered subtopic by subtopic.',
+    ],
+    title: 'Streaks, goals and the whole picture',
+    lede: 'A reason to come back tomorrow, and a page that shows where the time went.',
+    how: [
+      'A daily goal and a streak you can see everywhere',
+      'Time by subject, accuracy, best study times',
+      'Week, month, three months, six months, a year',
+    ],
+    limit: 'Time is counted from quizzes and the study timer. Reading a textbook with the timer off is invisible to it.',
   },
 ]

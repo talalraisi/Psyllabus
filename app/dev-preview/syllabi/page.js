@@ -37,6 +37,7 @@ import DashboardLayout from '@/components/DashboardLayout'
 import { StreakCard } from '@/components/Streak'
 import WaysToStudy from '@/components/WaysToStudy'
 import { RedemptionView } from '@/components/Redemption'
+import PlanStep from '@/components/onboarding/PlanStep'
 import { primeStudyDays } from '@/lib/streak'
 import { dayKey } from '@/lib/study-time'
 
@@ -157,6 +158,14 @@ function Preview() {
   })
   if (!ENABLED) notFound()
   if (!ready) return null
+
+  if (view === 'plans') {
+    return (
+      <div className="mx-auto max-w-4xl px-4 py-10" style={{ background: 'var(--bg)' }}>
+        <PlanStep supabase={{ rpc: async () => ({ data: { ok: false, error: 'Preview only: codes are checked on the real sign-up.' } }) }} onFree={() => {}} onUnlocked={() => {}} />
+      </div>
+    )
+  }
 
   if (view === 'redemption') {
     const NOW = Date.UTC(2026, 9, 21, 12)

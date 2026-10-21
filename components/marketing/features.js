@@ -345,6 +345,132 @@ function GraphicPrediction({ shown }) {
   )
 }
 
+/* 9. Syllabi, the tutor ---------------------------------------------------- */
+function GraphicSyllabi({ shown }) {
+  const [ref, seen] = useDraw(shown)
+  const line = (d) => ({ opacity: seen ? 1 : 0, transform: seen ? 'none' : 'translateY(6px)', transition: `opacity 360ms ease ${d}ms, transform 360ms ease ${d}ms` })
+  return (
+    <Frame>
+      <div ref={ref} className="flex flex-col gap-2 text-[11px] leading-relaxed">
+        <p className="ml-auto max-w-[82%] rounded-[12px] rounded-br-[4px] px-3 py-2" style={{ background: 'var(--brand)', color: '#fff', ...line(0) }}>
+          Why is the derivative of ln x equal to 1/x?
+        </p>
+        <div className="flex max-w-[92%] items-start gap-2" style={line(260)}>
+          <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[9px] font-bold" style={{ background: 'var(--brand)', color: '#fff' }}>
+            S
+          </span>
+          <p className="rounded-[12px] rounded-tl-[4px] border px-3 py-2" style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text-body)' }}>
+            Start from y = ln x, so x = e^y. Differentiate both sides… Now try one: d/dx of ln(3x)?
+          </p>
+        </div>
+        <p className="mt-1 text-[10px]" style={{ color: 'var(--text-faint)', ...line(520) }}>
+          Photos, PDFs and links welcome. It coaches; it never writes your coursework.
+        </p>
+      </div>
+    </Frame>
+  )
+}
+
+/* 10. Marking --------------------------------------------------------------- */
+function GraphicMarking({ shown }) {
+  const [ref, seen] = useDraw(shown)
+  const crits = [
+    ['A', 'Research design', 4, 6],
+    ['B', 'Data analysis', 3, 6],
+    ['C', 'Conclusion', 5, 6],
+    ['D', 'Evaluation', 2, 6],
+  ]
+  return (
+    <Frame>
+      <div ref={ref} className="flex flex-col gap-2">
+        {crits.map(([id, name, got, max], i) => (
+          <div key={id} className="grid grid-cols-[1.25rem_minmax(0,1fr)_2.5rem] items-center gap-2 text-[10.5px]">
+            <span className="font-semibold" style={{ color: 'var(--text-muted)' }}>
+              {id}
+            </span>
+            <span>
+              <span className="block truncate" style={{ color: 'var(--text-body)' }}>
+                {name}
+              </span>
+              <span className="mt-1 block h-1.5 overflow-hidden rounded-full" style={{ background: 'var(--border)' }}>
+                <span className="block h-full rounded-full" style={{ width: seen ? `${(got / max) * 100}%` : '0%', background: got / max >= 0.6 ? 'var(--status-proficient)' : 'var(--status-developing)', transition: `width 700ms cubic-bezier(0.16,1,0.3,1) ${i * 120}ms` }} />
+              </span>
+            </span>
+            <span className="text-right font-semibold tabular-nums">
+              {got}/{max}
+            </span>
+          </div>
+        ))}
+        <p className="mt-2 text-[10.5px]" style={{ color: 'var(--text-faint)' }}>
+          14/24 · likely a 5 · each mark explained, with the next band spelled out.
+        </p>
+      </div>
+    </Frame>
+  )
+}
+
+/* 11. Notes into cards ------------------------------------------------------- */
+function GraphicCards({ shown }) {
+  const [ref, seen] = useDraw(shown)
+  const cards = [
+    ['What lowers activation energy?', 'An enzyme'],
+    ['Where does the substrate bind?', 'The active site'],
+    ['What does denaturing change?', 'The active site’s shape'],
+  ]
+  return (
+    <Frame>
+      <div ref={ref} className="grid grid-cols-[minmax(0,0.8fr)_auto_minmax(0,1.2fr)] items-center gap-2">
+        <div className="rounded-[8px] border p-2 text-[9px] leading-relaxed" style={{ borderColor: 'var(--border)', background: 'var(--surface)', color: 'var(--text-faint)', transform: 'rotate(-2deg)' }}>
+          <p className="font-semibold" style={{ color: 'var(--text-muted)' }}>
+            Enzymes — notes
+          </p>
+          <p>· biological catalysts</p>
+          <p>· active site + substrate</p>
+          <p>· denature: heat, pH</p>
+        </div>
+        <span className="text-[14px]" style={{ color: 'var(--brand)' }}>
+          →
+        </span>
+        <div className="flex flex-col gap-1.5">
+          {cards.map(([f, b], i) => (
+            <div key={f} className="rounded-[8px] border px-2 py-1.5 text-[9.5px]" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)', opacity: seen ? 1 : 0, transform: seen ? 'none' : 'translateX(8px)', transition: `opacity 320ms ease ${i * 140}ms, transform 320ms ease ${i * 140}ms` }}>
+              <p className="font-semibold" style={{ color: 'var(--text)' }}>
+                {f}
+              </p>
+              <p style={{ color: 'var(--text-faint)' }}>{b}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Frame>
+  )
+}
+
+/* 12. Streaks and analytics -------------------------------------------------- */
+function GraphicStreak({ shown }) {
+  const [ref, seen] = useDraw(shown)
+  const week = [25, 18, 0, 41, 22, 35, 12]
+  const goal = 20
+  return (
+    <Frame>
+      <div ref={ref}>
+        <p className="mb-2 text-[11px] font-semibold" style={{ color: 'var(--text)' }}>
+          <span style={{ color: 'var(--flame)' }}>●</span> 6-day streak · 2.5h this week
+        </p>
+        <div className="relative flex h-16 items-end gap-1.5">
+          <span className="absolute inset-x-0 border-t border-dashed" style={{ bottom: `${(goal / 45) * 100}%`, borderColor: 'var(--border-strong)' }} />
+          {week.map((m, i) => (
+            <span key={i} className="flex-1 rounded-[4px]" style={{ height: seen ? `${Math.max(6, (m / 45) * 100)}%` : '6%', background: m >= goal ? 'var(--flame)' : m ? 'color-mix(in oklab, var(--flame) 40%, var(--surface))' : 'var(--border)', transition: `height 600ms cubic-bezier(0.16,1,0.3,1) ${i * 70}ms` }} />
+          ))}
+        </div>
+        <p className="mt-2 text-[10px]" style={{ color: 'var(--text-faint)' }}>
+          Time by subject, accuracy, when you focus best: all on one page.
+        </p>
+      </div>
+    </Frame>
+  )
+}
+
 const FEATURE_MODULES = [
   {
     label: 'The map',
@@ -394,6 +520,30 @@ const FEATURE_MODULES = [
     body: 'A running total out of 45 next to the grades you told us you want, built only from quiz results. It states how much of your syllabus it is based on, so a prediction from three quizzes is labelled low confidence instead of presented as a forecast.',
     Graphic: GraphicPrediction,
   },
+  {
+    label: 'Syllabi',
+    title: 'A tutor that knows your syllabus',
+    body: 'Ask about anything on your course, send a photo of a question or your notes, and Syllabi explains it the way your exam expects, then checks you understood.',
+    Graphic: GraphicSyllabi,
+  },
+  {
+    label: 'Marking',
+    title: 'Drafts and answers, marked',
+    body: 'Paste an IA, an EE, a TOK essay or a Paper 1 or 2 answer and get marks on the real criteria, each one explained, with your own sentences highlighted.',
+    Graphic: GraphicMarking,
+  },
+  {
+    label: 'Cards',
+    title: 'Your notes, as flashcards',
+    body: 'Upload photos of handwritten notes, a PDF or a page of text and get cards from exactly what is in them, to check and edit before you keep them.',
+    Graphic: GraphicCards,
+  },
+  {
+    label: 'Streaks',
+    title: 'Streaks, goals and the whole picture',
+    body: 'A daily goal and a streak to keep, and an analytics page with your time by subject, your accuracy and when in the week you study best.',
+    Graphic: GraphicStreak,
+  },
 ]
 
 /**
@@ -428,9 +578,14 @@ const GROUPS = [
     keys: ['Papers', 'Review', 'Resources'],
   },
   {
+    heading: 'Learn it with Syllabi',
+    blurb: 'An AI tutor that knows your course, marks your work and turns your notes into cards.',
+    keys: ['Syllabi', 'Marking', 'Cards'],
+  },
+  {
     heading: 'Spend the time you actually have',
     blurb: 'Tonight is forty minutes, not a term. The plan is built for tonight.',
-    keys: ['Calendar', 'Sessions'],
+    keys: ['Calendar', 'Sessions', 'Streaks'],
   },
 ]
 

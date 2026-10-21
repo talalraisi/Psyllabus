@@ -7,7 +7,7 @@ import { IconArrowRight } from '@/components/Icons'
 export const metadata = {
   title: 'About',
   description:
-    'Project Syllabus is built by an IB Diploma student in Muscat, Oman, for students who want to know where they actually stand before the exam tells them.',
+    'Project Syllabus is made by students, for students: built by an IB Diploma student in Muscat, Oman, for anyone who wants to know where they actually stand before the exam tells them.',
 }
 
 /**
@@ -32,7 +32,7 @@ export default function AboutPage() {
   return (
     <PageShell>
       <PageHead
-        eyebrow="About"
+        eyebrow="About · By students, for students"
         title="I needed this, so I am building it"
         intro="I am Talal Al-Raisi, a Diploma student at ABA Oman International School in Muscat. Six subjects, two years, hundreds of subtopics, and no way of telling which part of them actually needed me on a given evening."
       >

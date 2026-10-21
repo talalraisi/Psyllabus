@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Select, { Chevron } from '@/components/Select'
 import Logo from '@/components/Logo'
+import PlanStep from '@/components/onboarding/PlanStep'
 import { splitLevel, coursesOf, defaultLevel } from '@/lib/course-levels'
 import { getCurrentUser } from '@/lib/auth'
 import { realismNote, curriculumOf } from '@/lib/curriculum'
@@ -424,7 +425,7 @@ export default function Onboarding() {
             on and how much is left. */}
         <div className="mb-12">
           <div className="flex gap-1.5">
-            {[1, 2, 3, 4].map((n) => (
+            {[1, 2, 3, 4, 5].map((n) => (
               <span
                 key={n}
                 className="h-1 flex-1 rounded-full transition-colors duration-300"
@@ -437,10 +438,10 @@ export default function Onboarding() {
               className="text-[10.5px] font-semibold uppercase tracking-[0.16em]"
               style={{ color: 'var(--text-faint)' }}
             >
-              {['Setup', 'Subjects', 'Goals', 'Start'][step - 1]}
+              {['Setup', 'Subjects', 'Goals', 'Plan', 'Start'][step - 1]}
             </p>
             <p className="text-[12px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
-              Step {step} of 4
+              Step {step} of 5
             </p>
           </div>
         </div>
@@ -889,8 +890,22 @@ export default function Onboarding() {
           </div>
         )}
 
-        {/* Step 4, the one subject a free account starts with */}
+        {/* Step 4, the plans: before the free subject, with a code box and
+            what free leaves out (components/onboarding/PlanStep). */}
         {step === 4 && (
+          <PlanStep
+            supabase={supabase}
+            onFree={() => setStep(5)}
+            onUnlocked={async () => {
+              const user = await getCurrentUser(supabase)
+              if (user) invalidateProfile(user.id)
+              router.push('/dashboard')
+            }}
+          />
+        )}
+
+        {/* Step 5, the one subject a free account starts with */}
+        {step === 5 && (
           <div
             className="rounded-[14px] border p-6 md:p-9"
             style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
@@ -945,9 +960,9 @@ export default function Onboarding() {
               </p>
             )}
 
-            <p className="t-caption mt-4 text-center">
-              Have a school code? Add it in your profile and every subject opens.
-            </p>
+            <button type="button" onClick={() => setStep(4)} className="t-caption mx-auto mt-4 block hover:underline">
+              Back to the plans, or use a code
+            </button>
           </div>
         )}
         </div>

@@ -12,11 +12,12 @@ import WordRotate from '@/components/marketing/WordRotate'
 import { FeatureModules } from '@/components/marketing/features'
 import FloatingSubjects, { FloatingSubjectsRow } from '@/components/marketing/FloatingSubjects'
 import SubjectOrbit from '@/components/marketing/SubjectOrbit'
+import Everything from '@/components/marketing/Everything'
 
 export const metadata = {
   title: 'Project Syllabus',
   description:
-    'Project Syllabus tracks your IB, A-Level or AP syllabus topic by topic. Where you stand is set by testing, not by how confident you feel.',
+    'Made by students, for students. Project Syllabus maps your IB, A-Level or AP course topic by topic, tests what you know, plans what to study, and gives you Syllabi, an AI tutor that marks your drafts and turns your notes into flashcards.',
 }
 
 /**
@@ -126,6 +127,11 @@ export default async function Home() {
               div is sized to its content and mx-auto centres that, which pushed
               the headline a couple of hundred pixels right of the logo above it. */}
           <div className="hero-in relative z-10 mx-auto w-full max-w-6xl">
+            {/* Who made it, first. */}
+            <p className="mb-6 inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[12.5px] font-semibold" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)', color: 'var(--text-body)' }}>
+              <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--brand)' }} />
+              Made by students, for students
+            </p>
             <h1 className="max-w-3xl text-[clamp(2.6rem,6vw,4.6rem)] font-semibold leading-[0.98] tracking-[-0.038em]">
               Stop guessing.
               <br />
@@ -213,6 +219,14 @@ export default async function Home() {
                 </p>
               </Reveal>
             ))}
+          </div>
+        </Section>
+
+        {/* ------------------------------------------------------ everything */}
+        <Section label="Everything in one place" id="everything">
+          <Heading className="max-w-2xl">One app for the whole course, from the first quiz to the last paper</Heading>
+          <div className="mt-10">
+            <Everything />
           </div>
         </Section>
 
@@ -316,7 +330,7 @@ export default async function Home() {
 
         {/* ------------------------------------------------------- features */}
         <Section label="Features" tint id="features">
-          <Heading className="max-w-2xl">Three questions, and what answers each</Heading>
+          <Heading className="max-w-2xl">Four questions, and what answers each</Heading>
           <p className="mx-auto mt-4 max-w-lg text-center text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
             Shown rather than described, because a list of feature names tells you nothing about
             whether any of it is any good.
@@ -354,6 +368,32 @@ export default async function Home() {
           </div>
         </Section>
 
+
+        {/* -------------------------------------------------------- students */}
+        <Section label="Who made it" tint>
+          <div className="grid gap-10 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:items-center">
+            <div>
+              <Heading className="max-w-xl">By students, for students</Heading>
+              <p className="mt-5 max-w-lg text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                Psyllabus started with an IB Diploma student in Muscat, tired of revision apps that ask you how confident you feel. It is built with classmates sitting the same exams, tested in real revision weeks, and priced for a student&apos;s pocket rather than a school&apos;s budget.
+              </p>
+            </div>
+            <ul className="flex flex-col gap-3">
+              {[
+                ['Built by someone sitting the exams', 'Every feature started as a problem in a real revision week.'],
+                ['Shaped by classmates', 'What stayed in is what students actually used. What did not, went.'],
+                ['Priced for students', 'One subject free for good. The rest costs less than a textbook.'],
+              ].map(([t, l]) => (
+                <li key={t} className="rounded-[16px] border p-4" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
+                  <p className="text-[14px] font-semibold">{t}</p>
+                  <p className="mt-1 text-[13px]" style={{ color: 'var(--text-muted)' }}>
+                    {l}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </Section>
 
         {/* ------------------------------------------------------------ cta */}
         {/* The close: every subject in one orbit, with the way in. */}
