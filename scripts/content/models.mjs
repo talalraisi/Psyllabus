@@ -190,11 +190,15 @@ export async function askGemini(parts, schema, { cap = 25, note = '' } = {}) {
         generationConfig: { responseMimeType: 'application/json', responseJsonSchema: schema, maxOutputTokens: 32000 },
       }),
     })
-    if ((res.status === 429 || res.status >= 500) && attempt <= 5) {
-      await new Promise((r) => setTimeout(r, 6000 * attempt))
+    // Gemini is sometimes overloaded for a few minutes: wait it out.
+    if ((res.status === 429 || res.status >= 500) && attempt <= 10) {
+      await new Promise((r) => setTimeout(r, 10000 * attempt))
       continue
     }
     const data = await res.json()
+    // Still overloaded after that: the build carries on as if Gemini were out
+    // of credit (disputed questions dropped, audits skipped) rather than stopping.
+    if (res.status === 429 || res.status >= 500) throw new OverBudget(`Gemini unavailable (${res.status}) after ${attempt - 1} retries`)
     if (!res.ok) throw new Error(`Gemini ${res.status}: ${JSON.stringify(data).slice(0, 300)}`)
     const u = data.usageMetadata || {}
     const [pi, po] = PRICES[GEMINI_MODEL]

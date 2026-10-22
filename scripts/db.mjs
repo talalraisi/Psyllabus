@@ -139,6 +139,20 @@ export async function connect({ quiet = false } = {}) {
     process.exit(1)
   }
 
+  // The pooler allows a fixed number of sessions. Many build jobs connecting
+  // at once can hit it; waiting a moment and trying again always clears.
+  for (let tries = 0; ; tries++) {
+    try {
+      return makeResilient(await attempt(url), url)
+    } catch (err) {
+      if (!/EMAXCONNSESSION|max clients reached|too many clients/i.test(err.message) || tries >= 30) {
+        if (/EMAXCONNSESSION|max clients reached|too many clients/i.test(err.message)) throw err
+        break
+      }
+      await new Promise((r) => setTimeout(r, 2000 + Math.random() * 8000))
+    }
+  }
+
   try {
     return makeResilient(await attempt(url), url)
   } catch (err) {

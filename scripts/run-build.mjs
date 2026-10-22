@@ -27,7 +27,7 @@ const GEMINI_CAP = arg('gemini-cap', '28')
 // Waiting on the Batch API costs nothing, so by default everything waits at once.
 const PARALLEL = Number(arg('parallel', 100))
 const LOGS = path.join(ROOT, 'content-runs/logs')
-const STATUS = path.join(ROOT, 'content-runs/build-status.json')
+const STATUS = path.join(ROOT, arg('status', 'content-runs/build-status.json'))
 fs.mkdirSync(LOGS, { recursive: true })
 
 const PILOT = [
@@ -70,7 +70,9 @@ const allJobs = [
   ...REST.map((c) => ({ name: `content: ${c}`, steps: content(c) })),
   ...REST.filter((c) => !NO_PAPERS.has(c)).map((c) => ({ name: `papers: ${c}`, steps: papers(c) })),
 ]
-const jobs = allJobs.filter((j) => !SKIP.has(j.name.replace(/^(content|papers): /, '')))
+// --only "content: Music,papers: Computer Science" runs just those jobs.
+const ONLY = arg('only') ? new Set(String(arg('only')).split(',').map((x) => x.trim())) : null
+const jobs = allJobs.filter((j) => !SKIP.has(j.name.replace(/^(content|papers): /, '')) && (!ONLY || ONLY.has(j.name)))
 
 const status = Object.fromEntries(jobs.map((j) => [j.name, 'waiting']))
 const write = () => fs.writeFileSync(STATUS, JSON.stringify({ updated: new Date().toISOString(), status }, null, 1))
