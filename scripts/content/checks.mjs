@@ -109,12 +109,24 @@ export function readFigure(value) {
   if (value && typeof value === 'object') return { figure: value }
   const text = String(value ?? '').trim()
   if (!text || /^"?none"?$/i.test(text)) return { figure: { kind: 'none', alt: '' } }
-  try {
-    const figure = JSON.parse(text)
-    return figure && typeof figure === 'object' ? { figure } : { error: 'figure is not a JSON object' }
-  } catch {
-    return { error: 'figure is not valid JSON' }
+  // Forgiving about the usual slips: a code fence around it, typographic
+  // quotes, a trailing comma, words before or after the object.
+  const attempts = [text]
+  const start = text.indexOf('{')
+  const end = text.lastIndexOf('}')
+  if (start !== -1 && end > start) {
+    const body = text.slice(start, end + 1)
+    attempts.push(body, body.replace(/[\u201c\u201d]/g, '"').replace(/,\s*([}\]])/g, '$1'))
   }
+  for (const attempt of attempts) {
+    try {
+      const figure = JSON.parse(attempt)
+      if (figure && typeof figure === 'object') return { figure }
+    } catch {
+      // try the next repair
+    }
+  }
+  return { error: `figure is not valid JSON: ${text.slice(0, 80)}` }
 }
 
 export function checkFigure(raw, stem) {
@@ -214,6 +226,15 @@ export function checkQuestion(q, slot) {
   return problems
 }
 
+/** Mend a lesson check question the way a question is mended: bad answer variants go. */
+export function repairCheck(c) {
+  if (!c || c.type === 'mcq') return []
+  const q = { type: 'short_answer', answer_kind: c.answer_kind, accepted_answers: c.accepted_answers, wrong_answers: [] }
+  const repairs = repairQuestion(q)
+  c.accepted_answers = q.accepted_answers
+  return repairs
+}
+
 /** A lesson check question: the same rules, lighter. */
 export function checkCheck(c, where) {
   const problems = []
@@ -227,7 +248,7 @@ export function checkCheck(c, where) {
     if (!accepted.length) problems.push(`${where}: no accepted answer`)
     if (c.answer_kind === 'numeric') {
       const first = parseNumber(accepted[0])
-      for (const a of accepted.slice(1)) if (!sameValue(parseNumber(a), first)) problems.push(`${where}: accepted "${a}" differs`)
+      for (const a of accepted.slice(1)) if (!roundsTo(first, parseNumber(a), a)) problems.push(`${where}: accepted "${a}" differs`)
     }
   }
   if (!String(c.feedback_wrong || '').trim()) problems.push(`${where}: no feedback for a wrong answer`)
@@ -238,7 +259,9 @@ export function checkLesson(l) {
   const problems = []
   const sections = l.sections || []
   if (sections.length < 3 || sections.length > 5) problems.push(`${sections.length} sections (3-5 wanted)`)
-  const REFERS = /\b(the|this|that) (table|graph|diagram|figure|circuit|chart)\b|\bshown (below|above)\b/i
+  // Pointing at something on the page, not talking about graphs in general:
+  // "the table below", "the graph shows", "in the diagram".
+  const REFERS = /\b(the|this) (table|graph|diagram|figure|circuit|chart) (below|above|opposite|shows|gives|here)\b|\bshown (below|above)\b|\b(in|from|using) the (table|graph|diagram|figure|chart)\b/i
   sections.forEach((s, i) => {
     if (String(s.body || '').split(/\s+/).length < 40) problems.push(`section ${i + 1} too short`)
     problems.push(...checkCheck(s.check, `section ${i + 1} check`))

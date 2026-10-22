@@ -37,7 +37,7 @@ import { guideSection, hoursIn } from './content/guide.mjs'
 import { groupOf, planCounts, TIER_OF_HEAT, TIERS, HEAT_DIFFICULTY, HEAT_WORDS, HEAT_ORDER } from './content/formats.mjs'
 import { RULES, subjectBlock, slotsFor, questionPrompt, lessonPrompt, blindPrompt } from './content/prompts.mjs'
 import { QUESTIONS, LESSON, BLIND } from './content/schemas.mjs'
-import { checkQuestion, checkLesson, sameValue, readFigure, repairQuestion } from './content/checks.mjs'
+import { checkQuestion, checkLesson, sameValue, readFigure, repairQuestion, repairCheck } from './content/checks.mjs'
 import { runClaude, claudeParams, askGemini, ledger, RUNS, OverBudget } from './content/models.mjs'
 import { parseNumber } from '../lib/grading.js'
 import { checkWritten } from '../lib/flashcard-modes.js'
@@ -453,12 +453,67 @@ function lessonChecks(lesson) {
   return out
 }
 
+
+async function reviewLessons(review, round) {
+  if (review.length) {
+    const reqs = review.map((i) => {
+      const l = state.lessons[i].lesson
+      return {
+        custom_id: `lr_${i}_${round}`,
+        meta: i,
+        params: claudeParams({
+          model: 'claude-haiku-5-5',
+          system: ['You check IB lessons for accuracy before students see them.'],
+          user: `Guide section:\n${state.subtopics[i].guide || '(not available)'}\n\nLesson:\n${JSON.stringify({ ...l, sections: l.sections.map((s) => ({ heading: s.heading, body: s.body, figure: s.figure?.kind && s.figure.kind !== 'none' ? s.figure : undefined })), outcomes: l.outcomes.map((o) => o.statement), cards: l.cards.map((c, k) => ({ k, ...c })) })}\n\n1. List every factual error in the lesson, anything that contradicts the guide, any section whose main teaching is a different subtopic instead of "${state.subtopics[i].subtopic}", and any reference to a table, graph or diagram that is not given as that section's figure. Standard IB terms and ordinary depth are not errors: do not list something only because the guide does not spell it out.\n2. List the indexes of flashcards whose back is wrong or does not answer the front.\n3. Then solve these check questions independently:\n\n${blindPrompt(lessonChecks(l))}`,
+          schema: LESSON_REVIEW,
+          maxTokens: 24000,
+        }),
+      }
+    })
+    const res = await claude(reqs, `lesson-review-${round}`)
+    spend('lesson-review', res)
+    for (const r of reqs) {
+      const entry = state.lessons[r.meta]
+      const data = res[r.custom_id]?.data
+      if (!data) {
+        entry.problems = ['review failed']
+        continue
+      }
+      const answers = new Map(data.answers.map((a) => [a.id, a]))
+      const wrong = lessonChecks(entry.lesson).filter((c) => {
+        const a = answers.get(c.id)
+        return !(a && a.confident && agrees({ ...c.q, type: c.q.type }, a.answer))
+      })
+      entry.problems = [...data.errors, ...wrong.map((c) => `check ${c.id} ("${c.q.stem.slice(0, 60)}") did not agree when solved independently`)]
+      entry.badCards = data.bad_cards || []
+      entry.status = entry.problems.length ? 'failed' : 'passed'
+    }
+  }
+  for (const i of review) state.lessons[i].reviewed = true
+  save()
+}
+
 async function lessons() {
   state.lessons = state.lessons || {}
   const lessonTier = ['languages', 'arts'].includes(state.group) ? TIERS.basic : TIERS.middle
-  for (const round of [1, 2]) {
+  // Lessons that failed only the free checks get the repairs and the checks
+  // again, and go to review if they now pass; only the rest are rewritten.
+  const recheck = []
+  for (const [i, e] of Object.entries(state.lessons)) {
+    if (e.status !== 'failed' || !e.lesson || e.reviewed) continue
+    for (const c of [...e.lesson.sections.map((x) => x.check), ...e.lesson.outcomes.map((x) => x.check)]) repairCheck(c)
+    e.problems = checkLesson(e.lesson)
+    if (!e.problems.length) {
+      e.status = 'written'
+      recheck.push(Number(i))
+    }
+  }
+  if (recheck.length) log(`lessons: ${recheck.length} pass the checks after repairs; reviewing them`)
+  if (recheck.length) await reviewLessons(recheck, 'r')
+
+  for (const round of [1, 2, 3, 4]) {
     const todo = state.subtopics.map((s, i) => i).filter((i) => state.lessons[i]?.status !== 'passed' && (state.lessons[i]?.round || 0) < round)
-    if (!todo.length) break
+    if (!todo.length) continue
     log(`lessons round ${round}: ${todo.length} to write`)
     const requests = todo.map((i) => {
       const s = state.subtopics[i]
@@ -486,49 +541,22 @@ async function lessons() {
     spend('lessons', out)
     for (const r of requests) {
       const data = out[r.custom_id]?.data
+      if (data) for (const c of [...(data.sections || []).map((x) => x.check), ...(data.outcomes || []).map((x) => x.check)]) repairCheck(c)
       const problems = data ? checkLesson(data) : null
-      if (data) for (const sec of data.sections || []) sec.figure = readFigure(sec.figure).figure || { kind: 'none', alt: '' }
+      if (data) {
+        for (const sec of data.sections || []) {
+          const read = readFigure(sec.figure)
+          if (read.figure) sec.figure = read.figure
+          else sec.figure_raw = sec.figure
+        }
+      }
       state.lessons[r.meta] = data
         ? { round, lesson: data, problems, status: 'written' }
         : { round, problems: [out[r.custom_id]?.error || 'not written'], status: 'failed' }
     }
     save()
 
-    const review = todo.filter((i) => state.lessons[i].status === 'written' && !state.lessons[i].problems.length)
-    if (review.length) {
-      const reqs = review.map((i) => {
-        const l = state.lessons[i].lesson
-        return {
-          custom_id: `lr_${i}_${round}`,
-          meta: i,
-          params: claudeParams({
-            model: 'claude-haiku-5-5',
-            system: ['You check IB lessons for accuracy before students see them.'],
-            user: `Guide section:\n${state.subtopics[i].guide || '(not available)'}\n\nLesson:\n${JSON.stringify({ ...l, sections: l.sections.map((s) => ({ heading: s.heading, body: s.body })), outcomes: l.outcomes.map((o) => o.statement), cards: l.cards.map((c, k) => ({ k, ...c })) })}\n\n1. List every factual error in the lesson, anything that contradicts the guide, and any section that teaches a different subtopic instead of "${state.subtopics[i].subtopic}".\n2. List the indexes of flashcards whose back is wrong or does not answer the front.\n3. Then solve these check questions independently:\n\n${blindPrompt(lessonChecks(l))}`,
-            schema: LESSON_REVIEW,
-            maxTokens: 24000,
-          }),
-        }
-      })
-      const res = await claude(reqs, `lesson-review-${round}`)
-      spend('lesson-review', res)
-      for (const r of reqs) {
-        const entry = state.lessons[r.meta]
-        const data = res[r.custom_id]?.data
-        if (!data) {
-          entry.problems = ['review failed']
-          continue
-        }
-        const answers = new Map(data.answers.map((a) => [a.id, a]))
-        const wrong = lessonChecks(entry.lesson).filter((c) => {
-          const a = answers.get(c.id)
-          return !(a && a.confident && agrees({ ...c.q, type: c.q.type }, a.answer))
-        })
-        entry.problems = [...data.errors, ...wrong.map((c) => `check ${c.id} ("${c.q.stem.slice(0, 60)}") did not agree when solved independently`)]
-        entry.badCards = data.bad_cards || []
-        entry.status = entry.problems.length ? 'failed' : 'passed'
-      }
-    }
+    await reviewLessons(todo.filter((i) => state.lessons[i].status === 'written' && !state.lessons[i].problems.length), round)
     for (const i of todo) if (state.lessons[i].status === 'written') state.lessons[i].status = 'failed'
     save()
     log(`  ${Object.values(state.lessons).filter((l) => l.status === 'passed').length}/${state.subtopics.length} lessons passed`)
