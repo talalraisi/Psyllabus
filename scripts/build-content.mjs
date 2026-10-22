@@ -825,12 +825,15 @@ async function publish() {
   if (arg('retire-old')) {
     const done = state.subtopics.filter((s, i) => state.questions.some((x) => x.sub === i && x.status === 'published'))
     for (const s of done) {
+      const i = state.subtopics.indexOf(s)
       const q = await db.query(
         `update questions set verified = false, retired_at = now()
          where subject = any($1) and subtopic = $2 and generator is null and retired_at is null`,
         [s.courses, s.subtopic]
       )
       retiredQ += q.rowCount
+      // Old flashcards go only once the new deck is in: never a subtopic with none.
+      if (state.cards?.[i]?.status !== 'published') continue
       const c = await db.query(
         `update flashcard_presets set verified = false where subject = any($1) and subtopic = $2 and created_at < $3 and verified`,
         [s.courses, s.subtopic, started]
