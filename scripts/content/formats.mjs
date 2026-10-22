@@ -134,7 +134,8 @@ export const GROUPS = {
     examples: HUMANITIES_EXAMPLES,
   },
   languages: {
-    match: / (A|B):| ab initio|^Classical|^Literature and Performance/,
+    // "English A: Literature SL", "Arabic B HL", "Spanish ab initio SL".
+    match: / A:| B (SL|HL)$| B$| ab initio|^Classical|^Literature and Performance/,
     perSubtopic: 12,
     heat: { low: 0.45, medium: 0.35, hot: 0.15, extreme: 0.05, burning: 0 },
     mcqShare: 0.6,
