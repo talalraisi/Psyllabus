@@ -57,8 +57,8 @@ Most questions need none: write exactly "none". Add one only when the question c
 - bar, for categories: {"kind":"bar","alt":"...","y_label":"...","bars":[{"label":"A","value":3}]}
 - circuit: {"kind":"circuit","alt":"...","source":"12 V","series":[{"type":"resistor","label":"R1 = 2.0 Ω"}],"parallel":[[{"type":"resistor","label":"R2 = 6.0 Ω"}],[{"type":"lamp","label":""}]]}
   component types: resistor, lamp, ammeter, voltmeter, switch, variable_resistor, thermistor, ldr, diode, cell. parallel is [] for a plain series circuit, otherwise 2 or 3 branches.
-- forces: {"kind":"forces","alt":"...","surface":"incline","angle_deg":30,"body":"block","forces":[{"label":"W","direction_deg":270,"size":1},{"label":"N","direction_deg":60,"size":0.87}]}
-  surface: none, horizontal or incline; body: block, ball or point; direction_deg anticlockwise from the positive x axis (0 right, 90 up, 270 down); size 0.3 to 1, in proportion to the forces.
+- forces: {"kind":"forces","alt":"...","surface":"incline","angle_deg":30,"body":"block","forces":[{"label":"W","direction_deg":270,"size":1},{"label":"N","direction_deg":60,"size":0.87,"from":"contact"},{"label":"F","direction_deg":30,"size":0.9,"angle_label":"30°"}],"motion":{"direction_deg":0,"label":"direction of motion"}}
+  surface: none, horizontal or incline; body: block, ball or point; direction_deg anticlockwise from the positive x axis (0 right, 90 up, 270 down); size 0.3 to 1, in proportion to the forces. Put the angle a question depends on on its force as angle_label, start the normal reaction and friction at the surface with "from":"contact", and add motion when the direction of motion matters.
 Every value the question needs must agree between the stem and the figure, and the answer must never be on the figure. The stem refers to it ("The diagram shows...").`
 
 export function subjectBlock(subject, group) {
@@ -193,4 +193,26 @@ ${FRAME_SHAPES}
 - cards: 12 to 20 flashcards for the deck, covering this subtopic only.
 
 Every check is correct, with exactly one right answer where there is one, and feedback that teaches. Never refer to a table, graph or diagram that is not the frame's own figure.`
+}
+
+/* -------------------------------------------------------- lessons, v3 --- */
+
+export function lessonPrompt3({ subject, topic, subtopic, guide, neighbours = [] }) {
+  const blocks = FRAME_SHAPES.replace('FRAMES, one idea each, 14 to 22 of them. Each has', 'BLOCKS. Each block has').replace(/THE SHAPE OF A GOOD LESSON[\s\S]*$/, '')
+  return `Write an interactive lesson for IB ${subject}, ${topic}, subtopic "${subtopic}". A student moves through it a screen at a time.
+
+${guide ? `WHAT THE IB GUIDE SAYS STUDENTS MUST UNDERSTAND:\n${guide}` : 'Keep strictly to what this subtopic covers in the IB course.'}
+${neighbours.length ? `\nTHE GUIDE SECTION COVERS A WHOLE UNIT; THIS LESSON IS ONLY "${subtopic}". Teach only the guide statements that belong to it. These neighbouring subtopics have lessons of their own: ${neighbours.join('; ')}.\n` : ''}
+- hook: one line that makes a student curious.
+- overview: why it matters, and 3 to 5 things they will be able to do.
+
+SCREENS: 7 to 10 of them, each a titled screen holding 2 to 4 blocks. A screen is substantial, not a single thought: it teaches one part of the subtopic properly. Each screen has at least one explain block of 80 to 160 words that explains WHY, not just what, with a concrete example or real numbers, then the blocks that make it stick (a key_point, an analogy, a formula, a diagram, a worked example, a common mistake), and most screens end with something to do (a check, a reveal or cards). Across the lesson: at least one analogy, one key_point, one example, one mistake and one cards block; a formula block for every equation; a diagram block whenever the subtopic has a diagram or graph; and 5 to 8 checks of at least three different kinds (not only mcq). The whole lesson teaches to IB standard: a student who finishes it can answer exam questions on it.
+
+${blocks}
+
+- outcomes, "What you should know now": 3 to 5 statements in IB command-term language covering this subtopic's guide statements, each with one check (mcq, truefalse, numeric or short) that tests exactly it and needs no figure.
+- key_terms: the terms they must be able to define.
+- cards: 12 to 20 flashcards for the deck, covering this subtopic only.
+
+Every check is correct, with exactly one right answer where there is one, and feedback that teaches. Never refer to a table, graph or diagram that is not the block's own figure. In force diagrams, give the angle a question depends on as "angle_label" on that force, start the normal reaction and friction at the surface with "from":"contact", and show motion with "motion":{"direction_deg":0,"label":"direction of motion"} when it matters.`
 }

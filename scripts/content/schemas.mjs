@@ -249,3 +249,42 @@ export const LESSON2 = {
     },
   },
 }
+
+/* -------------------------------------------------------- lessons, v3 --- */
+
+const BLOCK = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['type', 'title', 'text', 'points', 'figure', 'data'],
+  properties: {
+    type: { type: 'string', enum: ['explain', 'key_point', 'note', 'analogy', 'diagram', 'formula', 'example', 'mistake', 'reveal', 'cards', 'check'] },
+    title: { type: 'string', description: 'A short heading for the block, or empty.' },
+    text: { type: 'string' },
+    points: { type: 'array', items: { type: 'string' } },
+    figure: { type: 'string', description: 'A figure as JSON in the shapes given, or "none".' },
+    data: { type: 'string', description: 'JSON for this block type, as given, or "{}".' },
+  },
+}
+
+/** A lesson as a few full screens, each several blocks deep. */
+export const LESSON3 = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['hook', 'overview', 'screens', 'outcomes', 'key_terms', 'cards'],
+  properties: {
+    hook: LESSON2.properties.hook,
+    overview: LESSON2.properties.overview,
+    screens: {
+      type: 'array',
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['title', 'blocks'],
+        properties: { title: { type: 'string' }, blocks: { type: 'array', items: BLOCK } },
+      },
+    },
+    outcomes: LESSON2.properties.outcomes,
+    key_terms: LESSON2.properties.key_terms,
+    cards: LESSON2.properties.cards,
+  },
+}

@@ -193,78 +193,99 @@ function Cards({ cards }) {
   )
 }
 
-/** The look of each teaching frame: the label, its colour, and its tint. */
+/** Each kind of block has its own colour, from the app's palette, so a screen reads at a glance. */
 const TONE = {
-  key_point: { color: 'var(--brand)', bg: 'var(--brand-tint)' },
-  analogy: { color: 'var(--heat-hot)', bg: 'color-mix(in oklab, var(--heat-hot) 10%, var(--surface))' },
-  note: { color: 'var(--text-muted)', bg: 'var(--surface-sunken)' },
+  key_point: { color: 'var(--brand)', bg: 'color-mix(in oklab, var(--brand) 12%, var(--surface))' },
+  analogy: { color: 'var(--heat-hot)', bg: 'color-mix(in oklab, var(--heat-hot) 12%, var(--surface))' },
+  note: { color: 'var(--heat-low)', bg: 'color-mix(in oklab, var(--heat-low) 12%, var(--surface))' },
+  formula: { color: 'var(--heat-medium)', bg: 'color-mix(in oklab, var(--heat-medium) 9%, var(--surface))' },
+  example: { color: 'var(--heat-medium)', bg: 'var(--surface)' },
+  reveal: { color: 'var(--heat-hot)', bg: 'var(--surface)' },
+  cards: { color: 'var(--brand)', bg: 'var(--surface)' },
+  check: { color: 'var(--brand)', bg: 'var(--surface)' },
+  mistake: { color: 'var(--heat-burning)', bg: 'var(--surface)' },
 }
 
-function Frame({ f, result, onResult }) {
-  const tone = TONE[f.type]
-  const figure = f.figure && f.figure.kind !== 'none' ? <QuestionFigure figure={f.figure} /> : null
-  return (
-    <div>
-      {LABEL[f.type] && (
-        <p className="text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: tone?.color || 'var(--text-faint)' }}>
-          {LABEL[f.type]}
+function Block({ b, result, onResult }) {
+  const tone = TONE[b.type]
+  const figure = b.figure && b.figure.kind !== 'none' ? <QuestionFigure figure={b.figure} /> : null
+  const tinted = ['key_point', 'analogy', 'note', 'formula'].includes(b.type)
+  const boxed = Boolean(tone) && !tinted
+  const content =
+    b.type === 'formula' ? (
+      <>
+        <Text>{b.text}</Text>
+        <div className="mt-3">
+          <Formula data={b.data} />
+        </div>
+      </>
+    ) : b.type === 'example' ? (
+      <Example data={b.data} />
+    ) : b.type === 'mistake' ? (
+      <>
+        <Text>{b.text}</Text>
+        <div className="mt-3">
+          <Mistake data={b.data} />
+        </div>
+      </>
+    ) : b.type === 'reveal' ? (
+      <>
+        <Text>{b.text}</Text>
+        <div className="mt-3">
+          <Reveal data={b.data} />
+        </div>
+      </>
+    ) : b.type === 'cards' ? (
+      <>
+        <Text>{b.text}</Text>
+        <div className="mt-3">
+          <Cards cards={b.data.cards || []} />
+        </div>
+      </>
+    ) : b.type === 'check' ? (
+      <>
+        {b.text && <Text>{b.text}</Text>}
+        {figure && <div className="mt-3">{figure}</div>}
+        <div className="mt-3">
+          <Interaction c={b.data} result={result} onResult={onResult} />
+        </div>
+      </>
+    ) : (
+      <>
+        <Text big={b.type === 'key_point' || b.type === 'analogy'}>{b.text}</Text>
+        <Points points={b.points} />
+      </>
+    )
+  const inner = (
+    <>
+      {LABEL[b.type] && (
+        <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: tone?.color || 'var(--text-faint)' }}>
+          <span className="h-1.5 w-1.5 rounded-full" style={{ background: tone?.color || 'var(--text-faint)' }} />
+          {LABEL[b.type]}
         </p>
       )}
-      {f.title && <h2 className="mt-1.5 text-[clamp(1.3rem,3.4vw,1.6rem)] font-semibold leading-tight tracking-[-0.02em]">{f.title}</h2>}
-      <div className="mt-4">
-        {tone ? (
-          <div className="rounded-[18px] p-5" style={{ background: tone.bg }}>
-            <Text big>{f.text}</Text>
-            <Points points={f.points} />
-          </div>
-        ) : f.type === 'formula' ? (
-          <>
-            <Text>{f.text}</Text>
-            <div className="mt-4">
-              <Formula data={f.data} />
-            </div>
-          </>
-        ) : f.type === 'example' ? (
-          <Example data={f.data} />
-        ) : f.type === 'mistake' ? (
-          <>
-            <Text>{f.text}</Text>
-            <div className="mt-4">
-              <Mistake data={f.data} />
-            </div>
-          </>
-        ) : f.type === 'reveal' ? (
-          <>
-            <Text>{f.text}</Text>
-            <div className="mt-4">
-              <Reveal data={f.data} />
-            </div>
-          </>
-        ) : f.type === 'cards' ? (
-          <>
-            <Text>{f.text}</Text>
-            <div className="mt-4">
-              <Cards cards={f.data.cards || []} />
-            </div>
-          </>
-        ) : f.type === 'check' ? (
-          <>
-            {f.text && <Text>{f.text}</Text>}
-            {figure && <div className="mt-4">{figure}</div>}
-            <div className="mt-4">
-              <Interaction c={f.data} result={result} onResult={onResult} />
-            </div>
-          </>
-        ) : (
-          <>
-            <Text big={f.type !== 'diagram'}>{f.text}</Text>
-            <Points points={f.points} />
-          </>
-        )}
-        {f.type !== 'check' && figure && <div className="mt-5">{figure}</div>}
-      </div>
-    </div>
+      {b.title && b.title.trim().toLowerCase() !== String(LABEL[b.type] || '').toLowerCase() && (
+        <h3 className={`${LABEL[b.type] ? 'mt-1.5 ' : ''}text-[17px] font-semibold leading-snug`}>{b.title}</h3>
+      )}
+      <div className={LABEL[b.type] || b.title ? 'mt-2.5' : ''}>{content}</div>
+      {b.type !== 'check' && figure && <div className="mt-4">{figure}</div>}
+    </>
   )
+  if (tinted) {
+    return (
+      <div className="rounded-[18px] border-l-4 p-5" style={{ borderColor: tone.color, background: tone.bg }}>
+        {inner}
+      </div>
+    )
+  }
+  if (boxed) {
+    return (
+      <div className="rounded-[18px] border p-5" style={{ borderColor: `color-mix(in oklab, ${tone.color} 45%, var(--border))`, background: tone.bg }}>
+        {inner}
+      </div>
+    )
+  }
+  return <div>{inner}</div>
 }
 
 const REASONS = ['Something is wrong', 'It is confusing', 'A typo or display problem', 'Something else']
@@ -318,17 +339,18 @@ function Report({ onSend, onClose }) {
 
 export default function FramePlayer({ lesson, met = [], onProgress, onAddCards, onReport, practiseHref, backHref, backLabel = 'Back' }) {
   const body = lesson.body || {}
-  const frames = body.frames || []
+  const screens = body.version === 3 ? body.screens || [] : (body.frames || []).map((f) => ({ title: '', blocks: [f] }))
   const outcomes = lesson.outcomes || []
-  const total = frames.length + 2 // overview, frames, what you should know
+  const total = screens.length + 2 // overview, screens, what you should know
   const [at, setAt] = useState(0)
   const [dir, setDir] = useState('next')
   const [results, setResults] = useState({})
   const [reporting, setReporting] = useState(false)
   const [added, setAdded] = useState(null)
 
-  const frame = at >= 1 && at <= frames.length ? frames[at - 1] : null
-  const gated = frame?.type === 'check' && !results[`f${at - 1}`]
+  const screen = at >= 1 && at <= screens.length ? screens[at - 1] : null
+  // Every check on the screen answered before moving on.
+  const gated = Boolean(screen?.blocks.some((b, bi) => b.type === 'check' && !results[`s${at - 1}b${bi}`]))
   const finale = at === total - 1
   const outcomesDone = outcomes.length > 0 && outcomes.every((_, i) => results[`o${i}`])
   const missed = outcomes.map((o, i) => ({ o, i })).filter(({ i }) => results[`o${i}`] && !results[`o${i}`].correct)
@@ -360,7 +382,6 @@ export default function FramePlayer({ lesson, met = [], onProgress, onAddCards, 
     }
   }
 
-  const context = frame ? `${frame.title}\n${frame.text}${frame.points?.length ? '\n' + frame.points.join('\n') : ''}` : body.overview?.why || ''
   const addMissed = async () => {
     setAdded('saving')
     const ok = await onAddCards?.(
@@ -388,7 +409,6 @@ export default function FramePlayer({ lesson, met = [], onProgress, onAddCards, 
             topic={lesson.subtopic}
             context={`${lesson.subject} · ${displaySubtopic(lesson.subtopic)}`}
             label="Ask Syllabi"
-            text={`I am doing a lesson on "${displaySubtopic(lesson.subtopic)}" (${lesson.subject}). Help me understand this part:\n\n${context.slice(0, 1200)}`}
           />
           <button type="button" onClick={() => setReporting(true)} className="btn btn-quiet control-sm" title="Report this screen">
             Report
@@ -437,8 +457,15 @@ export default function FramePlayer({ lesson, met = [], onProgress, onAddCards, 
               </div>
             )}
           </div>
-        ) : frame ? (
-          <Frame f={frame} result={results[`f${at - 1}`]} onResult={(r) => record(`f${at - 1}`, r)} />
+        ) : screen ? (
+          <div>
+            {screen.title && <h2 className="text-[clamp(1.35rem,3.6vw,1.7rem)] font-semibold leading-tight tracking-[-0.02em]">{screen.title}</h2>}
+            <div className={`stagger flex flex-col gap-5 ${screen.title ? 'mt-5' : ''}`}>
+              {screen.blocks.map((b, bi) => (
+                <Block key={bi} b={b} result={results[`s${at - 1}b${bi}`]} onResult={(r) => record(`s${at - 1}b${bi}`, r)} />
+              ))}
+            </div>
+          </div>
         ) : (
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.16em]" style={{ color: 'var(--brand)' }}>
@@ -500,7 +527,7 @@ export default function FramePlayer({ lesson, met = [], onProgress, onAddCards, 
       {reporting && (
         <Report
           onClose={() => setReporting(false)}
-          onSend={async (reason, note) => (await onReport?.({ screen: at, title: frame?.title || (at === 0 ? 'Overview' : 'What you should know now'), reason, note })) ?? true}
+          onSend={async (reason, note) => (await onReport?.({ screen: at, title: screen?.title || screen?.blocks?.[0]?.title || (at === 0 ? 'Overview' : 'What you should know now'), reason, note })) ?? true}
         />
       )}
     </div>

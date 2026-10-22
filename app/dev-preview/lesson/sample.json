@@ -3,497 +3,679 @@
  "subject": "Physics SL",
  "topic": "A. Space, time and motion",
  "subtopic": "Work done by a force",
- "minutes": 30,
+ "minutes": 40,
  "body": {
-  "version": 2,
-  "hook": "Push a wall as hard as you like and you do no work on it, yet carrying a bag along a flat corridor does none either. Why?",
+  "version": 3,
+  "hook": "Push a wall as hard as you can and you do no work on it, yet a gentle push along a slope can change a car's energy. What counts as work?",
   "overview": {
-   "why": "Work is the bridge between forces and energy, so it lets you solve motion problems without tracking time or acceleration. In the exam it appears in energy, power and efficiency questions; outside it, it explains why engines, cyclists and lifts need fuel.",
+   "why": "Work is the link between forces and energy, so it turns hard force-and-acceleration problems into simple energy bookkeeping, which IB examiners use constantly. Outside the exam it explains why ramps help, why engines need power ratings and why no machine is perfectly efficient.",
    "learn": [
-    "Calculate the work done by a constant force using W = Fs cos θ",
-    "Relate the work done by the resultant force to the change in kinetic energy",
-    "Apply conservation of mechanical energy with Ek, gravitational and elastic potential energy",
-    "Calculate power using P = Fv and efficiency from energy or power",
-    "Interpret a force-displacement graph as work done"
+    "Calculate the work done by a constant force using W = Fs cos θ, including when the force is at an angle",
+    "Find work done from the area under a force-displacement graph",
+    "Apply the work-energy relationship and conservation of mechanical energy to solve motion problems",
+    "Use P = Fv and efficiency to analyse energy transfers, including Sankey diagrams and energy density"
    ],
-   "minutes": 30
+   "minutes": 40
   },
-  "frames": [
+  "screens": [
    {
-    "type": "explain",
     "title": "Work is energy transferred",
-    "text": "When a force moves an object through a displacement, energy is transferred to or from it. This transfer is called work done. Work is measured in joules (J), and it is a scalar quantity.",
-    "points": [],
-    "figure": {
-     "kind": "none",
-     "alt": ""
-    },
-    "data": {}
-   },
-   {
-    "type": "analogy",
-    "title": "Think of it like pushing a shopping trolley",
-    "text": "Pushing a trolley along an aisle, your effort turns into the trolley's motion. Pushing at an angle wastes some effort pressing it into the floor. Only the part of your push along the way it moves counts as work.",
-    "points": [],
-    "figure": {
-     "kind": "none",
-     "alt": ""
-    },
-    "data": {}
-   },
-   {
-    "type": "formula",
-    "title": "Work done by a constant force",
-    "text": "Only the component of force along the displacement does work.",
-    "points": [],
-    "figure": {
-     "kind": "none",
-     "alt": ""
-    },
-    "data": {
-     "expression": "$W = Fs\\cos\\theta$",
-     "symbols": [
-      {
-       "symbol": "W",
-       "meaning": "work done by the force",
-       "unit": "J"
+    "blocks": [
+     {
+      "type": "explain",
+      "title": "Why physicists define work",
+      "text": "In everyday speech, holding a heavy box feels like work. In physics, work measures energy transferred by a force that moves its point of application. When a crane lifts a 500 kg crate, the crane's force transfers energy to the crate's gravitational potential energy. When friction slows a sliding box, friction transfers kinetic energy to thermal energy. If nothing moves in the direction of the force, no energy is transferred, so no work is done. That is why holding the box still, however tiring for your muscles, does no work on the box.",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
       },
-      {
-       "symbol": "F",
-       "meaning": "magnitude of the force",
-       "unit": "N"
+      "data": {}
+     },
+     {
+      "type": "key_point",
+      "title": "Need to know",
+      "text": "Work done by a force is equivalent to a transfer of energy. Work and energy are both measured in joules (J). One joule is the work done when a force of 1 N moves its point of application 1 m along the force.",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
       },
-      {
-       "symbol": "s",
-       "meaning": "displacement magnitude",
-       "unit": "m"
+      "data": {}
+     },
+     {
+      "type": "check",
+      "title": "Quick check",
+      "text": "",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
       },
-      {
-       "symbol": "θ",
-       "meaning": "angle between force and displacement",
-       "unit": "°"
+      "data": {
+       "kind": "truefalse",
+       "statement": "A student holds a 5 kg mass stationary at arm's length for one minute. The student does work on the mass because the force is large.",
+       "answer": false,
+       "right": "Correct. The mass does not move, so the displacement is zero and the work done on it is zero.",
+       "wrong": "Work needs displacement along the force. The mass does not move, so W = Fs cos θ = 0, however large the force."
       }
-     ]
-    }
+     }
+    ]
    },
    {
-    "type": "diagram",
-    "title": "Force at an angle",
-    "text": "A block is pulled along the ground by a force at 30° above the horizontal. Only the horizontal component F cos 30° does work along the displacement.",
-    "points": [],
-    "figure": {
-     "kind": "forces",
-     "alt": "A block on a horizontal surface with a pulling force directed up and to the right at 30 degrees above the horizontal, weight acting downwards and normal force acting upwards.",
-     "surface": "horizontal",
-     "angle_deg": 0,
-     "body": "block",
-     "forces": [
-      {
-       "label": "F",
-       "direction_deg": 30,
-       "size": 1
+    "title": "The equation W = Fs cos θ",
+    "blocks": [
+     {
+      "type": "explain",
+      "title": "Only the component along the motion counts",
+      "text": "A force transfers energy only through the part of it that acts along the displacement. Pulling a suitcase with a strap angled upwards, only the horizontal component of the pull moves the suitcase forward. The vertical component lifts slightly but does not add to the forward motion. If the force F makes an angle θ with the displacement s, the component along s is F cos θ. So the work done is Fs cos θ. For a force of 20 N at 30° over 5.0 m, the work is 20 × 5.0 × cos 30° = 87 J, not 100 J.",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
       },
-      {
-       "label": "W",
-       "direction_deg": 270,
-       "size": 0.6
+      "data": {}
+     },
+     {
+      "type": "formula",
+      "title": "Work done by a constant force",
+      "text": "",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
       },
-      {
-       "label": "N",
-       "direction_deg": 90,
-       "size": 0.5
-      }
-     ]
-    },
-    "data": {}
-   },
-   {
-    "type": "check",
-    "title": "Quick check: angle",
-    "text": "",
-    "points": [],
-    "figure": {
-     "kind": "none",
-     "alt": ""
-    },
-    "data": {
-     "kind": "mcq",
-     "prompt": "A force of 10 N acts at 90° to the displacement of an object. How much work does it do?",
-     "options": [
-      {
-       "id": "a",
-       "text": "10 J per metre",
-       "why": "Work is not per metre; this ignores cos 90°."
-      },
-      {
-       "id": "b",
-       "text": "Zero",
-       "why": ""
-      },
-      {
-       "id": "c",
-       "text": "Negative",
-       "why": "Work is negative only if the force has a component opposite to the displacement."
-      },
-      {
-       "id": "d",
-       "text": "Cannot be found without the displacement",
-       "why": "cos 90° = 0, so the work is zero whatever the displacement."
-      }
-     ],
-     "answer": "b",
-     "right": "Correct: cos 90° = 0, so no energy is transferred.",
-     "wrong": "W = Fs cos θ, and cos 90° = 0."
-    }
-   },
-   {
-    "type": "key_point",
-    "title": "Sign of work",
-    "text": "Work is positive when the force has a component along the displacement (energy transferred to the object), and negative when it opposes it, as friction does (energy removed from the object).",
-    "points": [],
-    "figure": {
-     "kind": "none",
-     "alt": ""
-    },
-    "data": {}
-   },
-   {
-    "type": "example",
-    "title": "Worked example: pulling a crate",
-    "text": "",
-    "points": [],
-    "figure": {
-     "kind": "none",
-     "alt": ""
-    },
-    "data": {
-     "problem": "A rope pulls a crate 12 m along a horizontal floor with a force of 50 N at 40° above the horizontal. Calculate the work done by the rope.",
-     "steps": [
-      "Use W = Fs cos θ.",
-      "W = 50 × 12 × cos 40°",
-      "cos 40° = 0.766, so W = 600 × 0.766 = 460 J"
-     ],
-     "answer": "460 J"
-    }
-   },
-   {
-    "type": "mistake",
-    "title": "Using the wrong angle",
-    "text": "",
-    "points": [],
-    "figure": {
-     "kind": "none",
-     "alt": ""
-    },
-    "data": {
-     "wrong": "Use θ as the angle between the force and the vertical or the surface normal.",
-     "right": "θ is the angle between the force direction and the displacement direction.",
-     "why": "Using the wrong angle gives sin instead of cos, and the wrong work."
-    }
-   },
-   {
-    "type": "check",
-    "title": "Quick check: calculate",
-    "text": "",
-    "points": [],
-    "figure": {
-     "kind": "none",
-     "alt": ""
-    },
-    "data": {
-     "kind": "numeric",
-     "prompt": "A 20 N force acts at 60° to the direction a trolley moves, which is 5.0 m. Calculate the work done by the force.",
-     "answer": "50",
-     "accepted": [
-      "50",
-      "50.0"
-     ],
-     "unit": "J",
-     "right": "W = 20 × 5.0 × cos 60° = 50 J.",
-     "wrong": "Use W = Fs cos θ with cos 60° = 0.5. Using the full 100 J ignores the angle."
-    }
-   },
-   {
-    "type": "explain",
-    "title": "Work and kinetic energy",
-    "text": "The work done by the resultant force on a system equals the change in its energy. For a body being accelerated, this is the change in kinetic energy: W = ΔEk.",
-    "points": [
-     "Positive resultant work: speeds up",
-     "Negative resultant work: slows down",
-     "Zero resultant work: constant speed"
-    ],
-    "figure": {
-     "kind": "none",
-     "alt": ""
-    },
-    "data": {}
-   },
-   {
-    "type": "formula",
-    "title": "Kinetic energy",
-    "text": "",
-    "points": [],
-    "figure": {
-     "kind": "none",
-     "alt": ""
-    },
-    "data": {
-     "expression": "$E_k = \\frac{1}{2}mv^2 = \\frac{p^2}{2m}$",
-     "symbols": [
-      {
-       "symbol": "E_k",
-       "meaning": "kinetic energy",
-       "unit": "J"
-      },
-      {
-       "symbol": "m",
-       "meaning": "mass",
-       "unit": "kg"
-      },
-      {
-       "symbol": "v",
-       "meaning": "speed",
-       "unit": "m s^-1"
-      },
-      {
-       "symbol": "p",
-       "meaning": "momentum",
-       "unit": "kg m s^-1"
-      }
-     ]
-    }
-   },
-   {
-    "type": "formula",
-    "title": "Potential energy changes",
-    "text": "",
-    "points": [],
-    "figure": {
-     "kind": "none",
-     "alt": ""
-    },
-    "data": {
-     "expression": "$\\Delta E_p = mg\\Delta h, \\quad E_H = \\frac{1}{2}k(\\Delta x)^2$",
-     "symbols": [
-      {
-       "symbol": "ΔE_p",
-       "meaning": "change in gravitational potential energy",
-       "unit": "J"
-      },
-      {
-       "symbol": "g",
-       "meaning": "gravitational field strength",
-       "unit": "N kg^-1"
-      },
-      {
-       "symbol": "Δh",
-       "meaning": "change in height",
-       "unit": "m"
-      },
-      {
-       "symbol": "k",
-       "meaning": "spring constant",
-       "unit": "N m^-1"
-      },
-      {
-       "symbol": "Δx",
-       "meaning": "extension or compression",
-       "unit": "m"
-      }
-     ]
-    }
-   },
-   {
-    "type": "key_point",
-    "title": "Conservation of mechanical energy",
-    "text": "Mechanical energy is Ek + gravitational Ep + elastic Ep. With no friction or resistive forces it is conserved, and work is the energy transformed between these forms. Non-conservative forces change the total by the work they do.",
-    "points": [],
-    "figure": {
-     "kind": "none",
-     "alt": ""
-    },
-    "data": {}
-   },
-   {
-    "type": "example",
-    "title": "Worked example: a falling ball",
-    "text": "",
-    "points": [],
-    "figure": {
-     "kind": "none",
-     "alt": ""
-    },
-    "data": {
-     "problem": "A 0.50 kg ball is dropped from rest from a height of 4.0 m. Ignoring air resistance, determine its speed just before landing. Use g = 9.81 N kg^-1.",
-     "steps": [
-      "Loss of Ep = gain of Ek",
-      "mgΔh = ½mv²",
-      "v = √(2 × 9.81 × 4.0) = √78.5",
-      "v = 8.9 m s^-1"
-     ],
-     "answer": "8.9 m s^-1"
-    }
-   },
-   {
-    "type": "check",
-    "title": "Quick check: sort the forces",
-    "text": "",
-    "points": [],
-    "figure": {
-     "kind": "none",
-     "alt": ""
-    },
-    "data": {
-     "kind": "sort",
-     "prompt": "Sort these by whether they are included in mechanical energy or are not.",
-     "groups": [
-      {
-       "name": "Mechanical energy",
-       "items": [
-        "Kinetic",
-        "Gravitational potential",
-        "Elastic potential"
-       ]
-      },
-      {
-       "name": "Not mechanical",
-       "items": [
-        "Thermal energy",
-        "Chemical energy",
-        "Nuclear energy"
+      "data": {
+       "expression": "$W = Fs\\cos\\theta$",
+       "symbols": [
+        {
+         "symbol": "W",
+         "meaning": "work done by the force",
+         "unit": "J"
+        },
+        {
+         "symbol": "F",
+         "meaning": "magnitude of the constant force",
+         "unit": "N"
+        },
+        {
+         "symbol": "s",
+         "meaning": "magnitude of the displacement",
+         "unit": "m"
+        },
+        {
+         "symbol": "\\theta",
+         "meaning": "angle between force and displacement",
+         "unit": "degrees"
+        }
        ]
       }
-     ],
-     "right": "Mechanical energy is only Ek + gravitational Ep + elastic Ep.",
-     "wrong": "Mechanical energy is the sum of kinetic, gravitational potential and elastic potential energy only."
-    }
+     },
+     {
+      "type": "diagram",
+      "title": "A block pulled at an angle",
+      "text": "The pulling force F makes 30° with the horizontal displacement. Only its horizontal component does work on the block.",
+      "points": [],
+      "figure": {
+       "kind": "forces",
+       "alt": "A block on a horizontal surface moving to the right. Weight W acts downward, normal reaction N acts upward from the surface, and a pulling force F acts up and to the right at 30 degrees above the horizontal.",
+       "surface": "horizontal",
+       "angle_deg": 0,
+       "body": "block",
+       "forces": [
+        {
+         "label": "W",
+         "direction_deg": 270,
+         "size": 0.7
+        },
+        {
+         "label": "N",
+         "direction_deg": 90,
+         "size": 0.5,
+         "from": "contact"
+        },
+        {
+         "label": "F",
+         "direction_deg": 30,
+         "size": 0.9,
+         "angle_label": "30°"
+        }
+       ],
+       "motion": {
+        "direction_deg": 0,
+        "label": "direction of motion"
+       }
+      },
+      "data": {}
+     },
+     {
+      "type": "check",
+      "title": "Try it",
+      "text": "",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
+      },
+      "data": {
+       "kind": "numeric",
+       "prompt": "A force of 20 N acts at 30° above the horizontal and pulls a block 5.0 m along a horizontal surface. Calculate the work done by the force.",
+       "answer": "87",
+       "accepted": [
+        "87",
+        "87 J"
+       ],
+       "unit": "J",
+       "right": "Correct: W = 20 × 5.0 × cos 30° = 86.6 J ≈ 87 J.",
+       "wrong": "Use W = Fs cos θ with θ = 30°. Without the cosine you get 100 J; using sin 30° gives 50 J. The correct value is 20 × 5.0 × cos 30° = 87 J."
+      }
+     }
+    ]
    },
    {
-    "type": "formula",
+    "title": "Special angles and negative work",
+    "blocks": [
+     {
+      "type": "explain",
+      "title": "What the cosine tells you",
+      "text": "The sign and size of cos θ tell you what the force does to the energy. If θ = 0°, the force points along the motion, cos θ = 1, and the force adds energy: a push on a trolley speeds it up. If θ = 90°, cos θ = 0, so the force does no work: gravity on a satellite in circular orbit is perpendicular to its motion. If θ = 180°, cos θ = −1 and the work is negative, meaning the force removes energy from the object. Friction on a sliding box does negative work, which is why the box slows down.",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
+      },
+      "data": {}
+     },
+     {
+      "type": "mistake",
+      "title": "Forgetting the angle",
+      "text": "",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
+      },
+      "data": {
+       "wrong": "A 5.0 kg bag is carried 10 m horizontally at constant velocity, so work by the lifting force = mgs = 490 J.",
+       "right": "The lifting force is vertical and the displacement is horizontal, so θ = 90° and the work done by it is 0.",
+       "why": "Work needs a force component along the displacement. Multiplying force by distance without cos θ ignores the direction of the force."
+      }
+     },
+     {
+      "type": "check",
+      "title": "Check",
+      "text": "",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
+      },
+      "data": {
+       "kind": "mcq",
+       "prompt": "A person carries a 5.0 kg bag 10 m along a level corridor at constant velocity. What is the work done on the bag by the person's upward lifting force? (g = 9.81 m s^-2)",
+       "options": [
+        {
+         "id": "a",
+         "text": "0 J",
+         "why": ""
+        },
+        {
+         "id": "b",
+         "text": "490 J",
+         "why": "This is mgs, which uses the weight and the distance but ignores that the force is perpendicular to the motion."
+        },
+        {
+         "id": "c",
+         "text": "50 J",
+         "why": "This is mass × distance, which has no physical meaning here: it uses 5.0 × 10 instead of a force."
+        },
+        {
+         "id": "d",
+         "text": "-490 J",
+         "why": "Negative work needs a force opposite to the motion (θ = 180°). The lifting force is at 90°, not 180°."
+        }
+       ],
+       "answer": "a",
+       "right": "Correct. The upward force is perpendicular to the horizontal displacement, so cos 90° = 0 and W = 0.",
+       "wrong": "The lifting force is vertical and the displacement is horizontal, so θ = 90° and cos θ = 0. The work done is zero."
+      }
+     }
+    ]
+   },
+   {
+    "title": "Work from a force-displacement graph",
+    "blocks": [
+     {
+      "type": "explain",
+      "title": "When the force changes",
+      "text": "W = Fs cos θ needs a constant force. Many real forces vary, like the force needed to stretch a spring. In that case, plot the component of force along the motion against displacement. For a tiny displacement the force is nearly constant, so the work is a thin strip of height F and width Δs. Adding all the strips gives the total area under the line. The area under a force-displacement line therefore equals the work done. For a spring with k = 50 N m^-1 stretched from 0 to 0.20 m, the force rises from 0 to 10 N, and the area is a triangle.",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
+      },
+      "data": {}
+     },
+     {
+      "type": "diagram",
+      "title": "Stretching a spring",
+      "text": "The line shows force against extension for a spring. The area under the line is the work done in stretching it.",
+      "points": [],
+      "figure": {
+       "kind": "plot",
+       "alt": "A straight line through the origin showing force in newtons rising linearly with extension in metres, passing through 5 N at 0.10 m and 10 N at 0.20 m.",
+       "x_label": "extension / m",
+       "y_label": "force / N",
+       "points": [
+        {
+         "x": 0,
+         "y": 0
+        },
+        {
+         "x": 0.05,
+         "y": 2.5
+        },
+        {
+         "x": 0.1,
+         "y": 5
+        },
+        {
+         "x": 0.15,
+         "y": 7.5
+        },
+        {
+         "x": 0.2,
+         "y": 10
+        }
+       ]
+      },
+      "data": {}
+     },
+     {
+      "type": "example",
+      "title": "Worked example",
+      "text": "",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
+      },
+      "data": {
+       "problem": "A spring has force constant 50 N m^-1. Calculate the work done in stretching it from rest by 0.20 m.",
+       "steps": [
+        "Force at full extension: F = kx = 50 × 0.20 = 10 N.",
+        "The force rises linearly from 0, so the work is the area of a triangle.",
+        "W = ½ × base × height = ½ × 0.20 × 10 = 1.0 J."
+       ],
+       "answer": "1.0 J"
+      }
+     }
+    ]
+   },
+   {
+    "title": "Work done equals change in kinetic energy",
+    "blocks": [
+     {
+      "type": "explain",
+      "title": "The work-energy relationship",
+      "text": "When several forces act on an object, add up their work, or equivalently find the work done by the resultant force. This total work equals the change in the energy of the system. If only the kinetic energy changes, the resultant force does work Fs on a mass m, and Fs = ΔEk. A 1200 kg car speeding from 10 m s^-1 to 20 m s^-1 gains ½ × 1200 × (20² − 10²) = 180 000 J. The resultant forward force must have done exactly that much work. This lets you find speeds without using time or acceleration.",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
+      },
+      "data": {}
+     },
+     {
+      "type": "formula",
+      "title": "Kinetic energy and work-energy",
+      "text": "",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
+      },
+      "data": {
+       "expression": "$W_{net} = \\Delta E_k = \\frac{1}{2}mv^2 - \\frac{1}{2}mu^2$",
+       "symbols": [
+        {
+         "symbol": "W_{net}",
+         "meaning": "work done by the resultant force",
+         "unit": "J"
+        },
+        {
+         "symbol": "m",
+         "meaning": "mass",
+         "unit": "kg"
+        },
+        {
+         "symbol": "u, v",
+         "meaning": "initial and final speed",
+         "unit": "m s^-1"
+        }
+       ]
+      }
+     },
+     {
+      "type": "check",
+      "title": "Try it",
+      "text": "",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
+      },
+      "data": {
+       "kind": "numeric",
+       "prompt": "A resultant force of 6.0 N acts on a 2.0 kg trolley, initially at rest, over a distance of 4.0 m along its motion. Calculate the final speed of the trolley.",
+       "answer": "4.9",
+       "accepted": [
+        "4.9",
+        "4.90"
+       ],
+       "unit": "m s^-1",
+       "right": "Correct: W = 6.0 × 4.0 = 24 J = ½ × 2.0 × v², so v² = 24 and v = 4.9 m s^-1.",
+       "wrong": "Set the work Fs = 24 J equal to ½mv². Then v² = 2 × 24 / 2.0 = 24, so v = 4.9 m s^-1. Forgetting to take the square root gives 24."
+      }
+     }
+    ]
+   },
+   {
+    "title": "Mechanical energy and its conservation",
+    "blocks": [
+     {
+      "type": "explain",
+      "title": "Three stores, one total",
+      "text": "Mechanical energy is the sum of kinetic energy ½mv², gravitational potential energy mgΔh near the Earth's surface, and elastic potential energy ½k(Δx)². When there is no friction or other resistive force, no energy leaves these stores, so the total is constant and work is just the energy transformed from one form to another. A 0.50 kg ball dropped from 1.8 m loses mgΔh = 8.8 J of potential energy and gains 8.8 J of kinetic energy, giving ½ × 0.50 × v² = 8.8 J and v = 5.9 m s^-1. The mass cancels, so any ball falls at the same speed.",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
+      },
+      "data": {}
+     },
+     {
+      "type": "formula",
+      "title": "Energy forms",
+      "text": "",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
+      },
+      "data": {
+       "expression": "$\\Delta E_p = mg\\Delta h \\qquad E_H = \\frac{1}{2}k(\\Delta x)^2 \\qquad E_k = \\frac{p^2}{2m}$",
+       "symbols": [
+        {
+         "symbol": "\\Delta E_p",
+         "meaning": "change in gravitational potential energy",
+         "unit": "J"
+        },
+        {
+         "symbol": "E_H",
+         "meaning": "elastic potential energy",
+         "unit": "J"
+        },
+        {
+         "symbol": "k",
+         "meaning": "spring constant",
+         "unit": "N m^-1"
+        },
+        {
+         "symbol": "p",
+         "meaning": "momentum",
+         "unit": "kg m s^-1"
+        }
+       ]
+      }
+     },
+     {
+      "type": "analogy",
+      "title": "Think of it like...",
+      "text": "Mechanical energy is like money split between a current account, a savings account and a wallet. Moving money between them changes the amounts in each, but the total stays the same unless you spend it on something outside, which is what friction does.",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
+      },
+      "data": {}
+     },
+     {
+      "type": "check",
+      "title": "Sort it",
+      "text": "",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
+      },
+      "data": {
+       "kind": "sort",
+       "prompt": "Sort these energy forms into mechanical and not mechanical.",
+       "groups": [
+        {
+         "name": "Mechanical energy",
+         "items": [
+          "Kinetic energy of a moving trolley",
+          "Gravitational potential energy of a raised book",
+          "Elastic potential energy of a compressed spring"
+         ]
+        },
+        {
+         "name": "Not mechanical energy",
+         "items": [
+          "Thermal energy of warm brakes",
+          "Chemical energy in a battery",
+          "Nuclear energy in uranium"
+         ]
+        }
+       ],
+       "right": "Correct. Mechanical energy is only kinetic, gravitational potential and elastic potential energy.",
+       "wrong": "Mechanical energy is the sum of kinetic, gravitational potential and elastic potential energy. Thermal, chemical and nuclear energy are other stores."
+      }
+     }
+    ]
+   },
+   {
+    "title": "When friction acts",
+    "blocks": [
+     {
+      "type": "explain",
+      "title": "Non-conservative forces take mechanical energy",
+      "text": "Real motion involves friction and air resistance, so mechanical energy is not conserved. The change in total mechanical energy equals the work done by the non-conservative forces. Consider a 2.0 kg box released from rest at a height of 1.5 m on a rough slope that reaches the bottom at 3.0 m s^-1. It loses mgΔh = 2.0 × 9.81 × 1.5 = 29.4 J of potential energy but gains only ½ × 2.0 × 3.0² = 9.0 J of kinetic energy. The missing 20.4 J is the work done against friction, now thermal energy. Total energy is still conserved.",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
+      },
+      "data": {}
+     },
+     {
+      "type": "key_point",
+      "title": "Need to know",
+      "text": "Change in mechanical energy of a system = work done on it by non-conservative forces such as friction. Mechanical energy is lost but total energy is always conserved.",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
+      },
+      "data": {}
+     },
+     {
+      "type": "check",
+      "title": "Fill the gaps",
+      "text": "",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
+      },
+      "data": {
+       "kind": "gap",
+       "prompt": "Complete the statement about a box sliding down a rough slope.",
+       "text": "Work done against friction transfers mechanical energy into ___ energy, and the total energy of the system is ___.",
+       "answers": [
+        "thermal",
+        "conserved"
+       ],
+       "bank": [
+        "thermal",
+        "conserved",
+        "destroyed",
+        "kinetic"
+       ],
+       "right": "Correct. Friction heats the surfaces, and energy is never destroyed.",
+       "wrong": "Friction transfers mechanical energy to thermal energy. Energy is not destroyed, so the total is conserved."
+      }
+     }
+    ]
+   },
+   {
     "title": "Power and efficiency",
-    "text": "Power is the rate of energy transfer. For a force moving an object at constant velocity along the force, P = Fv.",
-    "points": [],
-    "figure": {
-     "kind": "none",
-     "alt": ""
-    },
-    "data": {
-     "expression": "$P = \\frac{\\Delta W}{\\Delta t} = Fv, \\quad \\eta = \\frac{\\text{useful output}}{\\text{total input}}$",
-     "symbols": [
-      {
-       "symbol": "P",
-       "meaning": "power",
-       "unit": "W"
+    "blocks": [
+     {
+      "type": "explain",
+      "title": "How fast energy is transferred",
+      "text": "Two engines can do the same work, but the one that does it faster is more powerful. Power is the rate of doing work, P = ΔW/Δt. For a force F moving an object at constant speed v along the force, ΔW = FΔs, so P = Fv. A car at a steady 25 m s^-1 against a 600 N resistive force needs 600 × 25 = 15 kW from its engine. Efficiency compares useful output with total input, either as energy or as power. No real machine reaches 1, because some energy is always transferred to thermal energy in the surroundings.",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
       },
-      {
-       "symbol": "F",
-       "meaning": "force along the motion",
-       "unit": "N"
+      "data": {}
+     },
+     {
+      "type": "formula",
+      "title": "Power and efficiency",
+      "text": "",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
       },
-      {
-       "symbol": "v",
-       "meaning": "speed",
-       "unit": "m s^-1"
-      },
-      {
-       "symbol": "η",
-       "meaning": "efficiency",
-       "unit": "none"
+      "data": {
+       "expression": "$P = \\frac{\\Delta W}{\\Delta t} = Fv \\qquad \\eta = \\frac{\\text{useful power out}}{\\text{total power in}}$",
+       "symbols": [
+        {
+         "symbol": "P",
+         "meaning": "power",
+         "unit": "W"
+        },
+        {
+         "symbol": "v",
+         "meaning": "speed along the force",
+         "unit": "m s^-1"
+        },
+        {
+         "symbol": "\\eta",
+         "meaning": "efficiency (no unit; multiply by 100 for a percentage)",
+         "unit": "none"
+        }
+       ]
       }
-     ]
-    }
-   },
-   {
-    "type": "check",
-    "title": "Quick check: power",
-    "text": "",
-    "points": [],
-    "figure": {
-     "kind": "none",
-     "alt": ""
-    },
-    "data": {
-     "kind": "numeric",
-     "prompt": "A car moves at a constant 20 m s^-1 against a total resistive force of 600 N. Calculate the useful power the engine delivers.",
-     "answer": "12000",
-     "accepted": [
-      "12000",
-      "12 000",
-      "1.2e4"
-     ],
-     "unit": "W",
-     "right": "Constant speed means driving force = 600 N, so P = Fv = 600 × 20 = 12 000 W.",
-     "wrong": "At constant speed the driving force equals the resistive force; then P = Fv."
-    }
-   },
-   {
-    "type": "check",
-    "title": "Quick check: true or false",
-    "text": "",
-    "points": [],
-    "figure": {
-     "kind": "none",
-     "alt": ""
-    },
-    "data": {
-     "kind": "truefalse",
-     "statement": "A satellite in a circular orbit has the gravitational force on it doing no work, because the force is always perpendicular to its velocity.",
-     "answer": true,
-     "right": "Yes: θ = 90° so W = 0 and its kinetic energy stays constant.",
-     "wrong": "The force points to the centre and the motion is along the tangent, so θ = 90° and cos θ = 0."
-    }
-   },
-   {
-    "type": "cards",
-    "title": "Recap cards",
-    "text": "",
-    "points": [],
-    "figure": {
-     "kind": "none",
-     "alt": ""
-    },
-    "data": {
-     "cards": [
-      {
-       "front": "Work done by a constant force",
-       "back": "W = Fs cos θ"
+     },
+     {
+      "type": "check",
+      "title": "Try it",
+      "text": "",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
       },
-      {
-       "front": "Work by the resultant force",
-       "back": "Equals the change in kinetic energy"
-      },
-      {
-       "front": "Power in terms of force",
-       "back": "P = Fv"
-      },
-      {
-       "front": "Efficiency",
-       "back": "Useful output / total input (energy or power)"
+      "data": {
+       "kind": "numeric",
+       "prompt": "An electric motor takes 500 W of electrical power and lifts a 20 kg load at a constant speed of 0.50 m s^-1. Calculate the efficiency of the motor. Use g = 9.81 m s^-2.",
+       "answer": "0.20",
+       "accepted": [
+        "0.20",
+        "0.2"
+       ],
+       "unit": "",
+       "right": "Correct: useful power = mgv = 20 × 9.81 × 0.50 = 98 W, so η = 98 / 500 = 0.20.",
+       "wrong": "Useful power out is the rate of gain of potential energy: P = Fv = mgv = 98 W. Divide by the input power of 500 W to get 0.20. Dividing 500 by 98 gives 5.1, which is above 1 and impossible."
       }
-     ]
-    }
+     }
+    ]
+   },
+   {
+    "title": "Sankey diagrams and energy density",
+    "blocks": [
+     {
+      "type": "explain",
+      "title": "Showing where energy goes",
+      "text": "A Sankey diagram represents energy transfers with arrows whose widths are proportional to the amount of energy. A wide arrow enters the machine and splits into a useful arrow continuing forward and thinner wasted arrows going off to the side. If 200 J enters a lamp and 40 J leaves as light, the useful arrow is one fifth as wide as the input, giving an efficiency of 0.20. Fuels are compared by energy density, the energy released per unit volume or per unit mass. A fuel with higher energy density gives more work from the same amount of fuel.",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
+      },
+      "data": {}
+     },
+     {
+      "type": "note",
+      "title": "Exam tip",
+      "text": "The widths of the arrows must add up: input = useful output + wasted output. State units for energy density as J kg^-1 or J m^-3 depending on whether mass or volume is used.",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
+      },
+      "data": {}
+     },
+     {
+      "type": "cards",
+      "title": "Flip to review",
+      "text": "",
+      "points": [],
+      "figure": {
+       "kind": "none",
+       "alt": ""
+      },
+      "data": {
+       "cards": [
+        {
+         "front": "What is the equation for work done by a constant force?",
+         "back": "W = Fs cos θ, where θ is the angle between force and displacement."
+        },
+        {
+         "front": "When is the work done by a force zero?",
+         "back": "When the displacement is zero or the force is perpendicular to the displacement (θ = 90°)."
+        },
+        {
+         "front": "What does the area under a force-displacement graph represent?",
+         "back": "The work done by the force."
+        },
+        {
+         "front": "How is efficiency calculated?",
+         "back": "Useful work out / total work in, or useful power out / total power in."
+        }
+       ]
+      }
+     }
+    ]
    }
   ],
   "key_terms": [
    {
     "term": "Work done",
-    "definition": "The energy transferred by a force moving an object through a displacement; W = Fs cos θ."
+    "definition": "The energy transferred when a force moves its point of application; W = Fs cos θ."
    },
    {
     "term": "Joule",
-    "definition": "The work done when a force of 1 N moves an object 1 m in the direction of the force."
+    "definition": "The work done when a force of 1 N moves an object 1 m along the direction of the force."
    },
    {
     "term": "Kinetic energy",
-    "definition": "Energy a body has due to its motion; ½mv²."
+    "definition": "Energy due to motion, ½mv² or p²/2m."
    },
    {
     "term": "Gravitational potential energy",
-    "definition": "Energy due to position in a gravitational field; ΔEp = mgΔh near Earth's surface."
+    "definition": "Energy due to position in a gravitational field; near Earth, ΔEp = mgΔh."
    },
    {
     "term": "Elastic potential energy",
-    "definition": "Energy stored in a stretched or compressed spring; ½k(Δx)²."
+    "definition": "Energy stored in a deformed spring, ½k(Δx)²."
    },
    {
     "term": "Mechanical energy",
@@ -505,7 +687,15 @@
    },
    {
     "term": "Efficiency",
-    "definition": "The ratio of useful work or power output to total work or power input."
+    "definition": "The ratio of useful work (or power) output to total work (or power) input."
+   },
+   {
+    "term": "Sankey diagram",
+    "definition": "A diagram whose arrow widths are proportional to the energy transferred."
+   },
+   {
+    "term": "Energy density",
+    "definition": "The energy released by a fuel per unit mass or per unit volume."
    }
   ]
  },
@@ -514,77 +704,89 @@
    "statement": "Calculate the work done by a constant force acting at an angle to the displacement.",
    "check": {
     "kind": "numeric",
-    "prompt": "A force of 30 N acts at 30° to a displacement of 4.0 m. Calculate the work done, in J, to 2 significant figures.",
-    "answer": "100",
+    "prompt": "A force of 40 N acts at 60° to the direction of motion of a trolley that moves 3.0 m. Calculate the work done by the force.",
+    "answer": "60",
     "accepted": [
-     "100",
-     "1.0e2"
+     "60",
+     "60 J",
+     "60.0"
     ],
     "unit": "J",
-    "right": "W = 30 × 4.0 × cos 30° = 104 J ≈ 100 J.",
-    "wrong": "Use W = Fs cos θ with cos 30° = 0.866."
+    "right": "W = 40 × 3.0 × cos 60° = 60 J.",
+    "wrong": "Use W = Fs cos θ = 40 × 3.0 × 0.50 = 60 J. Omitting the cosine gives 120 J."
    }
   },
   {
-   "statement": "State the relationship between the work done by the resultant force and kinetic energy.",
+   "statement": "State the relationship between the work done by the resultant force and the change in kinetic energy.",
+   "check": {
+    "kind": "truefalse",
+    "statement": "The work done by the resultant force on an object equals the change in its energy.",
+    "answer": true,
+    "right": "Correct: net work equals the change in the energy of the system, which is the change in kinetic energy if only kinetic energy changes.",
+    "wrong": "This statement is true: the work done by the resultant force equals the change in the energy of the system."
+   }
+  },
+  {
+   "statement": "Identify the condition under which the total mechanical energy of a system is conserved.",
    "check": {
     "kind": "mcq",
-    "prompt": "The resultant force on a body does 40 J of work on it. What is the change in the body's kinetic energy?",
+    "prompt": "In which situation is the mechanical energy of the system conserved?",
     "options": [
      {
       "id": "a",
-      "text": "Increase of 40 J",
-      "why": ""
+      "text": "A ball falls through air with large air resistance",
+      "why": "Air resistance does work, transferring mechanical energy to thermal energy."
      },
      {
       "id": "b",
-      "text": "Decrease of 40 J",
-      "why": "Positive work increases kinetic energy."
+      "text": "A mass oscillates on a spring in a vacuum with no friction",
+      "why": ""
      },
      {
       "id": "c",
-      "text": "Increase of 20 J",
-      "why": "This wrongly halves the work, confusing it with ½mv²."
+      "text": "A box slides down a rough slope",
+      "why": "Friction transfers mechanical energy to thermal energy."
      },
      {
       "id": "d",
-      "text": "No change",
-      "why": "Non-zero resultant work changes the kinetic energy."
+      "text": "A car brakes to a halt",
+      "why": "The brakes transfer kinetic energy to thermal energy."
      }
     ],
-    "answer": "a",
-    "right": "W = ΔEk.",
-    "wrong": "Work by the resultant force equals the change in kinetic energy."
+    "answer": "b",
+    "right": "Correct: with no resistive forces, energy only moves between kinetic and elastic potential energy.",
+    "wrong": "Mechanical energy is conserved only when no frictional or resistive forces do work. Only the spring oscillating in a vacuum fits."
    }
   },
   {
-   "statement": "Determine the speed of an object using conservation of mechanical energy.",
+   "statement": "Calculate power from force and speed.",
    "check": {
     "kind": "numeric",
-    "prompt": "A frictionless roller coaster car starts from rest at a height of 5.0 m. Determine its speed at ground level. Use g = 9.81 N kg^-1.",
-    "answer": "9.9",
+    "prompt": "A cyclist moves at a constant 8.0 m s^-1 against a total resistive force of 25 N. Calculate the power developed by the cyclist.",
+    "answer": "200",
     "accepted": [
-     "9.9",
-     "9.90"
+     "200",
+     "200 W",
+     "2.0e2"
     ],
-    "unit": "m s^-1",
-    "right": "v = √(2gh) = √(2 × 9.81 × 5.0) = 9.9 m s^-1.",
-    "wrong": "Equate mgh to ½mv², so v = √(2gh); the mass cancels."
+    "unit": "W",
+    "right": "P = Fv = 25 × 8.0 = 200 W.",
+    "wrong": "At constant speed the driving force equals the resistive force, so P = Fv = 25 × 8.0 = 200 W. Dividing gives 3.1, which is wrong."
    }
   },
   {
-   "statement": "Calculate the efficiency of a device from its energy input and useful output.",
+   "statement": "Define energy density and state what a Sankey diagram represents.",
    "check": {
-    "kind": "numeric",
-    "prompt": "A motor takes in 500 J of electrical energy and lifts a load, gaining 350 J of gravitational potential energy. Calculate its efficiency as a decimal.",
-    "answer": "0.70",
+    "kind": "short",
+    "prompt": "State what the widths of the arrows in a Sankey diagram are proportional to.",
     "accepted": [
-     "0.70",
-     "0.7"
+     "energy",
+     "the amount of energy",
+     "energy transferred",
+     "the energy"
     ],
-    "unit": "",
-    "right": "η = 350/500 = 0.70.",
-    "wrong": "Efficiency = useful output / total input = 350/500."
+    "right": "Correct: arrow width is proportional to the energy transferred.",
+    "wrong": "The width of each arrow is proportional to the amount of energy being transferred."
    }
   }
  ]

@@ -77,6 +77,36 @@ const SAMPLES = [
     },
   },
   {
+    title: 'Pulled at an angle, with motion',
+    figure: {
+      kind: 'forces',
+      alt: 'A block pulled along smooth ground by F at 30° above the horizontal, with weight, normal reaction and the direction of motion.',
+      surface: 'horizontal',
+      body: 'block',
+      motion: { direction_deg: 0, label: 'direction of motion' },
+      forces: [
+        { label: 'F', direction_deg: 30, size: 1, angle_label: '30°' },
+        { label: 'W', direction_deg: 270, size: 0.65 },
+        { label: 'N', direction_deg: 90, size: 0.5, from: 'contact' },
+      ],
+    },
+  },
+  {
+    title: 'Friction at the contact on a slope',
+    figure: {
+      kind: 'forces',
+      alt: 'A block on a 25° slope with weight, normal reaction and friction up the slope acting at the surface.',
+      surface: 'incline',
+      angle_deg: 25,
+      body: 'block',
+      forces: [
+        { label: 'mg', direction_deg: 270, size: 1 },
+        { label: 'N', direction_deg: 65, size: 0.8, from: 'contact' },
+        { label: 'f', direction_deg: 155, size: 0.5, from: 'contact' },
+      ],
+    },
+  },
+  {
     title: 'A ball in the air',
     figure: {
       kind: 'forces',

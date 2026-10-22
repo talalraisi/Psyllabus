@@ -425,3 +425,38 @@ export function readLesson2(raw) {
   for (const c of lesson.cards || []) if (String(c.front).length > 300 || String(c.back).length > 1000) problems.push('a flashcard too long to store')
   return { lesson, problems }
 }
+
+/* -------------------------------------------------------- lessons, v3 --- */
+
+const TEACHING = new Set(['explain', 'key_point', 'note', 'analogy', 'diagram', 'formula', 'example', 'mistake'])
+const DOING = new Set(['check', 'reveal', 'cards'])
+
+/**
+ * Parse and check a v3 lesson: screens of blocks. Every block is checked as a
+ * v2 frame is; on top, a screen must teach properly (a real explanation, not
+ * a sentence) and the lesson must ask the student to do enough, in enough
+ * different ways.
+ */
+export function readLesson3(raw) {
+  const screens = (raw?.screens || []).map((s) => ({ title: s.title, blocks: s.blocks || [] }))
+  // Reuse the frame checks by laying the blocks out as frames, then put them back.
+  const flat = screens.flatMap((s) => s.blocks)
+  const asV2 = readLesson2({ ...raw, frames: flat })
+  const drop = /^\d+ frames|more than four screens|frame \d+ \(explain\): too much text/
+  const problems = asV2.problems.filter((p) => !drop.test(p)).map((p) => p.replace(/^frame (\d+)/, (m, n) => `block ${n}`))
+  let k = 0
+  const parsed = screens.map((s) => ({ title: s.title, blocks: s.blocks.map(() => asV2.lesson.frames[k++]) }))
+
+  if (parsed.length < 6 || parsed.length > 12) problems.push(`${parsed.length} screens (7 to 10 wanted)`)
+  parsed.forEach((s, i) => {
+    if (s.blocks.length < 1 || s.blocks.length > 5) problems.push(`screen ${i + 1} has ${s.blocks.length} blocks (2 to 4 wanted)`)
+    const words = s.blocks.filter((b) => b.type === 'explain').reduce((a, b) => a + String(b.text || '').split(/\s+/).filter(Boolean).length, 0)
+    const teaches = s.blocks.some((b) => TEACHING.has(b.type))
+    if (teaches && words < 50 && !s.blocks.some((b) => ['example', 'diagram', 'formula'].includes(b.type))) problems.push(`screen ${i + 1} is thin: ${words} words of explanation`)
+  })
+  const checks = flat.filter((b) => b.type === 'check').length
+  if (checks < 4) problems.push(`only ${checks} checks (5 to 8 wanted)`)
+  const doing = parsed.filter((s) => s.blocks.some((b) => DOING.has(b.type))).length
+  if (doing < Math.ceil(parsed.length * 0.6)) problems.push(`only ${doing} of ${parsed.length} screens ask the student to do something`)
+  return { lesson: { ...asV2.lesson, frames: undefined, screens: parsed }, problems }
+}

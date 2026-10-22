@@ -26,7 +26,7 @@ export default function LessonPreview() {
   return (
     <DashboardLayout profile={profile}>
       <Page>
-        {sample.body?.version === 2 ? (
+        {sample.body?.version >= 2 ? (
           <FramePlayer
             lesson={sample}
             onAddCards={async () => true}

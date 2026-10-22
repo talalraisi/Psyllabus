@@ -29,9 +29,12 @@ export function SyllabiProvider({ profile, children }) {
   const [state, setState] = useState(null)
   const count = useRef(0)
 
+  // Opening Syllabi opens the chat, on the right subject and topic, and
+  // nothing more: no question typed in for the student and nothing sent on
+  // their behalf. They ask what they actually want to ask.
   const open = useCallback((detail) => {
     count.current += 1
-    setState({ n: count.current, ...detail })
+    setState({ n: count.current, ...detail, text: '', autoSend: false })
   }, [])
   const close = useCallback(() => setState(null), [])
 
