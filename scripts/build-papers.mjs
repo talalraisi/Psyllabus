@@ -263,8 +263,10 @@ function checkSection(u, data) {
   const totals = qs.map((q) => q.parts.reduce((a, p) => a + (p.marks || 0), 0))
   if (s.style === 'multiple_choice') {
     if (qs.some((q) => q.parts.length !== 1 || q.parts[0].type !== 'mcq' || q.parts[0].marks !== 1)) problems.push('a multiple-choice item is not a single 1-mark question')
-  } else if (s.from > 0 && s.answer > 0) {
-    // Each question the candidate might choose carries the same marks.
+  } else if (s.from > 0 && s.answer > 0 && s.answer < s.from) {
+    // A choice ("answer 2 of 3"): each question the candidate might choose
+    // carries the same marks. Where every question is answered, they differ
+    // as on the real paper (2, 4, 6, then a 12-mark one) and only the total counts.
     const each = s.marks / s.answer
     totals.forEach((t, i) => {
       if (Math.abs(t - each) > 0.01) problems.push(`question ${qs[i].number} totals ${t} marks, ${each} wanted`)
@@ -334,7 +336,8 @@ function agrees(p, answer) {
 /* ---------------------------------------------------------------- stages --- */
 
 async function write(round = 1) {
-  const todo = units().filter((u) => state.sections[u.key]?.status !== 'passed' && (state.sections[u.key]?.round || 0) < round)
+  // Only what is missing or failed: a section that passed is never rewritten.
+  const todo = units().filter((u) => !['written', 'checked'].includes(state.sections[u.key]?.status) && (state.sections[u.key]?.round || 0) < round)
   if (!todo.length) return log(`write: nothing to write in round ${round}`)
   const syllabi = {}
   for (const level of new Set(todo.map((u) => u.level))) syllabi[level] = await syllabusFor(level)
@@ -520,8 +523,22 @@ try {
     }
     log('\nChecked and waiting. Review, then --stage publish.')
   } else if (STAGE === 'check') {
-    for (const sec of Object.values(state.sections)) if (sec.data && sec.status === 'failed') sec.status = 'written'
+    // Failed sections are checked again against the current rules (not
+    // waved through), except those a Gemini audit rejected.
+    for (const u of units()) {
+      const sec = state.sections[u.key]
+      if (!sec?.data || sec.status !== 'failed' || state.audits?.[`${u.level}-${u.paper.id}-v${u.version}`]?.verdict === 'reject') continue
+      sec.problems = checkSection(u, sec.data)
+      if (!sec.problems.length) sec.status = 'written'
+    }
+    save()
     for (const round of [1, 2, 3]) await check(round)
+    await audit()
+  } else if (STAGE === 'rewrite') {
+    // One more go for the sections still failing, and only those.
+    const round = Math.max(0, ...Object.values(state.sections).map((s) => s.round || 0)) + 1
+    await write(round)
+    await check(round)
     await audit()
   } else if (STAGE === 'publish') await publish()
   else if (STAGE === 'audit') await audit()
