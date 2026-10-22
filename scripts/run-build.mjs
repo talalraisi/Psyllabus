@@ -24,7 +24,8 @@ const arg = (n, d) => {
 }
 const CLAUDE_CAP = arg('claude-cap', '187')
 const GEMINI_CAP = arg('gemini-cap', '28')
-const PARALLEL = Number(arg('parallel', 6))
+// Waiting on the Batch API costs nothing, so by default everything waits at once.
+const PARALLEL = Number(arg('parallel', 100))
 const LOGS = path.join(ROOT, 'content-runs/logs')
 const STATUS = path.join(ROOT, 'content-runs/build-status.json')
 fs.mkdirSync(LOGS, { recursive: true })
@@ -60,12 +61,16 @@ const papers = (c) => [
   ['scripts/build-papers.mjs', '--course', paperName(c), '--stage', 'publish', ...caps],
 ]
 
-const jobs = [
+// Subjects held back, e.g. while their subtopic lists are being updated.
+const SKIP = new Set(String(arg('skip', '')).split(',').map((x) => x.trim()).filter(Boolean))
+
+const allJobs = [
   ...PILOT.map((c) => ({ name: `content: ${c}`, steps: content(c) })),
   ...PILOT.filter((c) => !NO_PAPERS.has(c)).map((c) => ({ name: `papers: ${c}`, steps: papers(c) })),
   ...REST.map((c) => ({ name: `content: ${c}`, steps: content(c) })),
   ...REST.filter((c) => !NO_PAPERS.has(c)).map((c) => ({ name: `papers: ${c}`, steps: papers(c) })),
 ]
+const jobs = allJobs.filter((j) => !SKIP.has(j.name.replace(/^(content|papers): /, '')))
 
 const status = Object.fromEntries(jobs.map((j) => [j.name, 'waiting']))
 const write = () => fs.writeFileSync(STATUS, JSON.stringify({ updated: new Date().toISOString(), status }, null, 1))

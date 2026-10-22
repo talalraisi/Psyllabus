@@ -114,7 +114,7 @@ export default function AboutPage() {
         <div className="mt-10">
           <StatRow
             stats={[
-              { value: 5492, label: 'IB subtopics mapped, from the official subject guides' },
+              { value: 5712, label: 'IB subtopics mapped, from the official subject guides' },
               { value: coursesIn('IB'), label: 'IB courses, each at SL and HL where offered' },
               { value: 8, label: 'features working today, from decay to the predicted grade' },
               { value: 1, suffix: ' person', label: 'building it, in Muscat, between lessons' },
