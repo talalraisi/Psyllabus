@@ -331,7 +331,10 @@ async function blind() {
   const out = await claude(requests, 'blind')
   spend('blind', out)
   for (const r of requests) {
-    const answers = new Map((out[r.custom_id]?.data?.answers || []).map((a) => [a.id, a]))
+    // A request that errored (no credit, overloaded) says nothing about its
+    // questions: they stay unchecked for the next run, not "disagreed".
+    if (!out[r.custom_id]?.data) continue
+    const answers = new Map((out[r.custom_id].data.answers || []).map((a) => [a.id, a]))
     for (const key of r.meta) {
       const x = state.questions.find((q) => q.key === key)
       const a = answers.get(key)
