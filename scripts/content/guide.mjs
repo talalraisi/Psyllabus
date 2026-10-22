@@ -38,6 +38,9 @@ const FILES = [
   [/^Visual Arts/, 'visual-arts'],
   [/^World Religions/, 'world-religions'],
   [/^Theory of Knowledge/, 'theory-of-knowledge'],
+  // Our students sit in 2028 and later: the 2028 History guide. The 2020 one
+  // (guides/ib/history.txt) is for exams up to 2027.
+  [/^History/, 'history-2028'],
   [/^Extended Essay/, 'extended-essay'],
 ]
 
@@ -122,4 +125,72 @@ export function guideSection({ subject, code, unit, topic }) {
 export function hoursIn(text) {
   const m = String(text || '').match(/(\d+(?:\.\d+)?)\s*hours?/i)
   return m ? Number(m[1]) : null
+}
+
+/**
+ * Find units in a guide the code cannot find by itself.
+ *
+ * Guides label their sections in their own ways ("Structure 1.1", "SL 1.1",
+ * a topic name in a table), so for units with no section found above, Haiku
+ * reads the guide once and names the exact line each unit's content starts
+ * on. Code then cuts each section from that line to the next unit's. About a
+ * cent a course. `ask(prompt, schema)` is the caller's model call.
+ *
+ * Returns {unitKey: {text, how}}.
+ */
+export async function mapUnits(subject, units, ask) {
+  const file = guideFileFor(subject)
+  if (!file || !units.length) return {}
+  const lines = linesOf(file)
+  // The syllabus part of the guide: past the contents page, before assessment.
+  const find = (re, after = 0) => lines.findIndex((l, i) => i > after && re.test(l))
+  let start = find(/^\s*Syllabus content\s*$/i, 300)
+  if (start === -1) start = find(/^\s*Syllabus outline\s*$/i, 300)
+  if (start === -1) start = 300
+  let end = find(/^\s*(Assessment in the Diploma Programme|Assessment objectives|External assessment)\s*$/i, start + 50)
+  if (end === -1) end = lines.length
+  const body = lines.slice(start, end).map((l, i) => `${start + i}: ${l}`).join('\n').slice(0, 600000)
+
+  const schema = {
+    type: 'object',
+    additionalProperties: false,
+    required: ['units'],
+    properties: {
+      units: {
+        type: 'array',
+        items: {
+          type: 'object',
+          additionalProperties: false,
+          required: ['key', 'line'],
+          properties: {
+            key: { type: 'string' },
+            line: { type: 'integer', description: 'The line number where this unit\'s content begins (its heading), or -1 if it is not in the guide.' },
+          },
+        },
+      },
+    },
+  }
+  const res = await ask(
+    `Below is the syllabus section of the IB ${subject.replace(/ (SL|HL)$/, '')} subject guide, with line numbers. For each unit listed, give the line number of the heading where that unit's content (its understandings, content statements or learning outcomes) begins. Use the line where the content starts, not the contents page. -1 if the unit is not in the guide.
+
+UNITS:
+${units.map((u) => `- key "${u.key}": ${[u.code, u.unit, u.topic].filter(Boolean).join(' · ')}${u.examples ? ` (subtopics such as: ${u.examples})` : ''}`).join('\n')}
+
+GUIDE:
+${body}`,
+    schema
+  )
+  const found = (res?.units || []).filter((u) => u.line >= start && u.line < end).sort((a, b) => a.line - b.line)
+  const out = {}
+  found.forEach((u, i) => {
+    const stop = Math.min(found[i + 1]?.line ?? end, u.line + 400)
+    const text = lines
+      .slice(u.line, stop > u.line ? stop : u.line + 120)
+      .join('\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .slice(0, MAX)
+      .trim()
+    if (text.length > 200) out[u.key] = { text, how: `mapped line ${u.line}` }
+  })
+  return out
 }

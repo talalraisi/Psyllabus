@@ -29,20 +29,39 @@ const PRICES = {
   'gemini-2.5-pro': [1.25, 10],
 }
 
+const LOG = path.join(RUNS, 'spend.jsonl')
+
+/**
+ * Money spent, summed from an append-only log. Several builds run at once,
+ * and a read-add-write of one JSON file would lose one build's spend to
+ * another's: appending a line is safe to do from many processes. The old
+ * spend.json, if there is one, is the starting balance.
+ */
 export function ledger() {
+  let base = { claude: 0, gemini: 0, history: [] }
   try {
-    return JSON.parse(fs.readFileSync(LEDGER, 'utf8'))
+    base = JSON.parse(fs.readFileSync(LEDGER, 'utf8'))
   } catch {
-    return { claude: 0, gemini: 0, history: [] }
+    // no starting balance
   }
+  const out = { claude: base.claude || 0, gemini: base.gemini || 0, history: base.history || [] }
+  try {
+    for (const line of fs.readFileSync(LOG, 'utf8').split('\n')) {
+      if (!line.trim()) continue
+      const entry = JSON.parse(line)
+      out[entry.provider] = (out[entry.provider] || 0) + entry.dollars
+      out.history.push(entry)
+    }
+  } catch {
+    // nothing logged yet
+  }
+  return out
 }
 
 function record(provider, dollars, note) {
   fs.mkdirSync(RUNS, { recursive: true })
-  const l = ledger()
-  l[provider] = Math.round((l[provider] + dollars) * 1e6) / 1e6
-  l.history.push({ at: new Date().toISOString(), provider, dollars: Math.round(dollars * 1e6) / 1e6, note })
-  fs.writeFileSync(LEDGER, JSON.stringify(l, null, 2))
+  const entry = { at: new Date().toISOString(), provider, dollars: Math.round(dollars * 1e6) / 1e6, note }
+  fs.appendFileSync(LOG, JSON.stringify(entry) + '\n')
 }
 
 export class OverBudget extends Error {}

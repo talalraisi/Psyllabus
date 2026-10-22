@@ -103,6 +103,9 @@ const planned = planCounts(
 )
 check('more teaching hours, more questions', planned[0].total > planned[1].total)
 check('no hours means the base count', planned[2].total === 30)
+const half = planCounts([{ subtopic: 'x' }], 'sciences', 0.5)[0]
+check('half scale halves the count', half.total === 15)
+check('half scale keeps the mix', half.heats.low >= 4 && half.heats.medium >= 4 && half.heats.burning + half.heats.extreme <= 3)
 check('heats add up to the total', planned.every((p) => Object.values(p.heats).reduce((a, b) => a + b, 0) === p.total))
 const slots = slotsFor(planned[2].heats, 'sciences')
 check('slots cover every heat', ['low', 'medium', 'hot', 'extreme', 'burning'].every((h) => slots.some((s) => s.heat === h)))

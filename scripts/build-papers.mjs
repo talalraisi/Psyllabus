@@ -54,6 +54,9 @@ const CLAUDE_CAP = Number(arg('claude-cap', 160))
 const GEMINI_CAP = Number(arg('gemini-cap', 25))
 const LEVELS = arg('levels') ? String(arg('levels')).split(',') : null
 const PAPERS = arg('papers') ? String(arg('papers')).split(',') : null
+// Gemini reads version 1 of each paper; later versions are written to the same
+// format and checked the same free ways, which keeps Gemini's bill down.
+const AUDIT_VERSIONS = Number(arg('audit-versions', 99))
 
 /* -------------------------------------------------------- which course --- */
 
@@ -427,8 +430,11 @@ async function audit() {
   for (const p of papers.values()) {
     if (state.audits[p.id]) continue
     if (!p.units.every((u) => state.sections[u.key]?.status === 'checked')) continue
+    if (p.version > AUDIT_VERSIONS) continue
     const content = p.units.map((u) => ({ section: u.section.name, questions: state.sections[u.key].data.questions }))
-    const res = await askGemini(
+    let res
+    try {
+      res = await askGemini(
       [
         {
           text: `You are checking a predicted IB exam paper before students sit it. The official format is below, from the IB subject guide. Check that the paper follows it exactly, that every question, answer and markscheme is correct, and that it reads like a real IB paper (command terms, demand, marks). Be strict and specific.
@@ -441,6 +447,11 @@ THE PAPER (IB ${COURSE} ${p.level}, version ${p.version}): ${JSON.stringify(cont
       AUDIT,
       { cap: GEMINI_CAP, note: `${slug} audit` }
     )
+    } catch (e) {
+      if (!(e instanceof OverBudget)) throw e
+      log('  Gemini credit is used up: the remaining papers are not audited')
+      break
+    }
     state.audits[p.id] = res
     if (res.verdict === 'reject') for (const u of p.units) state.sections[u.key] = { ...state.sections[u.key], status: 'failed', problems: res.problems }
     save()

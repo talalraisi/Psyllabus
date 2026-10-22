@@ -164,22 +164,33 @@ export function groupOf(subject) {
  * questions, between 0.6x and 1.6x the subject's base. Without hours, every
  * subtopic gets the base.
  */
-export function planCounts(subtopics, group) {
+export function planCounts(subtopics, group, scale = 1) {
   const g = GROUPS[group]
   const share = subtopics.map((s) => (s.hours && s.siblings ? s.hours / s.siblings : null))
   const known = share.filter(Boolean)
   const mean = known.length ? known.reduce((a, b) => a + b, 0) / known.length : null
+  const order = ['low', 'medium', 'hot', 'extreme', 'burning']
   return subtopics.map((s, i) => {
     const weight = share[i] && mean ? Math.min(1.6, Math.max(0.6, share[i] / mean)) : 1
-    const total = Math.max(3, Math.round(g.perSubtopic * weight))
-    const heats = {}
-    let left = total
-    const order = ['burning', 'extreme', 'hot', 'medium']
-    for (const h of order) {
-      heats[h] = g.heat[h] ? Math.max(h === 'burning' ? 0 : 1, Math.round(total * g.heat[h])) : 0
-      left -= heats[h]
+    const total = Math.max(3, Math.round(g.perSubtopic * weight * scale))
+    // Largest remainder, so the mix holds at any size: rounding each heat up
+    // on its own turned a 15-question subtopic a fifth hardest-tier.
+    const exact = order.map((h) => total * (g.heat[h] || 0))
+    const heats = Object.fromEntries(order.map((h, k) => [h, Math.floor(exact[k])]))
+    let left = total - Object.values(heats).reduce((a, b) => a + b, 0)
+    const byRemainder = order.map((h, k) => [h, exact[k] - Math.floor(exact[k])]).sort((a, b) => b[1] - a[1])
+    for (const [h] of byRemainder) {
+      if (left <= 0) break
+      if (g.heat[h]) {
+        heats[h]++
+        left--
+      }
     }
-    heats.low = Math.max(0, left)
+    // Every subtopic big enough for it gets at least one Hot question.
+    if (total >= 6 && g.heat.hot && !heats.hot) {
+      heats.hot = 1
+      heats.low--
+    }
     return { ...s, total, heats }
   })
 }

@@ -33,7 +33,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import crypto from 'node:crypto'
 import { loadEnv, connect } from './db.mjs'
-import { guideSection, hoursIn } from './content/guide.mjs'
+import { guideSection, hoursIn, mapUnits } from './content/guide.mjs'
 import { groupOf, planCounts, TIER_OF_HEAT, TIERS, HEAT_DIFFICULTY, HEAT_WORDS, HEAT_ORDER } from './content/formats.mjs'
 import { RULES, subjectBlock, slotsFor, questionPrompt, lessonPrompt3, blindPrompt } from './content/prompts.mjs'
 import { QUESTIONS, LESSON3, BLIND } from './content/schemas.mjs'
@@ -60,7 +60,10 @@ const DIRECT = Boolean(arg('direct', false))
 const CLAUDE_CAP = Number(arg('claude-cap', 60))
 const GEMINI_CAP = Number(arg('gemini-cap', 25))
 const AUDIT_N = Number(arg('audit', 40))
+// 0.5 builds half the planned questions per subtopic: the first build.
+const SCALE = Number(arg('scale', 1))
 const CODES = arg('codes') ? String(arg('codes')).split(',').map((s) => s.trim()) : null
+const EXCLUDE = arg('exclude-codes') ? String(arg('exclude-codes')).split(',').map((s) => s.trim()) : null
 const LIMIT = arg('limit') ? Number(arg('limit')) : null
 const CHUNK = { basic: 8, middle: 6, hard: 4 }
 
@@ -115,6 +118,8 @@ async function plan() {
   }
   let subtopics = [...byKey.values()]
   if (CODES) subtopics = subtopics.filter((s) => CODES.includes(s.code))
+  // Sections an earlier run already built (the Physics pilot's Theme A).
+  if (EXCLUDE) subtopics = subtopics.filter((s) => !EXCLUDE.includes(s.code))
   if (LIMIT) subtopics = subtopics.slice(0, LIMIT)
 
   const group = groupOf(rows[0].subject)
@@ -127,9 +132,36 @@ async function plan() {
     s.hours = hoursIn(g?.text)
     s.siblings = siblings[s.code]
   }
+  // Units the code could not find in the guide: Haiku points at them.
+  const unitKey = (x) => x.code || x.unit || x.topic
+  const missing = [...new Map(subtopics.filter((x) => !x.guide).map((x) => [unitKey(x), x])).values()]
+  if (missing.length) {
+    const units = missing.map((x) => ({
+      key: unitKey(x),
+      code: x.code,
+      unit: x.unit,
+      topic: x.topic,
+      examples: subtopics.filter((y) => unitKey(y) === unitKey(x)).slice(0, 3).map((y) => y.subtopic).join('; '),
+    }))
+    const ask = (user, schema) =>
+      runClaude(
+        [{ custom_id: 'map', params: claudeParams({ model: 'claude-haiku-5-5', system: ['You find sections in long documents precisely.'], user, schema, maxTokens: 8000 }) }],
+        { direct: true, cap: CLAUDE_CAP, note: `${slug} guide-map` }
+      ).then((o) => o.map?.data)
+    const mapped = await mapUnits(subtopics[0].courses[0], units, ask)
+    for (const x of subtopics) {
+      const m = !x.guide && mapped[unitKey(x)]
+      if (m) {
+        x.guide = m.text
+        x.guideHow = m.how
+        x.hours = hoursIn(m.text)
+      }
+    }
+  }
+
   state.group = group
   state.courses = [...new Set(rows.map((r) => r.subject))]
-  state.subtopics = planCounts(subtopics, group)
+  state.subtopics = planCounts(subtopics, group, SCALE)
   state.questions = state.questions || []
   save()
 
@@ -356,10 +388,23 @@ async function rule() {
   log(`rule: ${disputed.length - toGemini.length} Haiku questions dropped, ${toGemini.length} Sonnet questions to Gemini`)
   for (let i = 0; i < toGemini.length; i += 10) {
     const part = toGemini.slice(i, i + 10)
-    const res = await askGemini([{ text: blindPrompt(part.map((x) => ({ id: x.key, q: x.q }))) }], GEMINI_BLIND, {
-      cap: GEMINI_CAP,
-      note: `${slug} rule`,
-    })
+    let res
+    try {
+      res = await askGemini([{ text: blindPrompt(part.map((x) => ({ id: x.key, q: x.q }))) }], GEMINI_BLIND, {
+        cap: GEMINI_CAP,
+        note: `${slug} rule`,
+      })
+    } catch (e) {
+      // No Gemini credit left: a question the blind check disputed and
+      // nobody can rule on is dropped. Losing it costs less than publishing it wrong.
+      if (!(e instanceof OverBudget)) throw e
+      for (const x of toGemini.slice(i)) {
+        x.ruling = 'dropped: disputed, and no Gemini credit left to rule'
+        x.status = 'failed'
+      }
+      log('  Gemini credit is used up: the remaining disputed questions are dropped')
+      break
+    }
     const answers = new Map((res.answers || []).map((a) => [a.id, a]))
     for (const x of part) {
       const a = answers.get(x.key)
@@ -417,7 +462,14 @@ async function audit() {
 - verdict: publish, fix (usable but flawed) or reject (wrong, off-topic or misleading).
 
 ${part.map((x) => `[${x.key}] Subtopic "${state.subtopics[x.sub].subtopic}", heat ${x.q.heat}\n${JSON.stringify(x.q)}`).join('\n\n')}`
-    const res = await askGemini([{ text }], AUDIT, { cap: GEMINI_CAP, note: `${slug} audit` })
+    let res
+    try {
+      res = await askGemini([{ text }], AUDIT, { cap: GEMINI_CAP, note: `${slug} audit` })
+    } catch (e) {
+      if (!(e instanceof OverBudget)) throw e
+      log('  Gemini credit is used up: audit skipped (every question has still had the code checks and the blind solve)')
+      break
+    }
     const reviews = new Map((res.reviews || []).map((r) => [r.id, r]))
     for (const x of part) {
       x.audit = reviews.get(x.key) || { verdict: 'none' }
@@ -571,6 +623,89 @@ async function lessons() {
   }
 }
 
+/* ----------------------------------------------------------------- cards --- */
+
+const DECK = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['cards'],
+  properties: {
+    cards: {
+      type: 'array',
+      items: { type: 'object', additionalProperties: false, required: ['front', 'back'], properties: { front: { type: 'string' }, back: { type: 'string' } } },
+    },
+  },
+}
+const DECK_REVIEW = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['bad'],
+  properties: { bad: { type: 'array', items: { type: 'integer' }, description: 'Indexes (from 0) of cards that are wrong, vague, off this subtopic, or whose back does not answer the front.' } },
+}
+
+/**
+ * A deck per subtopic, when the build has no lessons to take them from.
+ * Haiku writes them from the guide's statements; a second Haiku pass reads
+ * them against the guide and every card it doubts is dropped, not mended.
+ */
+async function cards() {
+  state.cards = state.cards || {}
+  const todo = state.subtopics.map((s, i) => i).filter((i) => !state.cards[i]?.cards)
+  if (todo.length) {
+    log(`cards: ${todo.length} decks to write`)
+    const language = state.group === 'languages'
+    const requests = todo.map((i) => {
+      const s = state.subtopics[i]
+      const neighbours = state.subtopics.filter((o, k) => k !== i && o.code === s.code).map((o) => o.subtopic)
+      return {
+        custom_id: `c_${i}`,
+        meta: i,
+        params: claudeParams({
+          model: 'claude-haiku-5-5',
+          system: ['You write accurate, exam-focused flashcards for IB Diploma students.'],
+          user: `Write 12 to 16 flashcards for IB ${COURSE}, ${s.topic}, subtopic "${s.subtopic}".
+${s.guide ? `\nWHAT THE IB GUIDE SAYS STUDENTS MUST UNDERSTAND:\n${s.guide}\n` : ''}${neighbours.length ? `\nOnly "${s.subtopic}": these neighbours have their own decks: ${neighbours.join('; ')}.\n` : ''}
+Cover ${language ? 'the vocabulary, phrases, grammar points and text-type conventions this subtopic needs, with the target language on the front or back as a learner needs it' : 'the definitions, equations (with what each symbol means and its unit), key facts, processes and distinctions a student must know, in IB wording'}. Front: a question or prompt. Back: the answer, under 40 words. Maths in single dollars ($E_k = \\frac{1}{2}mv^2$). Every card correct and on this subtopic only.`,
+          schema: DECK,
+          maxTokens: 12000,
+        }),
+      }
+    })
+    const out = await claude(requests, 'cards')
+    spend('cards', out)
+    for (const r of requests) {
+      const deck = (out[r.custom_id]?.data?.cards || []).filter((c) => String(c.front).trim() && String(c.back).trim() && c.front.length <= 300 && c.back.length <= 1000)
+      state.cards[r.meta] = deck.length >= 6 ? { cards: deck, status: 'written' } : { status: 'failed' }
+    }
+    save()
+  }
+  const review = state.subtopics.map((s, i) => i).filter((i) => state.cards[i]?.status === 'written')
+  if (!review.length) return
+  const reqs = review.map((i) => ({
+    custom_id: `cr_${i}`,
+    meta: i,
+    params: claudeParams({
+      model: 'claude-haiku-5-5',
+      system: ['You check flashcards for accuracy before students see them.'],
+      user: `IB ${COURSE}, subtopic "${state.subtopics[i].subtopic}".\n${state.subtopics[i].guide ? `Guide:\n${state.subtopics[i].guide}\n` : ''}\nCards:\n${state.cards[i].cards.map((c, k) => `${k}. ${c.front} -> ${c.back}`).join('\n')}\n\nList the indexes of every card that is wrong, vague, off this subtopic, or whose back does not answer its front.`,
+      schema: DECK_REVIEW,
+      maxTokens: 8000,
+    }),
+  }))
+  const res = await claude(reqs, 'cards-review')
+  spend('cards-review', res)
+  for (const r of reqs) {
+    const bad = res[r.custom_id]?.data?.bad
+    const e = state.cards[r.meta]
+    if (!bad) continue
+    e.cards = e.cards.filter((c, k) => !bad.includes(k))
+    e.status = e.cards.length >= 6 ? 'passed' : 'failed'
+  }
+  save()
+  const decks = Object.values(state.cards).filter((e) => e.status === 'passed')
+  log(`  ${decks.length}/${state.subtopics.length} decks passed, ${decks.reduce((a, e) => a + e.cards.length, 0)} cards`)
+}
+
 /* --------------------------------------------------------------- publish --- */
 
 function rowFor(x, subject) {
@@ -666,6 +801,24 @@ async function publish() {
   }
   save()
 
+  for (const [i, entry] of Object.entries(state.cards || {})) {
+    if (entry.status !== 'passed') continue
+    const s = state.subtopics[i]
+    for (const subject of s.courses) {
+      for (const [k, c] of entry.cards.entries()) {
+        const res = await db.query(
+          `insert into flashcard_presets (curriculum, subject, topic, subtopic, front, back, position, verified, source, front_fingerprint)
+           values ('IB',$1,$2,$3,$4,$5,$6,true,'ai-generated',$7)
+           on conflict (subject, subtopic, front_fingerprint) where front_fingerprint is not null do nothing`,
+          [subject, s.topic, s.subtopic, c.front.trim(), c.back.trim(), k, fingerprint(c.front)]
+        )
+        cIn += res.rowCount
+      }
+    }
+    entry.status = 'published'
+  }
+  save()
+
   let retiredQ = 0
   let retiredC = 0
   if (arg('retire-old')) {
@@ -719,12 +872,14 @@ function report() {
 
 /* ------------------------------------------------------------------- run --- */
 
-const STAGES = { plan, questions, repair, blind, rule, audit, lessons, publish }
+const STAGES = { plan, questions, repair, blind, rule, audit, lessons, cards, publish }
+// This build has no lessons: decks come from the cards stage instead.
+const WITH_LESSONS = Boolean(arg('lessons', false))
 try {
   if (STAGE === 'all') {
     // Planning again would renumber the slots under work already paid for.
     if (!state.subtopics) await plan()
-    for (const name of ['questions', 'blind', 'rule', 'audit', 'lessons']) await STAGES[name]()
+    for (const name of ['questions', 'blind', 'rule', 'audit', WITH_LESSONS ? 'lessons' : 'cards']) await STAGES[name]()
     log('\nEverything is checked and waiting. Review the report, then run --stage publish.')
   } else if (STAGE === 'report') {
     /* report only */
