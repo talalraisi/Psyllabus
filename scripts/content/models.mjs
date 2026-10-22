@@ -190,6 +190,11 @@ export async function askGemini(parts, schema, { cap = 25, note = '' } = {}) {
         generationConfig: { responseMimeType: 'application/json', responseJsonSchema: schema, maxOutputTokens: 32000 },
       }),
     })
+    // The day's request quota is gone: no point waiting, it resets at midnight Pacific.
+    if (res.status === 429) {
+      const body = await res.clone().text()
+      if (/per_?day|PerDay/i.test(body)) throw new OverBudget('Gemini daily request quota used up')
+    }
     // Gemini is sometimes overloaded for a few minutes: wait it out.
     if ((res.status === 429 || res.status >= 500) && attempt <= 10) {
       await new Promise((r) => setTimeout(r, 10000 * attempt))
