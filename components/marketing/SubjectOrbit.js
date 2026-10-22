@@ -20,7 +20,7 @@ const RINGS = [
   { radius: 20, seconds: 74, subjects: ['arts', 'computing', 'psychology', 'music', 'tok'] },
 ]
 
-export default function SubjectOrbit({ subjects = 33 }) {
+export default function SubjectOrbit({ subjects = 38 }) {
   return (
     <div
       className="relative mx-auto flex max-w-6xl flex-col overflow-hidden rounded-[28px] border md:h-[32rem] md:flex-row md:items-center"

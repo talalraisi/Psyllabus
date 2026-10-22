@@ -24,7 +24,7 @@ export const metadata = {
 const ORDER = ['IB', 'A-Level', 'AP']
 
 const BLURB = {
-  IB: 'Groups 1 to 5 at both levels, with Theory of Knowledge and the Extended Essay alongside them. More courses are on the way.',
+  IB: 'All six groups at both levels, with Theory of Knowledge and the Extended Essay alongside them. More courses are on the way.',
   'A-Level': 'AS and A2 content, split the way the specifications split it.',
   AP: 'Course and exam description units, unit by unit.',
 }
@@ -61,7 +61,7 @@ export default function SubjectsPage() {
             stats={[
               { value: total, label: 'courses, listed in full below' },
               { value: entriesIn('IB'), label: 'entries once levels are counted separately' },
-              { value: 5154, label: 'subtopics mapped from the official IB guides' },
+              { value: 5492, label: 'subtopics mapped from the official IB guides' },
               { value: groupsOf('IB').length, label: 'IB subject groups, with more courses on the way' },
             ]}
           />
