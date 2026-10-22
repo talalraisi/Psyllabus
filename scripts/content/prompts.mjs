@@ -61,9 +61,24 @@ Most questions need none: write exactly "none". Add one only when the question c
   surface: none, horizontal or incline; body: block, ball or point; direction_deg anticlockwise from the positive x axis (0 right, 90 up, 270 down); size 0.3 to 1, in proportion to the forces. Put the angle a question depends on on its force as angle_label, start the normal reaction and friction at the surface with "from":"contact", and add motion when the direction of motion matters.
 Every value the question needs must agree between the stem and the figure, and the answer must never be on the figure. The stem refers to it ("The diagram shows...").`
 
+/**
+ * The language a course is examined in. IB Language A, B and ab initio
+ * papers are written entirely in the language being studied, so their
+ * questions are too.
+ */
+export function languageOf(subject) {
+  const m = /^(\w+) (A:|B\b|ab initio)/.exec(subject)
+  return m ? m[1] : 'English'
+}
+
 export function subjectBlock(subject, group) {
   const g = GROUPS[group]
-  return `SUBJECT: IB ${subject}
+  const language = languageOf(subject)
+  const inLanguage =
+    language !== 'English'
+      ? `\n\nLANGUAGE: write everything (questions, options, extracts, hints, explanations, feedback and markschemes) in ${language}, as the real IB ${subject} papers are.${/ab initio/.test(subject) ? ' This is ab initio: keep the language at beginner level, with short sentences and common vocabulary.' : ''}${/ B\b/.test(subject) ? ' This is Language B: language a learner at this level can read, using the vocabulary of the themes (identities, experiences, human ingenuity, social organization, sharing the planet).' : ''}`
+      : ''
+  return `SUBJECT: IB ${subject}${inLanguage}
 
 FORMATS FOR THIS SUBJECT
 ${g.formats}

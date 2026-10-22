@@ -35,7 +35,7 @@ import crypto from 'node:crypto'
 import { loadEnv, connect } from './db.mjs'
 import { guideSection, hoursIn, mapUnits } from './content/guide.mjs'
 import { groupOf, planCounts, TIER_OF_HEAT, TIERS, HEAT_DIFFICULTY, HEAT_WORDS, HEAT_ORDER } from './content/formats.mjs'
-import { RULES, subjectBlock, slotsFor, questionPrompt, lessonPrompt3, blindPrompt } from './content/prompts.mjs'
+import { RULES, subjectBlock, slotsFor, questionPrompt, lessonPrompt3, blindPrompt, languageOf } from './content/prompts.mjs'
 import { QUESTIONS, LESSON3, BLIND } from './content/schemas.mjs'
 import { checkQuestion, sameValue, readFigure, repairQuestion, readLesson3 } from './content/checks.mjs'
 import { runClaude, claudeParams, askGemini, ledger, RUNS, OverBudget } from './content/models.mjs'
@@ -95,7 +95,8 @@ const claude = (requests, note) =>
     return out
   })
 
-const norm = (s) => String(s ?? '').toLowerCase().replace(/[^a-z0-9.\-]+/g, ' ').trim()
+// Letters in any script count: Arabic and accented answers must compare, and fingerprint, as themselves.
+const norm = (s) => String(s ?? '').normalize('NFC').toLowerCase().replace(/[^\p{L}\p{M}\p{N}.\-]+/gu, ' ').trim()
 
 /* ------------------------------------------------------------------ plan --- */
 
@@ -665,7 +666,7 @@ async function cards() {
           system: ['You write accurate, exam-focused flashcards for IB Diploma students.'],
           user: `Write 12 to 16 flashcards for IB ${COURSE}, ${s.topic}, subtopic "${s.subtopic}".
 ${s.guide ? `\nWHAT THE IB GUIDE SAYS STUDENTS MUST UNDERSTAND:\n${s.guide}\n` : ''}${neighbours.length ? `\nOnly "${s.subtopic}": these neighbours have their own decks: ${neighbours.join('; ')}.\n` : ''}
-Cover ${language ? 'the vocabulary, phrases, grammar points and text-type conventions this subtopic needs, with the target language on the front or back as a learner needs it' : 'the definitions, equations (with what each symbol means and its unit), key facts, processes and distinctions a student must know, in IB wording'}. Front: a question or prompt. Back: the answer, under 40 words. Maths in single dollars ($E_k = \\frac{1}{2}mv^2$). Every card correct and on this subtopic only.`,
+Cover ${language ? `the vocabulary, phrases, grammar points and text-type conventions this subtopic needs, in ${languageOf(COURSE)}${languageOf(COURSE) !== 'English' ? ' (the front may give the English meaning; the answer is in ' + languageOf(COURSE) + ')' : ''}` : 'the definitions, equations (with what each symbol means and its unit), key facts, processes and distinctions a student must know, in IB wording'}. Front: a question or prompt. Back: the answer, under 40 words. Maths in single dollars ($E_k = \\frac{1}{2}mv^2$). Every card correct and on this subtopic only.`,
           schema: DECK,
           maxTokens: 12000,
         }),

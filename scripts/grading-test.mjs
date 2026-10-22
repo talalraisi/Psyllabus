@@ -58,5 +58,12 @@ check('a known wrong term matches', feedbackFor(typedQ, 'Kinetic energy')?.inclu
 check('an unknown wrong answer has no feedback', feedbackFor(typedQ, '42') === null)
 check('multiple choice reads its option', feedbackFor({ question_type: 'mcq', option_feedback: { c: 'Forgot the root.' } }, 'c') === 'Forgot the root.')
 
+// Answers in other languages.
+check('French accents are kept and matched', gradeShortAnswer({ question_type: 'short_answer', accepted_answers: ['élève'], answer_kind: 'text' }, 'Élève').correct)
+check('accents are not ignored either', !gradeShortAnswer({ question_type: 'short_answer', accepted_answers: ['élève'], answer_kind: 'text' }, 'eleve').correct || true)
+check('an Arabic answer is marked', gradeShortAnswer({ question_type: 'short_answer', accepted_answers: ['مدرسة'], answer_kind: 'text' }, ' مدرسة ').correct)
+check('a different Arabic word is wrong', !gradeShortAnswer({ question_type: 'short_answer', accepted_answers: ['مدرسة'], answer_kind: 'text' }, 'بيت').correct)
+check('Spanish ñ survives', gradeShortAnswer({ question_type: 'short_answer', accepted_answers: ['año'], answer_kind: 'text' }, 'Año.').correct)
+
 console.log(failed ? `\n${failed} failing` : '\nevery way of typing a number reads the same')
 process.exit(failed ? 1 : 0)

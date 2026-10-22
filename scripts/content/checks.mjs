@@ -12,7 +12,8 @@
 import { parseNumber } from '../../lib/grading.js'
 import { figureIsUsable } from '../../lib/figures.js'
 
-const norm = (s) => String(s ?? '').toLowerCase().replace(/[^a-z0-9.\-]+/g, ' ').trim()
+// Letters in any script count: Arabic and accented answers must compare, and fingerprint, as themselves.
+const norm = (s) => String(s ?? '').normalize('NFC').toLowerCase().replace(/[^\p{L}\p{M}\p{N}.\-]+/gu, ' ').trim()
 
 /** Significant figures a typed number was written to: "0.280" → 3, "8900" → 2, "8.9 × 10^3" → 2. */
 function sigFigsOf(text) {
