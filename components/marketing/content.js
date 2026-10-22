@@ -4,6 +4,8 @@
  * from what IB students actually complain about in public.
  */
 
+import { coursesIn } from '@/lib/catalogue'
+
 export const HOW_IT_WORKS = [
   {
     step: '01',
@@ -63,7 +65,7 @@ export const WHY = [
 export const FAQ = [
   {
     q: 'What is Project Syllabus?',
-    a: 'A study app for students taking the IB Diploma, A-Levels or AP, made by students for students. It lays out every topic and subtopic of your course, works out which parts you are weak on by testing you, builds your study plan, and gives you Syllabi, an AI tutor that marks drafts and turns your notes into flashcards. Built in Muscat, Oman by an IB Diploma student.',
+    a: 'A study app for students taking the IB Diploma, made by students for students. It lays out every topic and subtopic of your course, works out which parts you are weak on by testing you, builds your study plan, and gives you Syllabi, an AI tutor that marks drafts and turns your notes into flashcards. Built in Muscat, Oman by an IB Diploma student.',
   },
   {
     q: 'How is it different from a revision app or flashcards?',
@@ -79,7 +81,7 @@ export const FAQ = [
   },
   {
     q: 'Which subjects are covered?',
-    a: 'The syllabus is mapped for IB, A-Level and AP across 128 courses: 46 IB, 44 A-Level and 38 AP, listed in full on the Subjects page. Question coverage is still being built and is deeper in some subjects than others, which the app tells you rather than hides.',
+    a: `The syllabus is mapped for the IB Diploma across ${coursesIn('IB')} courses, listed in full on the Subjects page, with A-Levels and AP to follow. Question coverage is still being built and is deeper in some subjects than others, which the app tells you rather than hides.`,
   },
   {
     q: 'How do school codes work, and what stops one leaking?',

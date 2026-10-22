@@ -8,16 +8,16 @@ import { HOW_IT_WORKS, FEATURES, WHY, ANSWERS } from '@/components/marketing/con
 import { Heatmap, DecayDemo, PlanDemo } from '@/components/marketing/interactive'
 import { Reveal, ScrollBar, CountUp } from '@/components/marketing/scroll'
 import SiteNav from '@/components/marketing/SiteNav'
-import WordRotate from '@/components/marketing/WordRotate'
 import { FeatureModules } from '@/components/marketing/features'
 import FloatingSubjects, { FloatingSubjectsRow } from '@/components/marketing/FloatingSubjects'
+import { coursesIn } from '@/lib/catalogue'
 import SubjectOrbit from '@/components/marketing/SubjectOrbit'
 import Everything from '@/components/marketing/Everything'
 
 export const metadata = {
   title: 'Project Syllabus',
   description:
-    'Project Syllabus maps your IB, A-Level or AP course topic by topic, tests what you know, plans what to study, and gives you Syllabi, an AI tutor that marks your drafts and turns your notes into flashcards.',
+    'Project Syllabus maps your IB Diploma course topic by topic, tests what you know, plans what to study, and gives you Syllabi, an AI tutor that marks your drafts and turns your notes into flashcards.',
 }
 
 /**
@@ -133,11 +133,10 @@ export default async function Home() {
               <span style={{ color: 'var(--brand)' }}>Start progressing.</span>
             </h1>
 
-            {/* One curriculum at a time, so the line speaks to one reader:
-                components/marketing/WordRotate. */}
+            {/* The IB for now: A-Levels and AP come back once their content is built. */}
             <p className="mt-6 text-[clamp(1.4rem,3.2vw,2.1rem)] font-semibold leading-tight tracking-[-0.028em]">
               <span style={{ color: 'var(--text-muted)' }}>For students of </span>
-              <WordRotate words={['IBDP', 'A-Levels', 'AP']} duration={2200} style={{ color: 'var(--brand)' }} />
+              <span style={{ color: 'var(--brand)' }}>the IB Diploma</span>
             </p>
 
             <p
@@ -394,7 +393,7 @@ export default async function Home() {
         {/* The close: every subject in one orbit, with the way in. */}
         <section className="px-5 py-16 md:px-8 md:py-24">
           <Reveal>
-            <SubjectOrbit subjects={counts?.subjects ?? 173} />
+            <SubjectOrbit subjects={coursesIn('IB')} />
           </Reveal>
         </section>
 

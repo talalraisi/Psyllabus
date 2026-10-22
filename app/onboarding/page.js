@@ -27,7 +27,8 @@ const GRAD_YEARS = ['2027', '2028', '2029', '2030']
 
 export default function Onboarding() {
   const [step, setStep] = useState(1)
-  const [curriculum, setCurriculum] = useState('')
+  // With one curriculum offered there is nothing to choose, so it starts chosen.
+  const [curriculum, setCurriculum] = useState(() => (Object.keys(CURRICULUMS).length === 1 ? Object.keys(CURRICULUMS)[0] : ''))
   const [gradYear, setGradYear] = useState('')
   const [selectedSubjects, setSelectedSubjects] = useState([])
   const [targetGrades, setTargetGrades] = useState({})
@@ -461,12 +462,13 @@ export default function Onboarding() {
               Tell us about your curriculum so we can map your exact syllabus.
             </p>
 
+            {Object.keys(CURRICULUMS).length > 1 && (
             <div className="mb-6">
               <p className="label" id="curriculum-label">
                 Which curriculum are you studying?
               </p>
               <div className="grid grid-cols-3 gap-3" role="group" aria-labelledby="curriculum-label">
-                {['IB', 'AP', 'A-Level'].map(c => (
+                {Object.keys(CURRICULUMS).map(c => (
                   <button key={c} aria-pressed={curriculum === c} onClick={() => {
                     setCurriculum(c)
                     setSelectedSubjects([])
@@ -479,6 +481,7 @@ export default function Onboarding() {
                 ))}
               </div>
             </div>
+            )}
 
             <div className="mb-8">
               <p className="label" id="gradyear-label">

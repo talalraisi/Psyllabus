@@ -7,7 +7,7 @@ import { IconArrowRight } from '@/components/Icons'
 export const metadata = {
   title: 'Subjects',
   description:
-    'Every IB Diploma, A-Level and AP course Project Syllabus has mapped, listed in full, with the levels each one is offered at.',
+    'Every IB Diploma course Project Syllabus covers, listed in full, with the levels each one is offered at.',
 }
 
 /**
@@ -24,7 +24,7 @@ export const metadata = {
 const ORDER = ['IB', 'A-Level', 'AP']
 
 const BLURB = {
-  IB: 'Every group, both levels, with Theory of Knowledge and the Extended Essay alongside them.',
+  IB: 'Groups 1 to 5 at both levels, with Theory of Knowledge and the Extended Essay alongside them. More courses are on the way.',
   'A-Level': 'AS and A2 content, split the way the specifications split it.',
   AP: 'Course and exam description units, unit by unit.',
 }
@@ -52,8 +52,6 @@ export default function SubjectsPage() {
           <CoverageBar
             parts={[
               { label: 'IB', value: coursesIn('IB'), tone: 'var(--status-mastered)' },
-              { label: 'A-Level', value: coursesIn('A-Level'), tone: 'var(--status-proficient)' },
-              { label: 'AP', value: coursesIn('AP'), tone: 'var(--status-developing)' },
             ]}
           />
         </div>
@@ -62,9 +60,9 @@ export default function SubjectsPage() {
           <StatRow
             stats={[
               { value: total, label: 'courses, listed in full below' },
-              { value: entriesIn('IB') + entriesIn('A-Level') + entriesIn('AP'), label: 'entries once levels are counted separately' },
-              { value: 6583, label: 'subtopics mapped from official outlines' },
-              { value: 3, label: 'curricula, with more asked for than built' },
+              { value: entriesIn('IB'), label: 'entries once levels are counted separately' },
+              { value: 5154, label: 'subtopics mapped from the official IB guides' },
+              { value: groupsOf('IB').length, label: 'IB subject groups, with more courses on the way' },
             ]}
           />
         </div>

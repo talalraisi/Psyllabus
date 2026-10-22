@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og'
 
-export const alt = 'Project Syllabus: syllabus tracking for IB, A-Level and AP'
+export const alt = 'Project Syllabus: syllabus tracking for the IB Diploma'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
@@ -53,7 +53,7 @@ export default function OpengraphImage() {
             Know exactly what to study next.
           </div>
           <div style={{ fontSize: 30, color: '#635c4a', marginTop: 24, maxWidth: 860 }}>
-            Syllabus-mapped progress for IB, A-Level, and AP. Verified by testing, not
+            Syllabus-mapped progress for the IB Diploma. Verified by testing, not
             self-rating.
           </div>
         </div>

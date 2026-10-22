@@ -20,7 +20,7 @@ const RINGS = [
   { radius: 20, seconds: 74, subjects: ['arts', 'computing', 'psychology', 'music', 'tok'] },
 ]
 
-export default function SubjectOrbit({ subjects = 173 }) {
+export default function SubjectOrbit({ subjects = 33 }) {
   return (
     <div
       className="relative mx-auto flex max-w-6xl flex-col overflow-hidden rounded-[28px] border md:h-[32rem] md:flex-row md:items-center"
@@ -36,7 +36,7 @@ export default function SubjectOrbit({ subjects = 173 }) {
           <span style={{ color: 'var(--brand)' }}>in one orbit.</span>
         </h2>
         <p className="mt-5 max-w-md text-[15.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-          {subjects} subjects across the IB, A-Levels and AP. Sciences, maths, languages, humanities and
+          {subjects} IB Diploma courses. Sciences, maths, languages, humanities and
           the arts, each broken into the subtopics your exam is written from.
         </p>
         <div className="mt-8 flex flex-wrap items-center gap-3">

@@ -25,7 +25,7 @@ const DOES_NOT = [
 ]
 
 export default function SchoolsPage() {
-  const total = ['IB', 'A-Level', 'AP'].reduce((n, id) => n + coursesIn(id), 0)
+  const total = coursesIn('IB')
   return (
     <PageShell>
       <PageHead
@@ -128,7 +128,7 @@ export default function SchoolsPage() {
               {total} courses
             </p>
             <p className="mt-3 max-w-md text-[14.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              Across IB, A-Level and AP, mapped topic by topic from the official outlines. The whole
+              Every IB course we cover, mapped topic by topic from the official IB guides. The whole
               year group gets the full product, not a stripped-down school tier.
             </p>
             <Link href="/subjects" className="btn btn-outline control-md mt-6">
@@ -138,8 +138,6 @@ export default function SchoolsPage() {
           <CoverageBar
             parts={[
               { label: 'IB', value: coursesIn('IB'), tone: 'var(--status-mastered)' },
-              { label: 'A-Level', value: coursesIn('A-Level'), tone: 'var(--status-proficient)' },
-              { label: 'AP', value: coursesIn('AP'), tone: 'var(--status-developing)' },
             ]}
           />
         </div>

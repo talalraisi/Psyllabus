@@ -45,14 +45,14 @@ export const metadata = {
     statusBarStyle: 'default',
   },
   description:
-    'Project Syllabus tracks your IB, A-Level or AP syllabus topic by topic, shows you where you are weak, and tells you what to study today.',
-  keywords: ['IB', 'A-Level', 'AP', 'syllabus', 'study planner', 'exam prep'],
+    'Project Syllabus tracks your IB Diploma syllabus topic by topic, shows you where you are weak, and tells you what to study today.',
+  keywords: ['IB', 'IB Diploma', 'syllabus', 'study planner', 'exam prep'],
   authors: [{ name: 'Talal Al-Raisi' }],
   metadataBase: new URL('https://www.psyllabus.app'),
   openGraph: {
     title: 'Project Syllabus',
     description:
-      'Syllabus tracking for IB, A-Level and AP students. Where you stand is set by testing, not by how confident you feel.',
+      'Syllabus tracking for IB Diploma students. Where you stand is set by testing, not by how confident you feel.',
     siteName: 'Project Syllabus',
     locale: 'en_GB',
     type: 'website',
@@ -62,7 +62,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'Project Syllabus',
     description:
-      'Syllabus tracking for IB, A-Level and AP students.',
+      'Syllabus tracking for IB Diploma students.',
   },
 }
 
@@ -76,7 +76,7 @@ const organisationSchema = {
   url: 'https://www.psyllabus.app',
   logo: 'https://www.psyllabus.app/icon-512.png',
   description:
-    'Syllabus tracking for IB, A-Level and AP students. Where you stand is set by testing, not by how confident you feel.',
+    'Syllabus tracking for IB Diploma students. Where you stand is set by testing, not by how confident you feel.',
   foundingLocation: { '@type': 'Place', name: 'Muscat, Oman' },
 }
 

@@ -114,8 +114,8 @@ export default function AboutPage() {
         <div className="mt-10">
           <StatRow
             stats={[
-              { value: 6583, label: 'IB subtopics mapped, across all six groups and the core' },
-              { value: coursesIn('IB') + coursesIn('A-Level') + coursesIn('AP'), label: 'courses mapped across three curricula' },
+              { value: 5154, label: 'IB subtopics mapped, from the official subject guides' },
+              { value: coursesIn('IB'), label: 'IB courses, each at SL and HL where offered' },
               { value: 8, label: 'features working today, from decay to the predicted grade' },
               { value: 1, suffix: ' person', label: 'building it, in Muscat, between lessons' },
             ]}
