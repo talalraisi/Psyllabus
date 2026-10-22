@@ -1,0 +1,682 @@
+{
+ "id": "preview",
+ "subject": "Economics HL",
+ "paper": "p2",
+ "version": 1,
+ "name": "Paper 2 – Data response paper",
+ "minutes": 105,
+ "marks": 40,
+ "content": {
+  "instructions": "Answer one question from a choice of two.",
+  "calculator": "yes",
+  "skipped": [],
+  "sections": [
+   {
+    "name": "Paper 2",
+    "instructions": "Answer one question from a choice of two.",
+    "answer": 1,
+    "from": 2,
+    "marks": 40,
+    "marking": "analytic_and_markbands",
+    "questions": [
+     {
+      "number": "1",
+      "title": "Taxing sugary drinks",
+      "stimulus": "In January 2022 the government of a middle-income country introduced an indirect tax of USD 0.20 per litre on sugary drinks. The tax is collected from producers. Health economists estimate that treating diseases linked to excess sugar consumption, such as type 2 diabetes, costs the public health service USD 2.1 billion a year. Much of this is paid for by taxpayers who do not consume the drinks. The government announced that the tax revenue would fund free school meals.\n\nAlongside the tax, supermarkets were required to place water and unsweetened drinks at eye level and to print front-of-pack warning labels on sugary drinks.\n\nA health minister said: 'The tax is working. The adult obesity rate fell from 24.0% in 2021 to 23.5% in 2023.' A spokesperson for a consumer group argued: 'The government should abolish the tax because it hurts poorer households the most.' The country's largest drinks producer reduced the sugar content of its leading brand and increased its advertising spending to protect sales.\n\nThe prices in the table are the average prices paid by consumers, including the tax. All figures are invented for this question.",
+      "figure": {
+       "kind": "table",
+       "alt": "Sugary drinks market data 2021 to 2023",
+       "columns": [
+        "Year",
+        "Average consumer price per litre (USD)",
+        "Quantity sold (million litres)",
+        "Adult obesity rate (%)"
+       ],
+       "rows": [
+        [
+         "2021",
+         "1.00",
+         "800",
+         "24.0"
+        ],
+        [
+         "2022",
+         "1.15",
+         "728",
+         "23.8"
+        ],
+        [
+         "2023",
+         "1.18",
+         "712",
+         "23.5"
+        ]
+       ]
+      },
+      "parts": [
+       {
+        "label": "a(i)",
+        "marks": 2,
+        "command_term": "Calculate",
+        "prompt": "Using the data in the table, calculate the price elasticity of demand (PED) for sugary drinks between 2021 and 2022. Show your working.",
+        "type": "numeric",
+        "options": [],
+        "correct_answer": "",
+        "accepted_answers": [
+         "-0.6",
+         "−0.6",
+         "-0.60"
+        ],
+        "markscheme": {
+         "points": [
+          {
+           "point": "Percentage change in price = (1.15 - 1.00)/1.00 x 100 = +15% and percentage change in quantity = (728 - 800)/800 x 100 = -9% (both needed).",
+           "marks": 1
+          },
+          {
+           "point": "PED = -9% / 15% = -0.6 (accept 0.6 if the sign is explained).",
+           "marks": 1
+          }
+         ],
+         "markbands": "",
+         "indicative_content": [],
+         "guidance": "Award 2 marks for the correct answer with or without working. Award 1 mark for a correct method with one arithmetic slip (own figure rule)."
+        }
+       },
+       {
+        "label": "a(ii)",
+        "marks": 2,
+        "command_term": "Explain",
+        "prompt": "Explain what your answer to part (a)(i) suggests about the responsiveness of the quantity of sugary drinks demanded to a change in price.",
+        "type": "written",
+        "options": [],
+        "correct_answer": "",
+        "accepted_answers": [],
+        "markscheme": {
+         "points": [
+          {
+           "point": "A PED of -0.6 (between 0 and -1) means demand is price inelastic.",
+           "marks": 1
+          },
+          {
+           "point": "The quantity demanded falls by 0.6% for each 1% rise in price, which is a less than proportionate fall. A price rise therefore reduces consumption only slightly, and total consumer spending rises.",
+           "marks": 1
+          }
+         ],
+         "markbands": "",
+         "indicative_content": [
+          "Inelastic demand",
+          "Less than proportionate response",
+          "Link to effectiveness of the tax or to revenue"
+         ],
+         "guidance": "Do not award the second mark for a statement of 'inelastic' repeated. The interpretation must be quantified or linked to the context."
+        }
+       },
+       {
+        "label": "b(i)",
+        "marks": 2,
+        "command_term": "Calculate",
+        "prompt": "Calculate the tax revenue received by the government from the sugary drinks tax in 2022. Give your answer in USD million.",
+        "type": "numeric",
+        "options": [],
+        "correct_answer": "",
+        "accepted_answers": [
+         "145.6"
+        ],
+        "markscheme": {
+         "points": [
+          {
+           "point": "Revenue = tax per litre x quantity sold = 0.20 x 728 million.",
+           "marks": 1
+          },
+          {
+           "point": "= USD 145.6 million.",
+           "marks": 1
+          }
+         ],
+         "markbands": "",
+         "indicative_content": [],
+         "guidance": "Award 2 marks for the correct answer. Award 1 mark for use of a wrong quantity, such as 800 or 712, with the correct method."
+        }
+       },
+       {
+        "label": "b(ii)",
+        "marks": 3,
+        "command_term": "Calculate",
+        "prompt": "Calculate the amount of the tax revenue in 2022 that was borne by producers rather than by consumers. Give your answer in USD million and show your working.",
+        "type": "numeric",
+        "options": [],
+        "correct_answer": "",
+        "accepted_answers": [
+         "36.4"
+        ],
+        "markscheme": {
+         "points": [
+          {
+           "point": "Consumers' share of the tax = rise in consumer price = 1.15 - 1.00 = USD 0.15 per litre.",
+           "marks": 1
+          },
+          {
+           "point": "Producers' share = 0.20 - 0.15 = USD 0.05 per litre.",
+           "marks": 1
+          },
+          {
+           "point": "0.05 x 728 million = USD 36.4 million.",
+           "marks": 1
+          }
+         ],
+         "markbands": "",
+         "indicative_content": [],
+         "guidance": "Award 3 marks for the correct answer. Accept the alternative route: 145.6 - (0.15 x 728 = 109.2) = 36.4."
+        }
+       },
+       {
+        "label": "c",
+        "marks": 4,
+        "command_term": "Explain",
+        "prompt": "Using a demand and supply diagram, explain how the indirect tax is intended to correct the market failure caused by the consumption of sugary drinks.",
+        "type": "written",
+        "options": [],
+        "correct_answer": "",
+        "accepted_answers": [],
+        "markscheme": {
+         "points": [
+          {
+           "point": "Sugary drinks have a negative externality of consumption, because the marginal social benefit (MSB) is below the marginal private benefit (MPB, the demand curve). Consumers ignore the external health costs borne by third parties and taxpayers.",
+           "marks": 1
+          },
+          {
+           "point": "In the free market, output is at Qm where MPB = MPC. This is above the socially optimal quantity Qopt where MSB = MPC, so there is overconsumption and a welfare loss.",
+           "marks": 1
+          },
+          {
+           "point": "The tax raises producers' costs, shifting supply (MPC) to the left or upwards by the amount of the tax. The price rises and quantity falls towards Qopt, reducing the welfare loss.",
+           "marks": 1
+          },
+          {
+           "point": "A correctly drawn and labelled diagram: axes, D = MPB, MSB, S = MPC, S + tax, Qm and Qopt.",
+           "marks": 1
+          }
+         ],
+         "markbands": "",
+         "indicative_content": [
+          "Negative externality of consumption",
+          "Overconsumption at Qm",
+          "Tax shifts supply, Q falls to Qopt",
+          "Welfare loss reduced"
+         ],
+         "guidance": "A diagram is required for full marks. Award a maximum of 3 marks if no diagram is given. Accept an explanation that uses an MSC curve if the externality is clearly identified as one of consumption."
+        }
+       },
+       {
+        "label": "d",
+        "marks": 4,
+        "command_term": "Distinguish",
+        "prompt": "Distinguish between positive and normative statements, using one statement from the text as an example of each: 'The adult obesity rate fell from 24.0% in 2021 to 23.5% in 2023.' and 'The government should abolish the tax because it hurts poorer households the most.'",
+        "type": "written",
+        "options": [],
+        "correct_answer": "",
+        "accepted_answers": [],
+        "markscheme": {
+         "points": [
+          {
+           "point": "Positive statements are objective statements of fact that can be tested against evidence and shown to be true or false.",
+           "marks": 1
+          },
+          {
+           "point": "Normative statements are subjective value judgments about what ought to be, and cannot be proved true or false by evidence alone.",
+           "marks": 1
+          },
+          {
+           "point": "Positive example: 'The adult obesity rate fell from 24.0% to 23.5%', which can be checked against data.",
+           "marks": 1
+          },
+          {
+           "point": "Normative example: 'The government should abolish the tax...', which is a value judgment about fairness and what the government ought to do.",
+           "marks": 1
+          }
+         ],
+         "markbands": "",
+         "indicative_content": [],
+         "guidance": "Both examples must be correctly identified and linked to the definitions. If the examples are reversed, award a maximum of 2 marks (definitions only)."
+        }
+       },
+       {
+        "label": "e",
+        "marks": 4,
+        "command_term": "Explain",
+        "prompt": "Explain how the placement of water and unsweetened drinks at eye level in supermarkets could reduce the consumption of sugary drinks.",
+        "type": "written",
+        "options": [],
+        "correct_answer": "",
+        "accepted_answers": [],
+        "markscheme": {
+         "points": [
+          {
+           "point": "This is a nudge, a feature of choice architecture that steers choices in a predictable way without banning options or significantly changing prices.",
+           "marks": 1
+          },
+          {
+           "point": "Consumers often have bounded rationality. They use rules of thumb, make quick decisions and choose the most visible or easiest option rather than comparing all alternatives.",
+           "marks": 1
+          },
+          {
+           "point": "Placing water at eye level makes it more noticeable and convenient, so more consumers pick it instead of sugary drinks.",
+           "marks": 1
+          },
+          {
+           "point": "Demand for sugary drinks falls (shifts left) and consumption moves towards the socially optimal level. Consumer choice is preserved.",
+           "marks": 1
+          }
+         ],
+         "markbands": "",
+         "indicative_content": [
+          "Nudge and choice architecture",
+          "Bounded rationality",
+          "Impact on demand for sugary drinks"
+         ],
+         "guidance": "Award a maximum of 2 marks if the answer does not apply to the supermarket placement."
+        }
+       },
+       {
+        "label": "f",
+        "marks": 4,
+        "command_term": "Explain",
+        "prompt": "Explain two factors that could account for the value of the price elasticity of demand for sugary drinks that you calculated in part (a)(i).",
+        "type": "written",
+        "options": [],
+        "correct_answer": "",
+        "accepted_answers": [],
+        "markscheme": {
+         "points": [
+          {
+           "point": "Habit or addiction: regular consumers find it hard to cut back, so quantity demanded falls less than proportionately when price rises (1 mark for the factor, 1 mark for the link to inelastic demand).",
+           "marks": 2
+          },
+          {
+           "point": "Availability of substitutes (any one of): few close substitutes with the same taste, so consumers do not switch away. Or low proportion of income: at a price of about USD 1 a litre, the drink takes a small share of income, so consumers barely notice a price rise.",
+           "marks": 2
+          },
+          {
+           "point": "Other valid factors, such as time period or the narrowness of the market definition.",
+           "marks": 2
+          }
+         ],
+         "markbands": "",
+         "indicative_content": [
+          "Addictive or habit-forming nature",
+          "Few close substitutes",
+          "Small proportion of income",
+          "Time period"
+         ],
+         "guidance": "Award up to 2 marks for each of two factors. Maximum 4 marks. A factor stated without explanation earns a maximum of 1 mark."
+        }
+       },
+       {
+        "label": "g",
+        "marks": 15,
+        "command_term": "Evaluate",
+        "prompt": "Using information from the text/data and your knowledge of economics, evaluate the effectiveness of indirect taxes and other government policies in correcting the market failure associated with the consumption of sugary drinks.",
+        "type": "written",
+        "options": [],
+        "correct_answer": "",
+        "accepted_answers": [],
+        "markscheme": {
+         "points": [],
+         "markbands": "Band 0 (0 marks): The work does not reach a standard described by the descriptors below.\nBand 1 (1-3): Limited knowledge of relevant concepts, with little or no use of terminology. Little or no application to the text/data. Descriptive or superficial analysis. Evaluation is absent or is only unsupported assertion.\nBand 2 (4-6): Some relevant knowledge and some terminology. Some application to the text/data, though it may be generic. Analysis is partial or contains gaps, and diagrams (if used) may be inaccurate. Evaluation is limited and one-sided or lacks justification.\nBand 3 (7-9): Mostly accurate knowledge and appropriate terminology. Application to the text/data is generally clear. Analysis is logical and mostly well developed, with correct diagrams where relevant. Evaluation is present, with some balance, but it may not be fully justified or supported.\nBand 4 (10-12): Accurate and detailed knowledge with precise terminology. Effective and consistent application to the text/data. Well-developed analysis of more than one policy, supported by correct diagrams. Evaluation is balanced and justified, considering for example short and long run, stakeholders or assumptions.\nBand 5 (13-15): Thorough, precise knowledge. Sustained and insightful application to the context. Highly developed analysis. Evaluation is balanced, well-justified and reaches a supported conclusion on relative effectiveness. The response is well structured and focused throughout.",
+         "indicative_content": [
+          "Indirect tax: shifts supply left, raises price and reduces quantity, correcting overconsumption. Diagram of a negative externality of consumption with tax, welfare loss and Qopt.",
+          "Application of data: price rose from USD 1.00 to 1.15 and quantity fell from 800 to 728 million litres (PED -0.6). The tax raised USD 145.6 million, which can be used for free school meals (opportunity cost, use of revenue). Obesity fell only from 24.0% to 23.5%.",
+          "Evaluation of the tax: inelastic demand limits the fall in consumption. The tax is regressive, so low-income households bear a larger share of income. Producers bear part of the tax (USD 0.05 a litre) and may reformulate products. It is difficult to measure the external cost (USD 2.1 billion) and set the optimal tax. Time lags and other factors affecting obesity.",
+          "Other policies: nudges (eye-level placement, warning labels), which are cheap and preserve choice but have uncertain and limited effects; legislation or advertising bans, which are effective but restrict freedom and are costly to enforce; subsidies on healthy foods or education campaigns, which carry an opportunity cost and take time to work; regulation of sugar content.",
+          "Stakeholders: consumers, low-income households, producers and workers, taxpayers and the health service, government.",
+          "Conclusion: a judgment about whether the tax alone is the most effective, or whether a combination is best, supported by reasoning (for example, the tax is effective in raising revenue but not in cutting consumption when demand is inelastic, so it is best combined with nudges and education)."
+         ],
+         "guidance": "Award marks on the markbands. Evaluation is expected in the form of a supported judgment and not just a list of advantages and disadvantages. Credit relevant diagrams, which are not compulsory but support analysis."
+        }
+       }
+      ]
+     },
+     {
+      "number": "2",
+      "title": "Inflation, depreciation and the current account in an emerging economy",
+      "stimulus": "An emerging economy in Southeast Asia has relied on imports of energy, machinery and consumer goods to support its growth. Since 2021 its currency, the local currency unit (LCU), has weakened against the US dollar (USD). Annual inflation reached 11.1% in 2023. In response, the central bank raised its policy interest rate from 3% in 2021 to 7% in 2023.\n\nThe current account deficit has widened despite the LCU depreciating. Much of the deficit has been financed by foreign borrowing and by the sale of domestic assets to overseas buyers. Economists point out that many of the country's exports are agricultural goods with a low price elasticity of supply, and that firms take time to find new suppliers for imported inputs.\n\nThe government is considering several responses. One is a 15% tariff on imported consumer goods. Others are higher spending on education and infrastructure, and reduced public spending. Business groups warn that the tariff would raise costs for firms, while trade unions fear that tighter policy will cause job losses. Unemployment has risen from 6.5% in 2021 to 8.9% in 2023.\n\nAll figures are invented for this question. The exchange rate is expressed as LCU per 1 USD. The GDP deflator has 2021 as the base year (2021 = 100).",
+      "figure": {
+       "kind": "table",
+       "alt": "Macroeconomic data 2021 to 2023",
+       "columns": [
+        "Year",
+        "Nominal GDP (LCU billion)",
+        "GDP deflator (2021 = 100)",
+        "Exchange rate (LCU per USD)",
+        "Current account balance (% of GDP)",
+        "Policy interest rate (%)",
+        "Unemployment rate (%)"
+       ],
+       "rows": [
+        [
+         "2021",
+         "1200",
+         "100",
+         "20",
+         "-2.0",
+         "3",
+         "6.5"
+        ],
+        [
+         "2022",
+         "1350",
+         "108",
+         "22",
+         "-3.5",
+         "4",
+         "7.2"
+        ],
+        [
+         "2023",
+         "1512",
+         "120",
+         "26",
+         "-4.8",
+         "7",
+         "8.9"
+        ]
+       ]
+      },
+      "parts": [
+       {
+        "label": "a(i)",
+        "marks": 2,
+        "command_term": "Calculate",
+        "prompt": "Using the data in the table, calculate real GDP in 2022 (in LCU billion), using 2021 as the base year.",
+        "type": "numeric",
+        "options": [],
+        "correct_answer": "",
+        "accepted_answers": [
+         "1250",
+         "1,250"
+        ],
+        "markscheme": {
+         "points": [
+          {
+           "point": "Real GDP = (nominal GDP / GDP deflator) x 100 = (1350 / 108) x 100.",
+           "marks": 1
+          },
+          {
+           "point": "= LCU 1250 billion.",
+           "marks": 1
+          }
+         ],
+         "markbands": "",
+         "indicative_content": [],
+         "guidance": "Award 2 marks for the correct answer with or without working."
+        }
+       },
+       {
+        "label": "a(ii)",
+        "marks": 2,
+        "command_term": "Calculate",
+        "prompt": "Calculate the rate of real GDP growth between 2022 and 2023. Give your answer to one decimal place.",
+        "type": "numeric",
+        "options": [],
+        "correct_answer": "",
+        "accepted_answers": [
+         "0.8",
+         "0.8 %"
+        ],
+        "markscheme": {
+         "points": [
+          {
+           "point": "Real GDP in 2023 = (1512 / 120) x 100 = LCU 1260 billion.",
+           "marks": 1
+          },
+          {
+           "point": "Growth = (1260 - 1250) / 1250 x 100 = 0.8%.",
+           "marks": 1
+          }
+         ],
+         "markbands": "",
+         "indicative_content": [],
+         "guidance": "Award 2 marks for the correct answer. Award 1 mark for a correct method with an own figure from part (a)(i)."
+        }
+       },
+       {
+        "label": "b(i)",
+        "marks": 3,
+        "command_term": "Calculate",
+        "prompt": "Calculate the percentage change in the value of the LCU against the USD between 2022 and 2023. Give your answer to one decimal place and show your working.",
+        "type": "numeric",
+        "options": [],
+        "correct_answer": "",
+        "accepted_answers": [
+         "-15.4"
+        ],
+        "markscheme": {
+         "points": [
+          {
+           "point": "In 2022, 1 LCU = 1/22 = USD 0.04545. In 2023, 1 LCU = 1/26 = USD 0.03846.",
+           "marks": 1
+          },
+          {
+           "point": "Change = (0.03846 - 0.04545) / 0.04545 x 100.",
+           "marks": 1
+          },
+          {
+           "point": "= -15.4% (a depreciation of the LCU of 15.4%).",
+           "marks": 1
+          }
+         ],
+         "markbands": "",
+         "indicative_content": [],
+         "guidance": "Award 3 marks for the correct answer with working. Award 2 marks if the answer is correct (accept (22/26 - 1) x 100 = -15.4%). Award 1 mark for calculating the change in the LCU price of a dollar (18.2%) instead of the change in the value of the LCU. Do not penalise a sign error if the word 'depreciation' is used."
+        }
+       },
+       {
+        "label": "b(ii)",
+        "marks": 2,
+        "command_term": "Calculate",
+        "prompt": "A manufacturer imports a machine priced at USD 8000. Calculate the increase in the LCU price of the machine between 2022 and 2023.",
+        "type": "numeric",
+        "options": [],
+        "correct_answer": "",
+        "accepted_answers": [
+         "32000",
+         "32,000",
+         "32000 LCU"
+        ],
+        "markscheme": {
+         "points": [
+          {
+           "point": "2022 price = 8000 x 22 = LCU 176 000 and 2023 price = 8000 x 26 = LCU 208 000.",
+           "marks": 1
+          },
+          {
+           "point": "Increase = LCU 32 000.",
+           "marks": 1
+          }
+         ],
+         "markbands": "",
+         "indicative_content": [],
+         "guidance": "Award 2 marks for the correct answer. Award 1 mark for one correct conversion if the final answer is wrong."
+        }
+       },
+       {
+        "label": "c",
+        "marks": 4,
+        "command_term": "Explain",
+        "prompt": "Using an AD-AS diagram, explain how the depreciation of the LCU could contribute to cost-push inflation in this economy.",
+        "type": "written",
+        "options": [],
+        "correct_answer": "",
+        "accepted_answers": [],
+        "markscheme": {
+         "points": [
+          {
+           "point": "Depreciation makes imports more expensive in LCU terms. The economy relies on imported energy, machinery and other inputs, so firms' costs of production rise.",
+           "marks": 1
+          },
+          {
+           "point": "Short-run aggregate supply (SRAS) shifts to the left (from SRAS1 to SRAS2).",
+           "marks": 1
+          },
+          {
+           "point": "The general price level rises (cost-push inflation) and real GDP falls, with unemployment likely to increase.",
+           "marks": 1
+          },
+          {
+           "point": "Correctly labelled AD-AS diagram: price level and real GDP on the axes, AD, SRAS1 and SRAS2, and the equilibrium points P1/Y1 and P2/Y2.",
+           "marks": 1
+          }
+         ],
+         "markbands": "",
+         "indicative_content": [
+          "Higher imported input costs",
+          "SRAS shifts left",
+          "Price level up and real output down"
+         ],
+         "guidance": "A diagram is required for full marks. Award a maximum of 3 marks without a diagram. Do not credit a shift of AD to the right as cost-push inflation, but allow a brief mention of the demand-pull effect through higher net exports as additional analysis, up to a maximum of 1 mark."
+        }
+       },
+       {
+        "label": "d",
+        "marks": 4,
+        "command_term": "Explain",
+        "prompt": "Explain how the central bank's decision to raise the policy interest rate from 3% to 7% could help to reduce inflation.",
+        "type": "written",
+        "options": [],
+        "correct_answer": "",
+        "accepted_answers": [],
+        "markscheme": {
+         "points": [
+          {
+           "point": "Higher interest rates raise the cost of borrowing and the reward for saving. Consumers reduce borrowing and spending on credit, and firms reduce investment.",
+           "marks": 1
+          },
+          {
+           "point": "Consumption (C) and investment (I) fall, so aggregate demand (AD) falls or shifts to the left.",
+           "marks": 1
+          },
+          {
+           "point": "This reduces demand-pull pressure on the price level (inflation falls), and real GDP growth slows.",
+           "marks": 1
+          },
+          {
+           "point": "Higher interest rates may attract foreign financial inflows. Demand for the LCU rises and the currency appreciates, which lowers the LCU price of imports and reduces cost-push pressure.",
+           "marks": 1
+          }
+         ],
+         "markbands": "",
+         "indicative_content": [
+          "Contractionary monetary policy",
+          "C and I fall, AD shifts left",
+          "Exchange rate channel"
+         ],
+         "guidance": "Award a maximum of 3 marks if no mechanism through to the price level is given."
+        }
+       },
+       {
+        "label": "e",
+        "marks": 4,
+        "command_term": "Explain",
+        "prompt": "With reference to the text, explain why the current account deficit may have widened in the short run despite the depreciation of the LCU.",
+        "type": "written",
+        "options": [],
+        "correct_answer": "",
+        "accepted_answers": [],
+        "markscheme": {
+         "points": [
+          {
+           "point": "In the short run, demand for imports and exports is price inelastic, so the Marshall-Lerner condition (PED exports + PED imports > 1) is not met.",
+           "marks": 1
+          },
+          {
+           "point": "Importers cannot quickly switch suppliers (the text states that firms take time to find new suppliers), and exports have a low price elasticity of supply, so export volumes rise little.",
+           "marks": 1
+          },
+          {
+           "point": "Import volumes fall by a smaller proportion than the rise in the LCU price of imports, so import expenditure rises. Export revenue rises by less than this.",
+           "marks": 1
+          },
+          {
+           "point": "The current account therefore worsens first (the J-curve effect), as the deficit rose from 2.0% to 4.8% of GDP, and may improve later as elasticities rise.",
+           "marks": 1
+          }
+         ],
+         "markbands": "",
+         "indicative_content": [
+          "Marshall-Lerner condition",
+          "J-curve",
+          "Inelastic demand and supply in the short run"
+         ],
+         "guidance": "Award a maximum of 3 marks if there is no reference to the context."
+        }
+       },
+       {
+        "label": "f",
+        "marks": 4,
+        "command_term": "Explain",
+        "prompt": "Explain two possible effects of the 15% tariff on imported consumer goods.",
+        "type": "written",
+        "options": [],
+        "correct_answer": "",
+        "accepted_answers": [],
+        "markscheme": {
+         "points": [
+          {
+           "point": "Consumers: the tariff raises the domestic price of imported consumer goods and reduces the quantity bought. Consumer surplus falls and consumers have less choice (1 mark for the effect, 1 mark for explanation).",
+           "marks": 2
+          },
+          {
+           "point": "Domestic producers: the higher price of imports makes domestic substitutes relatively cheaper. Domestic output and employment rise, and producer surplus increases (1 + 1).",
+           "marks": 2
+          },
+          {
+           "point": "Government revenue: tariff revenue = tariff per unit x quantity imported (1 + 1).",
+           "marks": 2
+          },
+          {
+           "point": "Current account: imports fall, which may reduce the deficit. Or firms that use imported inputs face higher costs (1 + 1).",
+           "marks": 2
+          }
+         ],
+         "markbands": "",
+         "indicative_content": [
+          "Higher price, lower quantity of imports",
+          "Protection of domestic firms",
+          "Tariff revenue",
+          "Welfare loss and retaliation risk"
+         ],
+         "guidance": "Award up to 2 marks for each of two effects. Maximum 4 marks. A diagram is not required, but credit if it is used correctly."
+        }
+       },
+       {
+        "label": "g",
+        "marks": 15,
+        "command_term": "Evaluate",
+        "prompt": "Using information from the text/data and your knowledge of economics, evaluate policies the government could use to reduce the current account deficit.",
+        "type": "written",
+        "options": [],
+        "correct_answer": "",
+        "accepted_answers": [],
+        "markscheme": {
+         "points": [],
+         "markbands": "Band 0 (0 marks): The work does not reach a standard described by the descriptors below.\nBand 1 (1-3): Limited knowledge of relevant concepts, with little or no use of terminology. Little or no application to the text/data. Descriptive or superficial analysis. Evaluation is absent or is only unsupported assertion.\nBand 2 (4-6): Some relevant knowledge and some terminology. Some application to the text/data, though it may be generic. Analysis is partial or contains gaps, and diagrams (if used) may be inaccurate. Evaluation is limited and one-sided or lacks justification.\nBand 3 (7-9): Mostly accurate knowledge and appropriate terminology. Application to the text/data is generally clear. Analysis is logical and mostly well developed, with correct diagrams where relevant. Evaluation is present, with some balance, but it may not be fully justified or supported.\nBand 4 (10-12): Accurate and detailed knowledge with precise terminology. Effective and consistent application to the text/data. Well-developed analysis of more than one policy, supported by correct diagrams. Evaluation is balanced and justified, considering for example short and long run, stakeholders or conflicts between objectives.\nBand 5 (13-15): Thorough, precise knowledge. Sustained and insightful application to the context. Highly developed analysis. Evaluation is balanced, well-justified and reaches a supported conclusion on the relative effectiveness of the policies. The response is well structured and focused throughout.",
+         "indicative_content": [
+          "Expenditure-switching: tariffs or other trade barriers (15% tariff on consumer goods) reduce import volumes and divert demand to domestic goods. Risks include retaliation, higher costs for firms using imported inputs, inefficiency and WTO constraints.",
+          "Expenditure-reducing: contractionary fiscal policy (cut in government spending, higher taxes) and contractionary monetary policy (interest rate rise from 3% to 7%) reduce AD and so import demand. Evaluate: unemployment already rose from 6.5% to 8.9%, growth slowed to 0.8%, and conflicts arise between objectives (inflation and the current account against growth and unemployment). Higher interest rates may attract financial inflows.",
+          "Exchange rate: depreciation lowers export prices and raises import prices, but the J-curve and the Marshall-Lerner condition mean the deficit worsened (from 2.0% to 4.8% of GDP). It may improve over time as elasticities rise, but it also raises cost-push inflation (inflation 11.1%).",
+          "Supply-side policies: spending on education and infrastructure raises productivity and competitiveness and increases export capacity in the long run (an interventionist approach). It is costly, with time lags, and the opportunity cost is high if the budget is cut; its effect depends on the quality of spending.",
+          "Other: the financing of the deficit by borrowing and asset sales is not sustainable, so the financial account matters. Diversify exports away from low-elasticity agricultural goods.",
+          "Evaluation themes: short run against long run, stakeholders (exporters, importers, consumers, workers, government), size of the deficit and the elasticities involved, the likelihood of retaliation.",
+          "A conclusion that judges which policy or combination is likely to be most effective, with reasons (for example, supply-side policies for a sustainable long-run solution, supported by limited short-run measures)."
+         ],
+         "guidance": "Award marks on the markbands. Responses should evaluate more than one policy and use the data. Credit relevant diagrams (tariff diagram, AD-AS, J-curve), which are not compulsory but support analysis."
+        }
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

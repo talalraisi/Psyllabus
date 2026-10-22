@@ -14,6 +14,86 @@ import { figureIsUsable } from '../../lib/figures.js'
 
 const norm = (s) => String(s ?? '').toLowerCase().replace(/[^a-z0-9.\-]+/g, ' ').trim()
 
+/** Significant figures a typed number was written to: "0.280" → 3, "8900" → 2, "8.9 × 10^3" → 2. */
+function sigFigsOf(text) {
+  const t = String(text).replace(/[\u2212]/g, '-').trim().replace(/^[+-]/, '')
+  const sci = /^(\d+)(?:\.(\d+))?\s*[x×*]\s*10/i.exec(t)
+  const digits = sci ? `${sci[1]}${sci[2] ? '.' + sci[2] : ''}` : (/^\d*(?:\.\d+)?/.exec(t)?.[0] || '')
+  if (!digits) return 0
+  if (digits.includes('.')) return digits.replace('.', '').replace(/^0+/, '').length || 1
+  return digits.replace(/^0+/, '').replace(/0+$/, '').length || 1
+}
+
+/**
+ * Is `variant` a correct rounding of the precise value? 0.3 and 0.28 of
+ * 0.280 are; 12 of 11.49 is not, and neither is 8.9 written as "8.9 kN" for
+ * 8 900 N, which reads as 8.9.
+ */
+export function roundsTo(precise, variant, variantText) {
+  if (precise == null || variant == null) return false
+  if (precise === 0 || variant === 0) return precise === variant
+  // The writer may list both signs where the convention allows either (a PED
+  // of -0.6 or 0.6); the size is what has to round.
+  precise = Math.abs(precise)
+  variant = Math.abs(variant)
+  // The variant stands for every value that rounds to it: half a unit in its
+  // last significant figure either way. 1.835 is inside "1.84"; 11.49 is not
+  // inside "12".
+  const sf = Math.max(1, sigFigsOf(variantText))
+  const unit = Math.pow(10, Math.floor(Math.log10(Math.abs(variant))) - sf + 1)
+  return Math.abs(precise - variant) <= (unit / 2) * (1 + 1e-9)
+}
+
+/**
+ * Mend what can be mended without asking a model again, and say what was
+ * changed. A bad accepted variant is dropped rather than failing the whole
+ * question: the correct answer is still there, and rewriting a good question
+ * over a stray "8.9 kN" costs money for nothing.
+ */
+export function repairQuestion(q) {
+  const repairs = []
+  if (q.type === 'short_answer') {
+    const accepted = (q.accepted_answers || []).map((a) => String(a).trim()).filter(Boolean)
+    if (q.answer_kind === 'numeric') {
+      const parsed = accepted.map((a) => ({ a, n: parseNumber(a) })).filter((x) => x.n != null)
+      // The most precise value is the answer; every other form must round to it.
+      const best = parsed.sort((x, y) => sigFigsOf(y.a) - sigFigsOf(x.a))[0]
+      if (best) {
+        const keep = [best.a, ...accepted.filter((a) => a !== best.a && roundsTo(best.n, parseNumber(a), a))]
+        const dropped = accepted.filter((a) => !keep.includes(a))
+        if (dropped.length) repairs.push(`dropped accepted ${dropped.map((d) => `"${d}"`).join(', ')}`)
+        q.accepted_answers = [...new Set(keep)]
+      }
+    } else {
+      const keep = accepted.filter((a) => a.length <= 60 && !/[;]|not accepted/i.test(a))
+      if (keep.length !== accepted.length) repairs.push('dropped notes from the accepted answers')
+      q.accepted_answers = keep
+    }
+    const right = q.accepted_answers || []
+    const wrong = (q.wrong_answers || []).filter((w) => {
+      const n = parseNumber(w.answer)
+      return q.answer_kind === 'numeric' ? !right.some((a) => roundsTo(parseNumber(right[0]), n, w.answer) || sameValue(n, parseNumber(a))) : !right.some((a) => norm(a) === norm(w.answer))
+    })
+    if (wrong.length !== (q.wrong_answers || []).length) repairs.push('dropped a "wrong" answer that is right')
+    q.wrong_answers = wrong
+  }
+  if (q.type === 'mcq') {
+    q.marks = 1
+    const ms = q.markscheme
+    if (ms?.points?.length > 1) {
+      q.markscheme = { ...ms, points: [{ point: `${q.correct_answer?.toUpperCase()}. ${ms.points.map((p) => p.point).join('; ')}`, marks: 1 }] }
+      repairs.push('folded a multi-point markscheme into the one mark')
+    }
+    for (const o of q.options || []) {
+      if (o.id === q.correct_answer && String(o.why_wrong || '').trim()) {
+        o.why_wrong = ''
+        repairs.push('cleared feedback on the correct option')
+      }
+    }
+  }
+  return repairs
+}
+
 /** Two numbers that are the same answer written to different precision. */
 export function sameValue(a, b) {
   if (a == null || b == null) return false
@@ -83,7 +163,8 @@ export function checkQuestion(q, slot) {
   const ms = q.markscheme
   const msMarks = (ms?.points || []).reduce((a, p) => a + (p.marks || 0), 0)
   if (!ms?.command_term || !ms.points?.length) problems.push('no markscheme')
-  else if (msMarks !== q.marks) problems.push(`markscheme gives ${msMarks} marks for a ${q.marks}-mark question`)
+  // More points than marks is how IB writes "any two of"; fewer is a gap.
+  else if (msMarks < q.marks) problems.push(`markscheme gives ${msMarks} marks for a ${q.marks}-mark question`)
 
   if (q.type === 'mcq') {
     const ids = (q.options || []).map((o) => o.id)
@@ -110,7 +191,7 @@ export function checkQuestion(q, slot) {
       if (first == null) problems.push(`first accepted answer "${accepted[0]}" is not a number`)
       for (const a of accepted.slice(1)) {
         const n = parseNumber(a)
-        if (n == null || !sameValue(n, first)) problems.push(`accepted answer "${a}" is a different value from "${accepted[0]}"`)
+        if (n == null || !roundsTo(first, n, a)) problems.push(`accepted answer "${a}" is a different value from "${accepted[0]}"`)
       }
       if (first != null && Math.abs(first) >= 10 && new RegExp(`(^|[^\\d.])${String(accepted[0]).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([^\\d]|$)`).test(q.hint || '')) {
         problems.push('hint contains the answer')
@@ -157,14 +238,25 @@ export function checkLesson(l) {
   const problems = []
   const sections = l.sections || []
   if (sections.length < 3 || sections.length > 5) problems.push(`${sections.length} sections (3-5 wanted)`)
+  const REFERS = /\b(the|this|that) (table|graph|diagram|figure|circuit|chart)\b|\bshown (below|above)\b/i
   sections.forEach((s, i) => {
     if (String(s.body || '').split(/\s+/).length < 40) problems.push(`section ${i + 1} too short`)
     problems.push(...checkCheck(s.check, `section ${i + 1} check`))
-    problems.push(...checkFigure(s.figure, `${s.heading} ${s.body}`).map((p) => `section ${i + 1}: ${p}`))
+    const { figure, error } = readFigure(s.figure)
+    if (error) problems.push(`section ${i + 1}: ${error}`)
+    else if (figure.kind !== 'none') {
+      // A lesson's figure illustrates the section; it need not be named in the text.
+      problems.push(...checkFigure(figure, 'the figure').map((p) => `section ${i + 1}: ${p}`))
+    } else if (REFERS.test(`${s.body} ${s.check?.stem}`)) {
+      problems.push(`section ${i + 1} refers to a table, graph or diagram that is not there`)
+    }
   })
   const outcomes = l.outcomes || []
   if (outcomes.length < 3 || outcomes.length > 5) problems.push(`${outcomes.length} outcomes (3-5 wanted)`)
-  outcomes.forEach((o, i) => problems.push(...checkCheck(o.check, `outcome ${i + 1}`)))
+  outcomes.forEach((o, i) => {
+    problems.push(...checkCheck(o.check, `outcome ${i + 1}`))
+    if (REFERS.test(o.check?.stem || '')) problems.push(`outcome ${i + 1} check refers to a figure it does not have`)
+  })
   if (!l.worked_example?.steps?.length) problems.push('no worked example')
   const cards = l.cards || []
   if (cards.length < 10) problems.push(`only ${cards.length} flashcards`)

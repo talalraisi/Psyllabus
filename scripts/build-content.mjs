@@ -37,7 +37,7 @@ import { guideSection, hoursIn } from './content/guide.mjs'
 import { groupOf, planCounts, TIER_OF_HEAT, TIERS, HEAT_DIFFICULTY, HEAT_WORDS, HEAT_ORDER } from './content/formats.mjs'
 import { RULES, subjectBlock, slotsFor, questionPrompt, lessonPrompt, blindPrompt } from './content/prompts.mjs'
 import { QUESTIONS, LESSON, BLIND } from './content/schemas.mjs'
-import { checkQuestion, checkLesson, sameValue, readFigure } from './content/checks.mjs'
+import { checkQuestion, checkLesson, sameValue, readFigure, repairQuestion } from './content/checks.mjs'
 import { runClaude, claudeParams, askGemini, ledger, RUNS, OverBudget } from './content/models.mjs'
 import { parseNumber } from '../lib/grading.js'
 import { checkWritten } from '../lib/flashcard-modes.js'
@@ -183,13 +183,16 @@ function take(results, requests, round) {
     const got = new Map((res?.data?.questions || []).map((q) => [q.slot, q]))
     for (const sl of numbered) {
       const q = got.get(sl.slot)
+      // Mend what is safe to mend first, so one stray accepted variant does
+      // not send a good question back to be rewritten.
+      const repairs = q ? repairQuestion(q) : []
       const problems = q ? checkQuestion(q, sl) : [res?.error ? `request failed: ${res.error}` : 'not written']
       // Figures arrive as JSON text; from here on they are data.
       if (q) q.figure = readFigure(q.figure).figure || { kind: 'none', alt: '' }
       const key = `${sub}-${sl.id}`
       state.questions = state.questions.filter((x) => x.key !== key)
       if (q) {
-        state.questions.push({ key, sub, tier, slot: sl, q, problems, round, status: problems.length ? 'failed' : 'checked' })
+        state.questions.push({ key, sub, tier, slot: sl, q, problems, repairs, round, status: problems.length ? 'failed' : 'checked' })
       }
       if (problems.length) missing.push({ sub, tier, slot: sl, problems })
     }
@@ -233,6 +236,27 @@ async function questions() {
   log(`  round 2: ${still.length} still failing, dropped`)
 }
 
+/**
+ * Questions dropped by the code checks alone get the repairs and the checks
+ * again. Costs nothing; used when the checks improve after a run has finished.
+ */
+async function repair() {
+  let revived = 0
+  for (const x of state.questions) {
+    if (x.status !== 'failed' || x.ruling || x.audit) continue
+    const repairs = repairQuestion(x.q)
+    const problems = checkQuestion(x.q, x.slot)
+    x.repairs = [...(x.repairs || []), ...repairs]
+    x.problems = problems
+    if (!problems.length) {
+      x.status = 'checked'
+      revived++
+    }
+  }
+  save()
+  log(`repair: ${revived} questions revived; ${state.questions.filter((x) => x.status === 'failed').length} still failing`)
+}
+
 /* ----------------------------------------------------------------- blind --- */
 
 /** The subtopics of the unit a subtopic belongs to: the choices for "which does it test?". */
@@ -243,7 +267,12 @@ function agrees(q, answer) {
   if (!a) return false
   if (q.type === 'mcq') return a.toLowerCase().replace(/[^a-d]/g, '').startsWith(q.correct_answer)
   const accepted = q.accepted_answers || []
-  if (q.answer_kind === 'numeric') return sameValue(parseNumber(a), parseNumber(accepted[0]))
+  if (q.answer_kind === 'numeric') {
+    const n = parseNumber(a)
+    const want = parseNumber(accepted[0])
+    // Same size, other sign: the numbers agree and the sign is a convention.
+    return sameValue(n, want) || (n != null && want != null && sameValue(Math.abs(n), Math.abs(want)))
+  }
   return accepted.some((x) => norm(x) === norm(a)) || checkWritten(a, accepted.join(' / '), q.stem).correct
 }
 
@@ -286,8 +315,8 @@ async function blind() {
       }
       // Which subtopic it really tests. A question about a neighbour moves
       // there rather than being wasted.
-      const home = a?.tests && state.subtopics.findIndex((o) => o.subtopic === a.tests)
-      if (home != null && home >= 0 && home !== x.sub) {
+      const home = a?.tests ? state.subtopics.findIndex((o) => o.subtopic === a.tests) : -1
+      if (Number.isInteger(home) && home >= 0 && home !== x.sub) {
         x.moved = { from: state.subtopics[x.sub].subtopic, to: a.tests }
         x.sub = home
       }
@@ -418,7 +447,8 @@ const LESSON_REVIEW = {
 
 function lessonChecks(lesson) {
   const out = []
-  lesson.sections.forEach((s, i) => out.push({ id: `s${i}`, q: s.check }))
+  // A section's check is read under the section's figure, so it is solved with it.
+  lesson.sections.forEach((s, i) => out.push({ id: `s${i}`, q: { ...s.check, figure: s.figure } }))
   lesson.outcomes.forEach((o, i) => out.push({ id: `o${i}`, q: o.check }))
   return out
 }
@@ -637,7 +667,7 @@ function report() {
     `Per written question: ${['basic', 'middle', 'hard'].map((t) => { const n = qs.filter((x) => x.tier === t).length; return `${t} ${n ? '$' + ((state.spend?.[`write-${t}`] || 0) / n).toFixed(4) : '-'}` }).join(', ')}`,
     '',
     '## Dropped questions and why',
-    ...qs.filter((x) => x.status === 'failed').map((x) => `- [${x.tier}/${x.q?.heat}] ${state.subtopics[x.sub].subtopic}: ${x.ruling || x.problems.join('; ') || x.audit?.problems}`),
+    ...qs.filter((x) => x.status === 'failed').map((x) => `- [${x.tier}/${x.q?.heat}] ${state.subtopics[x.sub]?.subtopic ?? '?'}: ${x.ruling || (x.problems || []).join('; ') || x.audit?.problems}`),
     '',
     '## Audit findings',
     ...qs.filter((x) => x.audit && x.audit.verdict !== 'publish').map((x) => `- ${x.audit.verdict} [${x.tier}/${x.q.heat}] ${x.q.stem.slice(0, 90)}… — ${x.audit.problems}`),
@@ -651,7 +681,7 @@ function report() {
 
 /* ------------------------------------------------------------------- run --- */
 
-const STAGES = { plan, questions, blind, rule, audit, lessons, publish }
+const STAGES = { plan, questions, repair, blind, rule, audit, lessons, publish }
 try {
   if (STAGE === 'all') {
     // Planning again would renumber the slots under work already paid for.

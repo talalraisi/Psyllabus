@@ -17,9 +17,22 @@ import { IconClose, IconClock } from '@/components/Icons'
  * 6 questions, this will take 9 minutes", and a student deserves to know which
  * one they are about to sit.
  */
-export default function PaperPicker({ open, onClose, subject, curriculum, backHref }) {
+/**
+ * The predicted papers for a student's exam year. History runs two courses
+ * side by side (its 2020 and 2028 guides): a student sitting in 2028 or later
+ * sees the papers marked for that year, everyone else the standing ones.
+ */
+export function papersForYear(papers, examYear) {
+  const dated = papers.filter((p) => p.exam_from)
+  if (!dated.length) return papers
+  const theirs = papers.filter((p) => (p.exam_from ? Boolean(examYear) && examYear >= p.exam_from : !(examYear && dated.some((d) => examYear >= d.exam_from))))
+  return theirs.length ? theirs : papers.filter((p) => !p.exam_from)
+}
+
+export default function PaperPicker({ open, onClose, subject, curriculum, backHref, examYear }) {
   const [pool, setPool] = useState(null) // null while loading
   const [hlBySubtopic, setHlBySubtopic] = useState({})
+  const [predicted, setPredicted] = useState([])
   const router = useRouter()
   const supabase = createClient()
 
@@ -29,15 +42,18 @@ export default function PaperPicker({ open, onClose, subject, curriculum, backHr
     setPool(null)
 
     async function load() {
-      const [syllabus, { data: questions }] = await Promise.all([
+      const [syllabus, { data: questions }, { data: written }] = await Promise.all([
         getSyllabus(supabase, [subject]),
         supabase
           .from('questions')
           .select('id, subtopic, question_type, time_budget_seconds, marks')
           .eq('subject', subject)
           .eq('verified', true),
+        // Predicted papers, written in the real format. Only checked ones are readable.
+        supabase.from('exam_papers').select('id, paper, version, exam_from, name, minutes, marks').eq('subject', subject).order('paper').order('version'),
       ])
       if (cancelled) return
+      setPredicted(written || [])
       const hl = {}
       for (const row of syllabus || []) hl[row.subtopic] = !!row.hl_only
       setHlBySubtopic(hl)
@@ -126,6 +142,39 @@ export default function PaperPicker({ open, onClose, subject, curriculum, backHr
             <p className="t-small">Checking what we can field…</p>
           ) : (
             <div className="flex flex-col gap-3">
+              {(() => {
+                const list = papersForYear(predicted, examYear)
+                if (!list.length) return null
+                const byPaper = list.reduce((acc, p) => ((acc[p.paper] ||= []).push(p), acc), {})
+                return (
+                  <>
+                    <p className="t-caption">Predicted papers, written in the real exam&apos;s format with new questions.</p>
+                    {Object.values(byPaper).map((versions) => (
+                      <div key={versions[0].paper} className="rounded-[var(--r-md)] border border-[var(--border-strong)] p-4">
+                        <div className="flex items-baseline justify-between gap-3">
+                          <h3 className="text-sm font-semibold text-[var(--text)]">{versions[0].name}</h3>
+                          <span className="t-caption shrink-0">
+                            {versions[0].minutes} min · {versions[0].marks} marks
+                          </span>
+                        </div>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {versions.map((v) => (
+                            <button
+                              key={v.id}
+                              onClick={() => router.push(`/dashboard/paper/${v.id}?back=${encodeURIComponent(backHref || '')}`)}
+                              className="btn btn-solid control-md"
+                            >
+                              <IconClock width={16} height={16} />
+                              Version {v.version}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                    <p className="t-caption mt-2">Or a practice paper drawn from the question bank:</p>
+                  </>
+                )
+              })()}
               {papers.map((p) => {
                 const a = availability[p.id] || { available: 0, drawn: 0, minutes: 0 }
                 const empty = a.drawn === 0

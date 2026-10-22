@@ -45,7 +45,7 @@ CORRECTNESS
 FEEDBACK (a student sees this the moment they get it wrong)
 - Every wrong option: why_wrong names the specific mistake that produces exactly that option. Recompute it: if the mistake does not give that value, change the option. No vague or invented mistakes, and no option that gives itself away by its units or size.
 - Every typed-answer question: 2 or 3 wrong_answers a student would really type, each produced by a named mistake.
-- accepted_answers holds only the correct value in different forms (2.5, 2.50) or spellings. Never a different value, and never the value in other units (no "60 kJ" for 60000 J).
+- accepted_answers holds only the correct value in different forms (2.5, 2.50) or spellings. Where IB accepts the value with or without its sign (an elasticity, a change described as a fall), list both signs. Never a different value, and never the value in other units (no "60 kJ" for 60000 J).
 - hint: one sentence pointing at the method, never the answer.
 - explanation: the worked solution with the key steps.
 - markscheme on EVERY question, even 1 mark: the command term and one specific point per mark, M1/A1 where that is the convention.
@@ -108,6 +108,7 @@ ${guide ? `WHAT THE IB GUIDE SAYS STUDENTS MUST UNDERSTAND (write to this, and n
 ${neighbours.length ? `\nTHE GUIDE SECTION COVERS A WHOLE UNIT; YOURS IS ONLY "${subtopic}". These neighbouring subtopics have their own questions, so none of them may be the main thing a question tests (a hard question may use one as a single step on the way): ${neighbours.join('; ')}.\n` : ''}
 HEAT, exactly as defined here (a question one level easier than its slot is a failure):
 ${Object.values(HEAT_WORDS).join('\n')}
+Calibration, from reviewing earlier questions: rearranging one equation to find the unknown is Medium, not Low. Two separate calculations whose results are combined are Medium at least. A standard three-step calculation is Hot, not Extremely hot. Extremely hot must combine two parts of the syllabus or need set-up before calculating. Burning needs a genuine trap or insight, not just more steps.
 
 Write exactly ${slots.length} questions, one for each slot below, in this order. Each question's heat must be the heat of its slot: a Low question a revised student gets every time, a Burning question that only the best can do.
 
@@ -126,7 +127,8 @@ The lesson takes about 10 minutes and teaches a student who has not met this bef
 - worked_example: one IB-style problem solved step by step.
 - mistakes: 2-4 common mistakes, each with the fix.
 - key_terms: the terms a student must be able to define.
-- outcomes, "What you should know now": 3-5 statements written as IB command terms ("Calculate...", "Explain why..."), together covering the guide statements that belong to this subtopic, each with one check question that tests exactly that statement.
+- A section's check may use that section's figure. Never refer to a table, graph or diagram that is not given as that section's figure.
+- outcomes, "What you should know now": 3-5 statements written as IB command terms ("Calculate...", "Explain why..."), together covering the guide statements that belong to this subtopic, each with one check question that tests exactly that statement. Outcome checks have no figure, so they must be complete in their own words.
 - cards: 15-30 flashcards covering the key terms, definitions, equations and facts of this subtopic only.
 
 Check questions follow the question rules: correct, exactly one true option, accepted answers only the correct value, feedback that teaches.`

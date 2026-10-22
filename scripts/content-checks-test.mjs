@@ -5,7 +5,7 @@
  *
  *   node scripts/content-checks-test.mjs
  */
-import { checkQuestion, checkLesson, sameValue } from './content/checks.mjs'
+import { checkQuestion, checkLesson, sameValue, repairQuestion, roundsTo } from './content/checks.mjs'
 import { planCounts } from './content/formats.mjs'
 import { slotsFor } from './content/prompts.mjs'
 
@@ -47,7 +47,8 @@ check('rounding variants pass as accepted answers', checkQuestion({ ...typed, ac
 check('"60 kJ" accepted for 60000 J fails', has(checkQuestion({ ...typed, accepted_answers: ['60000', '60 kJ'] }), 'different value'))
 check('multiple choice worth 2 marks fails', has(checkQuestion({ ...mcq, marks: 2, markscheme: ms(2) }), 'always 1'))
 check('missing markscheme fails', has(checkQuestion({ ...typed, markscheme: { command_term: '', points: [], guidance: '' } }), 'no markscheme'))
-check('markscheme marks must add up', has(checkQuestion({ ...typed, markscheme: ms(1) }), 'gives 1 marks for a 2-mark'))
+check('more markscheme points than marks is "any two of"', checkQuestion({ ...typed, markscheme: ms(3) }).length === 0)
+check('markscheme marks must cover the question', has(checkQuestion({ ...typed, markscheme: ms(1) }), 'gives 1 marks for a 2-mark'))
 check('an option with no feedback fails', has(checkQuestion({ ...mcq, options: mcq.options.map((o) => (o.id === 'c' ? { ...o, why_wrong: '' } : o)) }), 'option c has no feedback'))
 check('feedback on the correct option fails', has(checkQuestion({ ...mcq, options: mcq.options.map((o) => (o.id === 'b' ? { ...o, why_wrong: 'Wrong because...' } : o)) }), 'correct option carries'))
 check('two identical options fail', has(checkQuestion({ ...mcq, options: mcq.options.map((o) => (o.id === 'd' ? { ...o, text: '7.0 m s^-1' } : o)) }), 'same thing'))
@@ -56,6 +57,34 @@ check('fewer than 2 wrong typed answers fails', has(checkQuestion({ ...typed, wr
 check('a hint with the answer fails', has(checkQuestion({ ...typed, hint: 'The answer is 60000 J.' }), 'hint contains the answer'))
 check('the wrong heat fails', has(checkQuestion(mcq, { heat: 'burning', type: 'mcq' }), 'slot asked for burning'))
 check('currency inside maths fails', has(checkQuestion({ ...typed, stem: 'A tax of $40$ per unit is imposed. Calculate the revenue.' }), 'currency'))
+
+// ---- repairs: mend what is safe to mend, so a good question is not rewritten
+const fix = (q) => {
+  const copy = JSON.parse(JSON.stringify(q))
+  return { repairs: repairQuestion(copy), q: copy }
+}
+check('rounding is a correct variant', roundsTo(0.28, 0.3, '0.3') && roundsTo(11.49, 11.5, '11.5') && roundsTo(11.49, 11, '11'))
+check('a wrong rounding is not', !roundsTo(11.49, 12, '12'))
+{
+  const r = fix({ ...typed, accepted_answers: ['0.3', '0.28', '0.280'] })
+  check('the most precise value becomes the answer', r.q.accepted_answers[0] === '0.280' && r.q.accepted_answers.length === 3)
+}
+{
+  const r = fix({ ...typed, accepted_answers: ['8.9 × 10^3 N', '8900 N', '8.9 kN', '8880'] })
+  check('a prefixed unit is dropped, not the question', !r.q.accepted_answers.includes('8.9 kN') && checkQuestion(r.q).length === 0)
+}
+{
+  const r = fix({ ...typed, accepted_answers: ['18', '+18', '18.0 m'] })
+  check('a plus sign is the same value', r.q.accepted_answers.length === 3)
+}
+{
+  const r = fix({ ...typed, wrong_answers: [{ answer: '60000', feedback: 'x' }, { answer: '1', feedback: 'y' }, { answer: '2', feedback: 'z' }] })
+  check('a "wrong" answer that is right is dropped', r.q.wrong_answers.length === 2 && checkQuestion(r.q).length === 0)
+}
+{
+  const r = fix({ ...mcq, markscheme: ms(2) })
+  check('a multi-point markscheme on multiple choice folds into one mark', r.q.markscheme.points.length === 1 && checkQuestion(r.q).length === 0)
+}
 
 // ---- figures ------------------------------------------------------------------
 const circuit = { kind: 'circuit', alt: 'A 12 V cell, R1 in series, R2 and R3 in parallel.', source: '12 V', series: [{ type: 'resistor', label: 'R1 = 2.0 Ω' }], parallel: [[{ type: 'resistor', label: 'R2 = 6.0 Ω' }], [{ type: 'resistor', label: 'R3 = 3.0 Ω' }]] }

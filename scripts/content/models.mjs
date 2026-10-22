@@ -141,11 +141,12 @@ export async function runClaude(requests, { direct = false, cap = 60, note = '',
         out[result.custom_id] = { error: r.type === 'errored' ? r.error?.error?.message || r.error?.type || 'errored' : r.type }
         continue
       }
-      dollars += claudeCost(r.message.model, r.message.usage, true)
+      const cost = claudeCost(r.message.model, r.message.usage, true)
+      dollars += cost
       try {
-        out[result.custom_id] = { data: parse(r.message) }
+        out[result.custom_id] = { cost, data: parse(r.message) }
       } catch (e) {
-        out[result.custom_id] = { error: e.message }
+        out[result.custom_id] = { cost, error: e.message }
       }
     }
   }

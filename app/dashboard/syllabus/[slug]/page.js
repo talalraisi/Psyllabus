@@ -351,14 +351,6 @@ export default function SyllabusPage() {
                               >
                                 {STATUS_LABELS[currentStatus]}
                               </span>
-                              <button
-                                onClick={() => setDrawerItem(item)}
-                                className="text-[12.5px] font-medium underline-offset-2 hover:underline"
-                                style={{ color: 'var(--text-muted)' }}
-                                title="Lessons, videos and notes for this subtopic"
-                              >
-                                Resources
-                              </button>
                               {lessonIds[item.subtopic] && (
                                 <Link
                                   href={`/dashboard/lesson/${lessonIds[item.subtopic]}?back=${encodeURIComponent(slugPath)}`}
@@ -397,6 +389,7 @@ export default function SyllabusPage() {
         onClose={() => setPapersOpen(false)}
         subject={subjectName}
         curriculum={profile?.curriculum}
+        examYear={Number(profile?.grad_year) || null}
         backHref={slugPath}
       />
 
