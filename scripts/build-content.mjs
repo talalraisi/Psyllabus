@@ -35,9 +35,9 @@ import crypto from 'node:crypto'
 import { loadEnv, connect } from './db.mjs'
 import { guideSection, hoursIn } from './content/guide.mjs'
 import { groupOf, planCounts, TIER_OF_HEAT, TIERS, HEAT_DIFFICULTY, HEAT_WORDS, HEAT_ORDER } from './content/formats.mjs'
-import { RULES, subjectBlock, slotsFor, questionPrompt, lessonPrompt, blindPrompt } from './content/prompts.mjs'
-import { QUESTIONS, LESSON, BLIND } from './content/schemas.mjs'
-import { checkQuestion, checkLesson, sameValue, readFigure, repairQuestion, repairCheck } from './content/checks.mjs'
+import { RULES, subjectBlock, slotsFor, questionPrompt, lessonPrompt2, blindPrompt } from './content/prompts.mjs'
+import { QUESTIONS, LESSON2, BLIND } from './content/schemas.mjs'
+import { checkQuestion, sameValue, readFigure, repairQuestion, readLesson2 } from './content/checks.mjs'
 import { runClaude, claudeParams, askGemini, ledger, RUNS, OverBudget } from './content/models.mjs'
 import { parseNumber } from '../lib/grading.js'
 import { checkWritten } from '../lib/flashcard-modes.js'
@@ -445,14 +445,25 @@ const LESSON_REVIEW = {
   },
 }
 
-function lessonChecks(lesson) {
-  const out = []
-  // A section's check is read under the section's figure, so it is solved with it.
-  lesson.sections.forEach((s, i) => out.push({ id: `s${i}`, q: { ...s.check, figure: s.figure } }))
-  lesson.outcomes.forEach((o, i) => out.push({ id: `o${i}`, q: o.check }))
-  return out
+/** A lesson interaction as a question the blind solver and agrees() understand. */
+function asQuestion(c, figure) {
+  if (c.kind === 'mcq') return { type: 'mcq', stem: c.prompt, options: c.options.map((o) => ({ id: o.id, text: o.text })), correct_answer: c.answer, figure }
+  if (c.kind === 'truefalse') {
+    return { type: 'mcq', stem: `True or false: ${c.statement}`, options: [{ id: 'a', text: 'True' }, { id: 'b', text: 'False' }], correct_answer: c.answer ? 'a' : 'b', figure }
+  }
+  if (c.kind === 'numeric') return { type: 'short_answer', answer_kind: 'numeric', stem: c.prompt, accepted_answers: c.accepted, answer_hint: c.unit ? `in ${c.unit}` : '', figure }
+  return { type: 'short_answer', answer_kind: 'text', stem: c.prompt, accepted_answers: c.accepted || [], figure }
 }
 
+/** The checks a solver can answer blind: everything but match, order, sort and gap, which the reviewer reads. */
+function lessonChecks(lesson) {
+  const out = []
+  lesson.frames.forEach((f, i) => {
+    if (f.type === 'check' && ['mcq', 'truefalse', 'numeric', 'short'].includes(f.data?.kind)) out.push({ id: `f${i}`, q: asQuestion(f.data, f.figure) })
+  })
+  lesson.outcomes.forEach((o, i) => out.push({ id: `o${i}`, q: asQuestion(o.check, undefined) }))
+  return out
+}
 
 async function reviewLessons(review, round) {
   if (review.length) {
@@ -464,7 +475,7 @@ async function reviewLessons(review, round) {
         params: claudeParams({
           model: 'claude-haiku-5-5',
           system: ['You check IB lessons for accuracy before students see them.'],
-          user: `Guide section:\n${state.subtopics[i].guide || '(not available)'}\n\nLesson:\n${JSON.stringify({ ...l, sections: l.sections.map((s) => ({ heading: s.heading, body: s.body, figure: s.figure?.kind && s.figure.kind !== 'none' ? s.figure : undefined })), outcomes: l.outcomes.map((o) => o.statement), cards: l.cards.map((c, k) => ({ k, ...c })) })}\n\n1. List every factual error in the lesson, anything that contradicts the guide, any section whose main teaching is a different subtopic instead of "${state.subtopics[i].subtopic}", and any reference to a table, graph or diagram that is not given as that section's figure. Standard IB terms and ordinary depth are not errors: do not list something only because the guide does not spell it out.\n2. List the indexes of flashcards whose back is wrong or does not answer the front.\n3. Then solve these check questions independently:\n\n${blindPrompt(lessonChecks(l))}`,
+          user: `Guide section:\n${state.subtopics[i].guide || '(not available)'}\n\nLesson (each frame is one screen; a frame's figure is shown with it):\n${JSON.stringify({ ...l, frames: l.frames.map((f) => ({ ...f, figure: f.figure?.kind !== 'none' ? f.figure : undefined })), outcomes: l.outcomes.map((o) => o.statement), cards: l.cards.map((c, k) => ({ k, ...c })) })}\n\n1. List every factual error in the lesson (including in match, order, sort and gap activities: is every pairing, order and grouping right?), anything that contradicts the guide, any section whose main teaching is a different subtopic instead of "${state.subtopics[i].subtopic}", and any reference to a table, graph or diagram that is not given as that section's figure. Standard IB terms and ordinary depth are not errors: do not list something only because the guide does not spell it out.\n2. List the indexes of flashcards whose back is wrong or does not answer the front.\n3. Then solve these check questions independently:\n\n${blindPrompt(lessonChecks(l))}`,
           schema: LESSON_REVIEW,
           maxTokens: 24000,
         }),
@@ -496,19 +507,22 @@ async function reviewLessons(review, round) {
 async function lessons() {
   state.lessons = state.lessons || {}
   const lessonTier = ['languages', 'arts'].includes(state.group) ? TIERS.basic : TIERS.middle
-  // Lessons that failed only the free checks get the repairs and the checks
-  // again, and go to review if they now pass; only the rest are rewritten.
+  // Lessons in the old format are written again as frames.
+  for (const [i, e] of Object.entries(state.lessons)) if (e.v !== 2) delete state.lessons[i]
+  // Lessons that failed only the free checks get them again (the checks
+  // improve), and go to review if they now pass; only the rest are rewritten.
   const recheck = []
   for (const [i, e] of Object.entries(state.lessons)) {
-    if (e.status !== 'failed' || !e.lesson || e.reviewed) continue
-    for (const c of [...e.lesson.sections.map((x) => x.check), ...e.lesson.outcomes.map((x) => x.check)]) repairCheck(c)
-    e.problems = checkLesson(e.lesson)
+    if (e.status !== 'failed' || !e.raw || e.reviewed) continue
+    const read = readLesson2(e.raw)
+    e.lesson = read.lesson
+    e.problems = read.problems
     if (!e.problems.length) {
       e.status = 'written'
       recheck.push(Number(i))
     }
   }
-  if (recheck.length) log(`lessons: ${recheck.length} pass the checks after repairs; reviewing them`)
+  if (recheck.length) log(`lessons: ${recheck.length} pass the checks now; reviewing them`)
   if (recheck.length) await reviewLessons(recheck, 'r')
 
   for (const round of [1, 2, 3, 4]) {
@@ -526,14 +540,14 @@ async function lessons() {
           effort: lessonTier.effort,
           system: systemFor(),
           user:
-            lessonPrompt({
+            lessonPrompt2({
               subject: COURSE,
               topic: s.topic,
               subtopic: s.subtopic,
               guide: s.guide,
               neighbours: state.subtopics.filter((o) => o !== s && o.code === s.code).map((o) => o.subtopic),
             }) + retry,
-          schema: LESSON,
+          schema: LESSON2,
         }),
       }
     })
@@ -541,18 +555,10 @@ async function lessons() {
     spend('lessons', out)
     for (const r of requests) {
       const data = out[r.custom_id]?.data
-      if (data) for (const c of [...(data.sections || []).map((x) => x.check), ...(data.outcomes || []).map((x) => x.check)]) repairCheck(c)
-      const problems = data ? checkLesson(data) : null
-      if (data) {
-        for (const sec of data.sections || []) {
-          const read = readFigure(sec.figure)
-          if (read.figure) sec.figure = read.figure
-          else sec.figure_raw = sec.figure
-        }
-      }
+      const read = data ? readLesson2(data) : null
       state.lessons[r.meta] = data
-        ? { round, lesson: data, problems, status: 'written' }
-        : { round, problems: [out[r.custom_id]?.error || 'not written'], status: 'failed' }
+        ? { v: 2, round, raw: data, lesson: read.lesson, problems: read.problems, status: 'written' }
+        : { v: 2, round, problems: [out[r.custom_id]?.error || 'not written'], status: 'failed' }
     }
     save()
 
@@ -631,7 +637,9 @@ async function publish() {
   for (const [i, entry] of Object.entries(state.lessons || {})) {
     if (entry.status !== 'passed') continue
     const s = state.subtopics[i]
-    const { outcomes, cards, minutes, ...body } = entry.lesson
+    const { outcomes, cards, overview, hook, frames, key_terms } = entry.lesson
+    const body = { version: 2, hook, overview, frames, key_terms }
+    const minutes = overview?.minutes
     for (const subject of s.courses) {
       await db.query(
         `insert into lessons (subject, topic, subtopic, body, outcomes, minutes, verified, generator)

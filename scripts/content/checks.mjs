@@ -289,3 +289,139 @@ export function checkLesson(l) {
   }
   return problems
 }
+
+/* -------------------------------------------------------- lessons, v2 --- */
+
+function parseJson(text) {
+  if (text && typeof text === 'object') return { value: text }
+  const t = String(text ?? '').trim()
+  if (!t) return { value: {} }
+  const attempts = [t]
+  const a = t.indexOf('{')
+  const b = t.lastIndexOf('}')
+  if (a !== -1 && b > a) attempts.push(t.slice(a, b + 1), t.slice(a, b + 1).replace(/[“”]/g, '"').replace(/,\s*([}\]])/g, '$1'))
+  for (const x of attempts) {
+    try {
+      return { value: JSON.parse(x) }
+    } catch {
+      // next
+    }
+  }
+  return { error: 'not valid JSON' }
+}
+
+const nonEmpty = (s) => String(s ?? '').trim().length > 0
+
+/** One interaction: does it have what the player needs, and is it self-consistent? */
+export function checkInteraction(c, where) {
+  const p = []
+  if (!c || typeof c !== 'object') return [`${where}: no interaction`]
+  if (!nonEmpty(c.wrong)) p.push(`${where}: no feedback for a wrong answer`)
+  switch (c.kind) {
+    case 'mcq': {
+      const ids = (c.options || []).map((o) => o.id)
+      if (ids.length < 3 || ids.length > 4 || new Set(ids).size !== ids.length) p.push(`${where}: multiple choice needs 3 or 4 distinct options`)
+      if (!ids.includes(c.answer)) p.push(`${where}: the answer is not an option`)
+      break
+    }
+    case 'truefalse':
+      if (typeof c.answer !== 'boolean' || !nonEmpty(c.statement)) p.push(`${where}: true/false needs a statement and a true or false answer`)
+      break
+    case 'match': {
+      const pairs = c.pairs || []
+      if (pairs.length < 3 || pairs.length > 5) p.push(`${where}: match needs 3 to 5 pairs`)
+      if (new Set(pairs.map((x) => norm(x.left))).size !== pairs.length || new Set(pairs.map((x) => norm(x.right))).size !== pairs.length) p.push(`${where}: match pairs repeat`)
+      break
+    }
+    case 'order':
+      if ((c.items || []).length < 3 || (c.items || []).length > 6) p.push(`${where}: order needs 3 to 6 items`)
+      break
+    case 'sort': {
+      const groups = c.groups || []
+      const items = groups.flatMap((g) => g.items || [])
+      if (groups.length < 2 || groups.length > 3) p.push(`${where}: sort needs 2 or 3 groups`)
+      if (items.length < 4 || items.length > 9) p.push(`${where}: sort needs 4 to 9 items`)
+      if (new Set(items.map(norm)).size !== items.length) p.push(`${where}: an item is in two groups`)
+      break
+    }
+    case 'gap': {
+      const blanks = (String(c.text || '').match(/___/g) || []).length
+      if (!blanks || blanks !== (c.answers || []).length) p.push(`${where}: gaps and answers do not line up`)
+      for (const a of c.answers || []) if (!(c.bank || []).some((w) => norm(w) === norm(a))) p.push(`${where}: answer "${a}" is not in the word bank`)
+      if ((c.bank || []).length <= (c.answers || []).length) p.push(`${where}: the word bank needs a distractor`)
+      break
+    }
+    case 'numeric': {
+      const first = parseNumber(c.answer ?? c.accepted?.[0])
+      if (first == null) p.push(`${where}: numeric answer missing`)
+      c.accepted = [String(c.answer), ...(c.accepted || [])].filter((a, i, all) => a && all.indexOf(a) === i && roundsTo(first, parseNumber(a), a))
+      break
+    }
+    case 'short':
+      if (!(c.accepted || []).some(nonEmpty)) p.push(`${where}: no accepted answer`)
+      break
+    default:
+      p.push(`${where}: unknown interaction "${c.kind}"`)
+  }
+  return p
+}
+
+const POINTS_AT = /\b(the|this) (table|graph|diagram|figure|circuit|chart) (below|above|opposite|shows|gives|here)\b|\bshown (below|above)\b|\b(in|from|using) the (table|graph|diagram|figure|chart)\b/i
+
+/**
+ * Parse and check a v2 lesson. Returns {lesson, problems}: the lesson with
+ * every frame's data and figure as objects, ready to store and to play.
+ */
+export function readLesson2(raw) {
+  const problems = []
+  const lesson = JSON.parse(JSON.stringify(raw || {}))
+  const frames = lesson.frames || []
+  if (frames.length < 12 || frames.length > 26) problems.push(`${frames.length} frames (14 to 22 wanted)`)
+  frames.forEach((f, i) => {
+    const where = `frame ${i + 1} (${f.type})`
+    const d = parseJson(f.data)
+    if (d.error) problems.push(`${where}: data ${d.error}`)
+    f.data = d.value || {}
+    const fig = readFigure(f.figure)
+    if (fig.error) problems.push(`${where}: ${fig.error}`)
+    f.figure = fig.figure || { kind: 'none', alt: '' }
+    if (f.figure.kind !== 'none') problems.push(...checkFigure(f.figure, 'the figure').map((x) => `${where}: ${x}`))
+    else if (POINTS_AT.test(`${f.text} ${JSON.stringify(f.data)}`)) problems.push(`${where}: refers to a table, graph or diagram it does not have`)
+    if (String(f.text || '').split(/\s+/).length > 90) problems.push(`${where}: too much text for one screen`)
+    const x = f.data
+    if (f.type === 'check') problems.push(...checkInteraction(x, where))
+    if (f.type === 'formula' && (!nonEmpty(x.expression) || !(x.symbols || []).length)) problems.push(`${where}: formula needs an expression and its symbols`)
+    if (f.type === 'example' && !(x.steps || []).length) problems.push(`${where}: example needs steps`)
+    if (f.type === 'mistake' && !(nonEmpty(x.wrong) && nonEmpty(x.right))) problems.push(`${where}: mistake needs wrong and right`)
+    if (f.type === 'reveal' && !(x.items || []).length) problems.push(`${where}: reveal needs items`)
+    if (f.type === 'cards' && ((x.cards || []).length < 2 || (x.cards || []).length > 6)) problems.push(`${where}: cards frame needs 2 to 6 cards`)
+    if (f.type === 'diagram' && f.figure.kind === 'none') problems.push(`${where}: a diagram frame without a figure`)
+  })
+  const types = new Set(frames.map((f) => f.type))
+  for (const t of ['analogy', 'key_point', 'example', 'mistake', 'cards']) if (!types.has(t)) problems.push(`no ${t} frame`)
+  const kinds = new Set(frames.filter((f) => f.type === 'check').map((f) => f.data?.kind))
+  if (kinds.size < 3) problems.push(`checks use ${kinds.size} kind(s); at least 3 wanted`)
+  // Something to do at least every few screens.
+  let gap = 0
+  for (const f of frames) {
+    // Tapping through a formula's symbols or a worked example step by step is doing something too.
+    gap = ['check', 'reveal', 'cards', 'formula', 'example'].includes(f.type) ? 0 : gap + 1
+    if (gap > 4) {
+      problems.push('more than four screens in a row with nothing to do')
+      break
+    }
+  }
+  lesson.outcomes = (lesson.outcomes || []).map((o, i) => {
+    const c = parseJson(o.check)
+    if (c.error) problems.push(`outcome ${i + 1}: check ${c.error}`)
+    const check = c.value || {}
+    problems.push(...checkInteraction(check, `outcome ${i + 1}`))
+    if (!['mcq', 'truefalse', 'numeric', 'short'].includes(check.kind)) problems.push(`outcome ${i + 1}: check must be mcq, truefalse, numeric or short`)
+    if (POINTS_AT.test(JSON.stringify(check))) problems.push(`outcome ${i + 1}: refers to a figure it does not have`)
+    return { statement: o.statement, check }
+  })
+  if (lesson.outcomes.length < 3 || lesson.outcomes.length > 5) problems.push(`${lesson.outcomes.length} outcomes (3 to 5 wanted)`)
+  if ((lesson.cards || []).length < 8) problems.push(`only ${(lesson.cards || []).length} deck flashcards`)
+  for (const c of lesson.cards || []) if (String(c.front).length > 300 || String(c.back).length > 1000) problems.push('a flashcard too long to store')
+  return { lesson, problems }
+}

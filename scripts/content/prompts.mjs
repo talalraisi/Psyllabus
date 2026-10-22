@@ -152,3 +152,45 @@ ${items
   })
   .join('\n\n')}`
 }
+
+/* -------------------------------------------------------- lessons, v2 --- */
+
+const FRAME_SHAPES = `FRAMES, one idea each, 14 to 22 of them. Each has a type, a title, short text (at most 60 words; never a wall of text), optional bullet points (revealed one by one), a figure ("none" or JSON in the figure shapes) and data (JSON for its type, or "{}"):
+- explain: plain teaching, short.
+- key_point: the thing they must remember ("Need to know"). text only.
+- note: a useful side note or exam tip.
+- analogy: "Think of it like..." an everyday comparison that makes it click.
+- diagram: the figure does the teaching; text is its caption. Required whenever the subtopic has a diagram or graph students draw or read.
+- formula: data {"expression":"$E_k = \\\\frac{1}{2}mv^2$","symbols":[{"symbol":"E_k","meaning":"kinetic energy","unit":"J"}]}
+- example: data {"problem":"...","steps":["...","..."],"answer":"..."} — revealed step by step.
+- mistake: data {"wrong":"what students write","right":"what is correct","why":"why the wrong one is wrong"}
+- reveal: predict-then-look. data {"items":[{"prompt":"What happens if...?","answer":"..."}]} (1 to 3 items)
+- cards: data {"cards":[{"front":"...","back":"..."}]} (3 to 5 flip cards on what was just taught)
+- check: data is one interaction, with "right" and "wrong" feedback that teaches:
+  {"kind":"mcq","prompt":"...","options":[{"id":"a","text":"...","why":"why it is wrong, empty if correct"}],"answer":"b","right":"...","wrong":"..."}
+  {"kind":"truefalse","statement":"...","answer":true,"right":"...","wrong":"..."}
+  {"kind":"match","prompt":"Match each ... to ...","pairs":[{"left":"...","right":"..."}],"right":"...","wrong":"..."} (3 to 5 pairs)
+  {"kind":"order","prompt":"Put these steps in order","items":["first","second","third"],"right":"...","wrong":"..."} (3 to 6, given in the correct order)
+  {"kind":"sort","prompt":"Sort these into...","groups":[{"name":"Scalar","items":["speed","mass"]},{"name":"Vector","items":["velocity","force"]}],"right":"...","wrong":"..."} (2 groups, 4 to 8 items)
+  {"kind":"gap","prompt":"Fill the gaps","text":"Displacement is a ___ quantity; distance is a ___ quantity.","answers":["vector","scalar"],"bank":["vector","scalar","derived"],"right":"...","wrong":"..."}
+  {"kind":"numeric","prompt":"...","answer":"9.9","accepted":["9.9","9.90"],"unit":"m s^-1","right":"...","wrong":"..."}
+  {"kind":"short","prompt":"...","accepted":["..."],"right":"...","wrong":"..."}
+
+THE SHAPE OF A GOOD LESSON: explain or analogy first, then alternate teaching frames and checks so the student does something every two or three screens. Use at least one analogy, one key_point, one example, one mistake, one cards frame, and checks of at least three different kinds (not only mcq). Include a formula frame for every equation the subtopic uses, and a diagram frame whenever it has a diagram or graph. Teach to IB standard; keep every frame short.`
+
+export function lessonPrompt2({ subject, topic, subtopic, guide, neighbours = [] }) {
+  return `Write an interactive lesson for IB ${subject}, ${topic}, subtopic "${subtopic}". It is a sequence of short screens a student moves through, not an article.
+
+${guide ? `WHAT THE IB GUIDE SAYS STUDENTS MUST UNDERSTAND:\n${guide}` : 'Keep strictly to what this subtopic covers in the IB course.'}
+${neighbours.length ? `\nTHE GUIDE SECTION COVERS A WHOLE UNIT; THIS LESSON IS ONLY "${subtopic}". Teach only the guide statements that belong to it. These neighbouring subtopics have lessons of their own: ${neighbours.join('; ')}.\n` : ''}
+- hook: one line that makes a student curious.
+- overview: why it matters, and 3 to 5 things they will be able to do.
+
+${FRAME_SHAPES}
+
+- outcomes, "What you should know now": 3 to 5 statements in IB command-term language covering this subtopic's guide statements, each with one check (mcq, truefalse, numeric or short) that tests exactly it and needs no figure.
+- key_terms: the terms they must be able to define.
+- cards: 12 to 20 flashcards for the deck, covering this subtopic only.
+
+Every check is correct, with exactly one right answer where there is one, and feedback that teaches. Never refer to a table, graph or diagram that is not the frame's own figure.`
+}

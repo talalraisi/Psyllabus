@@ -189,3 +189,63 @@ export const BLIND = {
     },
   },
 }
+
+/* -------------------------------------------------------- lessons, v2 --- */
+
+/**
+ * A lesson as frames, one idea a screen. The frame-specific parts travel as
+ * JSON text (data, figure) for the same reason figures do: spelled out as a
+ * schema for every kind of frame, the grammar would be too large to compile.
+ * The shapes are in the prompt and every one is validated in code.
+ */
+export const LESSON2 = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['hook', 'overview', 'frames', 'outcomes', 'key_terms', 'cards'],
+  properties: {
+    hook: { type: 'string', description: 'One line that makes a student want to know this.' },
+    overview: {
+      type: 'object',
+      additionalProperties: false,
+      required: ['why', 'learn', 'minutes'],
+      properties: {
+        why: { type: 'string', description: 'Two sentences: why this matters, in the exam and outside it.' },
+        learn: { type: 'array', items: { type: 'string' }, description: '3 to 5 things the student will be able to do by the end.' },
+        minutes: { type: 'integer' },
+      },
+    },
+    frames: {
+      type: 'array',
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['type', 'title', 'text', 'points', 'figure', 'data'],
+        properties: {
+          type: { type: 'string', enum: ['explain', 'key_point', 'note', 'analogy', 'diagram', 'formula', 'example', 'mistake', 'reveal', 'cards', 'check'] },
+          title: { type: 'string' },
+          text: { type: 'string', description: 'At most 60 words.' },
+          points: { type: 'array', items: { type: 'string' }, description: 'Short bullet lines, revealed one at a time. Empty if none.' },
+          figure: { type: 'string', description: 'A figure as JSON in the shapes given, or "none".' },
+          data: { type: 'string', description: 'JSON for this frame type, as given, or "{}".' },
+        },
+      },
+    },
+    outcomes: {
+      type: 'array',
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['statement', 'check'],
+        properties: { statement: { type: 'string' }, check: { type: 'string', description: 'A check as JSON (mcq, truefalse, numeric or short).' } },
+      },
+    },
+    key_terms: {
+      type: 'array',
+      items: { type: 'object', additionalProperties: false, required: ['term', 'definition'], properties: { term: { type: 'string' }, definition: { type: 'string' } } },
+    },
+    cards: {
+      type: 'array',
+      items: { type: 'object', additionalProperties: false, required: ['front', 'back'], properties: { front: { type: 'string' }, back: { type: 'string' } } },
+    },
+  },
+}
