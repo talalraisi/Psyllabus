@@ -102,6 +102,10 @@ function Syllabi() {
     load()
   }, [router, supabase])
 
+  // Leaving Syllabi forgets the open chat, so coming back starts on a new
+  // one; a refresh never runs this, so it still carries on where it was.
+  useEffect(() => () => remember(null), [])
+
   // Topics in syllabus order, for the topic picker.
   const topicsBySubject = useMemo(() => {
     const out = {}
