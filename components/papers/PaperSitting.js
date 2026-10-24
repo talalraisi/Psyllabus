@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import MathText from '@/components/MathText'
+import CodeText from '@/components/CodeText'
 import QuestionFigure from '@/components/QuestionFigure'
 import { IconCheck, IconClock, IconArrowLeft } from '@/components/Icons'
 import { gradeShortAnswer } from '@/lib/grading'
@@ -49,13 +50,13 @@ function clock(seconds) {
   return `${seconds < 0 ? '+' : ''}${h ? `${h}:` : ''}${String(m).padStart(h ? 2 : 1, '0')}:${String(sec).padStart(2, '0')}`
 }
 
-function Stimulus({ q }) {
+function Stimulus({ q, subject }) {
   if (!q.stimulus && (!q.figure || q.figure.kind === 'none')) return null
   return (
     <div className="mt-3 rounded-[14px] border p-4 sm:p-5" style={{ borderColor: 'var(--border)', background: 'var(--surface-sunken)' }}>
       {q.stimulus && (
         <div className="whitespace-pre-line text-[15px] leading-[1.7]" style={{ color: 'var(--text-body)' }}>
-          <MathText>{q.stimulus}</MathText>
+          <CodeText text={q.stimulus} subject={subject} />
         </div>
       )}
       {q.figure && q.figure.kind !== 'none' && (
@@ -404,7 +405,7 @@ export default function PaperSitting({ paper, initial, onSave, backHref, backLab
                       </button>
                     )}
                   </div>
-                  <Stimulus q={q} />
+                  <Stimulus q={q} subject={paper.subject} />
                   {q.parts.map((p, pi) => {
                     const k = keyOf(si, qi, pi)
                     const show = !choice || picked || marking

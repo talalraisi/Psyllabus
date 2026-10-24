@@ -6,6 +6,7 @@ import Link from 'next/link'
 import CopyButton from '@/components/CopyButton'
 import QuestionMenu from '@/components/QuestionMenu'
 import MathText from '@/components/MathText'
+import CodeText from '@/components/CodeText'
 import Calculator from '@/components/Calculator'
 import MarkScheme from '@/components/MarkScheme'
 import CountUp from '@/components/CountUp'
@@ -1089,9 +1090,9 @@ export default function QuizRunner({
                 Redemption · you got this one wrong before
               </p>
             )}
-            <p className="whitespace-pre-line text-[17px] font-medium leading-relaxed">
-              <MathText>{q.stem}</MathText>
-            </p>
+            <div className="whitespace-pre-line text-[17px] font-medium leading-relaxed">
+              <CodeText text={q.stem} subject={q.subject} />
+            </div>
           </div>
           <QuestionMenu question={q} />
         </div>

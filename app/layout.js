@@ -1,4 +1,4 @@
-import { Inter } from 'next/font/google'
+import { Inter, JetBrains_Mono } from 'next/font/google'
 import 'katex/dist/katex.min.css'
 import './globals.css'
 import LoadingBar from '@/components/LoadingBar'
@@ -6,6 +6,13 @@ import LoadingBar from '@/components/LoadingBar'
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
+  display: 'swap',
+})
+
+// Code in Computer Science questions (components/CodeText.js).
+const mono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-code',
   display: 'swap',
 })
 
@@ -100,7 +107,7 @@ document.documentElement.style.colorScheme=d?'dark':'light';
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${inter.variable} h-full`} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${mono.variable} h-full`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script

@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import MathText from '@/components/MathText'
+import CodeText from '@/components/CodeText'
 
 /**
  * What a question is set on: the extract a literature question is about, or
@@ -36,7 +36,7 @@ function QuestionStimulus({ text, kind = 'prose', subject = '' }) {
             : 'whitespace-pre-wrap text-[15px] leading-[1.75]'
         }`}
       >
-        <MathText>{text.trim()}</MathText>
+        <CodeText text={text.trim()} subject={subject} />
       </div>
     </figure>
   )
