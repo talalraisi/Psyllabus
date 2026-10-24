@@ -130,7 +130,7 @@ export const GROUPS = {
     heat: { low: 0.35, medium: 0.32, hot: 0.2, extreme: 0.09, burning: 0.04 },
     mcqShare: 0.35,
     formats:
-      'These subjects have no multiple-choice papers. Typed answers in the style of the data-response and short-answer parts of the papers: a calculation from given data, a single term, or a value read from a diagram, 1-4 marks. Multiple choice for recall and concepts at Low and Medium heat only.',
+      'These subjects have no multiple-choice papers. Typed answers in the style of the data-response and short-answer parts of the papers: a calculation from given data (in Economics, Business Management and Geography only), a single term, or a value read from a diagram, 1-4 marks. Multiple choice for recall and concepts at Low and Medium heat only.',
     examples: HUMANITIES_EXAMPLES,
   },
   languages: {

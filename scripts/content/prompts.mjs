@@ -71,8 +71,19 @@ export function languageOf(subject) {
   return m ? m[1] : 'English'
 }
 
+/**
+ * Subjects whose papers set no calculations. Told to write them, writers
+ * dressed arithmetic up in the subject (the years between two dates, the
+ * share of a poem's lines in its sestet), and the audit rejected every one.
+ * Language B and ab initio may still ask for a number read from a text.
+ */
+const NO_CALCULATION = /^(History|Psychology|Digital Society|Global Politics|Social and Cultural|Philosophy|World Religions|Visual Arts|Music|Film|Theatre|Dance)|^[A-Za-z]+ A: |^Literature and Performance/
+
 export function subjectBlock(subject, group) {
   const g = GROUPS[group]
+  const noCalc = NO_CALCULATION.test(subject)
+    ? `\n\nNO CALCULATIONS: this subject's papers never ask students to calculate, count or do arithmetic (dates, durations, percentages, lines, words, pages). Every typed answer is a term, a name, a concept, a date or a short phrase. "Steps" in the heat levels are steps of reasoning: recalling, then applying a concept, linking evidence to a claim, weighing two explanations.`
+    : ''
   const language = languageOf(subject)
   const inLanguage =
     language !== 'English'
@@ -81,7 +92,7 @@ export function subjectBlock(subject, group) {
   return `SUBJECT: IB ${subject}${inLanguage}
 
 FORMATS FOR THIS SUBJECT
-${g.formats}
+${g.formats}${noCalc}
 
 ORIGINAL EXAMPLES IN THE STYLE WANTED (not to be reused)
 ${g.examples}`
