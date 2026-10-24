@@ -71,7 +71,9 @@ const allJobs = [
   ...REST.filter((c) => !NO_PAPERS.has(c)).map((c) => ({ name: `papers: ${c}`, steps: papers(c) })),
 ]
 // --only "content: Music,papers: Computer Science" runs just those jobs.
-const ONLY = arg('only') ? new Set(String(arg('only')).split(',').map((x) => x.trim())) : null
+// Job names are split only before "content:" or "papers:", since a course
+// name can hold commas ("Sports, Exercise, and Health Science").
+const ONLY = arg('only') ? new Set(String(arg('only')).split(/,(?=\s*(?:content|papers):)/).map((x) => x.trim())) : null
 const jobs = allJobs.filter((j) => !SKIP.has(j.name.replace(/^(content|papers): /, '')) && (!ONLY || ONLY.has(j.name)))
 
 const status = Object.fromEntries(jobs.map((j) => [j.name, 'waiting']))
