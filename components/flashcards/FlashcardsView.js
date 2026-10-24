@@ -10,6 +10,7 @@ import StudyMenu from '@/components/StudyMenu'
 import LockedPanel from '@/components/LockedPanel'
 import Select from '@/components/Select'
 import CardMaker from '@/components/flashcards/CardMaker'
+import { ReadyShelf, ReadySubject } from '@/components/flashcards/ReadyDecks'
 
 /**
  * The flashcards page, laid out.
@@ -19,7 +20,8 @@ import CardMaker from '@/components/flashcards/CardMaker'
  *                   card's place in its spacing, so a student can see the
  *                   deck moving out as they learn it
  *   Your decks      one card per subject
- *   Ready-made      checked decks for their subjects, by subject
+ *   Ready-made      every subject they take; opening one lays its cards
+ *                   out by topic, unit and subtopic (ReadyDecks.js)
  *
  * Opening a deck shows its cards as a grid you can filter by subtopic or
  * search, twelve at a time, each editable in place.
@@ -137,13 +139,14 @@ function CardTile({ card, onEdit, onDelete }) {
   )
 }
 
-export default function FlashcardsView({ cards, presets = [], presetsLocked, notes, subjects, syllabi, error, onReview, onAdd, onEdit, onDelete }) {
+export default function FlashcardsView({ cards, readyCounts = {}, presetsLocked, notes, subjects, syllabi, error, onReview, onAdd, onEdit, onDelete, loadSyllabus, onStudyReady }) {
   const [deck, setDeck] = useState(null)
   const [subtopic, setSubtopic] = useState('')
   const [query, setQuery] = useState('')
   const [shown, setShown] = useState(PAGE)
   const [making, setMaking] = useState(null) // null | 'upload' | 'paste' | 'write'
-  const [openPreset, setOpenPreset] = useState(null)
+  // The ready-made subject open, with its syllabus: { subject, syllabus }.
+  const [ready, setReady] = useState(null)
 
   const known = (list) => list.filter((c) => (c.box || 0) >= MAX_BOX).length
 
@@ -155,21 +158,6 @@ export default function FlashcardsView({ cards, presets = [], presetsLocked, not
     }
     return [...map.values()].sort((a, b) => b.cards.length - a.cards.length || a.subject.localeCompare(b.subject))
   }, [cards])
-
-  // Ready-made decks not yet fully taken, by subject.
-  const offered = useMemo(() => {
-    const mine = new Set(cards.map((c) => `${c.subject}||${c.front}`))
-    const map = new Map()
-    for (const p of presets) {
-      if (mine.has(`${p.subject}||${p.front}`)) continue
-      if (!map.has(p.subject)) map.set(p.subject, { subject: p.subject, subtopics: new Map(), total: 0 })
-      const s = map.get(p.subject)
-      s.total++
-      if (!s.subtopics.has(p.subtopic)) s.subtopics.set(p.subtopic, [])
-      s.subtopics.get(p.subtopic).push({ ...p, preset: true, box: 1, reviews: 0 })
-    }
-    return [...map.values()].sort((a, b) => b.total - a.total)
-  }, [presets, cards])
 
   const open = (subject) => {
     setDeck(subject)
@@ -197,6 +185,28 @@ export default function FlashcardsView({ cards, presets = [], presetsLocked, not
       />
     </div>
   )
+
+  /* ------------------------------------------------------ a ready-made deck */
+  if (ready) {
+    return (
+      <Page width="default">
+        <ReadySubject
+          subject={ready.subject}
+          counts={readyCounts[ready.subject]}
+          syllabus={ready.syllabus}
+          mine={cards}
+          onBack={() => setReady(null)}
+          onStudy={onStudyReady}
+        />
+      </Page>
+    )
+  }
+
+  const openReady = async (subject) => {
+    const syllabus = await loadSyllabus(subject)
+    setReady({ subject, syllabus })
+    window.scrollTo?.({ top: 0 })
+  }
 
   /* ---------------------------------------------------------------- a deck */
   if (deck) {
@@ -380,52 +390,15 @@ export default function FlashcardsView({ cards, presets = [], presetsLocked, not
       {presetsLocked ? (
         <LockedPanel title="Decks somebody already wrote" blurb="Checked cards for every subtopic of your subjects, ready to study. Making your own stays free." />
       ) : (
-        offered.length > 0 && (
+        subjects.length > 0 && (
           <section>
-            <div className="mb-3 flex items-baseline justify-between gap-3">
+            <div className="mb-3 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
               <h2 className="text-[15px] font-semibold tracking-[-0.01em]">Ready-made decks</h2>
               <span className="text-[12px]" style={{ color: 'var(--text-faint)' }}>
-                Checked before anyone sees them. A card becomes yours when you first answer it.
+                Every subtopic of your subjects, checked before anyone sees it. Open a subject to pick what to study.
               </span>
             </div>
-            <ul className="flex flex-col gap-2">
-              {offered.map((s) => {
-                const expanded = openPreset === s.subject
-                const all = [...s.subtopics.values()].flat()
-                return (
-                  <li key={s.subject} className="overflow-hidden rounded-[16px] border" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
-                    <div className="flex items-center gap-3 px-4 py-3.5 sm:px-5">
-                      <button onClick={() => setOpenPreset(expanded ? null : s.subject)} aria-expanded={expanded} className="min-w-0 flex-1 text-left">
-                        <span className="block truncate text-[14px] font-semibold">{s.subject}</span>
-                        <span className="mt-0.5 block text-[12px]" style={{ color: 'var(--text-faint)' }}>
-                          {s.total} cards · {s.subtopics.size} subtopic{s.subtopics.size === 1 ? '' : 's'}
-                        </span>
-                      </button>
-                      <button onClick={() => onReview(all.slice(0, 20))} className="btn btn-outline control-sm shrink-0">
-                        Study 20
-                      </button>
-                    </div>
-                    {expanded && (
-                      <ul className="border-t px-2 py-1.5" style={{ borderColor: 'var(--border)' }}>
-                        {[...s.subtopics.entries()].map(([t, list]) => (
-                          <li key={t} className="flex items-center gap-3 rounded-[10px] px-3 py-2 transition-colors hover:bg-[var(--surface-sunken)]">
-                            <span className="min-w-0 flex-1 truncate text-[13px]" style={{ color: 'var(--text-body)' }}>
-                              {displaySubtopic(t)}
-                            </span>
-                            <span className="text-[11.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
-                              {list.length}
-                            </span>
-                            <button onClick={() => onReview(list)} className="text-[12.5px] font-semibold" style={{ color: 'var(--brand)' }}>
-                              Study
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </li>
-                )
-              })}
-            </ul>
+            <ReadyShelf subjects={subjects} counts={readyCounts} mine={cards} onOpen={openReady} />
           </section>
         )
       )}

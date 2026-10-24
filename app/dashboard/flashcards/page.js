@@ -4,12 +4,12 @@ import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
-import { getProfile } from '@/lib/cache'
+import { getProfile, getSyllabus } from '@/lib/cache'
 import DashboardLayout from '@/components/DashboardLayout'
 import { PageLoading } from '@/components/PageShell'
 import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { accessibleSubjects, canUse, hasSyllabi } from '@/lib/access'
-import { scheduleAfter } from '@/lib/flashcards'
+import { scheduleAfter, studyOrder } from '@/lib/flashcards'
 import FlashcardReview from '@/components/FlashcardReview'
 import FlashcardWrite from '@/components/FlashcardWrite'
 import FlashcardTest from '@/components/FlashcardTest'
@@ -28,7 +28,8 @@ export default function FlashcardsPage() {
   const [profile, setProfile] = useState(null)
   const [cards, setCards] = useState([])
   const [notes, setNotes] = useState([])
-  const [presets, setPresets] = useState([])
+  // Ready-made cards per subtopic, by subject: { subject: [{ topic, subtopic, cards }] }.
+  const [readyCounts, setReadyCounts] = useState({})
   const [loading, setLoading] = useState(true)
   const [reviewing, setReviewing] = useState(null)
   const [error, setError] = useState('')
@@ -56,15 +57,14 @@ export default function FlashcardsPage() {
     setProfile(profileData)
     const usable = accessibleSubjects(profileData)
 
-    const [{ data: cardRows }, { data: noteRows }, { data: presetRows }] = await Promise.all([
+    const [{ data: cardRows }, { data: noteRows }, ...countRows] = await Promise.all([
       supabase.from('flashcards').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
       supabase.from('notes').select('id, subject, subtopic, body').eq('user_id', user.id).order('updated_at', { ascending: false }),
-      // Only the verified ones are readable at all.
-      usable.length
-        ? supabase.from('flashcard_presets').select('id, subject, topic, subtopic, front, back').eq('verified', true).in('subject', usable)
-        : Promise.resolve({ data: [] }),
+      // How many ready-made cards each subtopic has, one subject at a time:
+      // the cards themselves are thousands a subject and are fetched to study.
+      ...usable.map((subject) => supabase.from('preset_deck_counts').select('topic, subtopic, cards').eq('subject', subject)),
     ])
-    setPresets(presetRows || [])
+    setReadyCounts(Object.fromEntries(usable.map((subject, i) => [subject, countRows[i]?.data || []])))
     setCards(cardRows || [])
     setNotes((noteRows || []).filter((n) => (n.body || '').trim().length > 20))
     setLoading(false)
@@ -84,6 +84,40 @@ export default function FlashcardsPage() {
   const review = (pool, mode = 'flip') => {
     if (!pool.length) return
     setReviewing({ cards: pool, mode })
+  }
+
+  /** A subject's syllabus, to lay its ready-made cards out by topic. */
+  const loadSyllabus = (subject) => getSyllabus(supabase, [subject])
+
+  /**
+   * Study ready-made subtopics: the cards already taken from them, on their
+   * own schedule, and the ones not yet met. Fetched in pages, because a
+   * whole topic can run past the 1,000 rows one request returns.
+   */
+  const studyReady = async (subject, subtopics, mode) => {
+    const presets = []
+    for (let i = 0; i < subtopics.length; i += 100) {
+      const names = subtopics.slice(i, i + 100)
+      for (let from = 0; ; from += 1000) {
+        const { data, error: err } = await supabase
+          .from('flashcard_presets')
+          .select('id, subject, topic, subtopic, front, back')
+          .eq('subject', subject)
+          .in('subtopic', names)
+          .order('subtopic')
+          .order('position')
+          .range(from, from + 999)
+        if (err) return setError('Could not load those cards. Try again in a moment.')
+        presets.push(...(data || []))
+        if (!data || data.length < 1000) break
+      }
+    }
+    const wanted = new Set(subtopics)
+    const own = cards.filter((c) => c.subject === subject && wanted.has(c.subtopic))
+    const taken = new Set(own.map((c) => c.front))
+    const fresh = presets.filter((p) => !taken.has(p.front)).map((p) => ({ ...p, preset: true, box: 1, reviews: 0 }))
+    const pool = [...own, ...fresh]
+    review(studyOrder(pool, pool.length), mode)
   }
 
   const markCard = async (card, correct) => {
@@ -177,7 +211,7 @@ export default function FlashcardsPage() {
     <DashboardLayout profile={profile}>
       <FlashcardsView
         cards={cards}
-        presets={canUse('presetDecks', profile) ? presets : []}
+        readyCounts={canUse('presetDecks', profile) ? readyCounts : {}}
         presetsLocked={!canUse('presetDecks', profile)}
         notes={notes}
         subjects={subjects}
@@ -187,6 +221,8 @@ export default function FlashcardsPage() {
         onAdd={addCards}
         onEdit={editCard}
         onDelete={deleteCard}
+        loadSyllabus={loadSyllabus}
+        onStudyReady={studyReady}
       />
     </DashboardLayout>
   )
