@@ -745,7 +745,6 @@ const fingerprint = (s) => crypto.createHash('sha1').update(norm(s)).digest('hex
 
 async function publish() {
   const db = await connect({ quiet: true })
-  const started = new Date()
   const ready = state.questions.filter((x) => x.status === 'passed')
   let qIn = 0
   let qDup = 0
@@ -835,11 +834,16 @@ async function publish() {
         [s.courses, s.subtopic]
       )
       retiredQ += q.rowCount
-      // Old flashcards go only once the new deck is in: never a subtopic with none.
+      // Old flashcards go only once the new deck is in: never a subtopic with
+      // none. "Old" is anything not in this subtopic's deck, whenever it was
+      // made, so a later run never retires the deck an earlier run published.
       if (state.cards?.[i]?.status !== 'published') continue
+      const keep = state.cards[i].cards.map((c) => fingerprint(c.front))
       const c = await db.query(
-        `update flashcard_presets set verified = false where subject = any($1) and subtopic = $2 and created_at < $3 and verified`,
-        [s.courses, s.subtopic, started]
+        `update flashcard_presets set verified = false
+         where subject = any($1) and subtopic = $2 and verified
+           and (front_fingerprint is null or front_fingerprint <> all($3))`,
+        [s.courses, s.subtopic, keep]
       )
       retiredC += c.rowCount
     }
