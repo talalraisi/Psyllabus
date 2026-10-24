@@ -278,7 +278,14 @@ function checkSection(u, data) {
   for (const q of qs) {
     const f = readFigure(q.figure)
     if (f.error) problems.push(`question ${q.number}: ${f.error}`)
-    else if (f.figure.kind !== 'none') problems.push(...checkFigure(f.figure, `${q.stimulus} ${q.parts.map((p) => p.prompt).join(' ')}`).map((p) => `question ${q.number}: ${p}`))
+    else if (f.figure.kind !== 'none')
+      problems.push(
+        ...checkFigure(f.figure, `${q.stimulus} ${q.parts.map((p) => p.prompt).join(' ')}`)
+          // A case study's table of data is part of the case, as on the real
+          // papers, whether or not a sentence points at it.
+          .filter((p) => !(f.figure.kind === 'table' && /never refers to/.test(p)))
+          .map((p) => `question ${q.number}: ${p}`)
+      )
     q.figure = f.figure || { kind: 'none', alt: '' }
     for (const p of q.parts) {
       const where = `question ${q.number}${p.label ? ` (${p.label})` : ''}`
