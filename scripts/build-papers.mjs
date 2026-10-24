@@ -546,7 +546,9 @@ try {
       if (!sec.problems.length) sec.status = 'written'
     }
     save()
-    for (const round of [1, 2, 3]) await check(round)
+    // Every round written so far, not only the first three: rewrites go on to round 4, 5…
+    const rounds = [...new Set(Object.values(state.sections).map((x) => x.round || 1))].sort((a, b) => a - b)
+    for (const round of rounds) await check(round)
     await audit()
   } else if (STAGE === 'rewrite') {
     // One more go for the sections still failing, and only those.
