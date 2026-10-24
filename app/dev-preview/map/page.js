@@ -1,79 +1,52 @@
 'use client'
 
 /**
- * The subject map without signing in, on a real syllabus. Development only.
- *
- * The progress here is SAMPLE progress, made up for the preview so the
- * mastery colours have something to show. It is labelled on the page and is
- * nobody's results.
- *
- *   /dev-preview/map?subject=Economics HL
+ * The subject map without signing in. Development only: a real syllabus,
+ * with made-up progress so every colour shows. ?subject= picks the subject.
  */
 
 import { Suspense, useEffect, useMemo, useState } from 'react'
 import { notFound, useSearchParams } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 import SubjectMap from '@/components/map/SubjectMap'
+import { createClient } from '@/lib/supabase'
 import { buildGraph } from '@/lib/subject-graph'
-import { progressKey } from '@/lib/progress'
 
 const ENABLED = process.env.NODE_ENV !== 'production'
-const CYCLE = ['mastered', 'proficient', 'mastered', 'confident', 'proficient', 'in_progress', 'not_started', 'decaying', 'not_started', 'mastered', 'not_started', 'confident']
+const STATUSES = ['mastered', 'proficient', 'confident', 'in_progress', 'decaying', 'not_started', 'not_started', 'not_started']
 
 function Preview() {
-  const params = useSearchParams()
-  const [subject, setSubject] = useState(params.get('subject') || 'Economics HL')
-  const [data, setData] = useState(null)
-
+  const subject = useSearchParams().get('subject') || 'Biology HL'
+  const [rows, setRows] = useState([])
+  const supabase = createClient()
   useEffect(() => {
-    let off = false
-    fetch(`/dev-preview/map/data?subject=${encodeURIComponent(subject)}`)
-      .then((r) => r.json())
-      .then((d) => !off && setData(d))
-    return () => {
-      off = true
-    }
-  }, [subject])
+    supabase.from('syllabus_content').select('subject, topic, unit, code, subtopic, position, hl_only, hl_extension').eq('subject', subject).then(({ data }) => setRows(data || []))
+  }, [supabase, subject])
 
   const graph = useMemo(() => {
-    if (!data) return null
-    const details = {}
+    if (!rows.length) return null
     const effective = {}
-    data.rows.forEach((r, i) => {
-      const status = CYCLE[(i * 5 + r.topic.length) % CYCLE.length]
-      if (status === 'not_started') return
-      const k = progressKey(subject, r.subtopic)
-      effective[k] = status
-      details[k] = { status, points: { mastered: 11, proficient: 8, confident: 5, in_progress: 2.5, decaying: 7 }[status], updatedAt: new Date(Date.UTC(2026, 9, 20) - i * 86400000).toISOString() }
+    const details = {}
+    rows.forEach((r, i) => {
+      const k = `${subject}::${r.subtopic}`
+      effective[k] = STATUSES[(i * 7) % STATUSES.length]
+      details[k] = { points: (i * 37) % 100 }
     })
-    return buildGraph({ subject, rows: data.rows, details, effective, key: progressKey })
-  }, [data, subject])
+    return buildGraph({ subject, rows, details, effective, key: (s, t) => `${s}::${t}` })
+  }, [rows, subject])
 
-  if (!ENABLED) notFound()
+  const profile = { is_admin: true, id: 'preview', full_name: 'Sample Student', curriculum: 'IB', subjects: [subject] }
   return (
-    <DashboardLayout profile={{ is_admin: true, id: 'preview', full_name: 'Sample Student', curriculum: 'IB', grad_year: '2028', subjects: [subject] }}>
-      <div className="relative h-[calc(100dvh-56px)] md:h-dvh">
-        {graph && (
-          <SubjectMap
-            key={subject}
-            graph={graph}
-            subjects={['Economics HL', 'Biology HL', 'Physics SL', 'History HL', 'Math Analysis & Approaches HL']}
-            onSubject={setSubject}
-            syllabi
-            initialAt={params.get('at')}
-          />
-        )}
-        <p className="pointer-events-none absolute right-4 top-16 rounded-full px-3 py-1 text-[11px] font-semibold" style={{ background: 'var(--flame-tint)', color: 'var(--flame)' }}>
-          Sample progress · preview only
-        </p>
-      </div>
+    <DashboardLayout profile={profile}>
+      <div className="h-[calc(100dvh-56px)] md:h-dvh">{graph && <SubjectMap key={subject} graph={graph} subjects={[subject]} onSubject={() => {}} />}</div>
     </DashboardLayout>
   )
 }
 
 export default function MapPreview() {
+  if (!ENABLED) notFound()
   return (
-    <Suspense fallback={null}>
+    <Suspense>
       <Preview />
     </Suspense>
   )

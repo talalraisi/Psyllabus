@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import MapCanvas from '@/components/map/MapCanvas'
+import OrbitCanvas from '@/components/map/OrbitCanvas'
 import Inspector from '@/components/map/Inspector'
 import Outline from '@/components/map/Outline'
 import SearchPalette from '@/components/map/SearchPalette'
@@ -413,57 +413,15 @@ export default function SubjectMap({ graph, subjects = [], onSubject, initialAt 
 
         {/* Canvas */}
         <section className="relative min-w-0 flex-1" aria-label={`Map of ${focus.title}`} style={{ background: 'var(--bg)' }}>
-          <MapCanvas
+          <OrbitCanvas
             graph={graph}
             focusId={focusId}
             selectedId={selectedId}
-            expandedId={expandedId}
-            view={view}
-            onView={onView}
-            animating={animating}
-            fade={fade}
             weakOnly={weakOnly}
-            showConnections={prefs.connections}
-            relations={relations}
             onSelect={setSelectedId}
             onEnter={enter}
-            onExpand={toggleExpand}
-            onSize={onSize}
-            onBackground={() => {
-              setSelectedId(null)
-            }}
-            controls={
-              <div data-ui className="absolute bottom-4 right-4 flex flex-col items-end gap-2">
-                <button
-                  type="button"
-                  onClick={fit}
-                  title="Center the map (0)"
-                  className="flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-[12.5px] font-semibold shadow-sm transition-colors hover:bg-[var(--surface-sunken)]"
-                  style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)', color: 'var(--text-body)' }}
-                >
-                  {svg(<><circle cx="12" cy="12" r="3" /><path d="M12 2v4M12 18v4M2 12h4M18 12h4" /></>, 14)}
-                  Center
-                </button>
-                <div className="flex flex-col overflow-hidden rounded-[12px] border" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
-                  {[
-                    ['Zoom in', 1.25, <path key="a" d="M12 5v14M5 12h14" />],
-                    ['Zoom out', 0.8, <path key="b" d="M5 12h14" />],
-                  ].map(([label, f, d]) => (
-                    <button
-                      key={label}
-                      type="button"
-                      onClick={() => zoom(f)}
-                      aria-label={label}
-                      title={label}
-                      className="flex h-9 w-9 items-center justify-center border-b transition-colors last:border-b-0 hover:bg-[var(--surface-sunken)]"
-                      style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}
-                    >
-                      {svg(d, 15)}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            }
+            onUp={() => travel(focus.parentId)}
+            onBackground={() => setSelectedId(null)}
           />
 
           {focusId !== graph.rootId && (
