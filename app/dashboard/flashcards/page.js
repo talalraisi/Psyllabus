@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
 import { getProfile, getSyllabus } from '@/lib/cache'
 import DashboardLayout from '@/components/DashboardLayout'
-import { PageLoading } from '@/components/PageShell'
+import { PageLoading, SkeletonActions } from '@/components/PageShell'
 import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { accessibleSubjects, canUse, hasSyllabi } from '@/lib/access'
 import { scheduleAfter, studyOrder } from '@/lib/flashcards'
@@ -187,7 +187,12 @@ export default function FlashcardsPage() {
   if (loading) {
     return (
       <DashboardLayout profile={null}>
-        <PageLoading title="Flashcards" width="default" rows={4} variant="cards" />
+        <PageLoading
+          title="Flashcards"
+          subtitle="Your own cards, from your notes or written yourself. Study them whenever you like."
+          action={<SkeletonActions widths={[132]} />}
+          variant="flashcards"
+        />
       </DashboardLayout>
     )
   }

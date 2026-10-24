@@ -131,7 +131,7 @@ function LessonPage() {
   if (!lesson) {
     return (
       <DashboardLayout profile={null}>
-        <PageLoading title="Lesson" width="default" rows={4} />
+        <PageLoading title="Lesson" variant="lesson" />
       </DashboardLayout>
     );
   }

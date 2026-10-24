@@ -18,7 +18,7 @@ import { getProfile, getSyllabus } from '@/lib/cache'
 import DashboardLayout from '@/components/DashboardLayout'
 import SubjectMap from '@/components/map/SubjectMap'
 import LockedPanel from '@/components/LockedPanel'
-import { Page, PageHeader } from '@/components/PageShell'
+import { Page, PageHeader, PageLoading } from '@/components/PageShell'
 import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { progressKey } from '@/lib/progress'
 import { buildEffectiveProgressMap, buildProgressDetailMap } from '@/lib/decay'
@@ -88,9 +88,7 @@ function SubjectMapPage() {
   if (loading) {
     return (
       <DashboardLayout profile={null}>
-        <div className="flex h-[calc(100dvh-56px)] items-center justify-center md:h-dvh">
-          <p className="text-sm text-[var(--text-muted)]">Loading your map…</p>
-        </div>
+        <PageLoading title="Subject map" variant="map" />
       </DashboardLayout>
     )
   }

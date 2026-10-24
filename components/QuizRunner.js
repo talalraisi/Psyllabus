@@ -13,7 +13,7 @@ import HeatBadge from '@/components/HeatBadge'
 import QuestionFigure from '@/components/QuestionFigure'
 import QuestionStimulus from '@/components/QuestionStimulus'
 import ReportQuestion from '@/components/ReportQuestion'
-import { EmptyState } from '@/components/PageShell'
+import { EmptyState, SkeletonQuiz } from '@/components/PageShell'
 import { IconCheck, IconClose } from '@/components/Icons'
 import { gradeAnswer, feedbackFor } from '@/lib/grading'
 import { createClient } from '@/lib/supabase'
@@ -125,29 +125,6 @@ function formatClock(totalSeconds) {
 
 // Bands live in lib/progress.js so the quiz, the heatmap and the legend can
 // never disagree about what a score means.
-
-/** Mirrors the quiz itself: rail, stem, four options. No card, because the
- *  quiz has no card either, and a skeleton that is the wrong shape reads as
- *  the page breaking rather than loading. */
-function Skeleton() {
-  return (
-    <div aria-hidden="true">
-      <div className="flex gap-1">
-        {Array.from({ length: 10 }).map((_, i) => (
-          <div key={i} className="skeleton h-1 flex-1 rounded-full" />
-        ))}
-      </div>
-      <div className="skeleton mt-6 h-3.5 w-40 rounded" />
-      <div className="skeleton mt-6 h-4 w-full rounded" />
-      <div className="skeleton mt-2 h-4 w-2/3 rounded" />
-      <div className="mt-7 flex flex-col gap-2">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="skeleton h-[52px] w-full rounded-xl" />
-        ))}
-      </div>
-    </div>
-  )
-}
 
 function Spinner() {
   return (
@@ -912,7 +889,7 @@ export default function QuizRunner({
 
   finishRef.current = finishQuiz
 
-  if (phase === PHASE.loading) return <Skeleton />
+  if (phase === PHASE.loading) return <SkeletonQuiz />
 
   if (phase === PHASE.empty) {
     return (

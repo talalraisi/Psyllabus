@@ -89,7 +89,7 @@ export default function FeedbackPage() {
   if (loading) {
     return (
       <DashboardLayout profile={null}>
-        <PageLoading title="Feedback" width="default" rows={5} />
+        <PageLoading title="Feedback" eyebrow="Beta" rows={5} variant="feedback" />
       </DashboardLayout>
     )
   }

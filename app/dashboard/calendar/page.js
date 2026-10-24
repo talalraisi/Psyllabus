@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
 import { getProfile } from '@/lib/cache'
 import DashboardLayout from '@/components/DashboardLayout'
-import { Page, PageHeader, Section, EmptyState, PageLoading } from '@/components/PageShell'
+import { Page, PageHeader, Section, EmptyState, PageLoading, SkeletonActions } from '@/components/PageShell'
 import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { IconCheck, IconClose } from '@/components/Icons'
 import ReminderWatcher from '@/components/ReminderWatcher'
@@ -267,7 +267,13 @@ export default function CalendarPage() {
   if (loading) {
     return (
       <DashboardLayout profile={null}>
-        <PageLoading title="Calendar" width="wide" variant="calendar" />
+        <PageLoading
+          title="Calendar"
+          subtitle="Your tests, your own calendar and your study plan, in one place."
+          action={<SkeletonActions widths={[106]} />}
+          width="wide"
+          variant="calendar"
+        />
       </DashboardLayout>
     )
   }

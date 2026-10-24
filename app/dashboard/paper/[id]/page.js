@@ -95,7 +95,7 @@ function PaperPage() {
   if (!paper || attempt === undefined) {
     return (
       <DashboardLayout profile={null}>
-        <PageLoading title="Paper" width="default" rows={4} />
+        <PageLoading title="Paper" variant="paper" />
       </DashboardLayout>
     )
   }

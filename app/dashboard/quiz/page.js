@@ -7,7 +7,7 @@ import { getCurrentUser } from '@/lib/auth'
 import { getProfile } from '@/lib/cache'
 import DashboardLayout from '@/components/DashboardLayout'
 import QuizRunner from '@/components/QuizRunner'
-import { Page } from '@/components/PageShell'
+import { Page, PageLoading } from '@/components/PageShell'
 import { IconArrowLeft } from '@/components/Icons'
 
 function QuizPageInner() {
@@ -82,11 +82,7 @@ function QuizPageInner() {
   if (loading) {
     return (
       <DashboardLayout profile={null}>
-        <Page width="narrow">
-          <span className="sr-only" role="status" aria-live="polite">
-            Loading quiz
-          </span>
-        </Page>
+        <PageLoading title="Quiz" width="narrow" variant="quiz" />
       </DashboardLayout>
     )
   }

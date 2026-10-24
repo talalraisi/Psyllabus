@@ -17,7 +17,7 @@ import { getProfile } from '@/lib/cache'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
-import { Page, PageHeader, EmptyState, PageLoading } from '@/components/PageShell'
+import { Page, PageHeader, EmptyState, PageLoading, SkeletonActions } from '@/components/PageShell'
 import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { IconArrowRight, IconCheck, IconCalendar } from '@/components/Icons'
 import TodoList from '@/components/TodoList'
@@ -311,7 +311,7 @@ export default function StudyPlanPage() {
   if (loading || !plan) {
     return (
       <DashboardLayout profile={null}>
-        <PageLoading title="Study Plan" width="default" rows={5} variant="plan" />
+        <PageLoading title="Study Plan" action={<SkeletonActions widths={[118, 98]} />} rows={5} variant="plan" />
       </DashboardLayout>
     )
   }

@@ -124,7 +124,7 @@ export default function CorePage() {
     return out
   }, [rows, done])
 
-  if (loading) return <PageLoading title="Diploma core" width="default" variant="core" />
+  if (loading) return <PageLoading title="Diploma core" subtitle="TOK and the extended essay are worth up to three points together." variant="core" />
 
   return (
     <DashboardLayout profile={profile}>

@@ -296,7 +296,14 @@ export default function TestBuilderPage() {
   if (loading) {
     return (
       <DashboardLayout profile={null}>
-        <PageLoading title="Build a Test" width="default" rows={4} />
+        <PageLoading
+          title="Build a Test"
+          eyebrow="Test builder"
+          subtitle="Set the paper on the left. It takes shape on the right as you go."
+          width="wide"
+          rows={6}
+          variant="test"
+        />
       </DashboardLayout>
     )
   }

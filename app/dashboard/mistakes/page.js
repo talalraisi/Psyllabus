@@ -60,7 +60,12 @@ export default function MistakeBankPage() {
   if (loading || !profile) {
     return (
       <DashboardLayout profile={null}>
-        <PageLoading title="Redemption" width="default" rows={4} variant="redemption" />
+        <PageLoading
+          title="Redemption"
+          subtitle="Questions you got wrong come back until you get them right three times running."
+          rows={4}
+          variant="redemption"
+        />
       </DashboardLayout>
     )
   }

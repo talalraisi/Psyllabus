@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
 import { getProfile, invalidateProfile } from '@/lib/cache'
+import { SkeletonStreak } from '@/components/PageShell'
 import {
   computeStreak,
   goalFor,
@@ -218,7 +219,7 @@ export function StreakCard({ profile, cta }) {
   const [picking, setPicking] = useState(false)
 
   if (!s) {
-    return <div id="streak" className="skeleton mb-10 h-[200px] rounded-[18px]" aria-hidden="true" />
+    return <SkeletonStreak id="streak" />
   }
 
   const { next, prev } = s.milestone

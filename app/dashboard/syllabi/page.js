@@ -189,7 +189,7 @@ function Syllabi() {
   if (!profile) {
     return (
       <DashboardLayout profile={null}>
-        <PageLoading title="Syllabi" />
+        <PageLoading title="Syllabi" variant="syllabi" />
       </DashboardLayout>
     )
   }

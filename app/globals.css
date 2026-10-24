@@ -519,10 +519,15 @@ body {
      Skeletons, every async surface uses this same pulse.
      =========================================================================== */
 
+  /* A wash of the text colour rather than a surface token. The surfaces sit
+     a shade or two apart, so a bone filled with one of them all but vanished
+     on a card filled with the next: in dark mode --surface-sunken on --surface
+     is #101010 on #141414. Tinting from --text reads the same on the page, on a
+     card and on an inset panel, in either theme. */
   .skeleton {
     position: relative;
     overflow: hidden;
-    background: var(--surface-sunken);
+    background: color-mix(in srgb, var(--text) 7%, transparent);
     border-radius: var(--r-md);
   }
 
@@ -537,7 +542,7 @@ body {
     background: linear-gradient(
       90deg,
       transparent,
-      color-mix(in srgb, var(--text-faint) 18%, transparent),
+      color-mix(in srgb, var(--text) 6%, transparent),
       transparent
     );
     animation: skeleton-sweep 1.4s ease-in-out infinite;

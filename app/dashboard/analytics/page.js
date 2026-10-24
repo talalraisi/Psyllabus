@@ -56,7 +56,12 @@ export default function AnalyticsPage() {
   if (!data || !profile) {
     return (
       <DashboardLayout profile={null}>
-        <PageLoading title="Analytics" width="wide" variant="dashboard" />
+        <PageLoading
+          title="Analytics"
+          subtitle="Where your study time goes, what you have covered, and how it is going."
+          width="wide"
+          variant="analytics"
+        />
       </DashboardLayout>
     )
   }
