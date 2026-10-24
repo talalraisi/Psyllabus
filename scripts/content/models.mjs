@@ -66,7 +66,22 @@ function record(provider, dollars, note) {
 
 export class OverBudget extends Error {}
 
-function guard(provider, cap) {
+/**
+ * The cap a run was started with, or a higher one set while it waits in a
+ * queue: content-runs/caps.json ({"claude": 213}) after a top-up, so jobs
+ * already queued don't stop at the old figure.
+ */
+function capFor(provider, cap) {
+  try {
+    const later = Number(JSON.parse(fs.readFileSync(path.join(RUNS, 'caps.json'), 'utf8'))[provider])
+    return Number.isFinite(later) && later > cap ? later : cap
+  } catch {
+    return cap
+  }
+}
+
+function guard(provider, given) {
+  const cap = capFor(provider, given)
   const spent = ledger()[provider]
   if (spent >= cap) throw new OverBudget(`${provider} has spent $${spent.toFixed(2)} of its $${cap} cap. Raise --${provider}-cap to go on.`)
 }
