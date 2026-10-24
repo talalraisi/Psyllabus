@@ -6,7 +6,7 @@ import CardMenu from '@/components/CardMenu'
 import { IconCheck, IconClose } from '@/components/Icons'
 import { displaySubtopic } from '@/lib/progress'
 import { checkWritten, makeBlank } from '@/lib/flashcard-modes'
-import { requeue } from '@/lib/flashcards'
+import { holdCard, releaseDue, untilLabel } from '@/lib/flashcards'
 import AgainChoice, { againFromKey } from '@/components/flashcards/AgainChoice'
 
 /**
@@ -24,6 +24,10 @@ import AgainChoice, { againFromKey } from '@/components/flashcards/AgainChoice'
  * It happens on a card rather than on a form, because the deck should feel
  * like the same object in every mode.
  *
+ * A missed card waits for the time the student picked and comes back as the
+ * next card once it is due. If the deck runs out first, the screen waits
+ * with a countdown rather than ending with a card still owed.
+ *
  * `blank` hides one term inside the answer instead of asking for the whole
  * thing: the gentler version of the same question, and the right one for a
  * card met ten minutes ago.
@@ -34,6 +38,11 @@ export default function FlashcardWrite({ cards, mode = 'write', onMark, onEdit, 
   const [value, setValue] = useState('')
   const [result, setResult] = useState(null)
   const [tally, setTally] = useState({ right: 0, wrong: 0 })
+  // Missed cards waiting for their time: [{ card, at }], soonest first.
+  const [waiting, setWaiting] = useState([])
+  // The deck is done but a missed card is still to come back.
+  const [holding, setHolding] = useState(false)
+  const [now, setNow] = useState(() => Date.now())
   const inputRef = useRef(null)
 
   const card = queue[index]
@@ -50,22 +59,46 @@ export default function FlashcardWrite({ cards, mode = 'write', onMark, onEdit, 
     setResult(checkWritten(value, expected, blank ? '' : card.front))
   }
 
-  /** Save the mark, then on to the next card, or out at the end. */
-  const leave = (correct, list = queue) => {
+  /** Save the mark, then on to the next card (a due one first), or out at the end. */
+  const leave = (correct, wait = waiting) => {
     onMark?.(card, correct)
     const next = { right: tally.right + (correct ? 1 : 0), wrong: tally.wrong + (correct ? 0 : 1) }
     setTally(next)
-    if (index >= list.length - 1) return onExit({ finished: true, tally: next })
-    setQueue(list)
-    setIndex((i) => i + 1)
+    const back = releaseDue(queue, index, wait)
+    setQueue(back.queue)
+    setWaiting(back.waiting)
     setValue('')
     setResult(null)
+    if (index < back.queue.length - 1) return setIndex((i) => i + 1)
+    if (!back.waiting.length) return onExit({ finished: true, tally: next })
+    setNow(Date.now())
+    setHolding(true)
   }
+
+  /** The waiting card is back: now, or because the student did not want to wait. */
+  const bringBack = (early = false) => {
+    const back = releaseDue(queue, index, waiting, early ? waiting[0].at : Date.now())
+    if (!back.added) return
+    setQueue(back.queue)
+    setWaiting(back.waiting)
+    setHolding(false)
+    setIndex((i) => i + 1)
+  }
+
+  // While holding, count down and bring the card back when it is due.
+  useEffect(() => {
+    if (!holding) return
+    const t = setInterval(() => {
+      setNow(Date.now())
+      if (waiting[0] && waiting[0].at <= Date.now()) bringBack()
+    }, 1000)
+    return () => clearInterval(t)
+  })
 
   // Close counts as right: a typo is not a gap in knowledge, and sending a
   // card back to box zero over a slipped key makes the schedule about typing.
   const onward = () => leave(true)
-  const again = (choice) => leave(false, requeue(queue, index, card, choice))
+  const again = (choice) => leave(false, holdCard(waiting, card, choice))
 
   const skip = () => {
     setQueue((q) => q.filter((c, i) => i !== index))
@@ -77,6 +110,10 @@ export default function FlashcardWrite({ cards, mode = 'write', onMark, onEdit, 
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === 'Escape') return onExit({ finished: false, tally })
+      if (holding) {
+        if (e.key === 'Enter') bringBack(true)
+        return
+      }
       if (result && !credit) {
         const choice = againFromKey(e.key)
         if (choice) {
@@ -95,6 +132,28 @@ export default function FlashcardWrite({ cards, mode = 'write', onMark, onEdit, 
   })
 
   if (!card) return null
+  if (holding && waiting[0]) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--bg)] p-5">
+        <div className="w-full max-w-md text-center">
+          <p className="text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
+            {waiting.length === 1 ? 'One card is coming back' : `${waiting.length} cards are coming back`}
+          </p>
+          <p className="mt-2 text-[34px] font-semibold tabular-nums" style={{ color: 'var(--text)' }}>
+            {untilLabel(waiting[0].at - now)}
+          </p>
+          <div className="mt-6 flex justify-center gap-2">
+            <button type="button" onClick={() => bringBack(true)} className="btn btn-solid control-lg">
+              Show it now
+            </button>
+            <button type="button" onClick={() => onExit({ finished: true, tally })} className="btn btn-outline control-lg">
+              Finish
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
   const tone = !result
     ? null
     : result.correct || result.overruled

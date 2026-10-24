@@ -5,11 +5,11 @@ import { AGAIN_CHOICES } from '@/lib/flashcards'
 /**
  * After a miss: when should this card come back?
  *
- * The student decides, and the answer is a feeling rather than a count.
- * Saying "it comes back in 4 cards" told them exactly when to expect it,
- * which turns the second attempt into waiting for a card rather than
- * recalling one. The place inside each choice is picked at random
- * (lib/flashcards.js, requeue), so it stays a surprise.
+ * The student decides, in time: 1 minute, 5, 10 or an hour. Saying "it
+ * comes back in 4 cards" told them exactly when to expect it, which turns the
+ * second attempt into waiting for a card rather than recalling one. The card
+ * waits for its time and then comes back as the next card
+ * (lib/flashcards.js, holdCard and releaseDue).
  *
  * Keys 1 to 4 are wired by the screen that shows this, because only it
  * knows whether a box has focus.

@@ -4,7 +4,7 @@
  * test built from four cards must not offer the same option twice.
  */
 import { checkWritten, makeBlank, buildTest, scoreTest } from '../lib/flashcard-modes.js'
-import { AGAIN_CHOICES, requeue, shuffleCards } from '../lib/flashcards.js'
+import { AGAIN_CHOICES, holdCard, releaseDue, untilLabel, shuffleCards } from '../lib/flashcards.js'
 
 let failed = 0
 const check = (name, ok) => {
@@ -71,15 +71,22 @@ check('a list of every word you know is not an answer', !right(
 
 // ---- coming back, and the order of a round --------------------------------
 const q = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r']
-const soon = AGAIN_CHOICES.find((c) => c.key === 'soon')
-const end = AGAIN_CHOICES.find((c) => c.key === 'end')
-check('"soon" lands within a few cards', [0, 0.5, 0.99].every((r) => {
-  const at = requeue(q, 0, 'X', soon, () => r).indexOf('X')
-  return at >= 2 && at <= 4
-}))
-check('"soon" is not always the same place', requeue(q, 0, 'X', soon, () => 0).indexOf('X') !== requeue(q, 0, 'X', soon, () => 0.99).indexOf('X'))
-check('"at the end" goes last', requeue(q, 3, 'X', end).at(-1) === 'X')
-check('requeue near the end does not fall off', requeue(['a', 'b'], 1, 'X', AGAIN_CHOICES[2]).at(-1) === 'X')
+const t0 = 1_800_000_000_000
+const min = (key) => AGAIN_CHOICES.find((c) => c.key === key)
+check('the choices are times: 1, 5, 10 minutes and an hour', AGAIN_CHOICES.map((c) => c.minutes).join() === '1,5,10,60')
+const held = holdCard([], 'X', min('5m'), t0)
+check('a missed card waits for its time', releaseDue(q, 0, held, t0 + 4 * 60000).added === 0)
+check('then comes back as the very next card', (() => {
+  const r = releaseDue(q, 3, held, t0 + 5 * 60000)
+  return r.queue[4] === 'X' && r.waiting.length === 0 && r.queue.length === q.length + 1
+})())
+const two = holdCard(holdCard([], 'late', min('10m'), t0), 'early', min('1m'), t0)
+check('soonest first when two are waiting', two[0].card === 'early')
+check('only the due one comes back', (() => {
+  const r = releaseDue(q, 0, two, t0 + 2 * 60000)
+  return r.queue[1] === 'early' && r.waiting.length === 1 && r.waiting[0].card === 'late'
+})())
+check('the countdown reads as a clock', untilLabel(65000) === '1:05' && untilLabel(0) === '0:00' && untilLabel(59 * 60000) === '59 min')
 const shuffled = shuffleCards(q)
 check('a shuffle keeps every card', shuffled.length === q.length && q.every((c) => shuffled.includes(c)))
 check('shuffles differ', new Set(Array.from({ length: 6 }, () => shuffleCards(q).join(''))).size > 1)

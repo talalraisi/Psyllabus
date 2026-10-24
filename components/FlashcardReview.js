@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import MathText from '@/components/MathText'
 import { IconCheck, IconClose, IconArrowLeft, IconArrowRight } from '@/components/Icons'
 import { displaySubtopic } from '@/lib/progress'
-import { requeue, shuffleCards } from '@/lib/flashcards'
+import { holdCard, releaseDue, shuffleCards } from '@/lib/flashcards'
 import CardMenu from '@/components/CardMenu'
 import AgainChoice, { againFromKey } from '@/components/flashcards/AgainChoice'
 import { AskSyllabi } from '@/components/syllabi/SyllabiDrawer'
@@ -32,6 +32,10 @@ import { AskSyllabi } from '@/components/syllabi/SyllabiDrawer'
  * said rather than offering the buttons again, so one card cannot be counted
  * twice.
  *
+ * A missed card waits for the time the student picked, then comes back as
+ * the next card (lib/flashcards.js, releaseDue). The deck loops, so there is
+ * always a next card for it to come back as.
+ *
  * Keyboard: space or up to flip, arrows to move, 1 missed, 2 got it, and 1
  * to 4 to choose when a missed card returns.
  */
@@ -43,6 +47,8 @@ export default function FlashcardReview({ cards, onMark, onEdit, onDelete, onExi
   const [flipped, setFlipped] = useState(false)
   // A missed card waits here until it is told when to come back.
   const [missed, setMissed] = useState(null)
+  // Missed cards waiting for their time: [{ card, at }], soonest first.
+  const [waiting, setWaiting] = useState([])
   // What was said about each position in the queue: 'right' or 'wrong'.
   const [answered, setAnswered] = useState({})
   const [direction, setDirection] = useState('next')
@@ -59,12 +65,20 @@ export default function FlashcardReview({ cards, onMark, onEdit, onDelete, onExi
   const roundStart = rounds[round - 1]
   const roundEnd = rounds[round] ?? queue.length
 
-  /** One card on. Past the last card, the deck is dealt again. */
+  /** One card on. A card whose time has come is next; past the last card, the deck is dealt again. */
   const advance = useCallback(
-    (list = queue) => {
+    (from = queue, wait = waiting) => {
       setDirection('next')
+      const back = releaseDue(from, index, wait)
+      const list = back.queue
+      setWaiting(back.waiting)
+      if (back.added) {
+        // Everything after this card moved along by the cards put in.
+        setRounds((r) => r.map((start) => (start > index ? start + back.added : start)))
+        setAnswered((a) => Object.fromEntries(Object.entries(a).map(([k, v]) => [Number(k) > index ? Number(k) + back.added : k, v])))
+      }
       if (index < list.length - 1) {
-        setFlipped(Boolean(answered[index + 1]))
+        setFlipped(!back.added && Boolean(answered[index + 1]))
         setQueue(list)
       } else {
         setFlipped(false)
@@ -73,7 +87,7 @@ export default function FlashcardReview({ cards, onMark, onEdit, onDelete, onExi
       }
       setIndex(index + 1)
     },
-    [queue, index, answered, cards]
+    [queue, waiting, index, answered, cards]
   )
 
   const go = useCallback(
@@ -101,15 +115,15 @@ export default function FlashcardReview({ cards, onMark, onEdit, onDelete, onExi
     [card, verdict, onMark, index, advance]
   )
 
-  /** The missed card goes back in where the student asked, and on we go. */
+  /** The missed card waits for the time the student asked for, and on we go. */
   const again = useCallback(
     (choice) => {
       if (!missed) return
-      const next = requeue(queue, index, missed, choice)
+      const wait = holdCard(waiting, missed, choice)
       setMissed(null)
-      advance(next)
+      advance(queue, wait)
     },
-    [missed, queue, index, advance]
+    [missed, waiting, queue, advance]
   )
 
   const flip = useCallback(() => {
@@ -320,7 +334,7 @@ export default function FlashcardReview({ cards, onMark, onEdit, onDelete, onExi
             )}
 
             <p className="t-caption mt-3 hidden text-center md:block">
-              {missed ? '1 soon · 2 in a bit · 3 later · 4 at the end' : 'Space to flip · arrows to move · 1 missed, 2 got it · Esc to leave'}
+              {missed ? '1 one minute · 2 five · 3 ten · 4 an hour' : 'Space to flip · arrows to move · 1 missed, 2 got it · Esc to leave'}
             </p>
           </div>
         </>
