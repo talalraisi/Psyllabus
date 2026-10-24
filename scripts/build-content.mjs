@@ -448,8 +448,12 @@ const AUDIT = {
   required: ['reviews'],
 }
 
+// --live: the audit also samples questions already published, and a
+// question Gemini rejects is retired from the app, not only from this run.
+const LIVE = process.argv.includes('--live')
+
 async function audit() {
-  const passed = state.questions.filter((x) => x.status === 'passed' && !x.audit)
+  const passed = state.questions.filter((x) => (x.status === 'passed' || (LIVE && x.status === 'published')) && !x.audit)
   if (!passed.length) return log('audit: nothing to audit')
   // A sample from every tier and heat, not whichever came first.
   const shuffled = [...passed].sort((a, b) => crypto.createHash('md5').update(a.key).digest('hex').localeCompare(crypto.createHash('md5').update(b.key).digest('hex')))
@@ -477,7 +481,9 @@ ${part.map((x) => `[${x.key}] Subtopic "${state.subtopics[x.sub].subtopic}", hea
     const reviews = new Map((res.reviews || []).map((r) => [r.id, r]))
     for (const x of part) {
       x.audit = reviews.get(x.key) || { verdict: 'none' }
-      if (x.audit.verdict === 'reject') x.status = 'failed'
+      if (x.audit.verdict !== 'reject') continue
+      if (x.status === 'published') await retireLive(x)
+      x.status = 'failed'
     }
     save()
   }
@@ -486,6 +492,19 @@ ${part.map((x) => `[${x.key}] Subtopic "${state.subtopics[x.sub].subtopic}", hea
     const count = (v) => a.filter((x) => x.audit.verdict === v).length
     log(`  ${tier.padEnd(6)} ${a.length} audited: ${count('publish')} publish, ${count('fix')} fix, ${count('reject')} reject; heat wrong ${a.filter((x) => x.audit.heat_right === false).length}`)
   }
+}
+
+/** Take a published question Gemini rejected out of the app (reversible: retired_at). */
+async function retireLive(x) {
+  const db = await connect({ quiet: true })
+  const res = await db.query(
+    `update questions set retired_at = now(), verified = false, recheck_note = $3
+     where subject = any($1) and generator is not null and retired_at is null
+       and stem_fingerprint = md5(btrim(regexp_replace(lower($2), '[[:punct:][:space:]]+', ' ', 'g')))`,
+    [state.subtopics[x.sub].courses, x.q.stem, `retired: Gemini audit rejected (${String(x.audit.problems).slice(0, 200)})`]
+  )
+  await db.end()
+  log(`  retired a live question Gemini rejected (${res.rowCount} rows)`)
 }
 
 /* --------------------------------------------------------------- lessons --- */

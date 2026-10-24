@@ -463,7 +463,14 @@ THE PAPER (IB ${COURSE} ${p.level}, version ${p.version}): ${JSON.stringify(cont
       break
     }
     state.audits[p.id] = res
-    if (res.verdict === 'reject') for (const u of p.units) state.sections[u.key] = { ...state.sections[u.key], status: 'failed', problems: res.problems }
+    if (res.verdict === 'reject') {
+      for (const u of p.units) state.sections[u.key] = { ...state.sections[u.key], status: 'failed', problems: res.problems }
+      // Already published: students stop seeing it (only verified papers are readable).
+      const subject = R.language !== 'English' || /^\w+ (A:|B|ab initio)/.test(COURSE) ? `${COURSE} ${p.level}` : `${R.base} ${p.level}`
+      const db = await connect({ quiet: true })
+      await db.query(`update exam_papers set verified = false where subject = $1 and paper = $2 and version = $3`, [subject, p.paper.id, p.version])
+      await db.end()
+    }
     save()
     log(`  ${p.id}: ${res.verdict}${res.problems.length ? ` — ${res.problems.slice(0, 2).join(' | ').slice(0, 220)}` : ''}`)
   }
