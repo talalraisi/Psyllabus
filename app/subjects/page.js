@@ -61,7 +61,7 @@ export default function SubjectsPage() {
             stats={[
               { value: total, label: 'courses, listed in full below' },
               { value: entriesIn('IB'), label: 'entries once levels are counted separately' },
-              { value: 5712, label: 'subtopics mapped from the official IB guides' },
+              { value: 5393, label: 'subtopics mapped from the official IB guides' },
               { value: groupsOf('IB').length, label: 'IB subject groups, with more courses on the way' },
             ]}
           />
