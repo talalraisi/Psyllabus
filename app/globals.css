@@ -905,6 +905,10 @@ body {
   letter-spacing: 0.005em;
   white-space: nowrap;
 }
+/* LaTeX set by KaTeX: the size of the text around it, and free to break
+   between terms so a long working line wraps instead of running off. */
+.math-tex { white-space: normal; letter-spacing: 0; }
+.math-tex .katex { font-size: 1.06em; color: inherit; }
 .math-sup, .math-sub { font-size: 0.72em; line-height: 0; }
 .math-sup { vertical-align: 0.45em; }
 .math-sub { vertical-align: -0.25em; }

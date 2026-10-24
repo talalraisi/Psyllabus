@@ -32,7 +32,7 @@ export default function ReportQuestion({ questionId, startOpen = false, onDone }
   const [open, setOpen] = useState(startOpen)
   const [reason, setReason] = useState('')
   const [note, setNote] = useState('')
-  const [state, setState] = useState('idle') // idle | saving | done | error
+  const [state, setState] = useState('idle') // idle | saving | done | gone | error
 
   const submit = async () => {
     if (!reason || state === 'saving') return
@@ -49,11 +49,14 @@ export default function ReportQuestion({ questionId, startOpen = false, onDone }
     // worth showing them. Anything else is.
     if (error && error.code !== '23505') return setState('error')
     setState('done')
+    // Said, then out of the way: fade, then close whatever holds it.
+    setTimeout(() => setState('gone'), 1600)
+    setTimeout(() => onDone?.(), 2000)
   }
 
-  if (state === 'done') {
+  if (state === 'done' || state === 'gone') {
     return (
-      <p className="t-caption m-2 text-[var(--success-text)]">
+      <p className="t-caption m-2 text-[var(--success-text)] transition-opacity duration-300" style={{ opacity: state === 'gone' ? 0 : 1 }} role="status">
         Thanks. We will look at this one.
       </p>
     )

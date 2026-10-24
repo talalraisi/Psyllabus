@@ -1,4 +1,5 @@
 import { Fragment } from 'react'
+import katex from 'katex'
 import { parseMath } from '@/lib/math-render'
 
 /**
@@ -10,10 +11,31 @@ import { parseMath } from '@/lib/math-render'
  * backslash commands into the characters they mean, and leaves every other
  * character alone.
  *
- * The maths runs are wrapped rather than styled inline so they can be given a
- * face of their own later, and so a real engine can be dropped in behind this
- * component without any caller changing.
+ * Anything between $…$ is real LaTeX (\frac12, \left( … \right), \dots)
+ * and is set by KaTeX. The home-made tokeniser could not follow those and
+ * printed them raw, which on a binomial-expansion question left the student
+ * reading "-\frac12". Bare runs in prose (Q^2, v_max) still go through the
+ * tokeniser, because they were never written as LaTeX.
  */
+
+const cache = new Map()
+/** KaTeX's HTML for one span, or null when it cannot set it (the tokens are shown instead). */
+function tex(src) {
+  if (cache.has(src)) return cache.get(src)
+  let html = null
+  try {
+    // trust stays false: no \href, \url or \includegraphics from a question.
+    // Fractions, sums and integrals at full size: inline they shrink to a
+    // size nobody can read on a phone.
+    const body = /\\(d?frac|sum|int|prod|lim)(?![a-zA-Z])/.test(src) ? `\\displaystyle ${src}` : src
+    html = katex.renderToString(body, { throwOnError: true, strict: 'ignore', output: 'html' })
+  } catch {
+    html = null
+  }
+  if (cache.size > 2000) cache.clear()
+  cache.set(src, html)
+  return html
+}
 
 function Token({ t }) {
   if (t.kind === 'sup') return <sup className="math-sup">{t.value}</sup>
@@ -53,6 +75,8 @@ export default function MathText({ children, className = '' }) {
   return (
     <span className={className}>
       {parts.map((part, i) => {
+        const html = part.tex ? tex(part.tex) : null
+        if (html) return <span key={i} className="math math-tex" dangerouslySetInnerHTML={{ __html: html }} />
         const inner = part.tokens.map((t, j) => <Token key={j} t={t} />)
         return part.math ? (
           <span key={i} className="math">

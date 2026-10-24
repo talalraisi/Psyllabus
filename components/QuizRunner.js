@@ -1100,7 +1100,7 @@ export default function QuizRunner({
           </div>
         </div>
 
-        <QuestionStimulus text={q.stimulus} kind={q.stimulus_kind} />
+        <QuestionStimulus text={q.stimulus} kind={q.stimulus_kind} subject={q.subject} />
 
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
@@ -1112,7 +1112,7 @@ export default function QuizRunner({
                 Redemption · you got this one wrong before
               </p>
             )}
-            <p className="text-[17px] font-medium leading-relaxed">
+            <p className="whitespace-pre-line text-[17px] font-medium leading-relaxed">
               <MathText>{q.stem}</MathText>
             </p>
           </div>
@@ -1212,36 +1212,39 @@ export default function QuizRunner({
 
         {/* A hint is offered rather than shown. Reading it before trying is the
             fastest way to feel like you understood something you could not
-            have done, so it costs a click and says so on the results. */}
-        {q.hint && hintsAllowed && (
-          <div className="mt-5">
-            {hintsShown[q.id] ? (
-              <p className="text-[13.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-                <span className="font-semibold">Hint. </span>
-                <MathText>{q.hint}</MathText>
-              </p>
+            have done, so it costs a click and says so on the results.
+            Help from Syllabi sits on the same line, to the right, in practice
+            and test (not in an exam), rather than floating on a line of its own. */}
+        {((q.hint && hintsAllowed) || ((sit === 'practice' || sit === 'test') && !(review === 'practice' && revealed[q.id]))) && (
+          <div className="mt-5 flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+            {q.hint && hintsAllowed ? (
+              hintsShown[q.id] ? (
+                <p className="min-w-0 flex-1 basis-64 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                  <span className="font-semibold">Hint. </span>
+                  <MathText>{q.hint}</MathText>
+                </p>
+              ) : (
+                <button
+                  onClick={() => setHintsShown((h) => ({ ...h, [q.id]: true }))}
+                  className="h-8 text-[13px] font-medium underline underline-offset-2"
+                  style={{ color: 'var(--text-muted)' }}
+                >
+                  Show a hint
+                </button>
+              )
             ) : (
-              <button
-                onClick={() => setHintsShown((h) => ({ ...h, [q.id]: true }))}
-                className="text-[13px] font-medium underline underline-offset-2"
-                style={{ color: 'var(--text-muted)' }}
-              >
-                Show a hint
-              </button>
+              <span />
             )}
-          </div>
-        )}
-
-        {/* Help while you work, in practice and test. Not in an exam. */}
-        {(sit === 'practice' || sit === 'test') && !(review === 'practice' && revealed[q.id]) && (
-          <div className="mt-5">
-            <AskSyllabi
-              subject={q.subject}
-              topic={q.subtopic}
-              context={`${q.subject} · ${q.subtopic || 'this question'}`}
-              label="Ask Syllabi"
-              text={`Help me think through this ${q.subject} question. Give me a nudge and ask me what I would do next, but do not just give me the answer.\n\n${String(q.stem || '').slice(0, 1500)}${Array.isArray(q.options) && q.options.length ? `\n\n${q.options.map((o) => `${o.id}) ${o.text}`).join('\n')}` : ''}`}
-            />
+            {(sit === 'practice' || sit === 'test') && !(review === 'practice' && revealed[q.id]) && (
+              <AskSyllabi
+                subject={q.subject}
+                topic={q.subtopic}
+                context={`${q.subject} · ${q.subtopic || 'this question'}`}
+                label="Ask Syllabi"
+                className="ml-auto"
+                text={`Help me think through this ${q.subject} question. Give me a nudge and ask me what I would do next, but do not just give me the answer.\n\n${String(q.stem || '').slice(0, 1500)}${Array.isArray(q.options) && q.options.length ? `\n\n${q.options.map((o) => `${o.id}) ${o.text}`).join('\n')}` : ''}`}
+              />
+            )}
           </div>
         )}
 

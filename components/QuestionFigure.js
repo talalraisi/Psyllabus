@@ -289,7 +289,7 @@ export default function QuestionFigure({ figure }) {
   if (!body) return null
 
   return (
-    <figure className="mb-5 rounded-[var(--r-md)] border border-[var(--border)] bg-[var(--surface-sunken)] p-4">
+    <figure className="mb-5 mt-5 rounded-[var(--r-md)] border border-[var(--border)] bg-[var(--surface-sunken)] p-4">
       {body}
       {figure.caption && (
         <figcaption className="t-caption mt-2 text-center">{figure.caption}</figcaption>
