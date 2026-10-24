@@ -10,6 +10,8 @@
  * on their papers. Language B and ab initio keep theirs: reading a number
  * out of a text in the target language is comprehension.
  *
+ * Multiple choice that asks for the same arithmetic goes too.
+ *
  * Retiring is reversible: retired_at and recheck_note mark every row.
  *
  *   node scripts/retire-calculations.mjs           # count
@@ -24,7 +26,10 @@ const SUBJECTS = '^(History|Psychology|Digital Society|Visual Arts|Music|Film|Th
 const NOTE = 'retired: calculation in a non-quantitative subject'
 
 const db = await connect({ quiet: true })
-const where = `generator is not null and retired_at is null and answer_kind = 'numeric' and subject ~ $1`
+// Typed numeric answers, and multiple choice that asks for the same
+// arithmetic ("how many years passed between…", "by what percentage did…").
+const ARITHMETIC = String.raw`(works? out the (gap|difference)|how many (years|months|days|decades|centuries)|number of years|years (passed|elapsed|between)|calculate|percentage (increase|decrease|fall|rise)|what percentage|by what percentage|average (number|of))`
+const where = `generator is not null and retired_at is null and subject ~ $1 and (answer_kind = 'numeric' or stem ~* '${ARITHMETIC}')`
 const { rows } = await db.query(`select regexp_replace(subject, ' (SL|HL)$', '') s, count(*)::int n from questions where ${where} group by 1 order by 1`, [SUBJECTS])
 for (const r of rows) console.log(`${r.s}: ${r.n}`)
 if (APPLY) {
