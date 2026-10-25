@@ -82,7 +82,7 @@ function askAbout(question, given, correct) {
   const picked = (question.options || []).find((o) => o.id === given)
   const mine = picked ? `${picked.id}) ${picked.text}` : String(given ?? '').trim() || '(no answer)'
   const right = (question.options || []).find((o) => o.id === question.correct_answer)
-  const answer = right ? `${right.id}) ${right.text}` : question.correct_answer
+  const answer = right ? `${right.id}) ${right.text}` : question.correct_answer ?? (question.accepted_answers || [])[0] ?? ''
   const body = questionAsText(question).slice(0, 1200)
   return [
     correct ? `I got this ${question.subject || ''} question right, but I want to understand it properly.` : `I got this ${question.subject || ''} question wrong.`,
@@ -1278,6 +1278,7 @@ export default function QuizRunner({
                 topic={q.subtopic}
                 context={`${q.subject} · ${q.subtopic || 'this question'}`}
                 label={revealed[q.id].correct ? 'Go deeper with Syllabi' : 'Why was I wrong?'}
+                send={!revealed[q.id].correct}
                 text={askAbout(q, selected, revealed[q.id].correct)}
               />
             </div>
@@ -1626,6 +1627,7 @@ export default function QuizRunner({
               subject={wrong[0].question.subject}
               context={`Quiz results · ${wrong.length} missed`}
               label="Go through them with Syllabi"
+              send
               text={[
                 `I just finished a ${wrong[0].question.subject || ''} quiz and got ${wrong.length} wrong. Go through them with me one at a time: explain my mistake, then give me a similar question.`,
                 '',

@@ -100,11 +100,14 @@ function PaperPage() {
     )
   }
 
+  // Back to wherever the paper was opened from: a subject's page (a slug),
+  // or the Exam papers page (a path).
   const back = params.get('back') || getSlugForSubject(paper.subject)
+  const fromPapers = back.startsWith('/dashboard/')
   return (
     <DashboardLayout profile={profile}>
       <Page>
-        <PaperSitting paper={paper} initial={attempt} onSave={save} backHref={`/dashboard/syllabus/${back}`} backLabel={paper.subject} />
+        <PaperSitting paper={paper} initial={attempt} onSave={save} backHref={fromPapers ? back : `/dashboard/syllabus/${back}`} backLabel={fromPapers ? 'Exam papers' : paper.subject} />
       </Page>
     </DashboardLayout>
   )

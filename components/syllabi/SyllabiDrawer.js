@@ -32,9 +32,12 @@ export function SyllabiProvider({ profile, children }) {
   // Opening Syllabi opens the chat, on the right subject and topic, and
   // nothing more: no question typed in for the student and nothing sent on
   // their behalf. They ask what they actually want to ask.
+  // The one exception is a button whose whole meaning is the question
+  // ("Why was I wrong?"): `send` sends it, so the explanation starts at once.
   const open = useCallback((detail) => {
     count.current += 1
-    setState({ n: count.current, ...detail, text: '', autoSend: false })
+    const send = Boolean(detail?.send && detail.text)
+    setState({ n: count.current, ...detail, text: send ? detail.text : '', autoSend: send })
   }, [])
   const close = useCallback(() => setState(null), [])
 
@@ -112,7 +115,7 @@ export function SyllabiProvider({ profile, children }) {
  * A button that opens Syllabi about something. Renders nothing for a
  * student without Syllabi, so it can be dropped in anywhere.
  */
-export function AskSyllabi({ subject, topic, text, label = 'Ask Syllabi', context, autoSend = true, size = 'sm', className = '' }) {
+export function AskSyllabi({ subject, topic, text, label = 'Ask Syllabi', context, autoSend = true, send = false, size = 'sm', className = '' }) {
   const { available, open } = useSyllabi()
   if (!available) return null
   return (
@@ -120,7 +123,7 @@ export function AskSyllabi({ subject, topic, text, label = 'Ask Syllabi', contex
       type="button"
       onClick={(e) => {
         e.stopPropagation()
-        open({ subject, topic, text, autoSend, label: context })
+        open({ subject, topic, text, autoSend, send, label: context })
       }}
       className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full font-semibold transition-[transform,filter] hover:brightness-110 active:scale-[0.97] ${size === 'xs' ? 'h-7 px-2.5 text-[11.5px]' : 'h-8 px-3 text-[12.5px]'} ${className}`}
       style={{ background: 'var(--brand-tint)', color: 'var(--brand)' }}

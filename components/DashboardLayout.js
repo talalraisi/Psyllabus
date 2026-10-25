@@ -62,6 +62,7 @@ const NAV_GROUPS = [
       { href: '/dashboard/map', label: 'Subject Map', Icon: IconOrbit, match: (p) => p === '/dashboard/map' },
       { href: '/dashboard/flashcards', label: 'Flashcards', Icon: IconCards, match: (p) => p === '/dashboard/flashcards' },
       { href: '/dashboard/test', label: 'Tests', Icon: IconTest, match: (p) => p === '/dashboard/test' || p.startsWith('/dashboard/quiz') },
+      { href: '/dashboard/papers', label: 'Exam Papers', Icon: IconPaper, match: (p) => p === '/dashboard/papers' || p.startsWith('/dashboard/paper/') },
       { href: '/dashboard/mistakes', label: 'Redemption', Icon: IconReview, match: (p) => p === '/dashboard/mistakes' },
     ],
   },
@@ -88,6 +89,18 @@ function IconAnalytics({ width = 17, height = 17, style }) {
     <svg width={width} height={height} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={style} aria-hidden="true">
       <path d="M4 20V14M10 20V10M16 20v-5M22 20H2" />
       <path d="m4 9 6-4 6 4 5-4" />
+    </svg>
+  )
+}
+
+/** A sheet with a clock in its corner: a timed exam paper. */
+function IconPaper({ width = 17, height = 17, style }) {
+  return (
+    <svg width={width} height={height} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={style} aria-hidden="true">
+      <path d="M14 3H6.5A1.5 1.5 0 0 0 5 4.5v15A1.5 1.5 0 0 0 6.5 21H12" />
+      <path d="M8.5 8h6M8.5 11.5h4" />
+      <circle cx="17" cy="16.5" r="4" />
+      <path d="M17 14.6v2l1.3 1" />
     </svg>
   )
 }

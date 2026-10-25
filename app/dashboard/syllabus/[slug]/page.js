@@ -181,7 +181,7 @@ export default function SyllabusPage() {
               )}
               {hasQuestions && (
                 <button onClick={() => setPapersOpen(true)} className="btn btn-outline control-sm">
-                  Test
+                  Exam papers
                 </button>
               )}
             </div>
