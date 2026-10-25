@@ -154,7 +154,10 @@ export async function POST(request) {
       // Thinking counts towards this, so it leaves room for the answer. With
       // the input caps above, it is what makes the claim's reservation a
       // ceiling (062-ai-limits.sql).
-      max_tokens: review ? 12000 : 3000,
+      // A long draft needs room for many more comments: an Extended Essay
+      // ran out at 12,000 and came back unfinished. Scaled with its length,
+      // up to 32,000 for the longest draft accepted (085-draft-room.sql).
+      max_tokens: review ? Math.min(32000, Math.max(12000, Math.round(12000 + (text.length - 8000) * 0.75))) : 3000,
       // A draft comes back as JSON the page can lay out: marks per criterion
       // and highlights on the student's own sentences.
       output_config: { effort: 'medium', format: { type: 'json_schema', schema: SCHEMAS[task] } },
