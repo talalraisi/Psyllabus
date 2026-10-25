@@ -202,6 +202,26 @@ async function docxText(file) {
   return value.replace(/\n{3,}/g, '\n\n').trim()
 }
 
+/**
+ * Syllabi reads the PDF itself (app/api/syllabi/read): maths, pictured
+ * quotations and figures come through, which pulling out the text cannot do.
+ * Returns { text, cut } or throws, with `fallback` set when the in-browser
+ * reader should be tried instead.
+ */
+export async function readPdfWithSyllabi(file) {
+  if (file.size > 3 * 1024 * 1024) throw Object.assign(new DraftFileProblem('That PDF is over 3 MB, too big for Syllabi to read, so only its text was pulled out.'), { fallback: true })
+  const bytes = new Uint8Array(await file.arrayBuffer())
+  let binary = ''
+  for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000))
+  const res = await fetch('/api/syllabi/read', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ pdf: btoa(binary) }) })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok || !data.text) {
+    const note = data.error ? `${data.error} Its text was pulled out instead, without pictures or equations.` : 'Syllabi could not read that PDF, so only its text was pulled out.'
+    throw Object.assign(new DraftFileProblem(note), { fallback: true })
+  }
+  return { text: data.text, cut: Boolean(data.cut) }
+}
+
 export async function readDraft(file) {
   const name = file.name.toLowerCase()
   if (file.size > MAX_BYTES) throw new DraftFileProblem('That file is over 15 MB. Open just the essay.')

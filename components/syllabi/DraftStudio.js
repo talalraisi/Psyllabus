@@ -10,7 +10,7 @@ import { senseCheck, MIN_WORDS } from '@/lib/sense-check'
 import { shortName } from '@/lib/subject-short'
 import { Chevron, Copy, Check, Download, Collapse, Refresh, FileIcon } from '@/components/syllabi/icons'
 import Select from '@/components/Select'
-import { readDraft, pdfHasImages, DraftFileProblem, DRAFT_ACCEPT, looksWrapped, reflow } from '@/components/syllabi/draftFile'
+import { readDraft, readPdfWithSyllabi, pdfHasImages, DraftFileProblem, DRAFT_ACCEPT, looksWrapped, reflow } from '@/components/syllabi/draftFile'
 
 /**
  * The draft studio: a page to write on and a marker beside it.
@@ -527,13 +527,24 @@ export default function DraftStudio({ subjects = [] }) {
     setError('')
     setReading(true)
     try {
-      setText((await readDraft(file)).slice(0, MAX))
-      // Quotations pasted into an essay as pictures (lyrics, screenshots)
-      // have no text to read, so say they are missing rather than let them
-      // vanish without a word.
-      if (/\.pdf$/i.test(file.name) && (await pdfHasImages(file))) {
-        setError('Opened. Some of this PDF is pictures (quoted lyrics or screenshots, for example), and those cannot be read as text. Paste them in where they belong if they matter.')
+      const pdf = /\.pdf$/i.test(file.name) || file.type === 'application/pdf'
+      if (pdf) {
+        // Syllabi reads the pages as they look: equations, pictured quotes
+        // and figures come through. If it cannot, the text is pulled out here.
+        try {
+          const { text: read, cut } = await readPdfWithSyllabi(file)
+          setText(read.slice(0, MAX))
+          if (cut) setError('Opened, but the PDF was long and the end was cut off. Paste in the rest if it matters.')
+          return
+        } catch (e) {
+          if (!e?.fallback) throw e
+          setText((await readDraft(file)).slice(0, MAX))
+          // Quotations pasted in as pictures have no text to pull out: say so.
+          setError((await pdfHasImages(file)) ? `${e.message} Some of it is pictures (quotes or screenshots, for example); paste those in where they belong.` : e.message)
+          return
+        }
       }
+      setText((await readDraft(file)).slice(0, MAX))
     } catch (e) {
       setError(e instanceof DraftFileProblem ? e.message : 'That file could not be opened. Paste the text in instead.')
     } finally {
@@ -1135,7 +1146,7 @@ export default function DraftStudio({ subjects = [] }) {
               className="pointer-events-none absolute inset-3 z-20 flex items-center justify-center rounded-[18px] border-2 border-dashed text-[14px] font-semibold"
               style={{ borderColor: 'var(--brand)', background: 'color-mix(in oklab, var(--brand) 8%, var(--bg))', color: 'var(--brand)' }}
             >
-              {reading ? 'Reading your file…' : 'Drop your draft here: PDF, Word or text'}
+              {reading ? 'Syllabi is reading your file. A long essay takes about a minute.' : 'Drop your draft here: PDF, Word or text'}
             </div>
           )}
           <div className="flex-1 overflow-y-auto">
