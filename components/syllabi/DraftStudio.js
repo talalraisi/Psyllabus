@@ -10,7 +10,7 @@ import { senseCheck, MIN_WORDS } from '@/lib/sense-check'
 import { shortName } from '@/lib/subject-short'
 import { Chevron, Copy, Check, Download, Collapse, Refresh, FileIcon } from '@/components/syllabi/icons'
 import Select from '@/components/Select'
-import { readDraft, DraftFileProblem, DRAFT_ACCEPT } from '@/components/syllabi/draftFile'
+import { readDraft, pdfHasImages, DraftFileProblem, DRAFT_ACCEPT } from '@/components/syllabi/draftFile'
 
 /**
  * The draft studio: a page to write on and a marker beside it.
@@ -519,6 +519,12 @@ export default function DraftStudio({ subjects = [] }) {
     setReading(true)
     try {
       setText((await readDraft(file)).slice(0, MAX))
+      // Quotations pasted into an essay as pictures (lyrics, screenshots)
+      // have no text to read, so say they are missing rather than let them
+      // vanish without a word.
+      if (/\.pdf$/i.test(file.name) && (await pdfHasImages(file))) {
+        setError('Opened. Some of this PDF is pictures (quoted lyrics or screenshots, for example), and those cannot be read as text. Paste them in where they belong if they matter.')
+      }
     } catch (e) {
       setError(e instanceof DraftFileProblem ? e.message : 'That file could not be opened. Paste the text in instead.')
     } finally {
