@@ -603,6 +603,8 @@ export default function QuizRunner({
    * the input removes the race instead of narrowing it.
    */
   const revealOne = (question, given = answersRef.current[question.id]) => {
+    // Only practice marks as you go; a test or exam is marked at the end.
+    if (review !== 'practice') return
     if (given == null || String(given).trim() === '') return
     const graded = gradeAnswer(question, given)
     setRevealed((prev) => ({ ...prev, [question.id]: graded }))
@@ -1104,26 +1106,39 @@ export default function QuizRunner({
             <label className="t-overline" htmlFor="short-answer">
               Your answer
             </label>
-            <input
-              id="short-answer"
-              key={q.id}
-              type="text"
-              inputMode={q.answer_kind === 'numeric' ? 'decimal' : 'text'}
-              autoComplete="off"
-              value={selected ?? ''}
-              onChange={(e) => selectAnswer(q.id, e.target.value)}
-              // Typed answers cannot mark on every keystroke, so they mark on
-              // Enter or on leaving the box — still no button to press.
-              onKeyDown={(e) => {
-                if (e.key !== 'Enter') return
-                e.preventDefault()
-                revealOne(q, e.currentTarget.value)
-              }}
-              onBlur={(e) => revealOne(q, e.currentTarget.value)}
-              disabled={review === 'practice' && !!revealed[q.id]}
-              placeholder={q.answer_kind === 'numeric' ? 'e.g. 9.81' : 'Type your answer'}
-              className="input mt-2"
-            />
+            {/* A typed answer is marked when the student says it is finished
+                (Done, or Enter), never because the box lost focus: clicking
+                away to think, or to the calculator, used to mark whatever was
+                half-typed. */}
+            <div className="mt-2 flex gap-2">
+              <input
+                id="short-answer"
+                key={q.id}
+                type="text"
+                inputMode={q.answer_kind === 'numeric' ? 'decimal' : 'text'}
+                autoComplete="off"
+                value={selected ?? ''}
+                onChange={(e) => selectAnswer(q.id, e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key !== 'Enter' || review !== 'practice') return
+                  e.preventDefault()
+                  revealOne(q, e.currentTarget.value)
+                }}
+                disabled={review === 'practice' && !!revealed[q.id]}
+                placeholder={q.answer_kind === 'numeric' ? 'e.g. 9.81' : 'Type your answer'}
+                className="input min-w-0 flex-1"
+              />
+              {review === 'practice' && !revealed[q.id] && (
+                <button
+                  type="button"
+                  onClick={() => revealOne(q)}
+                  disabled={selected == null || String(selected).trim() === ''}
+                  className="btn btn-solid control-lg shrink-0 disabled:opacity-40"
+                >
+                  Done
+                </button>
+              )}
+            </div>
             <p className="mt-2 text-[13px]" style={{ color: 'var(--text-faint)' }}>
               {q.answer_hint ||
                 (q.answer_kind === 'numeric'
