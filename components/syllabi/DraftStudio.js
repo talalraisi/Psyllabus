@@ -10,6 +10,7 @@ import { senseCheck, MIN_WORDS } from '@/lib/sense-check'
 import { shortName } from '@/lib/subject-short'
 import { Chevron, Copy, Check, Download, Collapse, Refresh, FileIcon } from '@/components/syllabi/icons'
 import Select from '@/components/Select'
+import { readDraft, DraftFileProblem, DRAFT_ACCEPT } from '@/components/syllabi/draftFile'
 
 /**
  * The draft studio: a page to write on and a marker beside it.
@@ -509,17 +510,36 @@ export default function DraftStudio({ subjects = [] }) {
     URL.revokeObjectURL(url)
   }
 
+  // A PDF, a Word file or a text file, opened or dropped: its text becomes the draft.
+  const [reading, setReading] = useState(false)
+  const [dragging, setDragging] = useState(false)
   const openFile = async (file) => {
-    if (!file) return
-    if (!/\.(txt|md)$/i.test(file.name) && !file.type.startsWith('text/')) {
-      setError('Open a .txt file here, or paste from Word or Google Docs.')
-      return
+    if (!file || busy) return
+    setError('')
+    setReading(true)
+    try {
+      setText((await readDraft(file)).slice(0, MAX))
+    } catch (e) {
+      setError(e instanceof DraftFileProblem ? e.message : 'That file could not be opened. Paste the text in instead.')
+    } finally {
+      setReading(false)
     }
-    if (file.size > 400 * 1024) {
-      setError('That file is too long for one draft.')
-      return
-    }
-    setText((await file.text()).slice(0, MAX))
+  }
+  const dropZone = {
+    onDragOver: (e) => {
+      if (!e.dataTransfer?.types?.includes('Files')) return
+      e.preventDefault()
+      setDragging(true)
+    },
+    onDragLeave: (e) => {
+      if (!e.currentTarget.contains(e.relatedTarget)) setDragging(false)
+    },
+    onDrop: (e) => {
+      if (!e.dataTransfer?.files?.length) return
+      e.preventDefault()
+      setDragging(false)
+      openFile(e.dataTransfer.files[0])
+    },
   }
 
   const pasteIn = async () => {
@@ -1092,8 +1112,16 @@ export default function DraftStudio({ subjects = [] }) {
       </div>
 
       <div className="relative flex min-h-0 flex-1">
-        {/* The page. */}
-        <section className="relative flex min-w-0 flex-1 flex-col">
+        {/* The page. A file dropped anywhere on it opens as the draft. */}
+        <section className="relative flex min-w-0 flex-1 flex-col" {...dropZone}>
+          {(dragging || reading) && (
+            <div
+              className="pointer-events-none absolute inset-3 z-20 flex items-center justify-center rounded-[18px] border-2 border-dashed text-[14px] font-semibold"
+              style={{ borderColor: 'var(--brand)', background: 'color-mix(in oklab, var(--brand) 8%, var(--bg))', color: 'var(--brand)' }}
+            >
+              {reading ? 'Reading your file…' : 'Drop your draft here: PDF, Word or text'}
+            </div>
+          )}
           <div className="flex-1 overflow-y-auto">
             <div className="mx-auto max-w-[760px] px-6 pb-20 pt-8 sm:px-12">
               {isPaper(kind) && (
@@ -1128,7 +1156,7 @@ export default function DraftStudio({ subjects = [] }) {
             <button type="button" onClick={pasteIn} disabled={busy} className="h-8 rounded-[8px] px-2.5 text-[12.5px] font-medium transition-colors hover:bg-[var(--surface-sunken)]" style={{ color: 'var(--text-muted)' }}>
               Paste
             </button>
-            <input ref={fileRef} type="file" accept=".txt,.md,text/plain" hidden onChange={(e) => (openFile(e.target.files?.[0]), (e.target.value = ''))} />
+            <input ref={fileRef} type="file" accept={DRAFT_ACCEPT} hidden onChange={(e) => (openFile(e.target.files?.[0]), (e.target.value = ''))} />
             <button type="button" onClick={() => fileRef.current?.click()} disabled={busy} className="flex h-8 items-center gap-1.5 rounded-[8px] px-2.5 text-[12.5px] font-medium transition-colors hover:bg-[var(--surface-sunken)]" style={{ color: 'var(--text-muted)' }}>
               <FileIcon size={14} />
               Open

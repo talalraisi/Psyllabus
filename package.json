@@ -33,7 +33,9 @@
     "@supabase/supabase-js": "^2.108.2",
     "ical.js": "^2.2.1",
     "katex": "^0.16.11",
+    "mammoth": "^1.8.0",
     "next": "^16.2.10",
+    "pdfjs-dist": "^4.4.168",
     "pg": "^8.23.0",
     "react": "19.2.4",
     "react-dom": "19.2.4"
