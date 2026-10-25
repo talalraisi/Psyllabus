@@ -10,7 +10,7 @@ import { senseCheck, MIN_WORDS } from '@/lib/sense-check'
 import { shortName } from '@/lib/subject-short'
 import { Chevron, Copy, Check, Download, Collapse, Refresh, FileIcon } from '@/components/syllabi/icons'
 import Select from '@/components/Select'
-import { readDraft, pdfHasImages, DraftFileProblem, DRAFT_ACCEPT } from '@/components/syllabi/draftFile'
+import { readDraft, pdfHasImages, DraftFileProblem, DRAFT_ACCEPT, looksWrapped, reflow } from '@/components/syllabi/draftFile'
 
 /**
  * The draft studio: a page to write on and a marker beside it.
@@ -232,6 +232,15 @@ function HighlightEditor({ text, onChange, parts, active, show, onCaret, markRef
         ref={boxRef}
         value={text}
         onChange={(e) => onChange(e.target.value.slice(0, MAX))}
+        // Text copied out of a PDF keeps a break after every line; put it back into paragraphs as it lands.
+        onPaste={(e) => {
+          const pasted = e.clipboardData?.getData('text/plain') || ''
+          if (!looksWrapped(pasted)) return
+          e.preventDefault()
+          const box = e.currentTarget
+          const clean = reflow(pasted)
+          onChange((box.value.slice(0, box.selectionStart) + clean + box.value.slice(box.selectionEnd)).slice(0, MAX))
+        }}
         onClick={(e) => onCaret(e.currentTarget.selectionStart)}
         onKeyUp={(e) => onCaret(e.currentTarget.selectionStart)}
         disabled={disabled}
@@ -550,7 +559,8 @@ export default function DraftStudio({ subjects = [] }) {
 
   const pasteIn = async () => {
     try {
-      const clip = await navigator.clipboard.readText()
+      const raw = await navigator.clipboard.readText()
+      const clip = looksWrapped(raw) ? reflow(raw) : raw
       if (clip) setText((t) => (t.trim() ? `${t}\n\n${clip}` : clip).slice(0, MAX))
     } catch {
       setError('Your browser blocked pasting from here. Use Ctrl+V or ⌘V in the page.')

@@ -15,6 +15,59 @@ export const DRAFT_ACCEPT = '.txt,.md,text/plain,.pdf,application/pdf,.docx,appl
 
 const MAX_BYTES = 15 * 1024 * 1024
 
+const PAGE_NUMBER = /^(page\s*)?\d{1,3}(\s*(of|\/)\s*\d{1,3})?$/i
+
+/**
+ * True when text has been copied out of a PDF and still has the PDF's line
+ * breaks in it: most lines end mid-sentence at about the same length, often
+ * with a blank line after every one.
+ */
+export function looksWrapped(text) {
+  const lines = String(text).split('\n').map((l) => l.trim()).filter(Boolean)
+  if (lines.length < 6) return false
+  const long = lines.filter((l) => l.length > 40)
+  const midSentence = long.filter((l) => !ENDS_SENTENCE.test(l)).length
+  return long.length >= lines.length * 0.5 && midSentence >= long.length * 0.5
+}
+
+/**
+ * Hard-wrapped text (copied out of a PDF) back into paragraphs.
+ *
+ * Copying from a PDF keeps a line break at the end of every line, and from a
+ * double-spaced essay a blank line after every one, so the draft arrived as a
+ * column of one-line paragraphs with the page numbers in between. Without the
+ * page's geometry, the text itself has to say where paragraphs end: a line
+ * that stops well short of the usual length after a full stop ends one; a
+ * short line with no full stop before a capital is a heading on its own; a
+ * number alone on a line is a page number and goes; everything else joins.
+ */
+export function reflow(text) {
+  const lines = String(text)
+    .replace(/\r\n?/g, '\n')
+    .split('\n')
+    .map((l) => l.replace(/\s+/g, ' ').trim())
+    .filter((l) => l && !PAGE_NUMBER.test(l))
+  if (!lines.length) return ''
+  const lengths = lines.map((l) => l.length).filter((n) => n > 40).sort((a, b) => a - b)
+  const usual = lengths.length ? lengths[Math.floor(lengths.length * 0.6)] : 70
+  const short = (l) => l.length < usual * 0.78
+  const heading = (l, next) => short(l) && !ENDS_SENTENCE.test(l) && !/[,;]$/.test(l) && (!next || /^[A-Z0-9“"(]/.test(next))
+
+  const out = []
+  lines.forEach((l, i) => {
+    const prev = lines[i - 1]
+    const startsNew =
+      i === 0 ||
+      (short(prev) && ENDS_SENTENCE.test(prev)) ||
+      heading(prev, l) ||
+      heading(l, lines[i + 1]) ||
+      /^[•▪◦]\s|^-\s|^\d+[.)]\s/.test(l)
+    if (startsNew) out.push(l)
+    else out[out.length - 1] += out[out.length - 1].endsWith('-') ? l : ` ${l}`
+  })
+  return out.join('\n\n')
+}
+
 /** The lines of one page, top to bottom: { text, y, x0, x1 }. */
 function linesOf(items) {
   const lines = []
@@ -121,7 +174,10 @@ async function docxText(file) {
 export async function readDraft(file) {
   const name = file.name.toLowerCase()
   if (file.size > MAX_BYTES) throw new DraftFileProblem('That file is over 15 MB. Open just the essay.')
-  if (/\.(txt|md)$/.test(name) || file.type.startsWith('text/')) return (await file.text()).trim()
+  if (/\.(txt|md)$/.test(name) || file.type.startsWith('text/')) {
+    const text = (await file.text()).trim()
+    return looksWrapped(text) ? reflow(text) : text
+  }
   if (name.endsWith('.pdf') || file.type === 'application/pdf') {
     let text = ''
     try {
@@ -130,7 +186,8 @@ export async function readDraft(file) {
       throw new DraftFileProblem('That PDF could not be opened. Try saving it again, or paste the text in.')
     }
     if (text.replace(/\s/g, '').length < 40) throw new DraftFileProblem('That PDF has no text in it, only pictures of pages (a scan or a photo). Paste the text in, or type it.')
-    return text
+    // If the page layout gave no clue to the paragraphs, the text itself can.
+    return looksWrapped(text) ? reflow(text) : text
   }
   if (name.endsWith('.docx')) {
     try {
