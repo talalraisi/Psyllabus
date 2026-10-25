@@ -13,7 +13,7 @@ import { statusLabel } from '@/lib/subject-graph'
  *   Planets    what it holds, in syllabus order clockwise from the top, on
  *              true circles. Size is how much is inside; the planet's tint is
  *              where you stand, kept quiet (untested is grey, weak is a warm
- *              tint rather than an alarm). Only the name sits under each one;
+ *              tint rather than an alarm), flat, no shading. Only the name sits under each one;
  *              the numbers are in the panel. Click to read about it, double-
  *              click to fly into it.
  *
@@ -211,9 +211,8 @@ export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = fal
               width: layout.hub * 2,
               height: layout.hub * 2,
               padding: layout.hub * 0.2,
-              background: 'radial-gradient(circle at 34% 28%, color-mix(in oklab, var(--brand) 26%, var(--surface)), var(--surface) 72%)',
+              background: 'color-mix(in oklab, var(--brand) 8%, var(--surface))',
               border: '1px solid color-mix(in oklab, var(--brand) 30%, var(--border))',
-              boxShadow: '0 0 40px -8px color-mix(in oklab, var(--brand) 45%, transparent), inset 0 -10px 24px -14px color-mix(in oklab, var(--brand) 50%, transparent)',
             }}
           >
             {/* A small sun (a phone) keeps only the name and the count. */}
@@ -265,10 +264,10 @@ export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = fal
                       top: p.y - p.r,
                       width: p.r * 2,
                       height: p.r * 2,
-                      background: `radial-gradient(circle at 32% 28%, color-mix(in oklab, ${c} 45%, white) 0%, ${c} 42%, color-mix(in oklab, ${c} 55%, black) 100%)`,
-                      boxShadow: sel
-                        ? `0 0 0 3px var(--bg), 0 0 0 4.5px ${c}, 0 0 34px 6px color-mix(in oklab, ${c} 40%, transparent)`
-                        : `0 10px 26px -12px color-mix(in oklab, ${c} 85%, transparent)`,
+                      // Flat: one even colour and a fine edge, no shading.
+                      background: c,
+                      border: `1px solid color-mix(in oklab, ${c} 70%, var(--text))`,
+                      boxShadow: sel ? `0 0 0 3px var(--bg), 0 0 0 4.5px ${c}, 0 0 28px 4px color-mix(in oklab, ${c} 35%, transparent)` : 'none',
                     }}
                   />
                   <button
