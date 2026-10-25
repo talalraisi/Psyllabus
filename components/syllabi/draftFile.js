@@ -30,6 +30,17 @@ export function looksWrapped(text) {
   return long.length >= lines.length * 0.5 && midSentence >= long.length * 0.5
 }
 
+/* A bibliography is a list, not prose: each entry is its own line. */
+const BIB_HEADING = /^(bibliography|references|works cited|sources|reference list)\s*:?$/i
+/** Where an entry starts: "Surname, A." or a name or title with its year in brackets close by ("MEAM. (2020", "1NB. (2020"). */
+const ENTRY_START = (l) => /^[A-Z][A-Za-z'’-]+, (?:[A-Z][a-z]*\.?|&)/.test(l) || (/^[A-Z0-9]/.test(l) && !/^\d+[/,]/.test(l) && /^.{0,80}?\((?:\d{4}|n\.d\.)/.test(l))
+/** How a line continues the one before: no space inside a URL broken across lines, or a word split with a hyphen. */
+function joinLine(prev, next) {
+  const lastWord = prev.split(' ').at(-1)
+  if (/^https?:\/\//.test(lastWord) && !/\s/.test(next)) return prev + next
+  return prev.endsWith('-') ? prev + next : `${prev} ${next}`
+}
+
 /**
  * Hard-wrapped text (copied out of a PDF) back into paragraphs.
  *
@@ -54,18 +65,25 @@ export function reflow(text) {
   const heading = (l, next) => short(l) && !ENDS_SENTENCE.test(l) && !/[,;]$/.test(l) && (!next || /^[A-Z0-9“"(]/.test(next))
 
   const out = []
+  let bib = false // past the Bibliography heading: one entry per paragraph
   lines.forEach((l, i) => {
     const prev = lines[i - 1]
-    const startsNew =
-      i === 0 ||
-      (short(prev) && ENDS_SENTENCE.test(prev)) ||
-      heading(prev, l) ||
-      heading(l, lines[i + 1]) ||
-      /^[•▪◦]\s|^-\s|^\d+[.)]\s/.test(l)
-    if (startsNew) out.push(l)
-    else out[out.length - 1] += out[out.length - 1].endsWith('-') ? l : ` ${l}`
+    const startsNew = bib
+      ? ENTRY_START(l)
+      : i === 0 ||
+        (short(prev) && ENDS_SENTENCE.test(prev)) ||
+        heading(prev, l) ||
+        heading(l, lines[i + 1]) ||
+        BIB_HEADING.test(l) ||
+        /^[•▪◦]\s|^-\s|^\d+[.)]\s/.test(l)
+    if (startsNew || !out.length) out.push(l)
+    else out[out.length - 1] = joinLine(out[out.length - 1], l)
+    if (BIB_HEADING.test(l)) {
+      bib = true
+      out.push('') // the heading stands alone; the first entry starts afresh
+    }
   })
-  return out.join('\n\n')
+  return out.filter(Boolean).join('\n\n')
 }
 
 /** The lines of one page, top to bottom: { text, y, x0, x1 }. */
@@ -117,6 +135,7 @@ async function pdfText(file) {
   const doc = await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()) }).promise
   const paragraphs = []
   let open = false // the last paragraph may carry on onto this page
+  let bib = false // past the Bibliography heading: one entry per paragraph
   for (let n = 1; n <= Math.min(doc.numPages, 60); n++) {
     const page = await doc.getPage(n)
     let lines = linesOf((await page.getTextContent()).items)
@@ -130,23 +149,35 @@ async function pdfText(file) {
     const right = Math.max(...lines.map((l) => l.x1))
     const left = Math.min(...lines.map((l) => l.x0))
 
+    // In a bibliography, entries with a hanging indent start at the margin
+    // and carry on indented; without one, the entry's own shape says where it starts.
+    const hanging = lines.some((l) => l.x0 > left + 12)
     lines.forEach((l, i) => {
       const prev = lines[i - 1]
-      const brokeHere =
-        i === 0
+      const brokeHere = bib
+        ? hanging
+          ? l.x0 < left + 6
+          : ENTRY_START(l.text)
+        : i === 0
           ? !open
-          : prev.y - l.y > usual * 1.45 || (prev.x1 < left + (right - left) * 0.8 && ENDS_SENTENCE.test(prev.text)) || /^[•▪◦-]\s/.test(l.text)
-      if (brokeHere || !paragraphs.length) paragraphs.push(l.text)
-      else {
+          : prev.y - l.y > usual * 1.45 || (prev.x1 < left + (right - left) * 0.8 && ENDS_SENTENCE.test(prev.text)) || BIB_HEADING.test(l.text) || /^[•▪◦-]\s/.test(l.text)
+      if (brokeHere || !paragraphs.length || paragraphs.at(-1) === null) {
+        if (paragraphs.at(-1) === null) paragraphs.pop()
+        paragraphs.push(l.text)
+      } else {
         const last = paragraphs.length - 1
-        // A word split at the end of a line ("santan-da" / "ves") joins up.
-        paragraphs[last] += paragraphs[last].endsWith('-') ? l.text : ` ${l.text}`
+        // A word split at the end of a line ("santan-da" / "ves") or a URL joins up.
+        paragraphs[last] = joinLine(paragraphs[last], l.text)
+      }
+      if (BIB_HEADING.test(l.text)) {
+        bib = true
+        paragraphs.push(null) // the heading stands alone
       }
     })
     const last = lines.at(-1)
     open = !ENDS_SENTENCE.test(last.text) && last.x1 > left + (right - left) * 0.8
   }
-  return paragraphs.join('\n\n')
+  return paragraphs.filter(Boolean).join('\n\n')
 }
 
 /** True when a PDF has pictures as well as text: quoted lyrics or diagrams that were pasted in as images. */
