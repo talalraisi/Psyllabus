@@ -71,7 +71,7 @@ export default function SubjectsPage() {
       {/* "Mapped topic by topic" is four words everybody nods at without
           picturing. This is the picture. */}
       <Band tint>
-        <div className="grid items-center gap-10 md:grid-cols-[1fr_1.1fr] md:gap-14">
+        <div className="grid grid-cols-[minmax(0,1fr)] items-center gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:gap-14">
           <div>
             <h2 className="text-[clamp(1.5rem,3vw,2rem)] font-semibold leading-tight tracking-[-0.03em]">
               What “mapped” means
