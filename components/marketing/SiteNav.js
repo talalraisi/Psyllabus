@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { IconMenu } from '@/components/Icons'
 import { Chevron } from '@/components/Select'
 
 /**
@@ -85,6 +84,16 @@ export default function SiteNav({ children }) {
   }, [more, mobile])
 
   useEffect(() => () => clearTimeout(leaving.current), [])
+
+  // The page under the menu stays where it is while the menu is down.
+  useEffect(() => {
+    if (!mobile) return
+    const before = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = before
+    }
+  }, [mobile])
 
   /* Opens on hover, and does not close the instant you leave the word — the
      gap between the word and the panel under it is a few pixels of nothing,
@@ -197,59 +206,81 @@ export default function SiteNav({ children }) {
           Get started
         </Link>
 
-        {/* Phone: the whole lot behind one button, since the bar has no room. */}
-        <div className="relative md:hidden">
-          <button
-            onClick={() => setMobile((v) => !v)}
-            aria-haspopup="menu"
-            aria-expanded={mobile}
-            aria-label="Menu"
-            className="btn btn-quiet control-sm px-2.5"
-          >
-            <IconMenu width={16} height={16} />
+        {/* Phone: a word, like More on the desktop, not a button of three
+            lines in the corner. It drops the menu down from the top. */}
+        <button
+          onClick={() => setMobile((v) => !v)}
+          aria-haspopup="dialog"
+          aria-expanded={mobile}
+          aria-controls="site-menu"
+          className="-order-1 flex items-center gap-1.5 text-[13.5px] font-medium md:hidden"
+          style={{ color: 'var(--text-body)' }}
+        >
+          <span className="nav-word" data-open={mobile || undefined}>
+            Menu
+          </span>
+          <Caret open={mobile} />
+        </button>
+      </div>
+
+      {/* The menu falls from the top and covers about a third of the screen;
+          the page under it dims and stays put. Always mounted, so it can
+          slide both ways; hidden from everyone while it is up. */}
+      <div
+        className="site-menu-backdrop fixed inset-0 z-[60] md:hidden"
+        data-open={mobile || undefined}
+        onClick={() => setMobile(false)}
+        aria-hidden="true"
+      />
+      <div
+        id="site-menu"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu"
+        className="site-menu fixed inset-x-0 top-0 z-[61] rounded-b-[24px] border-b px-5 pb-6 pt-4 md:hidden"
+        data-open={mobile || undefined}
+        inert={!mobile || undefined}
+        style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+      >
+        <div className="flex items-center justify-between">
+          <div className="min-w-0" onClick={() => setMobile(false)}>
+            {children}
+          </div>
+          <button onClick={() => setMobile(false)} className="flex items-center gap-1.5 text-[13.5px] font-medium" style={{ color: 'var(--text-body)' }}>
+            Close
+            <Caret open />
           </button>
-          {mobile && (
-            <div
-              role="menu"
-              className="elev-lg pop-enter absolute right-0 top-11 z-50 max-h-[75vh] w-[15rem] overflow-y-auto rounded-[12px] border"
-              style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
+        </div>
+
+        <nav className="mt-5 grid grid-cols-2 gap-x-4 gap-y-1">
+          {LINKS.map(([label, href], i) => (
+            <Link
+              key={href}
+              href={href}
+              onClick={() => setMobile(false)}
+              className="site-menu-item py-2 text-[22px] font-semibold tracking-[-0.02em]"
+              style={{ color: 'var(--text)', '--i': i }}
             >
-              {LINKS.map(([label, href]) => (
-                <Link
-                  key={href}
-                  href={href}
-                  role="menuitem"
-                  onClick={() => setMobile(false)}
-                  className="block px-4 py-3 text-[13.5px] font-medium hover:bg-[var(--surface-sunken)]"
-                >
-                  {label}
-                </Link>
-              ))}
-              {MORE.map((section) => (
-                <div key={section.heading} className="border-t" style={{ borderColor: 'var(--border)' }}>
-                  {section.items.map(([label, href]) => (
-                    <Link
-                      key={href}
-                      href={href}
-                      role="menuitem"
-                      onClick={() => setMobile(false)}
-                      className="block px-4 py-3 text-[13.5px] font-medium hover:bg-[var(--surface-sunken)]"
-                    >
-                      {label}
-                    </Link>
-                  ))}
-                </div>
-              ))}
-              <Link
-                href="/login"
-                onClick={() => setMobile(false)}
-                className="block border-t px-4 py-3 text-[13.5px] font-medium"
-                style={{ borderColor: 'var(--border)' }}
-              >
-                Log in
-              </Link>
-            </div>
-          )}
+              {label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="site-menu-item mt-3 flex flex-wrap gap-x-4 gap-y-1.5 border-t pt-4" style={{ borderColor: 'var(--border)', '--i': 4 }}>
+          {MORE.flatMap((s) => s.items).map(([label, href]) => (
+            <Link key={href} href={href} onClick={() => setMobile(false)} className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
+              {label}
+            </Link>
+          ))}
+        </div>
+
+        <div className="site-menu-item mt-5 grid grid-cols-2 gap-2" style={{ '--i': 5 }}>
+          <Link href="/login" onClick={() => setMobile(false)} className="btn btn-outline control-md justify-center">
+            Log in
+          </Link>
+          <Link href="/signup" onClick={() => setMobile(false)} className="btn btn-solid control-md justify-center">
+            Get started
+          </Link>
         </div>
       </div>
     </div>

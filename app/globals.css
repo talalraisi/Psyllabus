@@ -1653,3 +1653,41 @@ input[type='range'].slider:focus-visible::-moz-range-thumb {
   .frame-in-next, .frame-in-prev, .stagger > *, .lift-once { animation: none; }
   .flip-card-inner { transition: none; }
 }
+
+/* The phone menu (components/marketing/SiteNav.js): it falls from the top,
+   overshoots a touch and settles, covering about a third of the screen. The
+   links follow it down one after another. */
+.site-menu {
+  transform: translateY(-104%);
+  visibility: hidden;
+  transition: transform 520ms cubic-bezier(0.22, 1.25, 0.36, 1), visibility 0s linear 520ms;
+  box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.35);
+}
+.site-menu[data-open] {
+  transform: none;
+  visibility: visible;
+  transition: transform 520ms cubic-bezier(0.22, 1.25, 0.36, 1), visibility 0s;
+}
+.site-menu .site-menu-item {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 260ms ease, transform 360ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.site-menu[data-open] .site-menu-item {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(140ms + var(--i, 0) * 45ms);
+}
+.site-menu-backdrop {
+  background: rgba(0, 0, 0, 0.32);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 320ms ease;
+}
+.site-menu-backdrop[data-open] {
+  opacity: 1;
+  pointer-events: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-menu, .site-menu[data-open], .site-menu .site-menu-item, .site-menu[data-open] .site-menu-item { transition: none; }
+}
