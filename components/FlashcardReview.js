@@ -53,6 +53,8 @@ export default function FlashcardReview({ cards, onMark, onEdit, onDelete, onExi
   const [answered, setAnswered] = useState({})
   const [direction, setDirection] = useState('next')
   const [summary, setSummary] = useState(false)
+  // A glow round the card as it is marked: green for right, red for wrong.
+  const [flash, setFlash] = useState(null)
   const containerRef = useRef(null)
 
   const card = queue[index]
@@ -107,6 +109,7 @@ export default function FlashcardReview({ cards, onMark, onEdit, onDelete, onExi
     (correct) => {
       if (!card || verdict) return
       onMark(card, correct)
+      setFlash({ tone: correct ? 'right' : 'wrong', n: Date.now() })
       setAnswered((a) => ({ ...a, [index]: correct ? 'right' : 'wrong' }))
       // Right moves on. Wrong stays on the answer and asks when to bring it back.
       if (correct) advance()
@@ -236,7 +239,9 @@ export default function FlashcardReview({ cards, onMark, onEdit, onDelete, onExi
         <>
           {/* The card */}
           <div className="flex flex-1 items-center justify-center overflow-hidden p-5">
-            <div className="card-stage w-full max-w-4xl">
+            <div className="card-stage relative w-full max-w-4xl">
+              {/* On the stage, not the card, so it is still there while the next card comes in. */}
+              {flash && <div key={flash.n} className="card-glow" data-tone={flash.tone} aria-hidden="true" />}
               {/* The shake lives on its own layer, keyed to this card and this
                   miss, so it plays once and only here. */}
               <div className={missed ? 'card-wrong' : ''}>

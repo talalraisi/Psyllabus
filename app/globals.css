@@ -991,6 +991,46 @@ body {
 }
 .card-wrong { animation: card-wrong 420ms cubic-bezier(0.36, 0.07, 0.19, 0.97) backwards; }
 
+/* A glow as a card is marked: a soft edge of green for right or red for
+   wrong, rising and gone in under a second. Not a flash of the whole card,
+   which would be loud dozens of times a session. */
+@keyframes card-glow {
+  0%   { opacity: 0; }
+  20%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+.card-glow,
+.flashcard.card-right::after,
+.flashcard.card-wrong::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: 5;
+  border-radius: 19px;
+  pointer-events: none;
+  opacity: 0;
+  animation: card-glow 720ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.card-glow[data-tone='right'],
+.flashcard.card-right::after {
+  --tone: var(--status-proficient);
+}
+.card-glow[data-tone='wrong'],
+.flashcard.card-wrong::after {
+  --tone: var(--status-weak);
+}
+.card-glow,
+.flashcard.card-right::after,
+.flashcard.card-wrong::after {
+  border: 1.5px solid color-mix(in oklab, var(--tone) 75%, transparent);
+  background: color-mix(in oklab, var(--tone) 7%, transparent);
+  box-shadow:
+    0 0 36px 4px color-mix(in oklab, var(--tone) 32%, transparent),
+    inset 0 0 48px color-mix(in oklab, var(--tone) 16%, transparent);
+}
+.flashcard.card-right,
+.flashcard.card-wrong { position: relative; }
+
 /* The verdict arriving under it. */
 @keyframes verdict-in {
   from { opacity: 0; transform: translateY(6px) scale(0.98); }
@@ -1152,6 +1192,7 @@ body {
   .hero-in > *,
   .card-right,
   .card-wrong,
+  .card-glow,
   .verdict-in,
   .step-enter,
   .ground::before { animation: none; }
