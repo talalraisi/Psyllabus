@@ -26,6 +26,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { dayKey } from '@/lib/study-time'
 import { runs } from '@/lib/streak'
+import { pageZoom } from '@/lib/page-zoom'
 
 const FRAMES = [
   { key: '1M', name: '1 month', months: 1 },
@@ -225,7 +226,8 @@ export default function StudyHeatmap({ data, rest }) {
     if (!cell) return
     const r = cell.getBoundingClientRect()
     const x = Math.min(window.innerWidth - 90, Math.max(90, r.left + r.width / 2))
-    setTip({ title: cell.dataset.tip, value: cell.dataset.value, x, y: r.top })
+    const z = pageZoom()
+    setTip({ title: cell.dataset.tip, value: cell.dataset.value, x: x / z, y: r.top / z })
   }
 
   return (

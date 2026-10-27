@@ -2,6 +2,7 @@
 
 import { Children, isValidElement, useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { pageZoom } from '@/lib/page-zoom'
 
 /**
  * The app's dropdown, in place of the browser's <select>.
@@ -66,11 +67,13 @@ export default function Select({ value, onChange, children, className = '', styl
     const height = Math.min(300, options.length * 38 + 12)
     const below = window.innerHeight - r.bottom
     const up = below < height + 16 && r.top > below
+    // Measured in screen pixels; on a zoomed large screen, written back in page pixels.
+    const z = pageZoom()
     setPlace({
-      left: Math.min(r.left, window.innerWidth - Math.max(r.width, 200) - 8),
-      width: Math.max(r.width, 200),
-      top: up ? undefined : r.bottom + 6,
-      bottom: up ? window.innerHeight - r.top + 6 : undefined,
+      left: Math.min(r.left, window.innerWidth - Math.max(r.width, 200) - 8) / z,
+      width: Math.max(r.width, 200) / z,
+      top: up ? undefined : (r.bottom + 6) / z,
+      bottom: up ? (window.innerHeight - r.top + 6) / z : undefined,
       up,
     })
   }

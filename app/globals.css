@@ -1751,3 +1751,29 @@ input[type='range'].slider:focus-visible::-moz-range-thumb {
 .burger[data-open] > span:nth-child(2) { opacity: 0; transform: scaleX(0.2); }
 .burger[data-open] > span:nth-child(3) { transform: rotate(-45deg); }
 @media (prefers-reduced-motion: reduce) { .burger > span { transition: none; } }
+
+/* Large screens.
+
+   On a big monitor the site kept its laptop size: a column in the middle and
+   a metre of empty space either side. Past 1,800 px wide the whole page is
+   scaled up (15%, then 30% past 2,300 px), so a 2560 px screen looks like a
+   well-filled laptop. Zoom multiplies screen-height units too, so everything
+   sized by the screen's height is divided back by the same factor here, and
+   lib/page-zoom.js does the same for menus placed by measurement. */
+@media (min-width: 1800px) {
+  :root { --z: 1.15; zoom: 1.15; }
+}
+@media (min-width: 2300px) {
+  :root { --z: 1.3; zoom: 1.3; }
+}
+@media (min-width: 1800px) {
+  .h-dvh, .md\:h-dvh { height: calc(100dvh / var(--z)); }
+  .min-h-screen, .page { min-height: calc(100vh / var(--z)); }
+  .min-h-\[calc\(100svh-4rem\)\] { min-height: calc(100svh / var(--z) - 4rem); }
+  .min-h-\[52vh\] { min-height: calc(52vh / var(--z)); }
+  .min-h-\[60vh\] { min-height: calc(60vh / var(--z)); }
+  .max-h-\[90vh\] { max-height: calc(90vh / var(--z)); }
+  .max-h-\[70vh\] { max-height: calc(70vh / var(--z)); }
+  .max-h-\[50vh\] { max-height: calc(50vh / var(--z)); }
+  .pt-\[12vh\] { padding-top: calc(12vh / var(--z)); }
+}
