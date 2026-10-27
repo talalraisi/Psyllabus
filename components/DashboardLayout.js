@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
-import logoMark from '@/public/logo-mark.png'
+import logoMark from '@/public/logo-mark.svg'
 import {
   IconDashboard,
   IconSubjects,

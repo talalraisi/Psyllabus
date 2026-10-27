@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import logoMark from '@/public/logo-mark.png'
+import logoMark from '@/public/logo-mark.svg'
 import { IconArrowRight } from '@/components/Icons'
 import { SubjectTile } from '@/components/marketing/SubjectIcons'
 

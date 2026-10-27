@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import logoMark from '@/public/logo-mark.png'
+import logoMark from '@/public/logo-mark.svg'
 import ThemeToggle from '@/components/ThemeToggle'
 import SiteNav from '@/components/marketing/SiteNav'
 import { operatorLine } from '@/lib/legal'

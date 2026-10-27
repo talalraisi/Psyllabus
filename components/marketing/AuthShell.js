@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import logoMark from '@/public/logo-mark.png'
+import logoMark from '@/public/logo-mark.svg'
 
 /**
  * The frame every sign-in and sign-up screen sits in.
