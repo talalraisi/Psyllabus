@@ -206,20 +206,21 @@ export default function SiteNav({ children }) {
           Get started
         </Link>
 
-        {/* Phone: a word, like More on the desktop, not a button of three
-            lines in the corner. It drops the menu down from the top. */}
+        {/* Phone: three bare lines to the right of Get started, no outline or
+            fill, that fold into a cross while the menu is down. */}
         <button
           onClick={() => setMobile((v) => !v)}
           aria-haspopup="dialog"
           aria-expanded={mobile}
           aria-controls="site-menu"
-          className="-order-1 flex items-center gap-1.5 text-[13.5px] font-medium md:hidden"
-          style={{ color: 'var(--text-body)' }}
+          aria-label={mobile ? 'Close menu' : 'Menu'}
+          className="burger -mr-1.5 flex h-9 w-9 items-center justify-center md:hidden"
+          data-open={mobile || undefined}
+          style={{ color: 'var(--text)' }}
         >
-          <span className="nav-word" data-open={mobile || undefined}>
-            Menu
-          </span>
-          <Caret open={mobile} />
+          <span aria-hidden="true" />
+          <span aria-hidden="true" />
+          <span aria-hidden="true" />
         </button>
       </div>
 
@@ -246,9 +247,11 @@ export default function SiteNav({ children }) {
           <div className="min-w-0" onClick={() => setMobile(false)}>
             {children}
           </div>
-          <button onClick={() => setMobile(false)} className="flex items-center gap-1.5 text-[13.5px] font-medium" style={{ color: 'var(--text-body)' }}>
-            Close
-            <Caret open />
+          {/* The three lines, now a cross, where they were. */}
+          <button onClick={() => setMobile(false)} aria-label="Close menu" className="burger -mr-1.5 flex h-9 w-9 items-center justify-center" data-open={mobile || undefined} style={{ color: 'var(--text)' }}>
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
           </button>
         </div>
 
