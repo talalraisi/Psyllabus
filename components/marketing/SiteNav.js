@@ -238,7 +238,7 @@ export default function SiteNav({ children }) {
         role="dialog"
         aria-modal="true"
         aria-label="Menu"
-        className="site-menu fixed inset-x-0 top-0 z-[61] rounded-b-[24px] border-b px-5 pb-6 pt-4 md:hidden"
+        className="site-menu fixed inset-x-0 top-0 z-[61] rounded-b-[24px] border-b px-5 pb-8 pt-4 md:hidden"
         data-open={mobile || undefined}
         inert={!mobile || undefined}
         style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
@@ -255,13 +255,13 @@ export default function SiteNav({ children }) {
           </button>
         </div>
 
-        <nav className="mt-5 grid grid-cols-2 gap-x-4 gap-y-1">
+        <nav className="mt-7 grid grid-cols-2 gap-x-4 gap-y-2">
           {LINKS.map(([label, href], i) => (
             <Link
               key={href}
               href={href}
               onClick={() => setMobile(false)}
-              className="site-menu-item py-2 text-[22px] font-semibold tracking-[-0.02em]"
+              className="site-menu-item py-2.5 text-[16px] font-medium tracking-[-0.01em]"
               style={{ color: 'var(--text)', '--i': i }}
             >
               {label}
@@ -269,7 +269,7 @@ export default function SiteNav({ children }) {
           ))}
         </nav>
 
-        <div className="site-menu-item mt-3 flex flex-wrap gap-x-4 gap-y-1.5 border-t pt-4" style={{ borderColor: 'var(--border)', '--i': 4 }}>
+        <div className="site-menu-item mt-5 flex flex-wrap gap-x-4 gap-y-2 border-t pt-5" style={{ borderColor: 'var(--border)', '--i': 4 }}>
           {MORE.flatMap((s) => s.items).map(([label, href]) => (
             <Link key={href} href={href} onClick={() => setMobile(false)} className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
               {label}
@@ -277,7 +277,7 @@ export default function SiteNav({ children }) {
           ))}
         </div>
 
-        <div className="site-menu-item mt-5 grid grid-cols-2 gap-2" style={{ '--i': 5 }}>
+        <div className="site-menu-item mt-7 grid grid-cols-2 gap-2" style={{ '--i': 5 }}>
           <Link href="/login" onClick={() => setMobile(false)} className="btn btn-outline control-md justify-center">
             Log in
           </Link>
