@@ -47,8 +47,6 @@ const STUDY = [[0, 12], [1, 35], [2, 22], [3, 41], [5, 18], [6, 25], ...Array.fr
 const ENABLED = process.env.NODE_ENV !== 'production'
 const SUBJECTS = ['Physics SL', 'Math Analysis & Approaches HL', 'Computer Science SL', 'Economics HL', 'English A: Language & Literature SL']
 const PROFILE = { is_admin: true, subjects: SUBJECTS }
-// Made-up standing, so the orbit shows its tints.
-const STANDING = Object.fromEntries(SUBJECTS.map((s, i) => [s, { total: 40 + i * 25, proved: i * 6, status: ['not_started', 'in_progress', 'confident', 'proficient', 'mastered', 'decaying'][i % 6] }]))
 
 const TEXT = `Investigating how the length of a pendulum affects its period
 
@@ -225,7 +223,7 @@ function Preview() {
     <SyllabiProvider profile={PROFILE}>
       <div className="flex h-dvh flex-col p-4 md:p-6" style={{ background: 'var(--bg)' }}>
         {view === 'draft' && <DraftStudio subjects={SUBJECTS} />}
-        {view === 'ask' && <TutorChat subjects={SUBJECTS} standing={STANDING} you="Sample Student" />}
+        {view === 'ask' && <TutorChat subjects={SUBJECTS} />}
         {view === 'history' && (
           <div className="flex min-h-0 flex-1 gap-5">
             <aside className="flex w-64 shrink-0 flex-col border-r pr-5" style={{ borderColor: 'var(--border)' }}>
