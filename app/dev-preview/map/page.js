@@ -41,25 +41,26 @@ const sampleGraph = (subject, n) => {
     effective[k] = STATUSES[(i * 7 + n * 3) % STATUSES.length]
     details[k] = { points: (i * 37) % 100 }
   })
-  return buildGraph({ subject, rows, details, effective, key: (s, t) => `${s}::${t}` })
+  return { graph: buildGraph({ subject, rows, details, effective, key: (s, t) => `${s}::${t}` }), items: rows.map((r) => ({ ...r, status: effective[`${subject}::${r.subtopic}`] })) }
 }
 
 function Preview() {
   const params = useSearchParams()
   const router = useRouter()
   const subject = params.get('subject')
-  const graphs = useMemo(() => SUBJECTS.map((s, i) => ({ subject: s, graph: sampleGraph(s, i) })), [])
+  const samples = useMemo(() => SUBJECTS.map((s, i) => ({ subject: s, ...sampleGraph(s, i) })), [])
+  const graphs = samples.map(({ subject: s, graph: g }) => ({ subject: s, graph: g }))
   const graph = subject && graphs.find((g) => g.subject === subject)?.graph
   const profile = { is_admin: true, id: 'preview', full_name: 'Sample Student', curriculum: 'IB', subjects: SUBJECTS }
   return (
     <DashboardLayout profile={profile}>
-      <div className="h-[calc(100dvh-56px)] md:h-dvh">
-        {graph ? (
-          <SubjectMap key={subject} graph={graph} subjects={SUBJECTS} onSubject={(s) => router.replace(`/dev-preview/map?subject=${encodeURIComponent(s)}`)} onOverview={() => router.push('/dev-preview/map')} />
-        ) : (
-          <YouMap graphs={graphs} name={profile.full_name} onOpen={(s) => router.push(`/dev-preview/map?subject=${encodeURIComponent(s)}`)} />
-        )}
-      </div>
+      {graph ? (
+        <div className="h-[calc(100dvh-56px)] md:h-dvh">
+          <SubjectMap key={subject} graph={graph} subjects={SUBJECTS} initialAt={params.get('at')} onSubject={(s) => router.replace(`/dev-preview/map?subject=${encodeURIComponent(s)}`)} onOverview={() => router.push('/dev-preview/map')} />
+        </div>
+      ) : (
+        <YouMap graphs={graphs} items={samples.flatMap((x) => x.items)} name={profile.full_name} onOpen={(s, at) => router.push(`/dev-preview/map?subject=${encodeURIComponent(s)}${at ? `&at=${encodeURIComponent(at)}` : ''}`)} />
+      )}
     </DashboardLayout>
   )
 }

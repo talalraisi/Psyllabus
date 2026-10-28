@@ -19,9 +19,8 @@ import { getProfile, getSyllabus } from '@/lib/cache'
 import DashboardLayout from '@/components/DashboardLayout'
 import SubjectMap from '@/components/map/SubjectMap'
 import YouMap from '@/components/map/YouMap'
-import SubjectHeatmap from '@/components/SubjectHeatmap'
 import LockedPanel from '@/components/LockedPanel'
-import { Page, PageHeader, PageLoading, StatRow } from '@/components/PageShell'
+import { Page, PageHeader, PageLoading } from '@/components/PageShell'
 import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { progressKey, mergeSyllabusWithProgress } from '@/lib/progress'
 import { buildEffectiveProgressMap, buildProgressDetailMap } from '@/lib/decay'
@@ -39,8 +38,10 @@ function SubjectMapPage() {
   const params = useSearchParams()
   const supabase = createClient()
   const wanted = params.get('subject') || ''
-  // Read once: afterwards the map keeps the address up to date itself.
-  const [initialAt] = useState(() => params.get('at'))
+  // Where in the subject to land. The map keeps the address up to date
+  // itself afterwards; it is keyed by subject, so only the value it opens
+  // with counts.
+  const initialAt = params.get('at')
 
   useEffect(() => {
     if (!loading) return
@@ -87,13 +88,8 @@ function SubjectMapPage() {
   }, [subjects, rows, progress])
   const graph = subject ? graphs.find((g) => g.subject === subject)?.graph || null : null
 
-  // Every subtopic with its status, for the counts and the heatmap under the orbit.
+  // Every subtopic with its status, for the counts and the squares under the orbit.
   const heatmap = useMemo(() => (subject ? [] : mergeSyllabusWithProgress(rows, buildEffectiveProgressMap(progress))), [subject, rows, progress])
-  const counts = useMemo(() => {
-    const c = { total: heatmap.length }
-    for (const i of heatmap) c[i.status] = (c[i.status] || 0) + 1
-    return c
-  }, [heatmap])
 
   if (loading) {
     return (
@@ -145,25 +141,12 @@ function SubjectMapPage() {
           />
         </div>
       ) : (
-        <YouMap graphs={graphs} name={profile.full_name || ''} onOpen={(s) => router.push(`/dashboard/map?subject=${encodeURIComponent(s)}`)}>
-          <Page width="wide">
-            {/* Read left to right this is the ladder itself: everything tracked,
-                then the same subtopics by how well they are actually held. */}
-            <StatRow
-              className="mb-12"
-              countUp
-              stats={[
-                { label: 'tracked', value: counts.total, tone: 'var(--text)' },
-                { label: 'mastered', value: counts.mastered || 0, tone: 'var(--status-mastered)' },
-                { label: 'proficient', value: counts.proficient || 0, tone: 'var(--status-proficient)' },
-                { label: 'developing', value: counts.confident || 0, tone: 'var(--status-developing)' },
-                { label: 'weak', value: counts.in_progress || 0, tone: 'var(--status-weak)' },
-                { label: 'fading', value: counts.decaying || 0, tone: 'var(--status-fading)' },
-              ]}
-            />
-            <SubjectHeatmap items={heatmap} subjects={graphs.map((g) => g.subject)} />
-          </Page>
-        </YouMap>
+        <YouMap
+          graphs={graphs}
+          items={heatmap}
+          name={profile.full_name || ''}
+          onOpen={(s, at) => router.push(`/dashboard/map?subject=${encodeURIComponent(s)}${at ? `&at=${encodeURIComponent(at)}` : ''}`)}
+        />
       )}
     </DashboardLayout>
   )

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { displaySubtopic, STATUS_LABELS } from '@/lib/progress'
 
-const TONE = {
+export const TONE = {
   not_started: 'var(--status-untested)',
   in_progress: 'var(--status-weak)',
   decaying: 'var(--status-fading)',
@@ -12,14 +12,15 @@ const TONE = {
   mastered: 'var(--status-mastered)',
 }
 
-const NEEDS_WORK = new Set(['not_started', 'in_progress', 'decaying'])
+// Proved is proficient or better, the same line the map and the orbit draw.
+const PROVED = new Set(['proficient', 'mastered'])
 
 function tally(items) {
-  const todo = items.filter((r) => NEEDS_WORK.has(r.status)).length
+  const proved = items.filter((r) => PROVED.has(r.status)).length
   return {
     total: items.length,
-    todo,
-    pct: items.length ? Math.round(((items.length - todo) / items.length) * 100) : 0,
+    todo: items.length - proved,
+    pct: items.length ? Math.round((proved / items.length) * 100) : 0,
   }
 }
 
@@ -36,8 +37,10 @@ function tally(items) {
  * holds its place at the top rather than a tooltip that appears near the
  * cursor and vanishes. Keyboard users get the same readout, which a title
  * attribute never gave them.
+ *
+ * onPick(row): a cell opens that subtopic, where there is somewhere to open.
  */
-function Subject({ subject, items }) {
+export function HeatmapSubject({ subject, items, onPick }) {
   const [at, setAt] = useState(null)
   const topics = [...new Set(items.map((r) => r.topic))].map((topic) => ({
     topic,
@@ -85,6 +88,7 @@ function Subject({ subject, items }) {
                     onMouseLeave={() => setAt(null)}
                     onFocus={() => setAt(row)}
                     onBlur={() => setAt(null)}
+                    onClick={onPick ? () => onPick(row) : undefined}
                     aria-label={`${displaySubtopic(row.subtopic)}: ${STATUS_LABELS[row.status]}`}
                     className="h-[18px] w-[18px] rounded-[4px] transition-transform duration-150 hover:scale-125"
                     style={{ background: TONE[row.status] }}
@@ -114,7 +118,7 @@ export default function SubjectHeatmap({ items, subjects }) {
       </p>
       <div className="mt-5 flex flex-col gap-4">
         {bySubject.map(({ subject, items: si }) => (
-          <Subject key={subject} subject={subject} items={si} />
+          <HeatmapSubject key={subject} subject={subject} items={si} />
         ))}
       </div>
     </section>
