@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import MathText from '@/components/MathText'
 import SyllabiMark from '@/components/SyllabiMark'
+import YouOrbit from '@/components/syllabi/YouOrbit'
 import { subjectCode, shortName } from '@/lib/subject-short'
 import { prepare, linksIn, host, MAX_FILES, ACCEPT, FileProblem } from '@/components/syllabi/files'
 import { ArrowUp, Stop, Paperclip, Copy, Check, Chevron, FileIcon, LinkIcon, Close } from '@/components/syllabi/icons'
@@ -120,52 +121,6 @@ function CopyButton({ text }) {
   )
 }
 
-/** The hub, breathing, with your subjects slowly circling it. Tap one to switch to it. */
-function Hub({ subjects, subject, onPick }) {
-  const ring = subjects.slice(0, 10)
-  return (
-    <div className="group relative h-[168px] w-[168px]">
-      <div aria-hidden="true" className="absolute inset-0 rounded-full border" style={{ borderColor: 'var(--border-strong)' }} />
-      <div aria-hidden="true" className="absolute inset-[34px] rounded-full border border-dashed" style={{ borderColor: 'var(--border)' }} />
-      <div className="sy-orbit absolute inset-0 group-hover:[animation-play-state:paused]">
-        {ring.map((s, i) => {
-          const a = (i / ring.length) * 2 * Math.PI - Math.PI / 2
-          const on = s === subject
-          return (
-            <button
-              key={s}
-              type="button"
-              onClick={() => onPick(s)}
-              title={s}
-              aria-label={`Switch to ${s}`}
-              aria-pressed={on}
-              className="absolute flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border text-[9.5px] font-semibold transition-colors"
-              style={{
-                left: `${50 + 50 * Math.cos(a)}%`,
-                top: `${50 + 50 * Math.sin(a)}%`,
-                background: on ? 'var(--text)' : 'var(--surface)',
-                color: on ? 'var(--bg)' : 'var(--text-muted)',
-                borderColor: on ? 'var(--text)' : 'var(--border-strong)',
-              }}
-            >
-              <span className="sy-counter block group-hover:[animation-play-state:paused]">{subjectCode(s)}</span>
-            </button>
-          )
-        })}
-      </div>
-      <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center">
-        <span aria-hidden="true" className="absolute h-[72px] w-[72px] animate-ping rounded-full" style={{ border: '1px solid color-mix(in srgb, var(--brand) 40%, transparent)', animationDuration: '2.8s' }} />
-        <span
-          className="relative flex h-[60px] w-[60px] items-center justify-center rounded-full"
-          style={{ background: 'var(--brand)', color: '#fff', boxShadow: '0 0 36px color-mix(in srgb, var(--brand) 45%, transparent)' }}
-        >
-          <SyllabiMark size={24} />
-        </span>
-      </div>
-    </div>
-  )
-}
-
 /**
  * chat: a saved conversation to carry on with ({ id, subject, messages }).
  * onSaved: told each time the conversation is saved, so a list can update.
@@ -213,6 +168,8 @@ export default function TutorChat({
   initialTopic = '',
   autoSend = false,
   compact = false,
+  standing,
+  you = '',
 }) {
   const [subject, setSubject] = useState(() => {
     if (chat?.subject && subjects.includes(chat.subject)) return chat.subject
@@ -671,10 +628,10 @@ export default function TutorChat({
         </>
       ) : empty ? (
         <div className="flex flex-1 flex-col items-center justify-center pb-6">
-          <div className="sy-rise">
-            <Hub subjects={subjects} subject={subject} onPick={switchSubject} />
+          <div className="sy-rise w-full max-w-[460px]">
+            <YouOrbit subjects={subjects} subject={subject} standing={standing} you={you} onPick={switchSubject} compact={compact} />
           </div>
-          <h2 className="sy-rise mt-7 text-center text-[clamp(1.4rem,3vw,1.85rem)] font-semibold tracking-[-0.025em]" style={{ animationDelay: '60ms' }}>
+          <h2 className="sy-rise mt-3 text-center text-[clamp(1.4rem,3vw,1.85rem)] font-semibold tracking-[-0.025em]" style={{ animationDelay: '60ms' }}>
             What are we working on?
           </h2>
           <p className="sy-rise mt-2 text-center text-[13.5px]" style={{ color: 'var(--text-muted)', animationDelay: '100ms' }}>

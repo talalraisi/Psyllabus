@@ -20,6 +20,8 @@ import IdeasStudio from '@/components/syllabi/IdeasStudio'
 import DraftStudio from '@/components/syllabi/DraftStudio'
 import ChatHistory from '@/components/syllabi/ChatHistory'
 import { hasSyllabi } from '@/lib/access'
+import { buildEffectiveProgressMap } from '@/lib/decay'
+import { progressKey, STATUS_ORDER } from '@/lib/progress'
 
 /**
  * Ask fills the screen so the box sits at the bottom of it; Ideas scrolls
@@ -55,6 +57,7 @@ function Syllabi() {
   const params = useSearchParams()
   const [profile, setProfile] = useState(null)
   const [rows, setRows] = useState([])
+  const [progressRows, setProgressRows] = useState([])
   const [tab, setTab] = useState(() => (TABS.some(([k]) => k === params.get('tab')) ? params.get('tab') : 'ask'))
   const [seed, setSeed] = useState({ n: 0, subject: '', text: '' })
   const [chats, setChats] = useState([])
@@ -83,6 +86,12 @@ function Syllabi() {
         supabase.from('syllabi_folders').select('id, name, created_at').eq('user_id', user.id).order('created_at'),
       ])
       setRows(syllabus || [])
+      // Where they stand in each subject, for the orbit; it can arrive after the page.
+      supabase
+        .from('progress')
+        .select('*')
+        .eq('user_id', user.id)
+        .then(({ data }) => setProgressRows(data || []))
       setChats(list || [])
       setFolders(folderRows || [])
       // Carry on with the chat that was open before a refresh.
@@ -115,6 +124,28 @@ function Syllabi() {
     }
     return out
   }, [rows])
+
+  /* Where the student stands in each subject, for the orbit: how many
+     subtopics are proved (proficient or better), and one status for the
+     whole subject, the middle of the subtopics they have been tested on. */
+  const standing = useMemo(() => {
+    const effective = buildEffectiveProgressMap(progressRows)
+    const out = {}
+    for (const r of rows) {
+      const e = (out[r.subject] ||= { total: 0, proved: 0, tested: [] })
+      e.total++
+      const st = effective[progressKey(r.subject, r.subtopic)] || 'not_started'
+      if (st === 'proficient' || st === 'mastered') e.proved++
+      if (st !== 'not_started') e.tested.push(st)
+    }
+    for (const e of Object.values(out)) {
+      const fading = e.tested.filter((x) => x === 'decaying').length
+      const ladder = e.tested.filter((x) => x !== 'decaying').map((x) => STATUS_ORDER.indexOf(x)).sort((a, b) => a - b)
+      e.status = !e.tested.length ? 'not_started' : fading * 3 > e.tested.length || !ladder.length ? 'decaying' : STATUS_ORDER[ladder[Math.floor(ladder.length / 2)]]
+      delete e.tested
+    }
+    return out
+  }, [rows, progressRows])
 
   const openChat = useCallback(
     async (c) => {
@@ -270,6 +301,8 @@ function Syllabi() {
                 onNew={newChat}
                 initialSubject={seed.subject}
                 initialInput={seed.text}
+                standing={standing}
+                you={profile.full_name || ''}
               />
             </div>
           </div>

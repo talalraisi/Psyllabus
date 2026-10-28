@@ -50,11 +50,11 @@ function arc(cx, cy, r, frac) {
 }
 
 /** A status colour, softened towards grey so no planet shouts. */
-const tone = (status) =>
+export const tone = (status) =>
   !status || status === 'not_started' ? 'color-mix(in oklab, var(--text-faint) 55%, var(--surface))' : `color-mix(in oklab, ${STATUS_VAR[status]} 62%, var(--text-faint))`
 
 /** The same few dozen stars every time for a given size, so they do not jump about. */
-function stars(w, h, count) {
+export function stars(w, h, count) {
   let seed = Math.round(w * 7 + h * 13) || 1
   const rand = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646
   return Array.from({ length: count }, (_, i) => ({ x: rand() * w, y: rand() * h, r: 0.5 + rand() * 1.1, o: 0.12 + rand() * 0.35, twinkle: i % 6 === 0 }))
