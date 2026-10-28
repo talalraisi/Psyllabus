@@ -158,7 +158,7 @@ export const LESSON = {
     },
     cards: {
       type: 'array',
-      description: 'Flashcards for this subtopic: key terms, definitions, equations, facts. Front a question or prompt, back the answer in under 40 words.',
+      description: 'Flashcards for this subtopic, for recall: key terms, definitions, equations with their symbols named, rules, facts. Never a problem to work out. Front a question or prompt, back the answer in under 40 words.',
       items: { type: 'object', additionalProperties: false, required: ['front', 'back'], properties: { front: { type: 'string' }, back: { type: 'string' } } },
     },
   },

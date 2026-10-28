@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useSyncExternalStore } from 'react'
 import { PageHeader } from '@/components/PageShell'
-import { IconArrowLeft } from '@/components/Icons'
+import { IconArrowLeft, IconPlus } from '@/components/Icons'
 import { displaySubtopic } from '@/lib/progress'
 import { MAX_BOX } from '@/lib/flashcards'
 
@@ -19,6 +19,9 @@ import { MAX_BOX } from '@/lib/flashcards'
  * cards are fetched when it is studied, together with the ones the student
  * has already taken, so a deck they started carries on rather than starting
  * again.
+ *
+ * Any topic or subtopic can also go into a deck of the student's own (Add to
+ * a deck), or they can study the decks as they are laid out here.
  */
 
 const MODES = [
@@ -123,7 +126,7 @@ export function ReadyShelf({ subjects, counts, mine, onOpen }) {
 
 /* ---------------------------------------------------------------- subject */
 
-export function ReadySubject({ subject, counts, syllabus, mine, onBack, onStudy }) {
+export function ReadySubject({ subject, counts, syllabus, mine, onBack, onStudy, onAddToDeck }) {
   const saved = useSyncExternalStore(subscribe, readMode, () => null)
   const mode = MODES.some((m) => m.key === saved) ? saved : 'flip'
   const [query, setQuery] = useState('')
@@ -188,7 +191,7 @@ export function ReadySubject({ subject, counts, syllabus, mine, onBack, onStudy 
       </button>
       <PageHeader
         title={subject}
-        subtitle={`${total.toLocaleString()} ready-made cards in ${topics.reduce((a, t) => a + t.subtopics.length, 0)} subtopics. Pick a subtopic, or a whole topic, to study. A card becomes yours when you first answer it.`}
+        subtitle={`${total.toLocaleString()} ready-made cards in ${topics.reduce((a, t) => a + t.subtopics.length, 0)} subtopics. Study a subtopic or a whole topic as it is, or add it to a deck of your own.`}
       />
 
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -244,6 +247,17 @@ export function ReadySubject({ subject, counts, syllabus, mine, onBack, onStudy 
                     <Progress total={t.cards} started={started} known={known} />
                   </span>
                 </button>
+                {onAddToDeck && (
+                  <button
+                    onClick={() => onAddToDeck(subject, t.subtopics.map((s) => s.name), t.topic, t.cards)}
+                    aria-label={`Add ${t.topic} to a deck`}
+                    title="Add to a deck"
+                    className="btn btn-quiet control-sm shrink-0"
+                  >
+                    <IconPlus width={14} height={14} />
+                    <span className="hidden sm:inline">Add to deck</span>
+                  </button>
+                )}
                 <button onClick={() => study(t.topic, t.subtopics.map((s) => s.name))} disabled={busy != null} className="btn btn-outline control-sm shrink-0">
                   {busy === t.topic ? 'Loading…' : 'Study topic'}
                 </button>
@@ -273,6 +287,17 @@ export function ReadySubject({ subject, counts, syllabus, mine, onBack, onStudy 
                                     {s.cards} cards{p.started ? ` · ${p.started} started, ${p.known} known` : ''}
                                   </span>
                                 </span>
+                                {onAddToDeck && (
+                                  <button
+                                    onClick={() => onAddToDeck(subject, [s.name], displaySubtopic(s.name), s.cards)}
+                                    aria-label={`Add ${displaySubtopic(s.name)} to a deck`}
+                                    title="Add to a deck"
+                                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-[var(--surface)]"
+                                    style={{ color: 'var(--text-faint)' }}
+                                  >
+                                    <IconPlus width={15} height={15} />
+                                  </button>
+                                )}
                                 <button onClick={() => study(s.name, [s.name])} disabled={busy != null} className="btn btn-quiet control-sm shrink-0" style={{ color: 'var(--brand)' }}>
                                   {busy === s.name ? 'Loading…' : 'Study'}
                                 </button>

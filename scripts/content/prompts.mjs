@@ -155,7 +155,7 @@ The lesson takes about 10 minutes and teaches a student who has not met this bef
 - key_terms: the terms a student must be able to define.
 - A section's check may use that section's figure. Never refer to a table, graph or diagram that is not given as that section's figure.
 - outcomes, "What you should know now": 3-5 statements written as IB command terms ("Calculate...", "Explain why..."), together covering the guide statements that belong to this subtopic, each with one check question that tests exactly that statement. Outcome checks have no figure, so they must be complete in their own words.
-- cards: 15-30 flashcards covering the key terms, definitions, equations and facts of this subtopic only.
+- cards: 15-30 flashcards covering the key terms, definitions, equations and facts of this subtopic only. They are for recall: a definition, a formula with its symbols named, a rule, the conditions for something, the steps of a method, a key fact. Never a problem to work out ("Factorise...", "Calculate... given..."): problems belong in the questions. A card may end its back with a one-line example.
 
 Check questions follow the question rules: correct, exactly one true option, accepted answers only the correct value, feedback that teaches.`
 }
@@ -216,7 +216,7 @@ ${FRAME_SHAPES}
 
 - outcomes, "What you should know now": 3 to 5 statements in IB command-term language covering this subtopic's guide statements, each with one check (mcq, truefalse, numeric or short) that tests exactly it and needs no figure.
 - key_terms: the terms they must be able to define.
-- cards: 12 to 20 flashcards for the deck, covering this subtopic only.
+- cards: 12 to 20 flashcards for the deck, covering this subtopic only. They are for recall: a definition, a formula with its symbols named, a rule, the conditions for something, the steps of a method, a key fact. Never a problem to work out ("Factorise...", "Calculate... given..."): problems belong in the questions. A card may end its back with a one-line example.
 
 Every check is correct, with exactly one right answer where there is one, and feedback that teaches. Never refer to a table, graph or diagram that is not the frame's own figure.`
 }
@@ -238,7 +238,7 @@ ${blocks}
 
 - outcomes, "What you should know now": 3 to 5 statements in IB command-term language covering this subtopic's guide statements, each with one check (mcq, truefalse, numeric or short) that tests exactly it and needs no figure.
 - key_terms: the terms they must be able to define.
-- cards: 12 to 20 flashcards for the deck, covering this subtopic only.
+- cards: 12 to 20 flashcards for the deck, covering this subtopic only. They are for recall: a definition, a formula with its symbols named, a rule, the conditions for something, the steps of a method, a key fact. Never a problem to work out ("Factorise...", "Calculate... given..."): problems belong in the questions. A card may end its back with a one-line example.
 
 Every check is correct, with exactly one right answer where there is one, and feedback that teaches. Never refer to a table, graph or diagram that is not the block's own figure. In force diagrams, give the angle a question depends on as "angle_label" on that force, start the normal reaction and friction at the surface with "from":"contact", and show motion with "motion":{"direction_deg":0,"label":"direction of motion"} when it matters.`
 }
