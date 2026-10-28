@@ -7,7 +7,9 @@ import { statusLabel } from '@/lib/subject-graph'
 import { shortName, subjectCode, levelOf } from '@/lib/subject-short'
 
 /**
- * The top of the subject map: you, with every subject you take circling you.
+ * The progress page and the top of the subject map: you, with every subject
+ * you take circling you. What the old Progress page held (counts by status,
+ * the heatmap) follows below, as children.
  *
  * Each subject is a planet with its code in it, its edge where you stand in
  * it. The panel beside the orbit is the overview of you: how much of the
@@ -30,7 +32,7 @@ function Bar({ tally }) {
   )
 }
 
-export default function YouMap({ graphs, name = '', onOpen }) {
+export default function YouMap({ graphs, name = '', onOpen, children = null }) {
   const [selectedId, setSelectedId] = useState(null)
 
   const overview = useMemo(() => {
@@ -152,14 +154,14 @@ export default function YouMap({ graphs, name = '', onOpen }) {
   )
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    <div className="flex flex-col">
       <div className="flex h-14 shrink-0 items-center gap-3 border-b px-4" style={{ borderColor: 'var(--border)' }}>
-        <h1 className="text-[15px] font-semibold tracking-[-0.01em]">Subject map</h1>
+        <h1 className="text-[15px] font-semibold tracking-[-0.01em]">Progress</h1>
         <span className="hidden text-[12.5px] sm:inline" style={{ color: 'var(--text-faint)' }}>
-          You and every subject you take. Double-click one to walk into it.
+          You and every subject you take. Double-click one to walk into its map.
         </span>
       </div>
-      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto md:flex-row md:overflow-hidden">
+      <div className="flex flex-col border-b md:h-[min(74vh,720px)] md:flex-row" style={{ borderColor: 'var(--border)' }}>
         <section className="relative h-[440px] min-w-0 shrink-0 md:h-auto md:flex-1" aria-label="You and your subjects" style={{ background: 'var(--bg)' }}>
           <OrbitCanvas
             graph={overview}
@@ -170,10 +172,11 @@ export default function YouMap({ graphs, name = '', onOpen }) {
             onBackground={() => setSelectedId(null)}
           />
         </section>
-        <aside className="shrink-0 overflow-y-auto border-t p-5 md:w-[320px] md:border-l md:border-t-0" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
+        <aside className="shrink-0 border-t p-5 md:w-[320px] md:overflow-y-auto md:border-l md:border-t-0" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
           {panel}
         </aside>
       </div>
+      {children}
     </div>
   )
 }

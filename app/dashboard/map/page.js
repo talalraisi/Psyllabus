@@ -19,10 +19,11 @@ import { getProfile, getSyllabus } from '@/lib/cache'
 import DashboardLayout from '@/components/DashboardLayout'
 import SubjectMap from '@/components/map/SubjectMap'
 import YouMap from '@/components/map/YouMap'
+import SubjectHeatmap from '@/components/SubjectHeatmap'
 import LockedPanel from '@/components/LockedPanel'
-import { Page, PageHeader, PageLoading } from '@/components/PageShell'
+import { Page, PageHeader, PageLoading, StatRow } from '@/components/PageShell'
 import { startLoading, stopLoading } from '@/components/LoadingBar'
-import { progressKey } from '@/lib/progress'
+import { progressKey, mergeSyllabusWithProgress } from '@/lib/progress'
 import { buildEffectiveProgressMap, buildProgressDetailMap } from '@/lib/decay'
 import { buildGraph } from '@/lib/subject-graph'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
@@ -86,10 +87,18 @@ function SubjectMapPage() {
   }, [subjects, rows, progress])
   const graph = subject ? graphs.find((g) => g.subject === subject)?.graph || null : null
 
+  // Every subtopic with its status, for the counts and the heatmap under the orbit.
+  const heatmap = useMemo(() => (subject ? [] : mergeSyllabusWithProgress(rows, buildEffectiveProgressMap(progress))), [subject, rows, progress])
+  const counts = useMemo(() => {
+    const c = { total: heatmap.length }
+    for (const i of heatmap) c[i.status] = (c[i.status] || 0) + 1
+    return c
+  }, [heatmap])
+
   if (loading) {
     return (
       <DashboardLayout profile={null}>
-        <PageLoading title="Subject map" variant="map" />
+        <PageLoading title={wanted ? 'Subject map' : 'Progress'} variant="map" />
       </DashboardLayout>
     )
   }
@@ -101,7 +110,7 @@ function SubjectMapPage() {
     return (
       <DashboardLayout profile={profile}>
         <Page width="wide">
-          <PageHeader title="Subject map" subtitle="Every topic, unit and subtopic, and where you stand on each." />
+          <PageHeader title={subject ? 'Subject map' : 'Progress'} subtitle="Every topic, unit and subtopic, and where you stand on each." />
           {!allowed ? (
             <LockedPanel
               plan="Premium"
@@ -123,8 +132,8 @@ function SubjectMapPage() {
 
   return (
     <DashboardLayout profile={profile}>
-      <div className="h-[calc(100dvh-56px)] md:h-dvh">
-        {graph ? (
+      {graph ? (
+        <div className="h-[calc(100dvh-56px)] md:h-dvh">
           <SubjectMap
             key={subject}
             graph={graph}
@@ -134,10 +143,28 @@ function SubjectMapPage() {
             onSubject={(s) => router.replace(`/dashboard/map?subject=${encodeURIComponent(s)}`, { scroll: false })}
             onOverview={() => router.push('/dashboard/map', { scroll: false })}
           />
-        ) : (
-          <YouMap graphs={graphs} name={profile.full_name || ''} onOpen={(s) => router.push(`/dashboard/map?subject=${encodeURIComponent(s)}`, { scroll: false })} />
-        )}
-      </div>
+        </div>
+      ) : (
+        <YouMap graphs={graphs} name={profile.full_name || ''} onOpen={(s) => router.push(`/dashboard/map?subject=${encodeURIComponent(s)}`)}>
+          <Page width="wide">
+            {/* Read left to right this is the ladder itself: everything tracked,
+                then the same subtopics by how well they are actually held. */}
+            <StatRow
+              className="mb-12"
+              countUp
+              stats={[
+                { label: 'tracked', value: counts.total, tone: 'var(--text)' },
+                { label: 'mastered', value: counts.mastered || 0, tone: 'var(--status-mastered)' },
+                { label: 'proficient', value: counts.proficient || 0, tone: 'var(--status-proficient)' },
+                { label: 'developing', value: counts.confident || 0, tone: 'var(--status-developing)' },
+                { label: 'weak', value: counts.in_progress || 0, tone: 'var(--status-weak)' },
+                { label: 'fading', value: counts.decaying || 0, tone: 'var(--status-fading)' },
+              ]}
+            />
+            <SubjectHeatmap items={heatmap} subjects={graphs.map((g) => g.subject)} />
+          </Page>
+        </YouMap>
+      )}
     </DashboardLayout>
   )
 }

@@ -150,8 +150,8 @@ function CardTile({ card, onEdit, onDelete, onMove }) {
 /** One deck on the shelf: a tile that opens it, with its own menu. */
 function DeckTile({ name, cards, known, inFolder, menu, onOpen }) {
   return (
-    <li className="relative">
-      <button onClick={onOpen} className="elev lift flex h-full w-full flex-col rounded-[16px] border p-5 text-left" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
+    <li className="lift-tile relative">
+      <button onClick={onOpen} className="elev flex h-full w-full flex-col rounded-[16px] border p-5 text-left" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
         <span className="flex items-start gap-2 pr-8">
           <span className="text-[14.5px] font-semibold leading-snug tracking-[-0.01em]">{name}</span>
         </span>
@@ -616,8 +616,8 @@ export default function FlashcardsView({ cards, decks: named = [], folders = [],
                 const inside = shelf.filter((d) => d.folder_id === f.id)
                 const n = inside.reduce((a, d) => a + d.cards.length, 0)
                 return (
-                  <li key={f.id} className="relative">
-                    <button onClick={() => setFolder(f.id)} className="lift flex h-full w-full flex-col rounded-[16px] border p-5 text-left" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface-sunken)' }}>
+                  <li key={f.id} className="lift-tile relative">
+                    <button onClick={() => setFolder(f.id)} className="flex h-full w-full flex-col rounded-[16px] border p-5 text-left" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface-sunken)' }}>
                       <IconFolder width={22} height={22} style={{ color: 'var(--brand)' }} />
                       <span className="mt-3 pr-8 text-[14.5px] font-semibold leading-snug tracking-[-0.01em]">{f.name}</span>
                       <span className="mt-1 text-[12px]" style={{ color: 'var(--text-faint)' }}>

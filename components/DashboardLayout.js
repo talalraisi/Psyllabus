@@ -11,7 +11,6 @@ import {
   IconSubjects,
   IconStudyPlan,
   IconTest,
-  IconProgress,
   IconReview,
   IconTarget,
   IconCalendar,
@@ -59,7 +58,6 @@ const NAV_GROUPS = [
         Icon: IconSubjects,
         match: (p) => p.startsWith('/dashboard/syllabus') || p === '/dashboard/subjects',
       },
-      { href: '/dashboard/map', label: 'Subject Map', Icon: IconOrbit, match: (p) => p === '/dashboard/map' },
       { href: '/dashboard/flashcards', label: 'Flashcards', Icon: IconCards, match: (p) => p === '/dashboard/flashcards' },
       { href: '/dashboard/test', label: 'Tests', Icon: IconTest, match: (p) => p === '/dashboard/test' || p.startsWith('/dashboard/quiz') },
       { href: '/dashboard/papers', label: 'Exam Papers', Icon: IconPaper, match: (p) => p === '/dashboard/papers' || p.startsWith('/dashboard/paper/') },
@@ -76,7 +74,7 @@ const NAV_GROUPS = [
   {
     label: 'Progress',
     items: [
-      { href: '/dashboard/progress', label: 'Progress', Icon: IconProgress, match: (p) => p === '/dashboard/progress' || p === '/dashboard/Heatmap' },
+      { href: '/dashboard/map', label: 'Progress', Icon: IconOrbit, match: (p) => p === '/dashboard/map' || p === '/dashboard/progress' || p === '/dashboard/Heatmap' },
       { href: '/dashboard/analytics', label: 'Analytics', Icon: IconAnalytics, match: (p) => p === '/dashboard/analytics' },
       { href: '/dashboard/prediction', label: 'Predicted Grade', Icon: IconTarget, match: (p) => p === '/dashboard/prediction' },
     ],

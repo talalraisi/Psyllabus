@@ -1244,6 +1244,13 @@ body {
   transform: translateY(-3px);
   border-color: var(--border-strong);
 }
+/* A tile with its own menu on top: the whole tile lifts, menu and all. */
+.lift-tile {
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.lift-tile:hover {
+  transform: translateY(-3px);
+}
 
 /* A feature row whose marker grows into a rule as you point at it. */
 .mark {
@@ -1266,7 +1273,7 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .lift, .mark, .row .go { transition: none; }
-  .lift:hover { transform: none; }
+  .lift:hover, .lift-tile:hover { transform: none; }
 }
 
 /* --- Pinned steps. -------------------------------------------------------
