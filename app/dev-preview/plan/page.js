@@ -86,7 +86,7 @@ function Inner() {
           style={settings.style}
           isDone={(t) => done.has(t.id)}
           hrefFor={(t) => (t.quizzable ? '#' : null)}
-          onResources={() => {}}
+          onNotes={() => {}}
           onAdjust={(task, kind, to) => {
             if (kind === 'done') setDone((d) => new Set([...d, task.id]))
             else if (kind === 'undone') setDone((d) => new Set([...d].filter((x) => x !== task.id)))

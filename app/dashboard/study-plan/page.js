@@ -21,7 +21,7 @@ import { Page, PageHeader, EmptyState, PageLoading, SkeletonActions } from '@/co
 import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { IconArrowRight, IconCheck, IconCalendar } from '@/components/Icons'
 import TodoList from '@/components/TodoList'
-import ResourceHubDrawer from '@/components/ResourceHubDrawer'
+import NotesDrawer from '@/components/NotesDrawer'
 import ReminderWatcher from '@/components/ReminderWatcher'
 import PlanSettings from '@/components/plan/PlanSettings'
 import TodayPlan from '@/components/plan/TodayPlan'
@@ -410,7 +410,7 @@ export default function StudyPlanPage() {
                     style={settings.style}
                     isDone={isDone}
                     hrefFor={hrefFor}
-                    onResources={setDrawerItem}
+                    onNotes={setDrawerItem}
                     onAdjust={adjust}
                   />
 
@@ -486,7 +486,7 @@ export default function StudyPlanPage() {
                                 {c.minutes} min
                               </span>
                               <button onClick={() => setDrawerItem(c)} className="btn btn-quiet control-sm">
-                                Resources
+                                Notes
                               </button>
                               {c.quizzable && (
                                 <Link href={quizHref(c)} className="btn btn-outline control-sm">
@@ -513,7 +513,7 @@ export default function StudyPlanPage() {
           )
         )}
 
-        <ResourceHubDrawer
+        <NotesDrawer
           open={!!drawerItem}
           onClose={() => setDrawerItem(null)}
           subject={drawerItem?.subject}

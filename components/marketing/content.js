@@ -31,7 +31,6 @@ export const FEATURES = [
   ['Timed papers', 'Build a paper from any mix of topics and sit it against a live marks-per-minute clock.', 'developing'],
   ['Calendar and reminders', 'Put your tests and IA deadlines in, and the planner moves that subject up as they get close.', 'proficient'],
   ['A session timer that follows you', 'Start a study block and it keeps running while you work through quizzes.', 'fading'],
-  ['Real resources on every subtopic', 'Hand-picked lessons, videos and notes for the exact thing you got wrong, not a search box.', 'proficient'],
   ['Predicted grade', 'A running prediction out of 45, built from your quiz results, next to the grades you told us you want.', 'mastered'],
 ]
 
@@ -227,21 +226,6 @@ export const FEATURE_DETAIL = [
       'Measures effort. Never moves a level.',
     ],
     limit: 'Time in a session is not evidence of anything. It never moves a subtopic up a level. Only questions do that.',
-  },
-  {
-    label: 'Resources',
-    detail: [
-      'Each subtopic carries hand-picked lessons and notes, so a wrong answer ends somewhere specific. The usual failure after getting something wrong is a search box and twenty minutes of deciding which video to trust; here the gap you just demonstrated is already attached to something that explains it.',
-      "Links open on the creator's own site. Nothing is rehosted, mirrored or re-uploaded, and everything is credited to whoever made it. If a creator wants their link taken down it comes down.",
-    ],
-    title: 'Something to read for the exact gap',
-    lede: 'A wrong answer leads somewhere, not into a search box.',
-    how: [
-      'Hand-picked lessons and notes for each subtopic',
-      'A wrong answer ends somewhere, not in a search box',
-      'Opens on the creator’s own site. Nothing rehosted.',
-    ],
-    limit: 'These are other people’s materials, credited and linked. If a creator wants a link removed it comes down.',
   },
   {
     label: 'Prediction',

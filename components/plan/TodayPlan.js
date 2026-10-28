@@ -69,7 +69,7 @@ function teachMe(task) {
     : `I need to strengthen ${name} in ${task.subject}. Find out what I'm missing with a couple of quick questions, then explain the part I get wrong.`
 }
 
-function TaskMenu({ task, tomorrow, onAdjust, onResources, done, close }) {
+function TaskMenu({ task, tomorrow, onAdjust, onNotes, done, close }) {
   const [picking, setPicking] = useState(false)
   const syllabi = useSyllabi()
   const item = 'block w-full rounded-[8px] px-3 py-2 text-left text-[13px] hover:bg-[var(--surface-sunken)]'
@@ -90,8 +90,8 @@ function TaskMenu({ task, tomorrow, onAdjust, onResources, done, close }) {
         </button>
       )}
       {task.subtopic && (
-        <button role="menuitem" type="button" className={item} onClick={() => { onResources(task); close() }}>
-          Resources
+        <button role="menuitem" type="button" className={item} onClick={() => { onNotes(task); close() }}>
+          Notes
         </button>
       )}
       <button role="menuitem" type="button" className={item} onClick={() => { onAdjust(task, done ? 'undone' : 'done'); close() }}>
@@ -130,7 +130,7 @@ function TaskMenu({ task, tomorrow, onAdjust, onResources, done, close }) {
   )
 }
 
-export default function TodayPlan({ day, tomorrowKey, style, isDone, hrefFor, onResources, onAdjust }) {
+export default function TodayPlan({ day, tomorrowKey, style, isDone, hrefFor, onNotes, onAdjust }) {
   const [menu, setMenu] = useState(null)
   const rhythm = rhythmOf(style)
   const tasks = day.tasks
@@ -295,7 +295,7 @@ export default function TodayPlan({ day, tomorrowKey, style, isDone, hrefFor, on
                           Start
                         </Link>
                       ) : (
-                        <button type="button" onClick={() => onResources(task)} className="btn btn-solid control-sm">
+                        <button type="button" onClick={() => onNotes(task)} className="btn btn-solid control-sm">
                           Start
                         </button>
                       ))}
@@ -310,7 +310,7 @@ export default function TodayPlan({ day, tomorrowKey, style, isDone, hrefFor, on
                       ···
                     </button>
                     {menu === task.id && (
-                      <TaskMenu task={task} tomorrow={tomorrowKey} done={finished} onAdjust={onAdjust} onResources={onResources} close={() => setMenu(null)} />
+                      <TaskMenu task={task} tomorrow={tomorrowKey} done={finished} onAdjust={onAdjust} onNotes={onNotes} close={() => setMenu(null)} />
                     )}
                   </div>
                 </div>

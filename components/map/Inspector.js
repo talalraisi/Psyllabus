@@ -6,7 +6,6 @@ import { createClient } from '@/lib/supabase'
 import { AskSyllabi } from '@/components/syllabi/SyllabiDrawer'
 import { statusLabel, leavesOf, related, neighbours, pathTo } from '@/lib/subject-graph'
 import { STATUS_DESCRIPTIONS } from '@/lib/progress'
-import { curatedFor } from '@/lib/resource-catalog'
 import { getSlugForSubject } from '@/lib/subject-map'
 import { STATUS_VAR, progressLine } from '@/components/map/MapCanvas'
 
@@ -14,8 +13,8 @@ import { STATUS_VAR, progressLine } from '@/components/map/MapCanvas'
  * What is known about the selected node, and what to do with it.
  *
  * Only real things: the student's own level and score (from their quizzes),
- * how many questions the bank holds for it, the syllabus around it, and the
- * resources the app curates. Sections with nothing in them are left out
+ * how many questions the bank holds for it, and the syllabus around it.
+ * Sections with nothing in them are left out
  * rather than shown empty. The Syllabi actions open the tutor the rest of the
  * app uses, already asked the question, under its usual limits.
  */
@@ -131,7 +130,6 @@ export default function Inspector({ graph, node, subject, onGo, onEnter, onClose
 
   const rel = node.kind === 'subtopic' ? related(graph, node.id) : []
   const near = node.kind === 'subtopic' ? neighbours(graph, node.id) : {}
-  const resources = node.kind === 'subtopic' ? curatedFor({ subject, topic: row.topic, subtopic: row.subtopic }).slice(0, 4) : []
   const ask = (text, label) => (
     <AskSyllabi subject={subject} topic={row?.topic || (node.kind === 'topic' ? node.title : '')} text={text} label={label} context={`Subject map · ${node.title}`} size="xs" />
   )
@@ -273,26 +271,6 @@ export default function Inspector({ graph, node, subject, onGo, onEnter, onClose
           </Section>
         )}
 
-        {resources.length > 0 && (
-          <Section title="Resources">
-            <ul className="flex flex-col gap-1">
-              {resources.map((res) => (
-                <li key={res.url}>
-                  <a href={res.url} target="_blank" rel="noopener noreferrer" className="block rounded-[9px] px-2 py-1.5 -mx-2 transition-colors hover:bg-[var(--surface-sunken)]">
-                    <span className="block truncate text-[12.5px] font-medium" style={{ color: 'var(--text-body)' }}>
-                      {res.title}
-                    </span>
-                    {res.provider && (
-                      <span className="block truncate text-[11px]" style={{ color: 'var(--text-faint)' }}>
-                        {res.provider}
-                      </span>
-                    )}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </Section>
-        )}
       </div>
     </div>
   )

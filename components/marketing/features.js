@@ -273,44 +273,7 @@ function GraphicTimer({ shown }) {
   )
 }
 
-/* 7. Resources ------------------------------------------------------------- */
-function GraphicResources({ shown }) {
-  const [ref, seen] = useDraw(shown)
-  return (
-    <Frame>
-      <div ref={ref} className="flex flex-col gap-2">
-        {[['VIDEO', 'Circular motion walkthrough'], ['NOTES', 'Gravitation summary'], ['PAST PAPER', 'Paper 1 style questions']].map(
-          ([kind, title], i) => (
-            <div
-              key={title}
-              className="flex items-center gap-3 rounded-[6px] border px-3 py-2.5"
-              style={{
-                borderColor: 'var(--border-strong)',
-                background: 'var(--surface)',
-                opacity: seen ? 1 : 0,
-                transform: seen ? 'none' : 'translateY(6px)',
-                transition: `all 400ms cubic-bezier(0.16,1,0.3,1) ${i * 110}ms`,
-              }}
-            >
-              <span
-                className="rounded-[3px] px-1.5 py-0.5 text-[9px] font-semibold tracking-[0.1em]"
-                style={{ background: 'var(--brand-tint)', color: 'var(--brand)' }}
-              >
-                {kind}
-              </span>
-              <span className="truncate text-[11.5px]" style={{ color: 'var(--text-body)' }}>{title}</span>
-            </div>
-          )
-        )}
-      </div>
-      <p className="mt-3 text-[10.5px]" style={{ color: 'var(--text-faint)' }}>
-        Opens on the creator&rsquo;s own site. Nothing rehosted.
-      </p>
-    </Frame>
-  )
-}
-
-/* 8. Predicted grade ------------------------------------------------------- */
+/* 7. Predicted grade ------------------------------------------------------- */
 function GraphicPrediction({ shown }) {
   const [ref, seen] = useDraw(shown)
   return (
@@ -345,7 +308,7 @@ function GraphicPrediction({ shown }) {
   )
 }
 
-/* 9. Syllabi, the tutor ---------------------------------------------------- */
+/* 8. Syllabi, the tutor ---------------------------------------------------- */
 function GraphicSyllabi({ shown }) {
   const [ref, seen] = useDraw(shown)
   const line = (d) => ({ opacity: seen ? 1 : 0, transform: seen ? 'none' : 'translateY(6px)', transition: `opacity 360ms ease ${d}ms, transform 360ms ease ${d}ms` })
@@ -371,7 +334,7 @@ function GraphicSyllabi({ shown }) {
   )
 }
 
-/* 10. Marking --------------------------------------------------------------- */
+/* 9. Marking --------------------------------------------------------------- */
 function GraphicMarking({ shown }) {
   const [ref, seen] = useDraw(shown)
   const crits = [
@@ -409,7 +372,7 @@ function GraphicMarking({ shown }) {
   )
 }
 
-/* 11. Notes into cards ------------------------------------------------------- */
+/* 10. Notes into cards ------------------------------------------------------- */
 function GraphicCards({ shown }) {
   const [ref, seen] = useDraw(shown)
   const cards = [
@@ -446,7 +409,7 @@ function GraphicCards({ shown }) {
   )
 }
 
-/* 12. Streaks and analytics -------------------------------------------------- */
+/* 11. Streaks and analytics -------------------------------------------------- */
 function GraphicStreak({ shown }) {
   const [ref, seen] = useDraw(shown)
   const week = [25, 18, 0, 41, 22, 35, 12]
@@ -509,12 +472,6 @@ const FEATURE_MODULES = [
     Graphic: GraphicTimer,
   },
   {
-    label: 'Resources',
-    title: 'Something to read for the exact gap',
-    body: 'Every subtopic carries hand-picked lessons, videos and notes for that one thing, so a wrong answer leads somewhere instead of into a search box. Links open on the creator’s own site and nothing is rehosted or resold.',
-    Graphic: GraphicResources,
-  },
-  {
     label: 'Prediction',
     title: 'A grade you can check the maths on',
     body: 'A running total out of 45 next to the grades you told us you want, built only from quiz results. It states how much of your syllabus it is based on, so a prediction from three quizzes is labelled low confidence instead of presented as a forecast.',
@@ -575,7 +532,7 @@ const GROUPS = [
   {
     heading: 'Practise until it holds',
     blurb: 'The same subtopic, until getting it right stops being luck.',
-    keys: ['Papers', 'Review', 'Resources'],
+    keys: ['Papers', 'Review'],
   },
   {
     heading: 'Learn it with Syllabi',

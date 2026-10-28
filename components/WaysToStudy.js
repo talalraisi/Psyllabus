@@ -111,7 +111,7 @@ export default function WaysToStudy({ profile, focus }) {
     {
       key: 'notes',
       title: 'Notes',
-      line: 'Every topic and subtopic of your syllabus, with resources.',
+      line: 'Every topic and subtopic of your syllabus, with your notes on each.',
       href: notesHref,
       Icon: NoteIcon,
     },

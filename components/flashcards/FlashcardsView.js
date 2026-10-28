@@ -150,7 +150,10 @@ function CardTile({ card, onEdit, onDelete, onMove }) {
 /** One deck on the shelf: a tile that opens it, with its own menu. */
 function DeckTile({ name, cards, known, inFolder, menu, onOpen }) {
   return (
-    <li className="lift-tile relative">
+    <li>
+      {/* The lift is on this wrapper, not the li: the li runs the entrance
+          animation, which holds its transform and would cancel a hover. */}
+      <div className="lift-tile relative h-full">
       <button onClick={onOpen} className="elev flex h-full w-full flex-col rounded-[16px] border p-5 text-left" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
         <span className="flex items-start gap-2 pr-8">
           <span className="text-[14.5px] font-semibold leading-snug tracking-[-0.01em]">{name}</span>
@@ -181,6 +184,7 @@ function DeckTile({ name, cards, known, inFolder, menu, onOpen }) {
       <span className="absolute right-2.5 top-2.5">
         <DotsMenu label={`${name} options`} items={menu} />
       </span>
+      </div>
     </li>
   )
 }
@@ -616,7 +620,8 @@ export default function FlashcardsView({ cards, decks: named = [], folders = [],
                 const inside = shelf.filter((d) => d.folder_id === f.id)
                 const n = inside.reduce((a, d) => a + d.cards.length, 0)
                 return (
-                  <li key={f.id} className="lift-tile relative">
+                  <li key={f.id}>
+                    <div className="lift-tile relative h-full">
                     <button onClick={() => setFolder(f.id)} className="flex h-full w-full flex-col rounded-[16px] border p-5 text-left" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface-sunken)' }}>
                       <IconFolder width={22} height={22} style={{ color: 'var(--brand)' }} />
                       <span className="mt-3 pr-8 text-[14.5px] font-semibold leading-snug tracking-[-0.01em]">{f.name}</span>
@@ -633,6 +638,7 @@ export default function FlashcardsView({ cards, decks: named = [], folders = [],
                         ]}
                       />
                     </span>
+                    </div>
                   </li>
                 )
               })}

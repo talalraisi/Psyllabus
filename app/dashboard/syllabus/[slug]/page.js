@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase'
 import { getCurrentUser } from '@/lib/auth'
 import { getSyllabus, getProfile } from '@/lib/cache'
 import DashboardLayout from '@/components/DashboardLayout'
-import ResourceHubDrawer from '@/components/ResourceHubDrawer'
+import NotesDrawer from '@/components/NotesDrawer'
 import PaperPicker from '@/components/PaperPicker'
 import { Page, PageHeader, EmptyState } from '@/components/PageShell'
 import { startLoading, stopLoading } from '@/components/LoadingBar'
@@ -309,7 +309,7 @@ export default function SyllabusPage() {
                                 onClick={() => setDrawerItem(item)}
                                 className="text-left text-[14px] underline-offset-2 transition-colors hover:text-[var(--brand)] hover:underline"
                                 style={{ color: 'var(--text-body)' }}
-                                title="Open resources and practice quiz"
+                                title="Open your notes and a practice quiz"
                               >
                                 {displaySubtopic(item.subtopic)}
                               </button>
@@ -393,7 +393,7 @@ export default function SyllabusPage() {
         backHref={slugPath}
       />
 
-      <ResourceHubDrawer
+      <NotesDrawer
         open={!!drawerItem}
         onClose={() => setDrawerItem(null)}
         subject={subjectName}
