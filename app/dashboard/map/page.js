@@ -5,8 +5,9 @@
  *
  * Reads the subject's real syllabus and the student's own progress, builds
  * the tree once (lib/subject-graph.js) and hands it to the map
- * (components/map). ?subject= picks the subject and ?at= the level or
- * subtopic, so any part of the map can be linked to.
+ * (components/map). With no ?subject= it opens on you, every subject circling
+ * you (YouMap); ?subject= opens that subject and ?at= the level or subtopic,
+ * so any part of the map can be linked to.
  */
 
 import { Suspense, useEffect, useMemo, useState } from 'react'
@@ -17,6 +18,7 @@ import { getCurrentUser } from '@/lib/auth'
 import { getProfile, getSyllabus } from '@/lib/cache'
 import DashboardLayout from '@/components/DashboardLayout'
 import SubjectMap from '@/components/map/SubjectMap'
+import YouMap from '@/components/map/YouMap'
 import LockedPanel from '@/components/LockedPanel'
 import { Page, PageHeader, PageLoading } from '@/components/PageShell'
 import { startLoading, stopLoading } from '@/components/LoadingBar'
@@ -72,18 +74,17 @@ function SubjectMapPage() {
   }, [router, supabase])
 
   const subjects = useMemo(() => (profile?.subjects || []).filter((s) => !IB_CORE_SUBJECTS.includes(s)), [profile])
-  const subject = subjects.includes(wanted) ? wanted : subjects[0] || ''
+  // No subject asked for: the overview of you, every subject round you.
+  const subject = subjects.includes(wanted) ? wanted : ''
 
-  const graph = useMemo(() => {
-    if (!subject) return null
-    return buildGraph({
-      subject,
-      rows: rows.filter((r) => r.subject === subject),
-      details: buildProgressDetailMap(progress),
-      effective: buildEffectiveProgressMap(progress),
-      key: progressKey,
-    })
-  }, [subject, rows, progress])
+  const graphs = useMemo(() => {
+    const details = buildProgressDetailMap(progress)
+    const effective = buildEffectiveProgressMap(progress)
+    return subjects
+      .map((s) => ({ subject: s, graph: buildGraph({ subject: s, rows: rows.filter((r) => r.subject === s), details, effective, key: progressKey }) }))
+      .filter((g) => g.graph.nodes.get(g.graph.rootId).childIds.length > 0)
+  }, [subjects, rows, progress])
+  const graph = subject ? graphs.find((g) => g.subject === subject)?.graph || null : null
 
   if (loading) {
     return (
@@ -94,7 +95,7 @@ function SubjectMapPage() {
   }
 
   const allowed = canUse('subjectMap', profile)
-  const empty = !graph || graph.nodes.get(graph.rootId).childIds.length === 0
+  const empty = subject ? !graph : graphs.length === 0
 
   if (!allowed || empty) {
     return (
@@ -109,7 +110,7 @@ function SubjectMapPage() {
             />
           ) : (
             <p className="text-[14px]" style={{ color: 'var(--text-muted)' }}>
-              {subjects.length ? `Nothing is mapped for ${subject} yet.` : 'Pick your subjects first and the map will have something to draw.'}{' '}
+              {subjects.length ? `Nothing is mapped for ${subject || 'your subjects'} yet.` : 'Pick your subjects first and the map will have something to draw.'}{' '}
               <Link href="/dashboard/subjects" className="font-medium underline underline-offset-2" style={{ color: 'var(--text)' }}>
                 My subjects
               </Link>
@@ -123,14 +124,19 @@ function SubjectMapPage() {
   return (
     <DashboardLayout profile={profile}>
       <div className="h-[calc(100dvh-56px)] md:h-dvh">
-        <SubjectMap
-          key={subject}
-          graph={graph}
-          subjects={subjects}
-          syllabi={hasSyllabi(profile)}
-          initialAt={subject === wanted ? initialAt : null}
-          onSubject={(s) => router.replace(`/dashboard/map?subject=${encodeURIComponent(s)}`, { scroll: false })}
-        />
+        {graph ? (
+          <SubjectMap
+            key={subject}
+            graph={graph}
+            subjects={graphs.map((g) => g.subject)}
+            syllabi={hasSyllabi(profile)}
+            initialAt={initialAt}
+            onSubject={(s) => router.replace(`/dashboard/map?subject=${encodeURIComponent(s)}`, { scroll: false })}
+            onOverview={() => router.push('/dashboard/map', { scroll: false })}
+          />
+        ) : (
+          <YouMap graphs={graphs} name={profile.full_name || ''} onOpen={(s) => router.push(`/dashboard/map?subject=${encodeURIComponent(s)}`, { scroll: false })} />
+        )}
       </div>
     </DashboardLayout>
   )

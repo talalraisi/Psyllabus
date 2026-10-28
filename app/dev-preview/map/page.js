@@ -1,15 +1,15 @@
 'use client'
 
 /**
- * The subject map without signing in. Development only: a real syllabus,
- * with made-up progress so every colour shows. ?subject= picks the subject.
+ * The subject map without signing in. Development only: a made-up syllabus
+ * and progress, so every colour shows. Opens on you; ?subject= opens one.
  */
 
-import { Suspense, useEffect, useMemo, useState } from 'react'
-import { notFound, useSearchParams } from 'next/navigation'
+import { Suspense, useMemo } from 'react'
+import { notFound, useRouter, useSearchParams } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 import SubjectMap from '@/components/map/SubjectMap'
-import { createClient } from '@/lib/supabase'
+import YouMap from '@/components/map/YouMap'
 import { buildGraph } from '@/lib/subject-graph'
 
 const ENABLED = process.env.NODE_ENV !== 'production'
@@ -29,35 +29,37 @@ const SAMPLE = (subject) => {
   return out
 }
 
+const SUBJECTS = ['Biology HL', 'Economics HL', 'Math Analysis & Approaches HL', 'English A: Literature HL', 'History SL', 'Spanish B SL']
+
+/** A subject as a graph, from the sample syllabus, with made-up progress (each subject a little different). */
+const sampleGraph = (subject, n) => {
+  const rows = SAMPLE(subject).slice(0, 24 + n * 8)
+  const effective = {}
+  const details = {}
+  rows.forEach((r, i) => {
+    const k = `${subject}::${r.subtopic}`
+    effective[k] = STATUSES[(i * 7 + n * 3) % STATUSES.length]
+    details[k] = { points: (i * 37) % 100 }
+  })
+  return buildGraph({ subject, rows, details, effective, key: (s, t) => `${s}::${t}` })
+}
+
 function Preview() {
-  const subject = useSearchParams().get('subject') || 'Biology HL'
-  const [rows, setRows] = useState([])
-  const supabase = createClient()
-  useEffect(() => {
-    // Signed out, the syllabus is not readable; a made-up one stands in.
-    supabase
-      .from('syllabus_content')
-      .select('subject, topic, unit, code, subtopic, position, hl_only, hl_extension')
-      .eq('subject', subject)
-      .then(({ data }) => setRows(data?.length ? data : SAMPLE(subject)))
-  }, [supabase, subject])
-
-  const graph = useMemo(() => {
-    if (!rows.length) return null
-    const effective = {}
-    const details = {}
-    rows.forEach((r, i) => {
-      const k = `${subject}::${r.subtopic}`
-      effective[k] = STATUSES[(i * 7) % STATUSES.length]
-      details[k] = { points: (i * 37) % 100 }
-    })
-    return buildGraph({ subject, rows, details, effective, key: (s, t) => `${s}::${t}` })
-  }, [rows, subject])
-
-  const profile = { is_admin: true, id: 'preview', full_name: 'Sample Student', curriculum: 'IB', subjects: [subject] }
+  const params = useSearchParams()
+  const router = useRouter()
+  const subject = params.get('subject')
+  const graphs = useMemo(() => SUBJECTS.map((s, i) => ({ subject: s, graph: sampleGraph(s, i) })), [])
+  const graph = subject && graphs.find((g) => g.subject === subject)?.graph
+  const profile = { is_admin: true, id: 'preview', full_name: 'Sample Student', curriculum: 'IB', subjects: SUBJECTS }
   return (
     <DashboardLayout profile={profile}>
-      <div className="h-[calc(100dvh-56px)] md:h-dvh">{graph && <SubjectMap key={subject} graph={graph} subjects={[subject]} onSubject={() => {}} />}</div>
+      <div className="h-[calc(100dvh-56px)] md:h-dvh">
+        {graph ? (
+          <SubjectMap key={subject} graph={graph} subjects={SUBJECTS} onSubject={(s) => router.replace(`/dev-preview/map?subject=${encodeURIComponent(s)}`)} onOverview={() => router.push('/dev-preview/map')} />
+        ) : (
+          <YouMap graphs={graphs} name={profile.full_name} onOpen={(s) => router.push(`/dev-preview/map?subject=${encodeURIComponent(s)}`)} />
+        )}
+      </div>
     </DashboardLayout>
   )
 }

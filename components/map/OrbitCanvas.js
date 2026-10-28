@@ -70,7 +70,7 @@ const codeOf = (node) => {
 const tone = (status) =>
   !status || status === 'not_started' ? 'color-mix(in oklab, var(--text-faint) 55%, var(--surface))' : `color-mix(in oklab, ${STATUS_VAR[status]} 62%, var(--text-faint))`
 
-export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = false, onSelect, onEnter, onUp, onBackground, controls = null }) {
+export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = false, onSelect, onEnter, onUp, onBackground, upFromRoot = false, controls = null }) {
   const box = useRef(null)
   const [size, setSize] = useState({ w: 0, h: 0 })
 
@@ -241,8 +241,8 @@ export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = fal
             <span aria-hidden="true" className="orbit-pulse absolute inset-0 rounded-full" style={{ border: '1px solid color-mix(in srgb, var(--brand) 45%, transparent)' }} />
             <button
               type="button"
-              onClick={() => (isRoot ? onSelect?.(null) : onUp?.())}
-              title={isRoot ? focus.title : 'Back up a level'}
+              onClick={() => (isRoot && !upFromRoot ? onSelect?.(null) : onUp?.())}
+              title={isRoot && !upFromRoot ? focus.title : isRoot ? 'Back to you' : 'Back up a level'}
               className="relative flex h-full w-full flex-col items-center justify-center rounded-full text-center transition-[filter] hover:brightness-110"
               style={{ padding: layout.hub * 0.2, background: 'var(--brand)', color: '#fff', boxShadow: '0 0 40px color-mix(in srgb, var(--brand) 45%, transparent)' }}
             >
@@ -252,9 +252,9 @@ export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = fal
               <span className="mt-1 text-[10px] tabular-nums" style={{ opacity: 0.8 }}>
                 {layout.hub >= 64 ? `${t.proved} of ${t.total} proved` : `${t.proved}/${t.total}`}
               </span>
-              {!isRoot && layout.hub >= 64 && (
+              {(!isRoot || upFromRoot) && layout.hub >= 64 && (
                 <span className="mt-0.5 text-[10px] font-semibold" style={{ opacity: 0.9 }}>
-                  ↑ Back
+                  ↑ {isRoot ? 'You' : 'Back'}
                 </span>
               )}
             </button>

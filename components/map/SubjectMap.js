@@ -61,7 +61,7 @@ const svg = (d, size = 16) => (
   </svg>
 )
 
-export default function SubjectMap({ graph, subjects = [], onSubject, initialAt = null, syllabi = false }) {
+export default function SubjectMap({ graph, subjects = [], onSubject, onOverview = null, initialAt = null, syllabi = false }) {
   // Where a deep link lands: a branch opens its own level; a subtopic opens
   // its parent's, with it selected.
   const start = useMemo(() => {
@@ -420,19 +420,20 @@ export default function SubjectMap({ graph, subjects = [], onSubject, initialAt 
             weakOnly={weakOnly}
             onSelect={setSelectedId}
             onEnter={enter}
-            onUp={() => travel(focus.parentId)}
+            onUp={() => (focus.parentId ? travel(focus.parentId) : onOverview?.())}
+            upFromRoot={Boolean(onOverview)}
             onBackground={() => setSelectedId(null)}
           />
 
-          {focusId !== graph.rootId && (
+          {(focusId !== graph.rootId || onOverview) && (
             <button
               type="button"
-              onClick={() => travel(focus.parentId)}
+              onClick={() => (focus.parentId ? travel(focus.parentId) : onOverview())}
               className="absolute left-4 top-4 flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-[12.5px] font-medium shadow-sm transition-colors hover:bg-[var(--surface-sunken)]"
               style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)', color: 'var(--text-body)' }}
             >
               {svg(<path d="M15 6l-6 6 6 6" />, 14)}
-              <span className="max-w-[12rem] truncate">{crumbs.length > 2 ? crumbs.at(-2).title : 'Overview'}</span>
+              <span className="max-w-[12rem] truncate">{focusId === graph.rootId ? 'You' : crumbs.length > 2 ? crumbs.at(-2).title : 'Overview'}</span>
             </button>
           )}
 
