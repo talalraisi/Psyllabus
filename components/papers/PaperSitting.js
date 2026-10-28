@@ -271,7 +271,9 @@ function MarkPart({ part, response, mark, onMark }) {
 export default function PaperSitting({ paper, initial, onSave, backHref, backLabel = 'Back' }) {
   const content = paper.content || {}
   const sections = useMemo(() => content.sections || [], [content.sections])
-  const [phase, setPhase] = useState(initial?.submitted_at ? 'marking' : initial ? 'sitting' : 'intro')
+  // An unfinished sitting opens on the intro, which offers to carry on or start again.
+  const [phase, setPhase] = useState(initial?.submitted_at ? 'marking' : 'intro')
+  const [resumable, setResumable] = useState(Boolean(initial && !initial.submitted_at))
   const [answers, setAnswers] = useState(initial?.answers || {})
   const [chosen, setChosen] = useState(initial?.chosen || [])
   const [marks, setMarks] = useState(initial?.marks || {})
@@ -354,6 +356,23 @@ export default function PaperSitting({ paper, initial, onSave, backHref, backLab
     onSave?.({ start: true, mode: m })
   }
 
+  /** Back into the unfinished sitting, answers and clock as they were. */
+  const carryOn = () => {
+    setNow(stamp())
+    setResumable(false)
+    setPhase('sitting')
+    window.scrollTo({ top: 0 })
+  }
+
+  /** Throw the unfinished sitting away: a clean paper, and the choice of how to sit it. */
+  const startAgain = () => {
+    clearTimeout(saveTimer.current)
+    setAnswers({})
+    setChosen([])
+    setMarks({})
+    setResumable(false)
+  }
+
   const togglePause = () => {
     const t = stamp()
     if (pausedAt) {
@@ -378,6 +397,7 @@ export default function PaperSitting({ paper, initial, onSave, backHref, backLab
 
   /* ------------------------------------------------------------- intro --- */
   if (phase === 'intro') {
+    const done = Object.values(answers).filter((v) => String(v ?? '').trim()).length
     return (
       <div className="mx-auto w-full max-w-2xl">
         <Link href={backHref} className="btn btn-quiet control-sm">
@@ -415,28 +435,48 @@ export default function PaperSitting({ paper, initial, onSave, backHref, backLab
               The {content.skipped.join(' and ')} section needs audio, so it is left out here. Everything else is as in the real paper.
             </p>
           )}
-          <p className="mt-5 text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
-            Written in the format of the real IB paper, with new questions. How do you want to take it?
-          </p>
-          <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
-            {MODES.map((m) => (
-              <button
-                key={m.key}
-                type="button"
-                onClick={() => start(m.key)}
-                className="lift flex flex-col items-start rounded-[16px] border p-4 text-left transition-colors hover:border-[var(--brand)]"
-                style={{ borderColor: m.key === 'exam' ? 'var(--brand)' : 'var(--border-strong)', background: m.key === 'exam' ? 'var(--brand-tint)' : 'var(--surface)' }}
-              >
-                <span className="flex items-center gap-2 text-[14.5px] font-semibold">
-                  {m.key !== 'view' && m.key !== 'practice' && <IconClock width={15} height={15} />}
-                  {m.title}
-                </span>
-                <span className="mt-1 text-[12.5px] leading-snug" style={{ color: 'var(--text-muted)' }}>
-                  {m.line(`${Math.floor(paper.minutes / 60) ? `${Math.floor(paper.minutes / 60)} h ` : ''}${paper.minutes % 60 ? `${paper.minutes % 60} min` : ''}`.trim())}
-                </span>
-              </button>
-            ))}
-          </div>
+          {resumable ? (
+            <div className="mt-6 rounded-[16px] border p-4 sm:p-5" style={{ borderColor: 'var(--brand)', background: 'var(--brand-tint)' }}>
+              <p className="text-[14.5px] font-semibold">You have this paper in progress</p>
+              <p className="mt-1 text-[12.5px]" style={{ color: 'var(--text-muted)' }}>
+                {MODES.find((m) => m.key === mode)?.title || 'Exam conditions'} · {done} answer{done === 1 ? '' : 's'} so far
+                {startedAt ? ` · started ${new Date(startedAt).toLocaleString(undefined, { weekday: 'short', hour: 'numeric', minute: '2-digit' })}` : ''}
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button type="button" onClick={carryOn} className="btn btn-solid control-md">
+                  Carry on
+                </button>
+                <button type="button" onClick={startAgain} className="btn btn-outline control-md">
+                  Start again from the beginning
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <p className="mt-5 text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
+                Written in the format of the real IB paper, with new questions. How do you want to take it?
+              </p>
+              <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+                {MODES.map((m) => (
+                  <button
+                    key={m.key}
+                    type="button"
+                    onClick={() => start(m.key)}
+                    className="lift flex flex-col items-start rounded-[16px] border p-4 text-left transition-colors hover:border-[var(--brand)]"
+                    style={{ borderColor: m.key === 'exam' ? 'var(--brand)' : 'var(--border-strong)', background: m.key === 'exam' ? 'var(--brand-tint)' : 'var(--surface)' }}
+                  >
+                    <span className="flex items-center gap-2 text-[14.5px] font-semibold">
+                      {m.key !== 'view' && m.key !== 'practice' && <IconClock width={15} height={15} />}
+                      {m.title}
+                    </span>
+                    <span className="mt-1 text-[12.5px] leading-snug" style={{ color: 'var(--text-muted)' }}>
+                      {m.line(`${Math.floor(paper.minutes / 60) ? `${Math.floor(paper.minutes / 60)} h ` : ''}${paper.minutes % 60 ? `${paper.minutes % 60} min` : ''}`.trim())}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
     )
@@ -448,7 +488,17 @@ export default function PaperSitting({ paper, initial, onSave, backHref, backLab
   return (
     <div className="mx-auto w-full max-w-3xl">
       <div className="sticky top-0 z-10 -mx-4 mb-6 flex items-center justify-between gap-3 border-b px-4 py-3 backdrop-blur" style={{ borderColor: 'var(--border)', background: 'color-mix(in oklab, var(--bg) 88%, transparent)' }}>
-        <div className="min-w-0">
+        <Link
+          href={backHref}
+          aria-label={marking || reading ? `Leave: back to ${backLabel}` : 'Leave. Your answers are saved, so you can carry on later.'}
+          title={marking || reading ? undefined : 'Your answers are saved, so you can carry on later'}
+          className="-ml-1.5 flex h-9 shrink-0 items-center gap-1 rounded-full px-2 text-[12.5px] font-medium transition-colors hover:bg-[var(--surface-sunken)]"
+          style={{ color: 'var(--text-muted)' }}
+        >
+          <IconArrowLeft width={14} height={14} />
+          Leave
+        </Link>
+        <div className="min-w-0 flex-1">
           <p className="truncate text-[13px] font-semibold">{paper.name}</p>
           <p className="text-[12px]" style={{ color: 'var(--text-faint)' }}>
             {paper.subject}

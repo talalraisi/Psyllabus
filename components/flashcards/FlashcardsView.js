@@ -30,25 +30,31 @@ import { ConfirmSheet, DotsMenu, NameSheet, PickDeckSheet, PickFolderSheet, Toas
  * search, twelve at a time, each editable in place.
  */
 
-// From never answered to known: each right answer moves a card one along.
-const BOX_LABEL = ['New', 'Learning', 'Learning', 'Familiar', 'Familiar', 'Known']
+// From never answered to known: each right answer moves a card one box along,
+// and the boxes read as the four levels a card shows (levelOf).
+const LEVELS = [
+  { label: 'New', boxes: [0] },
+  { label: 'Learning', boxes: [1, 2] },
+  { label: 'Familiar', boxes: [3, 4] },
+  { label: 'Known', boxes: [5] },
+]
 const PAGE = 12
 
 function Boxes({ cards, compact = false }) {
-  const counts = Array.from({ length: MAX_BOX + 1 }, (_, b) => cards.filter((c) => Math.min(MAX_BOX, c.box || 0) === b).length)
+  const counts = LEVELS.map((l) => cards.filter((c) => l.boxes.includes(Math.min(MAX_BOX, c.box || 0))).length)
   const max = Math.max(1, ...counts)
   if (compact) {
     return (
       <span className="flex h-1.5 w-full overflow-hidden rounded-full" style={{ background: 'var(--border)' }} aria-hidden="true">
         {counts.map((n, b) => (
-          <span key={b} style={{ width: `${(n / Math.max(1, cards.length)) * 100}%`, background: `color-mix(in oklab, var(--brand) ${25 + b * 15}%, var(--surface-sunken))` }} />
+          <span key={b} style={{ width: `${(n / Math.max(1, cards.length)) * 100}%`, background: `color-mix(in oklab, var(--brand) ${25 + b * 25}%, var(--surface-sunken))` }} />
         ))}
       </span>
     )
   }
   return (
     <div>
-      <div className="flex h-24 items-end gap-1.5" role="img" aria-label={counts.map((n, b) => `${BOX_LABEL[b]}: ${n}`).join(', ')}>
+      <div className="flex h-24 items-end gap-1.5" role="img" aria-label={counts.map((n, b) => `${LEVELS[b].label}: ${n}`).join(', ')}>
         {counts.map((n, b) => (
           <div key={b} className="flex flex-1 flex-col items-center justify-end gap-1">
             <span className="text-[11px] font-semibold tabular-nums" style={{ color: n ? 'var(--text)' : 'var(--text-faint)' }}>
@@ -56,15 +62,15 @@ function Boxes({ cards, compact = false }) {
             </span>
             <span
               className="w-full rounded-[6px] transition-[height] duration-700"
-              style={{ height: `${Math.max(4, (n / max) * 64)}px`, background: n ? `color-mix(in oklab, var(--brand) ${30 + b * 14}%, var(--surface-sunken))` : 'var(--border)' }}
+              style={{ height: `${Math.max(4, (n / max) * 64)}px`, background: n ? `color-mix(in oklab, var(--brand) ${30 + b * 23}%, var(--surface-sunken))` : 'var(--border)' }}
             />
           </div>
         ))}
       </div>
       <div className="mt-1.5 flex gap-1.5">
-        {BOX_LABEL.map((l, i) => (
-          <span key={i} className="flex-1 truncate text-center text-[10px]" style={{ color: 'var(--text-faint)' }}>
-            {l}
+        {LEVELS.map((l) => (
+          <span key={l.label} className="flex-1 truncate text-center text-[10.5px]" style={{ color: 'var(--text-faint)' }}>
+            {l.label}
           </span>
         ))}
       </div>
