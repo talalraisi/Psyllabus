@@ -65,7 +65,8 @@ function PaperPage() {
   const save = useCallback(
     async (patch) => {
       if (patch.start) {
-        const { data } = await supabase.from('paper_attempts').insert({ user_id: userId.current, paper_id: id, total: paper?.marks }).select('id').single()
+        const mode = ['exam', 'stopwatch', 'practice'].includes(patch.mode) ? patch.mode : 'exam'
+        const { data } = await supabase.from('paper_attempts').insert({ user_id: userId.current, paper_id: id, total: paper?.marks, mode }).select('id').single()
         attemptId.current = data?.id || null
         return
       }

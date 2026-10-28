@@ -24,8 +24,22 @@ import { checkWritten } from '@/lib/flashcard-modes'
  * band the answer fits. That is how IB students are taught to use a
  * markscheme, and it is free.
  *
+ * Four ways in: exam conditions (the real duration, counting down), timing
+ * yourself (a stopwatch that pauses), no clock at all, or just reading it
+ * (the questions and their markschemes, nothing answered or saved).
+ *
  * Presentational: the page loads the paper and saves the attempt.
  */
+
+/** The time now, for the handlers: outside the component, so it is plainly not render. */
+const stamp = () => Date.now()
+
+const MODES = [
+  { key: 'exam', title: 'Exam conditions', line: (m) => `The real ${m}, counting down. Keeps going into overtime so you can finish.` },
+  { key: 'stopwatch', title: 'Time yourself', line: () => 'A stopwatch you can pause. See how long the paper takes you.' },
+  { key: 'practice', title: 'No clock', line: () => 'Answer at your own pace, then mark it against the markscheme.' },
+  { key: 'view', title: 'Just read it', line: () => 'Look through the questions and their markschemes. Nothing is saved.' },
+]
 
 const keyOf = (si, qi, pi) => `${si}.${qi}.${pi}`
 
@@ -111,6 +125,60 @@ function AnswerBox({ part, value, onChange, disabled }) {
       autoComplete="off"
       className="input mt-2 h-11 w-full max-w-sm text-[16px] sm:text-[15px]"
     />
+  )
+}
+
+/** A part's markscheme on its own, for reading a paper rather than sitting it. */
+function ReadScheme({ part }) {
+  const [open, setOpen] = useState(false)
+  const s = part.markscheme || {}
+  const answerLine = part.type === 'mcq' ? part.correct_answer?.toUpperCase() : part.type !== 'written' ? (part.accepted_answers || [])[0] : null
+  return (
+    <div className="mt-2">
+      <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} className="text-[13px] font-semibold" style={{ color: 'var(--brand)' }}>
+        {open ? 'Hide markscheme' : 'Show markscheme'}
+      </button>
+      {open && (
+        <div className="mt-2 rounded-[14px] border p-4" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
+          {answerLine && (
+            <p className="text-[14px] font-semibold" style={{ color: 'var(--status-proficient)' }}>
+              Answer: <MathText>{answerLine}</MathText>
+            </p>
+          )}
+          {(s.points || []).length > 0 && (
+            <ul className="mt-2 flex flex-col gap-1.5">
+              {s.points.map((p, i) => (
+                <li key={i} className="flex items-start gap-2.5 text-[14px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: 'var(--text-faint)' }} />
+                  <span>
+                    <MathText>{p.point}</MathText> <span style={{ color: 'var(--text-faint)' }}>[{p.marks}]</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+          {String(s.markbands || '').trim() && (
+            <div className="mt-3 whitespace-pre-line text-[13.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+              <MathText>{s.markbands}</MathText>
+            </div>
+          )}
+          {s.indicative_content?.length > 0 && (
+            <ul className="mt-3 flex list-disc flex-col gap-1 pl-5 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+              {s.indicative_content.map((c, i) => (
+                <li key={i}>
+                  <MathText>{c}</MathText>
+                </li>
+              ))}
+            </ul>
+          )}
+          {s.guidance && (
+            <p className="mt-2 text-[13px]" style={{ color: 'var(--text-muted)' }}>
+              <MathText>{s.guidance}</MathText>
+            </p>
+          )}
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -209,13 +277,17 @@ export default function PaperSitting({ paper, initial, onSave, backHref, backLab
   const [marks, setMarks] = useState(initial?.marks || {})
   const [startedAt, setStartedAt] = useState(() => (initial?.started_at ? new Date(initial.started_at).getTime() : null))
   const [now, setNow] = useState(() => Date.now())
+  const [mode, setMode] = useState(initial?.mode || 'exam')
+  // The stopwatch: time spent paused, and when the current pause began.
+  const [pausedMs, setPausedMs] = useState(0)
+  const [pausedAt, setPausedAt] = useState(null)
   const saveTimer = useRef(null)
 
   useEffect(() => {
-    if (phase !== 'sitting') return
+    if (phase !== 'sitting' || mode === 'practice') return
     const t = setInterval(() => setNow(Date.now()), 1000)
     return () => clearInterval(t)
-  }, [phase])
+  }, [phase, mode])
 
   const save = (patch, immediate = false) => {
     clearTimeout(saveTimer.current)
@@ -263,15 +335,32 @@ export default function PaperSitting({ paper, initial, onSave, backHref, backLab
 
   const score = Object.values(allMarks).reduce((a, m) => a + (m || 0), 0)
   const unmarked = Object.values(allMarks).filter((m) => m == null).length
-  const elapsed = startedAt ? (now - startedAt) / 1000 : 0
+  const elapsed = startedAt ? ((pausedAt ?? now) - startedAt - pausedMs) / 1000 : 0
   const left = paper.minutes * 60 - elapsed
 
-  const start = () => {
-    const t = Date.now()
+  const start = (m) => {
+    if (m === 'view') {
+      setPhase('reading')
+      window.scrollTo({ top: 0 })
+      return
+    }
+    const t = stamp()
+    setMode(m)
     setStartedAt(t)
     setNow(t)
+    setPausedMs(0)
+    setPausedAt(null)
     setPhase('sitting')
-    onSave?.({ start: true })
+    onSave?.({ start: true, mode: m })
+  }
+
+  const togglePause = () => {
+    const t = stamp()
+    if (pausedAt) {
+      setPausedMs((p) => p + (t - pausedAt))
+      setPausedAt(null)
+    } else setPausedAt(t)
+    setNow(t)
   }
 
   const submit = () => {
@@ -327,12 +416,27 @@ export default function PaperSitting({ paper, initial, onSave, backHref, backLab
             </p>
           )}
           <p className="mt-5 text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
-            Written in the format of the real IB paper, with new questions. Sit it in one go, in exam conditions. The clock keeps running after time is up, so you can finish.
+            Written in the format of the real IB paper, with new questions. How do you want to take it?
           </p>
-          <button type="button" onClick={start} className="btn btn-solid control-lg mt-6 w-full">
-            <IconClock width={16} height={16} />
-            Start the paper
-          </button>
+          <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+            {MODES.map((m) => (
+              <button
+                key={m.key}
+                type="button"
+                onClick={() => start(m.key)}
+                className="lift flex flex-col items-start rounded-[16px] border p-4 text-left transition-colors hover:border-[var(--brand)]"
+                style={{ borderColor: m.key === 'exam' ? 'var(--brand)' : 'var(--border-strong)', background: m.key === 'exam' ? 'var(--brand-tint)' : 'var(--surface)' }}
+              >
+                <span className="flex items-center gap-2 text-[14.5px] font-semibold">
+                  {m.key !== 'view' && m.key !== 'practice' && <IconClock width={15} height={15} />}
+                  {m.title}
+                </span>
+                <span className="mt-1 text-[12.5px] leading-snug" style={{ color: 'var(--text-muted)' }}>
+                  {m.line(`${Math.floor(paper.minutes / 60) ? `${Math.floor(paper.minutes / 60)} h ` : ''}${paper.minutes % 60 ? `${paper.minutes % 60} min` : ''}`.trim())}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     )
@@ -340,6 +444,7 @@ export default function PaperSitting({ paper, initial, onSave, backHref, backLab
 
   /* ---------------------------------------------------- sitting / marking --- */
   const marking = phase === 'marking'
+  const reading = phase === 'reading'
   return (
     <div className="mx-auto w-full max-w-3xl">
       <div className="sticky top-0 z-10 -mx-4 mb-6 flex items-center justify-between gap-3 border-b px-4 py-3 backdrop-blur" style={{ borderColor: 'var(--border)', background: 'color-mix(in oklab, var(--bg) 88%, transparent)' }}>
@@ -349,16 +454,42 @@ export default function PaperSitting({ paper, initial, onSave, backHref, backLab
             {paper.subject}
           </p>
         </div>
-        {marking ? (
+        {reading ? (
+          <div className="flex shrink-0 items-center gap-2">
+            <span className="text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
+              Reading
+            </span>
+            <button type="button" onClick={() => setPhase('intro')} className="btn btn-solid control-sm">
+              Sit it
+            </button>
+          </div>
+        ) : marking ? (
           <p className="shrink-0 text-[15px] font-semibold tabular-nums">
             {score}/{paper.marks}
             {unmarked > 0 && <span className="ml-2 text-[12px] font-normal" style={{ color: 'var(--text-faint)' }}>{unmarked} to mark</span>}
           </p>
         ) : (
           <div className="flex shrink-0 items-center gap-3">
-            <span className="text-[15px] font-semibold tabular-nums" style={{ color: left < 0 ? 'var(--status-weak)' : left < 300 ? 'var(--heat-hot)' : 'var(--text)' }}>
-              {clock(left)}
-            </span>
+            {mode === 'exam' && (
+              <span className="text-[15px] font-semibold tabular-nums" style={{ color: left < 0 ? 'var(--status-weak)' : left < 300 ? 'var(--heat-hot)' : 'var(--text)' }}>
+                {clock(left)}
+              </span>
+            )}
+            {mode === 'practice' && (
+              <span className="text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
+                No clock
+              </span>
+            )}
+            {mode === 'stopwatch' && (
+              <>
+                <span className="text-[15px] font-semibold tabular-nums" style={{ color: pausedAt ? 'var(--text-faint)' : 'var(--text)' }}>
+                  {clock(elapsed)}
+                </span>
+                <button type="button" onClick={togglePause} className="btn btn-quiet control-sm">
+                  {pausedAt ? 'Resume' : 'Pause'}
+                </button>
+              </>
+            )}
             <button type="button" onClick={submit} className="btn btn-solid control-sm">
               Finish
             </button>
@@ -399,7 +530,7 @@ export default function PaperSitting({ paper, initial, onSave, backHref, backLab
                       {q.parts.length === 1 && q.parts[0].type === 'mcq' ? `${q.number}.` : `Question ${q.number}`}
                       {q.title && q.parts[0]?.type !== 'mcq' ? ` · ${q.title}` : ''}
                     </h3>
-                    {choice && !marking && (
+                    {choice && !marking && !reading && (
                       <button type="button" onClick={() => choose(si, qi)} className={picked ? 'btn btn-solid control-sm' : 'btn btn-outline control-sm'}>
                         {picked ? 'Answering this one' : 'Answer this question'}
                       </button>
@@ -418,7 +549,7 @@ export default function PaperSitting({ paper, initial, onSave, backHref, backLab
                             [{p.marks}]
                           </span>
                         </p>
-                        {show && <AnswerBox part={p} value={answers[k]} disabled={marking} onChange={(v) => answer(k, v)} />}
+                        {reading ? <ReadScheme part={p} /> : show && <AnswerBox part={p} value={answers[k]} disabled={marking} onChange={(v) => answer(k, v)} />}
                         {marking && <MarkPart part={p} response={answers[k]} mark={marks[k]?.marks} onMark={(m) => setMark(k, m)} />}
                       </div>
                     )
@@ -430,7 +561,16 @@ export default function PaperSitting({ paper, initial, onSave, backHref, backLab
         )
       })}
 
-      {!marking ? (
+      {reading ? (
+        <div className="mb-16 flex flex-wrap gap-2">
+          <button type="button" onClick={() => setPhase('intro')} className="btn btn-solid control-md">
+            Sit this paper
+          </button>
+          <Link href={backHref} className="btn btn-quiet control-md">
+            Done
+          </Link>
+        </div>
+      ) : !marking ? (
         <button type="button" onClick={submit} className="btn btn-solid control-lg mb-16 w-full">
           Finish and mark
         </button>
