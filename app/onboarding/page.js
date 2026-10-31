@@ -66,12 +66,10 @@ export default function Onboarding() {
 
   const currentCurriculum = CURRICULUMS[curriculum]
 
-  // Six subjects for the Diploma, and no rules about which groups they come
-  // from. Plenty of real timetables break the standard pattern, and blocking
-  // someone at sign-up over it helps nobody.
-  const subjectsValid = curriculum === 'IB'
-    ? selectedSubjects.length === 6
-    : selectedSubjects.length > 0
+  // Up to six for the Diploma, and no rules about which groups they come
+  // from. Not every IB subject is here yet, so a student takes the ones that
+  // are; and plenty of real timetables break the standard pattern anyway.
+  const subjectsValid = selectedSubjects.length > 0
 
   /**
    * Choosing a course, then choosing its level.
@@ -122,11 +120,8 @@ export default function Onboarding() {
   const ibTotal = predictedTotal(targetGrades, selectedSubjects)
   const consentComplete = !needsConsent || (guardianOk && termsOk)
 
-  const gradesComplete = isIB
-    ? selectedSubjects.every((s) => targetGrades[s]) &&
-      !!targetGrades['Theory of Knowledge'] &&
-      !!targetGrades['Extended Essay']
-    : Object.keys(targetGrades).length === selectedSubjects.length
+  // Targets are optional: any, all or none of them. Skipping says so on the button.
+  const anyTargets = Object.values(targetGrades).some(Boolean)
 
   /**
    * Whose account is this?
@@ -517,7 +512,7 @@ export default function Onboarding() {
               Select your subjects
             </h1>
             <p className="mt-3 text-[14.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              {curriculum === 'IB' && 'Pick the six subjects you actually take. Theory of Knowledge and the Extended Essay are added for you.'}
+              {curriculum === 'IB' && 'Pick the subjects you take, up to six. Not every IB subject is here yet, so add the ones that are. Theory of Knowledge and the Extended Essay are added for you.'}
               {curriculum === 'AP' && 'Select the AP courses you are taking.'}
               {curriculum === 'A-Level' && 'Most students take 3-4 A-Level subjects.'}
             </p>
@@ -721,7 +716,7 @@ export default function Onboarding() {
               Set your target grades
             </h1>
             <p className="mb-8 mt-3 text-[14.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              Where you honestly intend to land. Raise them whenever you get there.
+              Where you honestly intend to land. Raise them whenever you get there. Optional: skip any you have not decided.
             </p>
 
             {/* What the two numbers are, said once, quietly, then as the
@@ -754,9 +749,11 @@ export default function Onboarding() {
                         onChange={(e) => setPredicted(subject, e.target.value)}
                         aria-label={`${subject}: predicted now`}
                         className="h-10 w-[5.75rem] rounded-full border pl-3.5 pr-1.5 text-[13.5px] font-semibold tabular-nums"
-                        style={{ borderColor: 'var(--border-strong)', color: predictedGrades[subject] ? 'var(--text)' : 'var(--text-faint)' }}
+                        style={{ borderColor: 'var(--border-strong)', color: predictedGrades[subject] && predictedGrades[subject] !== 'none' ? 'var(--text)' : 'var(--text-faint)' }}
                       >
                         <option value="">—</option>
+                        {/* Most students have no predicted grade yet: an answer, not a blank. */}
+                        <option value="none">None</option>
                         {[...grades].reverse().map((g) => (
                           <option key={g} value={g}>
                             {g}
@@ -876,9 +873,9 @@ export default function Onboarding() {
               </button>
               <button
                 onClick={handleFinish}
-                disabled={loading || !gradesComplete || !consentComplete}
+                disabled={loading || !consentComplete}
                 className="btn btn-solid control-lg flex-1 text-base">
-                {loading ? 'Setting up…' : 'Continue'}
+                {loading ? 'Setting up…' : anyTargets ? 'Continue' : 'Skip for now'}
               </button>
             </div>
           </div>
