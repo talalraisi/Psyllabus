@@ -174,10 +174,12 @@ export default async function Home() {
               [floorTo(counts?.flashcards ?? 80000, 5000), 'flashcards'],
             ].map(([v, l], i) => (
               <Reveal key={l} delay={i * 70}>
-                <p className="text-[clamp(2.1rem,4vw,3.1rem)] font-semibold leading-none tracking-[-0.035em]">
-                  <CountUp to={v} suffix={<span className="ml-0.5 font-medium" style={{ color: 'var(--brand)' }}>+</span>} />
+                {/* Set like the headline above: the figure in the text colour,
+                    the plus in the brand green, the words muted. */}
+                <p className="text-[clamp(2.2rem,4.2vw,3.2rem)] font-semibold leading-[0.98] tracking-[-0.038em]" style={{ color: 'var(--text)' }}>
+                  <CountUp to={v} suffix={<span style={{ color: 'var(--brand)' }}>+</span>} />
                 </p>
-                <p className="mt-3 text-[11.5px] font-semibold uppercase tracking-[0.14em]" style={{ color: 'var(--text-faint)' }}>
+                <p className="mt-3 text-[15px] font-semibold tracking-[-0.01em]" style={{ color: 'var(--text-muted)' }}>
                   {l}
                 </p>
               </Reveal>
