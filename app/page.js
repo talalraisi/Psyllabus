@@ -162,14 +162,16 @@ export default async function Home() {
 
         {/* -------------------------------------------------------- coverage */}
         <Section tint>
-          <div className="mx-auto grid max-w-4xl grid-cols-2 gap-x-8 gap-y-10 text-center md:grid-cols-4">
+          <div className="mx-auto grid max-w-5xl grid-cols-2 gap-x-8 gap-y-10 text-center md:grid-cols-5">
             {[
-              [counts?.subjects ?? 173, '', 'subjects covered'],
-              [counts?.subtopics ?? 5914, '', 'subtopics mapped'],
+              [counts?.subjects ?? 169, '', 'subjects covered'],
+              [counts?.subtopics ?? 9400, '', 'subtopics mapped'],
               [3, '', 'curricula'],
-              [5, '', 'levels of mastery'],
+              [counts?.questions ?? 49000, '', 'checked questions'],
+              [counts?.flashcards ?? 80000, '', 'ready-made flashcards'],
             ].map(([v, suffix, l], i) => (
-              <Reveal key={l} delay={i * 70}>
+              // Five in a row; on a phone the fifth takes the whole last line.
+              <Reveal key={l} delay={i * 70} className={i === 4 ? 'col-span-2 md:col-span-1' : ''}>
                 <p className="text-[clamp(2rem,3.6vw,2.8rem)] font-semibold leading-none tracking-[-0.03em]">
                   <CountUp to={v} suffix={suffix} />
                 </p>
