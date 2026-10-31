@@ -29,6 +29,9 @@ export const metadata = {
  * eventually overstates, and a marketing claim has to stay defensible without
  * anyone thinking about it.
  */
+/** Down to a round figure, so every number can honestly carry a "+". */
+const floorTo = (n, step) => Math.floor(Number(n) / step) * step
+
 async function bankCounts() {
   try {
     const res = await fetch(
@@ -162,20 +165,21 @@ export default async function Home() {
 
         {/* -------------------------------------------------------- coverage */}
         <Section tint>
-          <div className="mx-auto grid max-w-5xl grid-cols-2 gap-x-8 gap-y-10 text-center md:grid-cols-5">
+          <div className="mx-auto grid max-w-4xl grid-cols-2 gap-x-8 gap-y-12 text-center md:grid-cols-4">
             {[
-              [counts?.subjects ?? 169, '', 'subjects covered'],
-              [counts?.subtopics ?? 9400, '', 'subtopics mapped'],
-              [3, '', 'curricula'],
-              [counts?.questions ?? 49000, '', 'checked questions'],
-              [counts?.flashcards ?? 80000, '', 'ready-made flashcards'],
-            ].map(([v, suffix, l], i) => (
-              // Five in a row; on a phone the fifth takes the whole last line.
-              <Reveal key={l} delay={i * 70} className={i === 4 ? 'col-span-2 md:col-span-1' : ''}>
-                <p className="text-[clamp(2rem,3.6vw,2.8rem)] font-semibold leading-none tracking-[-0.03em]">
-                  <CountUp to={v} suffix={suffix} />
+              [floorTo(counts?.subjects ?? 160, 10), 'subjects'],
+              [floorTo(counts?.subtopics ?? 9400, 100), 'subtopics mapped'],
+              // At least 50,000: the bank is past it now, rounding down to 45,000 undersells it.
+              [Math.max(50000, floorTo(counts?.questions ?? 50000, 5000)), 'practice questions'],
+              [floorTo(counts?.flashcards ?? 80000, 5000), 'flashcards'],
+            ].map(([v, l], i) => (
+              <Reveal key={l} delay={i * 70}>
+                <p className="text-[clamp(2.1rem,4vw,3.1rem)] font-semibold leading-none tracking-[-0.035em]">
+                  <CountUp to={v} suffix={<span className="ml-0.5 font-medium" style={{ color: 'var(--brand)' }}>+</span>} />
                 </p>
-                <p className="mt-2.5 text-[13px]" style={{ color: 'var(--text-muted)' }}>{l}</p>
+                <p className="mt-3 text-[11.5px] font-semibold uppercase tracking-[0.14em]" style={{ color: 'var(--text-faint)' }}>
+                  {l}
+                </p>
               </Reveal>
             ))}
           </div>
