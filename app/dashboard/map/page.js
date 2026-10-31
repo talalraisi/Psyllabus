@@ -26,7 +26,7 @@ import { progressKey, mergeSyllabusWithProgress } from '@/lib/progress'
 import { buildEffectiveProgressMap, buildProgressDetailMap } from '@/lib/decay'
 import { buildGraph } from '@/lib/subject-graph'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
-import { canUse, hasSyllabi } from '@/lib/access'
+import { accessibleSubjects, canUse, hasSyllabi } from '@/lib/access'
 
 function SubjectMapPage() {
   const [profile, setProfile] = useState(null)
@@ -63,7 +63,7 @@ function SubjectMapPage() {
       }
       setProfile(profileData)
       // The core has no subtopics to quiz, so it has no map. It has its page.
-      const subjects = (profileData.subjects || []).filter((s) => !IB_CORE_SUBJECTS.includes(s))
+      const subjects = accessibleSubjects(profileData).filter((s) => !IB_CORE_SUBJECTS.includes(s))
       const [syllabusRows, { data: progressRows }] = await Promise.all([
         getSyllabus(supabase, subjects),
         supabase.from('progress').select('subject, subtopic, status, mastery_points, updated_at, last_correct_at').eq('user_id', user.id),
@@ -75,7 +75,10 @@ function SubjectMapPage() {
     load()
   }, [router, supabase])
 
-  const subjects = useMemo(() => (profile?.subjects || []).filter((s) => !IB_CORE_SUBJECTS.includes(s)), [profile])
+  // The subjects this plan opens: a free account maps its own subject, and
+  // the rest wait for Basic (counted in the panel, not drawn).
+  const subjects = useMemo(() => (profile ? accessibleSubjects(profile) : []).filter((s) => !IB_CORE_SUBJECTS.includes(s)), [profile])
+  const lockedCount = (profile?.subjects || []).filter((s) => !IB_CORE_SUBJECTS.includes(s) && !subjects.includes(s)).length
   // No subject asked for: the overview of you, every subject round you.
   const subject = subjects.includes(wanted) ? wanted : ''
 
@@ -145,6 +148,7 @@ function SubjectMapPage() {
           graphs={graphs}
           items={heatmap}
           name={profile.full_name || ''}
+          locked={lockedCount}
           onOpen={(s, at) => router.push(`/dashboard/map?subject=${encodeURIComponent(s)}${at ? `&at=${encodeURIComponent(at)}` : ''}`)}
         />
       )}

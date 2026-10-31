@@ -80,7 +80,7 @@ const Eyebrow = ({ children }) => (
   </p>
 )
 
-export default function YouMap({ graphs, items = [], name = '', onOpen }) {
+export default function YouMap({ graphs, items = [], name = '', onOpen, locked = 0 }) {
   const [selectedId, setSelectedId] = useState(null)
   const below = useRef(null)
 
@@ -206,6 +206,11 @@ export default function YouMap({ graphs, items = [], name = '', onOpen }) {
               )
             })}
           </ul>
+          {locked > 0 && (
+            <a href="/pricing" className="-mt-2 rounded-[12px] border border-dashed px-3 py-2.5 text-[12.5px] transition-colors hover:bg-[var(--surface-sunken)]" style={{ borderColor: 'var(--border-strong)', color: 'var(--text-muted)' }}>
+              Your other {locked} subject{locked === 1 ? '' : 's'} join the map with Basic. <span style={{ color: 'var(--brand)' }}>See plans</span>
+            </a>
+          )}
         </>
       )}
     </div>

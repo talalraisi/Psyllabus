@@ -59,7 +59,7 @@ function Preview() {
           <SubjectMap key={subject} graph={graph} subjects={SUBJECTS} initialAt={params.get('at')} onSubject={(s) => router.replace(`/dev-preview/map?subject=${encodeURIComponent(s)}`)} onOverview={() => router.push('/dev-preview/map')} />
         </div>
       ) : (
-        <YouMap graphs={graphs} items={samples.flatMap((x) => x.items)} name={profile.full_name} onOpen={(s, at) => router.push(`/dev-preview/map?subject=${encodeURIComponent(s)}${at ? `&at=${encodeURIComponent(at)}` : ''}`)} />
+        <YouMap graphs={graphs} items={samples.flatMap((x) => x.items)} name={profile.full_name} locked={params.get("locked") ? 3 : 0} onOpen={(s, at) => router.push(`/dev-preview/map?subject=${encodeURIComponent(s)}${at ? `&at=${encodeURIComponent(at)}` : ''}`)} />
       )}
     </DashboardLayout>
   )
