@@ -75,11 +75,10 @@ const Node = memo(function Node({ node, role, selected, expanded, dim, onSelect,
         onClick={() => onSelect(node.id)}
         onDoubleClick={() => branch && onEnter(node.id)}
         aria-pressed={selected}
-        className="flex h-full w-full items-center gap-2 rounded-full border px-3 text-left text-[11.5px] font-medium transition-[box-shadow,border-color,opacity] duration-200"
+        className="flex h-full w-full items-center gap-2 rounded-full border px-3 text-left text-[11.5px] font-medium transition-[border-color,opacity] duration-200"
         style={{
           borderColor: selected ? 'var(--brand)' : 'var(--border-strong)',
           background: 'var(--surface)',
-          boxShadow: selected ? '0 0 0 3px var(--brand-tint)' : '0 6px 16px -12px rgb(0 0 0 / 0.5)',
           opacity: dim ? 0.3 : 1,
           color: 'var(--text-body)',
         }}
@@ -103,13 +102,11 @@ const Node = memo(function Node({ node, role, selected, expanded, dim, onSelect,
         onDoubleClick={() => branch && onEnter(node.id)}
         aria-pressed={selected}
         aria-label={`${node.title}. ${statusLabel(node.status)}. ${progressLine(node)}.${branch ? ' Double-click to open.' : ''}`}
-        className={`flex h-full w-full flex-col justify-between rounded-[14px] border p-3 text-left transition-[box-shadow,border-color,transform] duration-200 group-hover:-translate-y-0.5 ${branch ? 'pr-6' : ''}`}
+        className={`flex h-full w-full flex-col justify-between rounded-[14px] border p-3 text-left transition-[border-color,transform] duration-200 group-hover:-translate-y-0.5 ${branch ? 'pr-6' : ''}`}
         style={{
           borderColor: selected ? 'var(--brand)' : 'var(--border-strong)',
           background: 'var(--surface)',
-          boxShadow: selected
-            ? '0 0 0 3px var(--brand-tint), 0 14px 30px -18px rgb(0 0 0 / 0.6)'
-            : '0 10px 26px -20px rgb(0 0 0 / 0.55)',
+          borderWidth: selected ? 1.5 : 1,
         }}
       >
         <span className="flex items-center gap-1.5 text-[10.5px] font-medium" style={{ color: 'var(--text-faint)' }}>
@@ -172,8 +169,7 @@ function Hub({ node, onSelect, selected }) {
       className="relative flex h-full w-full flex-col items-center justify-center rounded-full border px-5 text-center"
       style={{
         borderColor: selected ? 'var(--brand)' : 'var(--border-strong)',
-        background: 'radial-gradient(circle at 50% 35%, var(--surface), var(--surface-sunken))',
-        boxShadow: '0 20px 50px -28px rgb(0 0 0 / 0.7)',
+        background: 'var(--surface)',
       }}
     >
       <Ring value={pct} size={HUB} stroke={3} />

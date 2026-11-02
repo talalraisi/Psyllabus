@@ -90,7 +90,6 @@ export default function ProgressOverTime({ items, now }) {
             </text>
           </g>
         ))}
-        <path d={`${path('tested')} L${x(WEEKS - 1)},${y(0)} L${x(0)},${y(0)} Z`} fill="var(--brand)" opacity="0.07" />
         <path d={path('tested')} fill="none" stroke="color-mix(in oklab, var(--brand) 40%, var(--border-strong))" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
         <path d={path('proved')} fill="none" stroke="var(--brand)" strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
         {/* The numbers now, at the end of each line. */}

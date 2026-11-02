@@ -404,7 +404,7 @@ export default function SubjectMap({ graph, subjects = [], onSubject, onOverview
         <div className={`fixed inset-0 z-50 2xl:hidden ${outlineMobile ? '' : 'pointer-events-none'}`} aria-hidden={!outlineMobile} inert={!outlineMobile || undefined}>
           <div className="absolute inset-0 bg-black/30 transition-opacity duration-200" style={{ opacity: outlineMobile ? 1 : 0 }} onClick={() => setOutlineMobile(false)} />
           <aside
-            className="absolute inset-y-0 left-0 w-[300px] max-w-[85vw] shadow-2xl transition-transform duration-300"
+            className="absolute inset-y-0 left-0 w-[300px] max-w-[85vw] border-r transition-transform duration-300"
             style={{ background: 'var(--surface)', transform: outlineMobile ? 'none' : 'translateX(-105%)', transitionTimingFunction: 'cubic-bezier(0.16,1,0.3,1)' }}
           >
             <Outline graph={graph} focusId={focusId} selectedId={selectedId} weakOnly={weakOnly} onWeakOnly={setWeakOnly} onGo={goTo} />
@@ -429,7 +429,7 @@ export default function SubjectMap({ graph, subjects = [], onSubject, onOverview
             <button
               type="button"
               onClick={() => (focus.parentId ? travel(focus.parentId) : onOverview())}
-              className="absolute left-4 top-4 flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-[12.5px] font-medium shadow-sm transition-colors hover:bg-[var(--surface-sunken)]"
+              className="absolute left-4 top-4 flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-[12.5px] font-medium transition-colors hover:bg-[var(--surface-sunken)]"
               style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)', color: 'var(--text-body)' }}
             >
               {svg(<path d="M15 6l-6 6 6 6" />, 14)}
@@ -441,8 +441,8 @@ export default function SubjectMap({ graph, subjects = [], onSubject, onOverview
           {next.length > 0 &&
             (prefs.strip ? (
               <div
-                className="absolute bottom-4 left-1/2 flex max-w-[calc(100%-120px)] -translate-x-1/2 items-center gap-2 overflow-x-auto rounded-full border py-1.5 pl-3 pr-1.5 shadow-lg md:max-w-[calc(100%-360px)]"
-                style={{ borderColor: 'var(--border-strong)', background: 'color-mix(in oklab, var(--surface) 94%, transparent)', backdropFilter: 'blur(8px)' }}
+                className="absolute bottom-4 left-1/2 flex max-w-[calc(100%-120px)] -translate-x-1/2 items-center gap-2 overflow-x-auto rounded-full border py-1.5 pl-3 pr-1.5 md:max-w-[calc(100%-360px)]"
+                style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
               >
                 <span className="shrink-0 text-[10.5px] font-semibold uppercase tracking-[0.12em]" style={{ color: 'var(--text-faint)' }}>
                   Next
@@ -468,7 +468,7 @@ export default function SubjectMap({ graph, subjects = [], onSubject, onOverview
               <button
                 type="button"
                 onClick={() => setPref('strip', true)}
-                className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full border px-3.5 py-1.5 text-[12px] font-medium shadow-lg md:left-[calc(50%)]"
+                className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full border px-3.5 py-1.5 text-[12px] font-medium md:left-[calc(50%)]"
                 style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)', color: 'var(--text-muted)' }}
               >
                 What next?
@@ -483,7 +483,7 @@ export default function SubjectMap({ graph, subjects = [], onSubject, onOverview
           </aside>
         )}
         {selected && (
-          <div className="fixed inset-x-0 bottom-0 z-50 max-h-[62vh] overflow-hidden rounded-t-[20px] border-t shadow-2xl lg:hidden" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)', animation: 'sheet-up 280ms cubic-bezier(0.16,1,0.3,1)' }}>
+          <div className="fixed inset-x-0 bottom-0 z-50 max-h-[62vh] overflow-hidden rounded-t-[20px] border-t lg:hidden" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)', animation: 'sheet-up 280ms cubic-bezier(0.16,1,0.3,1)' }}>
             <div className="mx-auto mt-2 h-1 w-10 rounded-full" style={{ background: 'var(--border-strong)' }} aria-hidden="true" />
             <div className="h-[calc(62vh-12px)]">{inspector}</div>
           </div>
