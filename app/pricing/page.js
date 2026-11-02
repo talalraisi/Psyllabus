@@ -6,6 +6,7 @@ import PageShell from '@/components/marketing/PageShell'
 import { PriceCompare } from '@/components/marketing/visuals'
 import { IconCheck, IconArrowRight, IconClose } from '@/components/Icons'
 import { PLANS, SCHOOL_PLAN, COMPARISON } from '@/lib/plans'
+import { billingLive } from '@/lib/billing'
 
 /**
  * Three plans and a footnote.
@@ -140,7 +141,7 @@ export default function PricingPage() {
               )}
 
               <Link
-                href={plan.id === 'free' ? '/signup' : '/signup?plan=' + plan.id}
+                href={plan.id === 'free' ? '/signup' : '/upgrade?plan=' + plan.id}
                 className={`btn control-md mt-4 w-full ${plan.featured ? 'btn-solid' : 'btn-outline'}`}
               >
                 {plan.cta}
@@ -152,7 +153,9 @@ export default function PricingPage() {
 
         {/* Said once, plainly, rather than printed on three buttons. */}
         <p className="mt-5 text-[13px]" style={{ color: 'var(--text-muted)' }}>
-          Paid plans are not live yet. Sign up free and you will be the first to be offered one.
+          {billingLive
+            ? 'Pay monthly or yearly, cancel any time. Payment is handled by Lemon Squeezy.'
+            : 'Paid plans are not live yet. Sign up free and you will be the first to be offered one.'}
         </p>
 
         {/* Row by row, where the eye can travel across. */}

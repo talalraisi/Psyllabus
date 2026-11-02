@@ -10,11 +10,75 @@ import AvatarCropper from '@/components/AvatarCropper'
 import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader, Section, PageLoading, Spinner } from '@/components/PageShell'
-import { hasAllSubjects, planLabel, FREE_SUBJECT_LIMIT } from '@/lib/access'
+import { hasAllSubjects, hasSyllabi, planLabel, FREE_SUBJECT_LIMIT } from '@/lib/access'
+import { billingLive } from '@/lib/billing'
 
 // Only a guard against someone picking a RAW file; the cropper re-encodes
 // everything to a small square before it is uploaded.
 const MAX_AVATAR_MB = 25
+
+/**
+ * Paying for a plan, and managing one. Upgrade buttons for an account on the
+ * free plan (Premium only for one already on Basic), Manage billing for a
+ * subscriber, nothing for a school licence. After the checkout the student
+ * lands back here with ?upgraded=1, a moment before the webhook has set the
+ * plan, so it says the plan is on its way rather than showing the old one.
+ */
+function Billing({ paid, syllabi, school }) {
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  const [upgraded] = useState(() => typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('upgraded') === '1')
+  if (!billingLive || school) return null
+
+  const portal = async () => {
+    setBusy(true)
+    setError('')
+    try {
+      const res = await fetch('/api/billing/portal', { method: 'POST' })
+      const json = await res.json()
+      if (json.url) {
+        window.location.assign(json.url)
+        return
+      }
+      setError(json.error || 'Could not open billing.')
+    } catch {
+      setError('Could not open billing. Check your connection.')
+    }
+    setBusy(false)
+  }
+
+  return (
+    <div className="mb-6">
+      {upgraded && !paid && (
+        <p className="mb-4 rounded-[12px] px-4 py-3 text-[13.5px]" style={{ background: 'var(--brand-tint)', color: 'var(--text)' }}>
+          Payment received. Your plan switches on within a minute; refresh this page if it has not yet.
+        </p>
+      )}
+      <div className="flex flex-wrap gap-2">
+        {paid && (
+          <button type="button" onClick={portal} disabled={busy} className="btn btn-outline control-md">
+            {busy ? 'Opening…' : 'Manage billing'}
+          </button>
+        )}
+        {!syllabi && (
+          <Link href="/upgrade?plan=premium" className="btn btn-solid control-md">
+            {paid ? 'Upgrade to Premium' : 'Get Premium'}
+          </Link>
+        )}
+        {!paid && (
+          <Link href="/upgrade?plan=basic" className="btn btn-outline control-md">
+            Get Basic
+          </Link>
+        )}
+      </div>
+      {error && (
+        <p className="mt-3 text-[13px]" role="alert" style={{ color: 'var(--danger)' }}>
+          {error}
+        </p>
+      )}
+    </div>
+  )
+}
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState(null)
@@ -375,6 +439,7 @@ export default function ProfilePage() {
   }
 
   const premium = hasAllSubjects(profile)
+  const paid = profile?.plan === 'basic' || profile?.plan === 'premium'
   const initial = String(profile.full_name || profile.email || 'S').charAt(0).toUpperCase()
 
   return (
@@ -523,6 +588,8 @@ export default function ProfilePage() {
                 </span>
               )}
             </div>
+
+            <Billing paid={paid} syllabi={hasSyllabi(profile)} school={!paid && premium} />
 
             {!premium && (
               <>
