@@ -1,30 +1,36 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import Link from 'next/link'
 import OrbitCanvas from '@/components/map/OrbitCanvas'
 import ProgressOverTime from '@/components/map/ProgressOverTime'
 import { HeatmapSubject, TONE } from '@/components/SubjectHeatmap'
 import Counting from '@/components/Counting'
 import { statusLabel } from '@/lib/subject-graph'
+import { displaySubtopic } from '@/lib/progress'
 import { shortName, levelOf } from '@/lib/subject-short'
 
 /**
  * Progress: where you stand, how it is changing, and every subtopic, with
  * one choice of subject running through all of it.
  *
- *   Figures      proved, tested, needs work, questions answered: four large
- *                numbers, each with the count it comes from
+ *   Figures      proved, tested, needs work, mastered: four large numbers,
+ *                each with the count it comes from
  *   Constellation  you in the middle, every subject a star joined to you,
  *                bigger and brighter the more of it is proved
- *   Over time    tested and proved over twelve weeks, and questions a week
+ *   Over time    tested and proved over twelve weeks
+ *   Next         the subtopics closest to proved, and the ones slipping,
+ *                each a click from practice
+ *
+ * About where you stand, not how much you did: time, accuracy and questions
+ * answered are the Analytics page's.
  *   Subjects     each one as a row of numbers and a bar of its statuses
  *   Subtopics    every subtopic as a square, each opening on the map
  *
  * Choosing a subject (the chips, a star, a row) narrows every part to it.
  *
  * graphs: [{ subject, graph }] (lib/subject-graph.js), one per subject.
- * items: every subtopic with { subject, topic, unit, subtopic, status, testedAt, provedAt }.
- * attempts: quizzes with { subject, created_at, total_questions, score }.
+ * items: every subtopic with { subject, topic, unit, subtopic, status, points, testedAt, provedAt }.
  */
 
 const firstName = (name = '') => name.trim().split(/\s+/)[0] || ''
@@ -82,7 +88,7 @@ const Card = ({ title, aside, children, className = '' }) => (
   </section>
 )
 
-export default function YouMap({ graphs, items = [], attempts = [], name = '', onOpen, locked = 0, now }) {
+export default function YouMap({ graphs, items = [], name = '', onOpen, locked = 0, now }) {
   const [selectedId, setSelectedId] = useState(null)
 
   const overview = useMemo(() => {
@@ -123,10 +129,11 @@ export default function YouMap({ graphs, items = [], attempts = [], name = '', o
   const counts = useMemo(() => Object.fromEntries(Object.entries(bySubject).map(([s, list]) => [s, count(list)])), [bySubject])
 
   const scopeItems = selected ? bySubject[selected.subject] || [] : items
-  const scopeAttempts = selected ? attempts.filter((a) => a.subject === selected.subject) : attempts
   const c = count(scopeItems)
-  const answered = scopeAttempts.reduce((n, a) => n + (a.total_questions || 0), 0)
-  const week = scopeAttempts.filter((a) => now - new Date(a.created_at).getTime() < 7 * 86400000).reduce((n, a) => n + (a.total_questions || 0), 0)
+  // Closest to proved first: developing, with the most points behind them.
+  // Then what is slipping, which a short retest brings back.
+  const almost = scopeItems.filter((i) => i.status === 'confident').sort((a, b) => (b.points || 0) - (a.points || 0)).slice(0, 5)
+  const slipping = scopeItems.filter((i) => i.status === 'decaying').sort((a, b) => (b.points || 0) - (a.points || 0)).slice(0, 3)
 
   const share = (n) => (counts[n.subject]?.tested ? counts[n.subject].weak / counts[n.subject].tested : 0)
   const needsMost = [...subjects].filter((n) => counts[n.subject]?.weak > 0).sort((a, b) => share(b) - share(a))[0]
@@ -145,7 +152,7 @@ export default function YouMap({ graphs, items = [], attempts = [], name = '', o
           </p>
         </div>
         {subjects.length > 1 && (
-          <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1" role="radiogroup" aria-label="Subject">
+          <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1" role="radiogroup" aria-label="Subject" style={{ scrollbarWidth: 'none' }}>
             {[{ id: null, title: 'All subjects' }, ...subjects].map((n) => {
               const on = selectedId === n.id
               return (
@@ -171,7 +178,7 @@ export default function YouMap({ graphs, items = [], attempts = [], name = '', o
         <Figure label="Proved" value={pctOf(c.proved, c.total)} suffix="%" tone="var(--brand)" line={`${c.proved.toLocaleString()} of ${c.total.toLocaleString()} subtopics`} />
         <Figure label="Tested" value={c.tested} line={`${pctOf(c.tested, c.total)}% of the syllabus has been quizzed`} />
         <Figure label="Needs work" value={c.weak} tone={c.weak ? 'var(--status-weak)' : undefined} line={c.weak ? `${c.in_progress} weak, ${c.decaying} fading` : 'Nothing weak or fading'} />
-        <Figure label="Questions answered" value={answered} line={`${week.toLocaleString()} in the last 7 days`} />
+        <Figure label="Mastered" value={c.mastered} line={`the top level, of ${c.total.toLocaleString()}`} />
       </div>
 
       {/* The constellation, and how it is changing. */}
@@ -181,11 +188,45 @@ export default function YouMap({ graphs, items = [], attempts = [], name = '', o
             <OrbitCanvas graph={overview} focusId="you" selectedId={selectedId} onSelect={(id) => setSelectedId(id)} onEnter={(id) => onOpen(overview.nodes.get(id).subject)} onBackground={() => setSelectedId(null)} />
           </div>
         </Card>
-        <Card title="Over time" aside="Last 12 weeks">
-          <div className="px-5 pb-5 pt-3 sm:px-6">
-            <ProgressOverTime items={scopeItems} attempts={scopeAttempts} now={now} />
-          </div>
-        </Card>
+        <div className="flex flex-col gap-3">
+          <Card title="Proved over time" aside="Last 12 weeks">
+            <div className="px-5 pb-5 pt-3 sm:px-6">
+              <ProgressOverTime items={scopeItems} now={now} />
+            </div>
+          </Card>
+          <Card title="Next to prove" aside="Closest first">
+            <div className="px-2 pb-3 pt-2 sm:px-3">
+              {almost.length + slipping.length === 0 ? (
+                <p className="px-3 py-4 text-[13px]" style={{ color: 'var(--text-muted)' }}>
+                  {c.tested ? 'Nothing is close to the line right now. Quiz a new subtopic to start the next one.' : 'Quiz a subtopic and it will show up here as it gets close to proved.'}
+                </p>
+              ) : (
+                [...almost.map((r) => ['almost', r]), ...slipping.map((r) => ['slipping', r])].map(([kind, r]) => (
+                  <div key={`${r.subject}|${r.subtopic}`} className="flex items-center gap-3 rounded-[12px] px-3 py-2.5 hover:bg-[var(--surface-sunken)]">
+                    <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: TONE[r.status] }} aria-hidden="true" />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-[13.5px] font-medium">{displaySubtopic(r.subtopic)}</span>
+                      <span className="block truncate text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
+                        {kind === 'almost' ? 'Almost proved' : 'Slipping, a short retest brings it back'}
+                        {selected ? '' : ` · ${shortName(r.subject)}`}
+                      </span>
+                    </span>
+                    <button type="button" onClick={() => openSubtopic(r)} className="hidden shrink-0 text-[12px] font-medium sm:inline" style={{ color: 'var(--text-muted)' }}>
+                      View
+                    </button>
+                    <Link
+                      href={`/dashboard/quiz?subject=${encodeURIComponent(r.subject)}&topic=${encodeURIComponent(r.topic)}&subtopic=${encodeURIComponent(r.subtopic)}&back=${encodeURIComponent('/dashboard/map')}`}
+                      className="shrink-0 rounded-full border px-3 py-1 text-[12px] font-medium transition-colors hover:bg-[var(--surface)]"
+                      style={{ borderColor: 'var(--border-strong)', color: 'var(--text-body)' }}
+                    >
+                      Practise
+                    </Link>
+                  </div>
+                ))
+              )}
+            </div>
+          </Card>
+        </div>
       </div>
 
       {/* Every subject as numbers. */}

@@ -17,8 +17,8 @@ import { statusLabel } from '@/lib/subject-graph'
  *            nobody has tested is a faint outline. Every star is named.
  *            Click to read about it, double-click to go into it.
  *
- * Faint background stars glint; the centre breathes. With reduced motion,
- * nothing does.
+ * Flat: no glow, no pulse. Stars and lines draw in once when a level opens;
+ * with reduced motion they are simply there.
  */
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v))
@@ -64,7 +64,7 @@ export function knownOf(n) {
 function sky(w, h, count) {
   let seed = Math.round(w * 7 + h * 13) || 1
   const rand = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646
-  return Array.from({ length: count }, (_, i) => ({ x: rand() * w, y: rand() * h, r: 0.5 + rand() * 1, o: 0.1 + rand() * 0.3, twinkle: i % 5 === 0 }))
+  return Array.from({ length: count }, () => ({ x: rand() * w, y: rand() * h, r: 0.5 + rand() * 1, o: 0.1 + rand() * 0.25 }))
 }
 
 export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = false, onSelect, onEnter, onUp, onBackground, upFromRoot = false, controls = null }) {
@@ -126,17 +126,13 @@ export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = fal
       }}
     >
       <style>{`
-        .orbit-star { animation: orbit-glint 5s ease-in-out infinite; }
         .orbit-hub { animation: orbit-hub 700ms cubic-bezier(.16,1,.3,1) both; }
-        .orbit-pulse { animation: orbit-pulse 3.2s cubic-bezier(0,0,.2,1) infinite; }
         .orbit-planet { animation: orbit-in 700ms cubic-bezier(.16,1,.3,1) both; }
         .orbit-line { animation: orbit-draw 900ms cubic-bezier(.16,1,.3,1) both; }
-        @keyframes orbit-glint { 0%, 100% { opacity: .15; } 50% { opacity: .65; } }
         @keyframes orbit-hub { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
-        @keyframes orbit-pulse { 0% { transform: scale(1); opacity: .8; } 75%, 100% { transform: scale(1.5); opacity: 0; } }
         @keyframes orbit-in { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
         @keyframes orbit-draw { from { stroke-dashoffset: var(--len); } to { stroke-dashoffset: 0; } }
-        @media (prefers-reduced-motion: reduce) { .orbit-star, .orbit-hub, .orbit-pulse, .orbit-planet, .orbit-line { animation: none; } }
+        @media (prefers-reduced-motion: reduce) { .orbit-hub, .orbit-planet, .orbit-line { animation: none; } }
         .orbit-dot { transition: transform 200ms cubic-bezier(.16,1,.3,1); transform-box: fill-box; transform-origin: center; }
         .orbit-hit:hover .orbit-dot, .orbit-hit:focus-visible .orbit-dot { transform: scale(1.18); }
       `}</style>
@@ -144,7 +140,7 @@ export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = fal
       {layout && (
         <svg className="absolute inset-0 h-full w-full" aria-hidden="false" role="group" aria-label={`${focus.title} and what it holds`}>
           {layout.stars.map((st, i) => (
-            <circle key={i} className={st.twinkle ? 'orbit-star' : undefined} cx={st.x} cy={st.y} r={st.r} fill="var(--text-faint)" opacity={st.o} style={st.twinkle ? { animationDelay: `${-i * 0.6}s` } : undefined} data-bg />
+            <circle key={i} cx={st.x} cy={st.y} r={st.r} fill="var(--text-faint)" opacity={st.o} data-bg />
           ))}
           {layout.planets.map((p) => {
             const len = Math.hypot(p.x - layout.cx, p.y - layout.cy)
@@ -192,8 +188,6 @@ export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = fal
                 }}
               >
                 <title>{`${n.title} · ${statusLabel(n.status)}${n.score != null ? ` · ${n.score}%` : ''}${leaf ? '' : ` · ${n.tally?.proved || 0} of ${n.tally?.total} proved`}`}</title>
-                {/* A soft halo on the stars you know well. */}
-                {p.k > 0.5 && <circle cx={p.x} cy={p.y} r={p.r * 2.1} fill="var(--brand)" opacity={0.1 + 0.12 * p.k} />}
                 {sel && <circle cx={p.x} cy={p.y} r={p.r + 6} fill="none" stroke="var(--brand)" strokeWidth="1.5" />}
                 <circle
                   className="orbit-dot"
@@ -224,13 +218,12 @@ export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = fal
 
       {layout && (
         <div key={`hub-${focusId}`} className="orbit-hub absolute" style={{ left: layout.cx - layout.hub, top: layout.cy - layout.hub, width: layout.hub * 2, height: layout.hub * 2 }}>
-          <span aria-hidden="true" className="orbit-pulse absolute inset-0 rounded-full" style={{ border: '1px solid color-mix(in srgb, var(--brand) 45%, transparent)' }} />
           <button
             type="button"
             onClick={() => (isRoot && !upFromRoot ? onSelect?.(null) : onUp?.())}
             title={isRoot && !upFromRoot ? focus.title : isRoot ? 'Back to you' : 'Back up a level'}
             className="relative flex h-full w-full flex-col items-center justify-center rounded-full text-center transition-[filter] hover:brightness-110"
-            style={{ padding: layout.hub * 0.2, background: 'var(--brand)', color: '#fff', boxShadow: '0 0 44px color-mix(in srgb, var(--brand) 40%, transparent)' }}
+            style={{ padding: layout.hub * 0.2, background: 'var(--brand)', color: '#fff' }}
           >
             <span className={`font-semibold leading-tight tracking-[-0.01em] ${layout.hub >= 64 ? 'line-clamp-3' : 'line-clamp-2'}`} style={{ fontSize: clamp(layout.hub / 5.5, 11, 15) }}>
               {focus.title}

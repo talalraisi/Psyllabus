@@ -117,7 +117,7 @@ function SubjectMapPage() {
       const p = rowOf.get(k)
       const updated = ms(p?.updated_at)
       const first = firstQuiz.get(k) ?? null
-      return { ...r, testedAt: first != null && updated != null ? Math.min(first, updated) : first ?? updated, provedAt: ms(p?.last_correct_at) ?? updated }
+      return { ...r, points: Number(p?.mastery_points) || 0, testedAt: first != null && updated != null ? Math.min(first, updated) : first ?? updated, provedAt: ms(p?.last_correct_at) ?? updated }
     })
   }, [subject, rows, progress, attempts])
 
@@ -188,7 +188,6 @@ function SubjectMapPage() {
         <YouMap
           graphs={graphs}
           items={heatmap}
-          attempts={attempts}
           now={loadedAt}
           name={profile.full_name || ''}
           locked={lockedCount}

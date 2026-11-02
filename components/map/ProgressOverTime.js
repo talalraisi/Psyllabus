@@ -1,21 +1,18 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 
 /**
- * Progress over the last twelve weeks, in two plain charts.
+ * How much you have proved, week by week, over the last twelve weeks: the
+ * one thing Progress tracks over time. (How much you studied, and how
+ * accurately, is the Analytics page's business.)
  *
- *   Lines   subtopics tested and subtopics proved, to date, each week. A
- *           subtopic counts as tested from its first quiz and as proved from
- *           the last time it was answered right while proved: the progress
- *           table keeps where each subtopic stands, not its whole history,
- *           so these are the best dates there are.
- *   Bars    questions answered each week, with how many were right.
- *
- * Every number is written on the chart, not left to a tooltip.
+ * A subtopic counts as tested from its first quiz and as proved from the
+ * last time it was answered right while proved: the progress table keeps
+ * where each subtopic stands, not its whole history, so these are the best
+ * dates there are. The numbers now are written at the ends of the lines.
  *
  * items: subtopics with { status, testedAt, provedAt } (ms or null).
- * attempts: quizzes with { created_at, total_questions, score }.
  */
 
 const WEEKS = 12
@@ -32,36 +29,25 @@ function weekStart(t) {
 
 const short = (t) => new Date(t).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
 
-export default function ProgressOverTime({ items, attempts, now }) {
-  const [hover, setHover] = useState(null)
+export default function ProgressOverTime({ items, now }) {
 
   const weeks = useMemo(() => {
     const first = weekStart(now) - (WEEKS - 1) * 7 * DAY
     return Array.from({ length: WEEKS }, (_, i) => {
       const from = first + i * 7 * DAY
       const to = from + 7 * DAY
-      const inWeek = attempts.filter((a) => {
-        const t = new Date(a.created_at).getTime()
-        return t >= from && t < to
-      })
-      const asked = inWeek.reduce((n, a) => n + (a.total_questions || 0), 0)
-      const right = inWeek.reduce((n, a) => n + (a.score || 0), 0)
       return {
         from,
         tested: items.filter((r) => r.status !== 'not_started' && r.testedAt != null && r.testedAt < to).length,
         proved: items.filter((r) => PROVED.has(r.status) && r.provedAt != null && r.provedAt < to).length,
-        asked,
-        right,
       }
     })
-  }, [items, attempts, now])
+  }, [items, now])
 
   const last = weeks.at(-1)
-  const prev = weeks.at(-2)
   const top = Math.max(4, ...weeks.map((w) => w.tested))
   const step = top <= 10 ? 2 : top <= 40 ? 10 : top <= 100 ? 25 : top <= 250 ? 50 : 100
   const yMax = Math.ceil(top / step) * step
-  const maxAsked = Math.max(1, ...weeks.map((w) => w.asked))
 
   const W = 640
   const H = 190
@@ -73,34 +59,19 @@ export default function ProgressOverTime({ items, attempts, now }) {
   const y = (v) => T + (1 - v / yMax) * (H - T - B)
   const path = (key) => weeks.map((w, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(w[key]).toFixed(1)}`).join(' ')
 
-  const pct = last.asked ? Math.round((last.right / last.asked) * 100) : null
-  const change = last.asked - prev.asked
+  const gained = last.proved - weeks[0].proved
 
   return (
     <div>
-      {/* This week, in words and numbers, before any chart. */}
-      <div className="grid grid-cols-3 gap-2">
-        {[
-          ['This week', last.asked ? `${last.asked}` : '0', last.asked ? `questions${change ? `, ${change > 0 ? '+' : ''}${change} on last week` : ''}` : 'questions so far'],
-          ['Right', pct == null ? '–' : `${pct}%`, pct == null ? 'no quizzes yet' : `${last.right} of ${last.asked}`],
-          ['Proved', `${last.proved}`, `${last.proved - weeks[0].proved >= 0 ? '+' : ''}${last.proved - weeks[0].proved} in 12 weeks`],
-        ].map(([label, big, small]) => (
-          <div key={label} className="rounded-[12px] px-3 py-2.5" style={{ background: 'var(--surface-sunken)' }}>
-            <p className="text-[11px] font-medium" style={{ color: 'var(--text-faint)' }}>
-              {label}
-            </p>
-            <p className="mt-0.5 text-[22px] font-semibold leading-tight tracking-[-0.02em]" style={{ fontVariantNumeric: 'proportional-nums' }}>
-              {big}
-            </p>
-            <p className="truncate text-[11.5px]" style={{ color: 'var(--text-muted)' }}>
-              {small}
-            </p>
-          </div>
-        ))}
-      </div>
+      <p className="text-[13.5px]" style={{ color: 'var(--text-body)' }}>
+        <span className="font-semibold" style={{ color: 'var(--brand)' }}>
+          {gained > 0 ? `+${gained}` : gained}
+        </span>{' '}
+        subtopics proved in the last 12 weeks, {last.proved} in all.
+      </p>
 
       {/* Tested and proved, to date. */}
-      <div className="mt-5 flex items-center gap-4 text-[11.5px]" style={{ color: 'var(--text-muted)' }}>
+      <div className="mt-4 flex items-center gap-4 text-[11.5px]" style={{ color: 'var(--text-muted)' }}>
         <span className="flex items-center gap-1.5">
           <span className="h-[3px] w-4 rounded-full" style={{ background: 'color-mix(in oklab, var(--brand) 40%, var(--border-strong))' }} />
           Subtopics tested
@@ -138,37 +109,6 @@ export default function ProgressOverTime({ items, attempts, now }) {
         )}
       </svg>
 
-      {/* Questions answered each week. */}
-      <p className="mt-4 text-[11.5px]" style={{ color: 'var(--text-muted)' }}>
-        Questions answered each week
-      </p>
-      <div className="mt-2 flex h-24 items-end gap-1.5">
-        {weeks.map((w, i) => (
-          <div
-            key={w.from}
-            className="relative flex h-full flex-1 flex-col items-center justify-end"
-            onPointerEnter={() => setHover(i)}
-            onPointerLeave={() => setHover(null)}
-          >
-            {w.asked > 0 && (
-              <span className="mb-1 text-[10.5px] font-semibold tabular-nums" style={{ color: hover === i ? 'var(--text)' : 'var(--text-muted)' }}>
-                {w.asked}
-              </span>
-            )}
-            <span className="flex w-full flex-col justify-end overflow-hidden rounded-t-[4px]" style={{ height: `${Math.max(w.asked ? 6 : 2, (w.asked / maxAsked) * 64)}px`, background: w.asked ? 'color-mix(in oklab, var(--brand) 18%, var(--surface-sunken))' : 'var(--border)' }}>
-              <span className="block w-full" style={{ height: `${w.asked ? (w.right / w.asked) * 100 : 0}%`, background: 'var(--brand)', opacity: 0.85 }} />
-            </span>
-            {hover === i && w.asked > 0 && (
-              <span className="pointer-events-none absolute -top-7 z-10 whitespace-nowrap rounded-full px-2 py-0.5 text-[11px]" style={{ background: 'var(--text)', color: 'var(--bg)' }}>
-                {short(w.from)}: {w.right} of {w.asked} right
-              </span>
-            )}
-          </div>
-        ))}
-      </div>
-      <p className="mt-1.5 text-[11px]" style={{ color: 'var(--text-faint)' }}>
-        Green is the share answered right.
-      </p>
     </div>
   )
 }
