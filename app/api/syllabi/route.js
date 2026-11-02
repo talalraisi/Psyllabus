@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { TASKS, DRAFT_REVIEW_SCHEMA } from '@/lib/syllabi-prompts'
 import { rubricFor } from '@/lib/criteria'
+import { componentGrade } from '@/lib/component-grade'
+import { markDraft, settleMarks } from '@/lib/draft-marking'
 import { cleanReview } from '@/lib/draft-review'
 import { senseCheck } from '@/lib/sense-check'
 import { RESEARCH_SCHEMA, STUDY_SCHEMA, cleanResearch, cleanStudy } from '@/lib/ideas'
@@ -144,32 +146,42 @@ export async function POST(request) {
   const anthropic = new Anthropic()
   const model = MODELS.writing
 
+  const message = question ? `QUESTION / EXTRACT:\n${question}\n\n---\n\nSTUDENT ANSWER:\n${text.trim()}` : text.trim() || 'No text provided.'
+  // Thinking counts towards this, so it leaves room for the answer. With
+  // the input caps above, it is what makes the claim's reservation a
+  // ceiling (062-ai-limits.sql). A long draft needs room for many more
+  // comments: an Extended Essay ran out at 12,000 and came back unfinished.
+  // Scaled with its length, up to 32,000 for the longest draft accepted
+  // (085-draft-room.sql).
+  const maxTokens = review ? Math.min(32000, Math.max(12000, Math.round(12000 + (text.length - 8000) * 0.75))) : 3000
+
   let response
+  // A draft's two extra marks-only readings (lib/draft-marking.js).
+  let extra = []
   try {
-    // Streamed, then collected: a long review would otherwise sit on one
-    // open request long enough to time out.
-    response = await anthropic.messages
-      .stream({
-      model,
-      // Thinking counts towards this, so it leaves room for the answer. With
-      // the input caps above, it is what makes the claim's reservation a
-      // ceiling (062-ai-limits.sql).
-      // A long draft needs room for many more comments: an Extended Essay
-      // ran out at 12,000 and came back unfinished. Scaled with its length,
-      // up to 32,000 for the longest draft accepted (085-draft-room.sql).
-      max_tokens: review ? Math.min(32000, Math.max(12000, Math.round(12000 + (text.length - 8000) * 0.75))) : 3000,
-      // A draft comes back as JSON the page can lay out: marks per criterion
-      // and highlights on the student's own sentences.
-      output_config: { effort: 'medium', format: { type: 'json_schema', schema: SCHEMAS[task] } },
-      system: prompt,
-      messages: [
-        {
-          role: 'user',
-          content: question ? `QUESTION / EXTRACT:\n${question}\n\n---\n\nSTUDENT ANSWER:\n${text.trim()}` : text.trim() || 'No text provided.',
-        },
-      ],
-    }, { signal: request.signal })
-      .finalMessage()
+    if (review) {
+      // The guide's own criteria for this piece, where we have them
+      // (091-marking-rubrics.sql). Marking still works without them.
+      const { data: guide } = rubric?.key ? await supabase.rpc('marking_rubric', { p_key: rubric.key }) : { data: null }
+      const marked = await markDraft({ anthropic, model, kind, subject, rubric, question, guide: guide || null, content: message, maxTokens, signal: request.signal })
+      response = { content: [{ type: 'text', text: marked.answer }], stop_reason: marked.stop_reason, usage: marked.usage }
+      extra = marked.extra
+    } else {
+      // Streamed, then collected: a long answer would otherwise sit on one
+      // open request long enough to time out.
+      response = await anthropic.messages
+        .stream(
+          {
+            model,
+            max_tokens: maxTokens,
+            output_config: { effort: 'medium', format: { type: 'json_schema', schema: SCHEMAS[task] } },
+            system: prompt,
+            messages: [{ role: 'user', content: message }],
+          },
+          { signal: request.signal }
+        )
+        .finalMessage()
+    }
   } catch (e) {
     // The student gets a sentence, not a stack trace; the log gets the detail.
     console.error('syllabi:', e?.message || e)
@@ -203,6 +215,16 @@ export async function POST(request) {
         : task === 'research_questions'
           ? cleanResearch(answer)
           : cleanStudy(answer)
+  if (parsed && review) {
+    // Each mark the middle of three readings, and the grade from the real
+    // boundaries rather than the model's guess (lib/component-grade.js).
+    parsed.criteria = settleMarks(parsed.criteria, extra)
+    const basis = componentGrade({ kind, subject, rubric, total: parsed.criteria.reduce((a, c) => a + c.score, 0) })
+    if (basis) {
+      parsed.grade_estimate = basis.grade
+      parsed.grade_basis = basis
+    }
+  }
   if (!parsed) {
     return NextResponse.json(
       { error: response.stop_reason === 'refusal' ? answer : 'Syllabi could not finish that. Try again, or send a shorter part.' },
