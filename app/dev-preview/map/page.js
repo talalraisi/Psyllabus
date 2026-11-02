@@ -41,8 +41,23 @@ const sampleGraph = (subject, n) => {
     effective[k] = STATUSES[(i * 7 + n * 3) % STATUSES.length]
     details[k] = { points: (i * 37) % 100 }
   })
-  return { graph: buildGraph({ subject, rows, details, effective, key: (s, t) => `${s}::${t}` }), items: rows.map((r) => ({ ...r, status: effective[`${subject}::${r.subtopic}`] })) }
+  // Made-up history: each tested subtopic first quizzed some weeks ago.
+  const T0 = Date.UTC(2026, 10, 3)
+  const items = rows.map((r, i) => {
+    const status = effective[`${subject}::${r.subtopic}`]
+    const ago = ((i * 13 + n * 5) % 80) * 86400000
+    return { ...r, status, testedAt: status === 'not_started' ? null : T0 - ago, provedAt: T0 - Math.floor(ago / 2) }
+  })
+  return { graph: buildGraph({ subject, rows, details, effective, key: (s, t) => `${s}::${t}` }), items }
 }
+
+// Made-up quizzes over twelve weeks, more of them lately.
+const ATTEMPTS = Array.from({ length: 70 }, (_, i) => ({
+  subject: SUBJECTS[i % SUBJECTS.length],
+  created_at: new Date(Date.UTC(2026, 10, 3) - ((i * 37) % 84) * 86400000).toISOString(),
+  total_questions: 8 + (i % 5) * 2,
+  score: 5 + (i % 7),
+}))
 
 function Preview() {
   const params = useSearchParams()
@@ -59,7 +74,7 @@ function Preview() {
           <SubjectMap key={subject} graph={graph} subjects={SUBJECTS} initialAt={params.get('at')} onSubject={(s) => router.replace(`/dev-preview/map?subject=${encodeURIComponent(s)}`)} onOverview={() => router.push('/dev-preview/map')} />
         </div>
       ) : (
-        <YouMap graphs={graphs} items={samples.flatMap((x) => x.items)} name={profile.full_name} locked={params.get("locked") ? 3 : 0} onOpen={(s, at) => router.push(`/dev-preview/map?subject=${encodeURIComponent(s)}${at ? `&at=${encodeURIComponent(at)}` : ''}`)} />
+        <YouMap graphs={graphs} items={samples.flatMap((x) => x.items)} attempts={ATTEMPTS} now={Date.UTC(2026, 10, 3)} name={profile.full_name} locked={params.get("locked") ? 3 : 0} onOpen={(s, at) => router.push(`/dev-preview/map?subject=${encodeURIComponent(s)}${at ? `&at=${encodeURIComponent(at)}` : ''}`)} />
       )}
     </DashboardLayout>
   )

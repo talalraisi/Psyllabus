@@ -5,22 +5,20 @@ import { STATUS_VAR } from '@/components/map/MapCanvas'
 import { statusLabel } from '@/lib/subject-graph'
 
 /**
- * The subject map as an orbit, drawn like the Syllabi hub it started from.
+ * The subject map as a constellation: where you are is the bright centre,
+ * and what it holds are stars around it, each joined to the centre by a fine
+ * line. Nothing moves: the map is something to read, and a star never slides
+ * out from under the pointer.
  *
- *   Hub        the level you are on (the subject, a topic or a unit), a green
- *              disc that breathes, with a pulse going out from it. Click it to
- *              go back up.
- *   Rings      a solid outer orbit, dashed ones inside it.
- *   Planets    what the level holds: small round tokens with their code in
- *              them, in syllabus order clockwise from the top, circling
- *              slowly. The edge is where you stand (untested is plain); the
- *              one selected is filled. Pointing at any of them stops the whole
- *              system so nothing moves out from under the pointer. Click to
- *              read about it, double-click to fly into it.
+ *   Centre   the level you are on (you, a subject, a topic or a unit), with
+ *            a thin arc of how much of it is proved. Click it to go back up.
+ *   Stars    what it holds, in syllabus order clockwise from the top. The more
+ *            of it you have proved, the bigger and brighter the star; one
+ *            nobody has tested is a faint outline. Every star is named.
+ *            Click to read about it, double-click to go into it.
  *
- * Names sit under the planets when there are few enough to read; with more,
- * the code is enough and the name is on hover and in the panel. With reduced
- * motion nothing turns.
+ * Faint background stars glint; the centre breathes. With reduced motion,
+ * nothing does.
  */
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v))
@@ -49,26 +47,25 @@ function arc(cx, cy, r, frac) {
   return `M ${cx} ${cy - r} A ${r} ${r} 0 ${f > 0.5 ? 1 : 0} 1 ${cx + r * Math.cos(a)} ${cy + r * Math.sin(a)}`
 }
 
-/** Two letters for a title with no code: "Cell biology" is CB. */
-const initialsOf = (title) => {
-  const words = String(title).split(/[\s:&,-]+/).filter((w) => /^[A-Za-z]/.test(w) && !/^(and|of|the|in|to|for)$/i.test(w))
-  return (words.length > 1 ? words[0][0] + words[1][0] : (words[0] || '?').slice(0, 2)).toUpperCase()
-}
-
-/** What goes inside a planet: "A. Unity and diversity" is A, "Unit 2 - Micro" is 2, a unit's own code as it is. */
-const codeOf = (node) => {
-  const title = String(node.title)
-  return (
-    node.code ||
-    title.match(/^(?:Theme|Topic|Unit|Part|Option|Paper)\s+([A-Z0-9]{1,3})\b/i)?.[1] ||
-    title.match(/^([A-Z]?\d+(?:\.\d+)*|[A-Z])(?=[.:)\s])/)?.[1] ||
-    initialsOf(title)
-  )
-}
-
 /** A status colour, softened towards grey so no planet shouts. */
-const tone = (status) =>
+export const tone = (status) =>
   !status || status === 'not_started' ? 'color-mix(in oklab, var(--text-faint) 55%, var(--surface))' : `color-mix(in oklab, ${STATUS_VAR[status]} 62%, var(--text-faint))`
+
+/** How much of a node is known, 0 to 1: proved counts fully, tested a little. */
+const STATUS_KNOWN = { not_started: 0, in_progress: 0.25, decaying: 0.35, confident: 0.55, proficient: 0.8, mastered: 1 }
+export function knownOf(n) {
+  if (n.kind === 'subtopic') return STATUS_KNOWN[n.status] ?? 0
+  const t = n.tally
+  if (!t?.total) return 0
+  return Math.min(1, (t.proved + 0.35 * Math.max(0, t.assessed - t.proved)) / t.total)
+}
+
+/** The same few dozen background stars every time for a given size. */
+function sky(w, h, count) {
+  let seed = Math.round(w * 7 + h * 13) || 1
+  const rand = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646
+  return Array.from({ length: count }, (_, i) => ({ x: rand() * w, y: rand() * h, r: 0.5 + rand() * 1, o: 0.1 + rand() * 0.3, twinkle: i % 5 === 0 }))
+}
 
 export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = false, onSelect, onEnter, onUp, onBackground, upFromRoot = false, controls = null }) {
   const box = useRef(null)
@@ -94,25 +91,25 @@ export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = fal
     const cy = h / 2
     const hub = clamp(side * 0.1, 44, 72)
     const n = children.length
-    const rings = n <= 10 ? 1 : n <= 22 ? 2 : 3
     const narrow = w < 520
-    // A token big enough for its code: smaller when there are many.
-    const r = clamp((n > 22 ? 15 : n > 10 ? 17 : 21) * s, 13, 24)
-    // Names only while they can be read without colliding as the ring turns.
-    const named = !narrow ? n <= 12 : n <= 6
-    const labelW = narrow ? 92 : clamp(w * 0.16, 96, 140)
-    const R = Math.max(hub + 56 * s, Math.min(w / 2 - (named ? labelW / 2 : r) - 12, h / 2 - r - (named ? 40 : 14) - (narrow ? 60 : 44)))
-    const radii = Array.from({ length: rings }, (_, k) => (rings === 1 ? R : R * (0.6 + (0.4 * k) / (rings - 1))))
+    const labelW = narrow ? 88 : clamp(w * 0.15, 96, 150)
+    // One circle of stars for a few, two alternating for many, so names have room.
+    const twoRings = n > 10
+    const R = Math.max(hub + 60 * s, Math.min(w / 2 - labelW / 2 - 8, h / 2 - 46))
     const planets = children.map((c, i) => {
       const a = -Math.PI / 2 + (i / Math.max(1, n)) * 2 * Math.PI
-      const ring = rings === 1 ? 0 : rings - 1 - (i % rings)
-      const x = cx + radii[ring] * Math.cos(a)
-      const y = cy + radii[ring] * Math.sin(a)
-      const code = codeOf(c)
+      const rr = twoRings && i % 2 ? R * 0.68 : R
+      const x = cx + rr * Math.cos(a)
+      const y = cy + rr * Math.sin(a)
+      const k = knownOf(c)
+      // A star is never smaller than a fingertip can find; knowing it makes it grow.
+      const r = clamp((narrow ? 7 : 8) + k * (narrow ? 9 : 13) * Math.max(s, 0.85), 7, 24)
       const [l1, l2] = lines(c.title, Math.round(labelW / 6.4))
-      return { node: c, x, y, r, a, i, code, l1, l2 }
+      // The name sits outward from the centre, so it never crosses a line.
+      const below = Math.sin(a) > -0.25
+      return { node: c, x, y, r, a, i, k, l1, l2, below }
     })
-    return { cx, cy, hub, radii, planets, s, named, labelW }
+    return { cx, cy, hub, R, planets, s, labelW, stars: sky(w, h, Math.round((w * h) / 5200)) }
   }, [size, children])
 
   const needsWork = (n) => (n.kind === 'subtopic' ? ['in_progress', 'decaying'].includes(n.status) : (n.tally?.weak || 0) + (n.tally?.fading || 0) > 0)
@@ -129,147 +126,141 @@ export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = fal
       }}
     >
       <style>{`
-        .orbit-spin { animation: orbit-turn 120s linear infinite; }
-        .orbit-upright { animation: orbit-turn 120s linear infinite reverse; }
-        .orbit:has(.orbit-dot:hover) .orbit-spin, .orbit:has(.orbit-dot:hover) .orbit-upright,
-        .orbit:has(.orbit-dot:focus-visible) .orbit-spin, .orbit:has(.orbit-dot:focus-visible) .orbit-upright { animation-play-state: paused; }
-        .orbit-planet { animation: orbit-in 800ms cubic-bezier(.16,1,.3,1) both; }
+        .orbit-star { animation: orbit-glint 5s ease-in-out infinite; }
         .orbit-hub { animation: orbit-hub 700ms cubic-bezier(.16,1,.3,1) both; }
-        .orbit-pulse { animation: orbit-pulse 2.8s cubic-bezier(0,0,.2,1) infinite; }
-        @keyframes orbit-turn { to { transform: rotate(360deg); } }
-        @keyframes orbit-in { from { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(.3); } to { opacity: 1; transform: none; } }
+        .orbit-pulse { animation: orbit-pulse 3.2s cubic-bezier(0,0,.2,1) infinite; }
+        .orbit-planet { animation: orbit-in 700ms cubic-bezier(.16,1,.3,1) both; }
+        .orbit-line { animation: orbit-draw 900ms cubic-bezier(.16,1,.3,1) both; }
+        @keyframes orbit-glint { 0%, 100% { opacity: .15; } 50% { opacity: .65; } }
         @keyframes orbit-hub { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
-        @keyframes orbit-pulse { 0% { transform: scale(1); opacity: .9; } 75%, 100% { transform: scale(1.45); opacity: 0; } }
-        @media (prefers-reduced-motion: reduce) { .orbit-spin, .orbit-upright, .orbit-planet, .orbit-hub, .orbit-pulse { animation: none; } }
-        .orbit-dot { transition: transform 220ms cubic-bezier(.16,1,.3,1), background-color 200ms, color 200ms; }
-        .orbit-dot:hover, .orbit-dot:focus-visible { transform: scale(1.12); }
+        @keyframes orbit-pulse { 0% { transform: scale(1); opacity: .8; } 75%, 100% { transform: scale(1.5); opacity: 0; } }
+        @keyframes orbit-in { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
+        @keyframes orbit-draw { from { stroke-dashoffset: var(--len); } to { stroke-dashoffset: 0; } }
+        @media (prefers-reduced-motion: reduce) { .orbit-star, .orbit-hub, .orbit-pulse, .orbit-planet, .orbit-line { animation: none; } }
+        .orbit-dot { transition: transform 200ms cubic-bezier(.16,1,.3,1); transform-box: fill-box; transform-origin: center; }
+        .orbit-hit:hover .orbit-dot, .orbit-hit:focus-visible .orbit-dot { transform: scale(1.18); }
       `}</style>
 
       {layout && (
-        <svg className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true">
-          {layout.radii.map((R, k) => (
-            <circle
-              key={k}
-              cx={layout.cx}
-              cy={layout.cy}
-              r={R}
-              fill="none"
-              stroke={k === layout.radii.length - 1 ? 'var(--border-strong)' : 'var(--border)'}
-              strokeWidth="1"
-              strokeDasharray={k === layout.radii.length - 1 ? undefined : '4 5'}
-            />
+        <svg className="absolute inset-0 h-full w-full" aria-hidden="false" role="group" aria-label={`${focus.title} and what it holds`}>
+          {layout.stars.map((st, i) => (
+            <circle key={i} className={st.twinkle ? 'orbit-star' : undefined} cx={st.x} cy={st.y} r={st.r} fill="var(--text-faint)" opacity={st.o} style={st.twinkle ? { animationDelay: `${-i * 0.6}s` } : undefined} data-bg />
           ))}
-          {/* An inner dashed ring close round the hub, as on the Syllabi hub. */}
-          <circle cx={layout.cx} cy={layout.cy} r={layout.hub + 22 * layout.s} fill="none" stroke="var(--border)" strokeDasharray="4 5" />
-          {/* How much of this level is proved, as a thin arc. */}
-          {proved > 0 && <path d={arc(layout.cx, layout.cy, layout.hub + 22 * layout.s, proved)} fill="none" stroke="var(--brand)" strokeWidth="2" strokeLinecap="round" />}
+          {layout.planets.map((p) => {
+            const len = Math.hypot(p.x - layout.cx, p.y - layout.cy)
+            const sel = p.node.id === selectedId
+            return (
+              <line
+                key={`l-${focusId}-${p.node.id}`}
+                className="orbit-line"
+                x1={layout.cx}
+                y1={layout.cy}
+                x2={p.x}
+                y2={p.y}
+                stroke={sel ? 'var(--brand)' : 'var(--border-strong)'}
+                strokeWidth={sel ? 1.4 : 0.8}
+                strokeDasharray={len}
+                style={{ '--len': len, animationDelay: `${Math.min(p.i, 24) * 25}ms` }}
+              />
+            )
+          })}
+          {layout.planets.map((p) => {
+            const n = p.node
+            const sel = n.id === selectedId
+            const dim = weakOnly && !needsWork(n)
+            const leaf = n.kind === 'subtopic'
+            const untested = p.k === 0
+            const pick = (e) => {
+              e.stopPropagation()
+              onSelect?.(sel ? null : n.id)
+            }
+            const ly = p.below ? p.y + p.r + 15 : p.y - p.r - (p.l2 ? 22 : 8)
+            return (
+              <g
+                key={`${focusId}-${n.id}`}
+                className="orbit-hit orbit-planet cursor-pointer"
+                style={{ transformOrigin: `${p.x}px ${p.y}px`, animationDelay: `${Math.min(p.i, 24) * 25 + 150}ms`, opacity: dim ? 0.25 : 1, transition: 'opacity 300ms' }}
+                role="button"
+                tabIndex={0}
+                aria-pressed={sel}
+                aria-label={`${n.title}: ${statusLabel(n.status)}${n.score != null ? `, ${n.score}%` : ''}`}
+                onClick={pick}
+                onDoubleClick={() => !leaf && onEnter?.(n.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') (leaf ? pick(e) : onEnter?.(n.id))
+                  if (e.key === ' ') pick(e)
+                }}
+              >
+                <title>{`${n.title} · ${statusLabel(n.status)}${n.score != null ? ` · ${n.score}%` : ''}${leaf ? '' : ` · ${n.tally?.proved || 0} of ${n.tally?.total} proved`}`}</title>
+                {/* A soft halo on the stars you know well. */}
+                {p.k > 0.5 && <circle cx={p.x} cy={p.y} r={p.r * 2.1} fill="var(--brand)" opacity={0.1 + 0.12 * p.k} />}
+                {sel && <circle cx={p.x} cy={p.y} r={p.r + 6} fill="none" stroke="var(--brand)" strokeWidth="1.5" />}
+                <circle
+                  className="orbit-dot"
+                  cx={p.x}
+                  cy={p.y}
+                  r={p.r}
+                  fill={untested ? 'var(--bg)' : 'var(--brand)'}
+                  fillOpacity={untested ? 1 : 0.35 + 0.65 * p.k}
+                  stroke={untested ? 'var(--border-strong)' : 'var(--brand)'}
+                  strokeWidth={untested ? 1.2 : 0}
+                />
+                <text x={p.x} y={ly} textAnchor="middle" fontSize="12" fill={sel ? 'var(--text)' : 'var(--text-muted)'} fontWeight={sel ? 600 : 450}>
+                  <tspan x={p.x}>{p.l1}</tspan>
+                  {p.l2 && (
+                    <tspan x={p.x} dy="14">
+                      {p.l2}
+                    </tspan>
+                  )}
+                </text>
+              </g>
+            )
+          })}
+          {/* How much of this level is proved, as a thin arc round the centre. */}
+          <circle cx={layout.cx} cy={layout.cy} r={layout.hub + 8} fill="none" stroke="var(--border)" strokeWidth="2" />
+          {proved > 0 && <path d={arc(layout.cx, layout.cy, layout.hub + 8, proved)} fill="none" stroke="var(--brand)" strokeWidth="2.5" strokeLinecap="round" />}
         </svg>
       )}
 
       {layout && (
-        <>
-          {/* Everything that circles: one layer turning about the hub. */}
-          <div className="orbit-spin pointer-events-none absolute inset-0" style={{ transformOrigin: `${layout.cx}px ${layout.cy}px` }}>
-            {layout.planets.map((p) => {
-              const n = p.node
-              const c = tone(n.status)
-              const sel = n.id === selectedId
-              const dim = weakOnly && !needsWork(n)
-              const leaf = n.kind === 'subtopic'
-              const untested = !n.status || n.status === 'not_started'
-              const pick = (e) => {
-                e.stopPropagation()
-                onSelect?.(sel ? null : n.id)
-              }
-              return (
-                <div key={`${focusId}-${n.id}`} className="absolute h-0 w-0" style={{ left: p.x, top: p.y }}>
-                  {/* Upright: turns back the other way, so codes and names stay level. */}
-                  <div className="orbit-upright absolute left-0 top-0 h-0 w-0" style={{ transformOrigin: '0 0' }}>
-                    <div
-                      className="orbit-planet pointer-events-auto absolute left-0 top-0 h-0 w-0"
-                      style={{ '--dx': `${layout.cx - p.x}px`, '--dy': `${layout.cy - p.y}px`, animationDelay: `${Math.min(p.i, 24) * 30}ms`, opacity: dim ? 0.25 : 1, transition: 'opacity 300ms' }}
-                    >
-                      <button
-                        type="button"
-                        onClick={pick}
-                        onDoubleClick={() => !leaf && onEnter?.(n.id)}
-                        aria-label={`${n.title}: ${statusLabel(n.status)}${n.score != null ? `, ${n.score}%` : ''}`}
-                        aria-pressed={sel}
-                        title={`${n.title} · ${statusLabel(n.status)}${n.score != null ? ` · ${n.score}%` : ''}${leaf ? '' : ` · ${n.tally?.total} subtopics`}`}
-                        className="orbit-dot absolute flex items-center justify-center rounded-full font-semibold"
-                        style={{
-                          left: -p.r,
-                          top: -p.r,
-                          width: p.r * 2,
-                          height: p.r * 2,
-                          fontSize: clamp(p.r * 0.5, 8.5, 11),
-                          background: sel ? 'var(--text)' : 'var(--surface)',
-                          color: sel ? 'var(--bg)' : 'var(--text-muted)',
-                          border: `${untested ? 1 : 2}px solid ${sel ? 'var(--text)' : untested ? 'var(--border-strong)' : c}`,
-                        }}
-                      >
-                        <span className="max-w-full truncate px-0.5">{p.code}</span>
-                      </button>
-                      {(layout.named || sel) && (
-                        <button
-                          type="button"
-                          tabIndex={-1}
-                          onClick={pick}
-                          onDoubleClick={() => !leaf && onEnter?.(n.id)}
-                          className="absolute text-center leading-[15px]"
-                          style={{ left: -layout.labelW / 2, top: p.r + 6, width: layout.labelW }}
-                        >
-                          <span className="block text-[12px]" style={{ color: sel ? 'var(--text)' : 'var(--text-muted)', fontWeight: sel ? 600 : 450 }}>
-                            {p.l1}
-                          </span>
-                          {p.l2 && (
-                            <span className="block text-[12px]" style={{ color: sel ? 'var(--text)' : 'var(--text-muted)', fontWeight: sel ? 600 : 450 }}>
-                              {p.l2}
-                            </span>
-                          )}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-
-          {/* The hub, breathing, with a pulse going out from it. */}
-          <div key={`hub-${focusId}`} className="orbit-hub absolute" style={{ left: layout.cx - layout.hub, top: layout.cy - layout.hub, width: layout.hub * 2, height: layout.hub * 2 }}>
-            <span aria-hidden="true" className="orbit-pulse absolute inset-0 rounded-full" style={{ border: '1px solid color-mix(in srgb, var(--brand) 45%, transparent)' }} />
-            <button
-              type="button"
-              onClick={() => (isRoot && !upFromRoot ? onSelect?.(null) : onUp?.())}
-              title={isRoot && !upFromRoot ? focus.title : isRoot ? 'Back to you' : 'Back up a level'}
-              className="relative flex h-full w-full flex-col items-center justify-center rounded-full text-center transition-[filter] hover:brightness-110"
-              style={{ padding: layout.hub * 0.2, background: 'var(--brand)', color: '#fff', boxShadow: '0 0 40px color-mix(in srgb, var(--brand) 45%, transparent)' }}
-            >
-              <span className={`font-semibold leading-tight tracking-[-0.01em] ${layout.hub >= 64 ? 'line-clamp-3' : 'line-clamp-2'}`} style={{ fontSize: clamp(layout.hub / 6, 10.5, 14.5) }}>
-                {focus.title}
+        <div key={`hub-${focusId}`} className="orbit-hub absolute" style={{ left: layout.cx - layout.hub, top: layout.cy - layout.hub, width: layout.hub * 2, height: layout.hub * 2 }}>
+          <span aria-hidden="true" className="orbit-pulse absolute inset-0 rounded-full" style={{ border: '1px solid color-mix(in srgb, var(--brand) 45%, transparent)' }} />
+          <button
+            type="button"
+            onClick={() => (isRoot && !upFromRoot ? onSelect?.(null) : onUp?.())}
+            title={isRoot && !upFromRoot ? focus.title : isRoot ? 'Back to you' : 'Back up a level'}
+            className="relative flex h-full w-full flex-col items-center justify-center rounded-full text-center transition-[filter] hover:brightness-110"
+            style={{ padding: layout.hub * 0.2, background: 'var(--brand)', color: '#fff', boxShadow: '0 0 44px color-mix(in srgb, var(--brand) 40%, transparent)' }}
+          >
+            <span className={`font-semibold leading-tight tracking-[-0.01em] ${layout.hub >= 64 ? 'line-clamp-3' : 'line-clamp-2'}`} style={{ fontSize: clamp(layout.hub / 5.5, 11, 15) }}>
+              {focus.title}
+            </span>
+            <span className="mt-1 text-[10.5px] tabular-nums" style={{ opacity: 0.85 }}>
+              {layout.hub >= 56 ? `${Math.round(proved * 100)}% proved` : `${Math.round(proved * 100)}%`}
+            </span>
+            {(!isRoot || upFromRoot) && layout.hub >= 56 && (
+              <span className="mt-0.5 text-[10px] font-semibold" style={{ opacity: 0.9 }}>
+                ↑ {isRoot ? 'You' : 'Back'}
               </span>
-              <span className="mt-1 text-[10px] tabular-nums" style={{ opacity: 0.8 }}>
-                {layout.hub >= 64 ? `${t.proved} of ${t.total} proved` : `${t.proved}/${t.total}`}
-              </span>
-              {(!isRoot || upFromRoot) && layout.hub >= 64 && (
-                <span className="mt-0.5 text-[10px] font-semibold" style={{ opacity: 0.9 }}>
-                  ↑ {isRoot ? 'You' : 'Back'}
-                </span>
-              )}
-            </button>
-          </div>
-        </>
+            )}
+          </button>
+        </div>
       )}
 
-      {/* Legend, quiet, out of the way. */}
-      <div data-ui className="pointer-events-none absolute right-4 top-4 hidden max-w-[15rem] flex-wrap justify-end gap-x-3 gap-y-1 text-[10px] sm:flex" style={{ color: 'var(--text-faint)' }}>
-        {['mastered', 'proficient', 'confident', 'in_progress', 'decaying', 'not_started'].map((st) => (
-          <span key={st} className="flex items-center gap-1.5">
-            <span className="h-[8px] w-[8px] rounded-full" style={{ border: `2px solid ${st === 'not_started' ? 'var(--border-strong)' : tone(st)}` }} />
-            {statusLabel(st)}
-          </span>
-        ))}
+      {/* What brightness means, quiet and out of the way. */}
+      <div data-ui className="pointer-events-none absolute right-4 top-4 hidden items-center gap-3 text-[10.5px] sm:flex" style={{ color: 'var(--text-faint)' }}>
+        <span className="flex items-center gap-1.5">
+          <span className="h-[9px] w-[9px] rounded-full border" style={{ borderColor: 'var(--border-strong)' }} />
+          Untested
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="h-[8px] w-[8px] rounded-full" style={{ background: 'var(--brand)', opacity: 0.45 }} />
+          Started
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="h-[11px] w-[11px] rounded-full" style={{ background: 'var(--brand)' }} />
+          Proved
+        </span>
       </div>
       {controls}
     </div>

@@ -1,88 +1,89 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import OrbitCanvas from '@/components/map/OrbitCanvas'
+import ProgressOverTime from '@/components/map/ProgressOverTime'
 import { HeatmapSubject, TONE } from '@/components/SubjectHeatmap'
 import Counting from '@/components/Counting'
 import { statusLabel } from '@/lib/subject-graph'
-import { shortName, subjectCode, levelOf } from '@/lib/subject-short'
+import { shortName, levelOf } from '@/lib/subject-short'
 
 /**
- * Progress: you, with every subject you take circling you, and everything
- * under it answering to the same selection.
+ * Progress: where you stand, how it is changing, and every subtopic, with
+ * one choice of subject running through all of it.
  *
- *   Orbit      each subject a planet, its edge where you stand in it. Select
- *              one to read it; double-click it to walk into its own map.
- *   Panel      how much is proved and how the rest is spread (one bar, every
- *              status in it, counted), for all of you or for the subject
- *              selected; which subject needs you most and which is strongest;
- *              every subject as a line to select.
- *   Subtopics  every subtopic as a cell, for every subject or only the one
- *              selected (the chips and the orbit are the same choice). A cell
- *              opens that subtopic in its subject's map.
+ *   Figures      proved, tested, needs work, questions answered: four large
+ *                numbers, each with the count it comes from
+ *   Constellation  you in the middle, every subject a star joined to you,
+ *                bigger and brighter the more of it is proved
+ *   Over time    tested and proved over twelve weeks, and questions a week
+ *   Subjects     each one as a row of numbers and a bar of its statuses
+ *   Subtopics    every subtopic as a square, each opening on the map
  *
- * graphs: [{ subject, graph }] from lib/subject-graph.js, one per subject.
- * items: every subtopic with its status ({ subject, topic, unit, subtopic, status }).
+ * Choosing a subject (the chips, a star, a row) narrows every part to it.
+ *
+ * graphs: [{ subject, graph }] (lib/subject-graph.js), one per subject.
+ * items: every subtopic with { subject, topic, unit, subtopic, status, testedAt, provedAt }.
+ * attempts: quizzes with { subject, created_at, total_questions, score }.
  */
 
 const firstName = (name = '') => name.trim().split(/\s+/)[0] || ''
 
-// Best to worst, then untested: the order the bar and its legend read in.
+// Best to worst, then untested: the order bars and legends read in.
 const LADDER = ['mastered', 'proficient', 'confident', 'in_progress', 'decaying', 'not_started']
 
 function count(items) {
   const c = Object.fromEntries(LADDER.map((s) => [s, 0]))
   for (const i of items) c[i.status in c ? i.status : 'not_started']++
-  return { ...c, total: items.length, proved: c.mastered + c.proficient }
+  return { ...c, total: items.length, proved: c.mastered + c.proficient, tested: items.length - c.not_started, weak: c.in_progress + c.decaying }
 }
 
-/** Every status as one bar, then each counted underneath. */
-function Breakdown({ c }) {
-  return (
-    <div>
-      <span className="flex h-2 w-full gap-[2px] overflow-hidden rounded-full" aria-hidden="true">
-        {LADDER.map((s) =>
-          c[s] ? <span key={s} className="bar-fill h-full first:rounded-l-full last:rounded-r-full" style={{ width: `${(c[s] / Math.max(1, c.total)) * 100}%`, background: TONE[s] }} /> : null
-        )}
-      </span>
-      <dl className="mt-3 grid grid-cols-3 gap-x-3 gap-y-2.5">
-        {LADDER.map((s) => (
-          <div key={s} className="min-w-0">
-            <dt className="flex items-center gap-1.5 truncate text-[11px]" style={{ color: 'var(--text-faint)' }}>
-              <span className="h-[7px] w-[7px] shrink-0 rounded-full" style={{ background: TONE[s] }} />
-              {statusLabel(s)}
-            </dt>
-            <dd className="mt-0.5 text-[15px] font-semibold tabular-nums" style={{ color: c[s] ? 'var(--text)' : 'var(--text-faint)' }}>
-              <Counting to={c[s]} />
-            </dd>
-          </div>
-        ))}
-      </dl>
-    </div>
-  )
-}
+const pctOf = (n, d) => (d ? Math.round((n / d) * 100) : 0)
 
-/** A subject as a line: proved in green, the rest of what is tested lighter. */
-function Bar({ c }) {
-  const pct = (n) => `${Math.min(100, (n / Math.max(1, c.total)) * 100)}%`
-  const tested = c.total - c.not_started
+/** Every status as one bar. */
+function StatusBar({ c, height = 8 }) {
   return (
-    <span className="relative block h-1.5 w-full overflow-hidden rounded-full" style={{ background: 'var(--border)' }} aria-hidden="true">
-      <span className="absolute inset-y-0 left-0 rounded-full" style={{ width: pct(tested), background: 'color-mix(in oklab, var(--brand) 30%, var(--surface-sunken))' }} />
-      <span className="absolute inset-y-0 left-0 rounded-full" style={{ width: pct(c.proved), background: 'var(--brand)' }} />
+    <span className="flex w-full gap-[2px] overflow-hidden rounded-full" style={{ height }} aria-hidden="true">
+      {LADDER.map((s) => (c[s] ? <span key={s} className="bar-fill h-full first:rounded-l-full last:rounded-r-full" style={{ width: `${(c[s] / Math.max(1, c.total)) * 100}%`, background: TONE[s] }} /> : null))}
     </span>
   )
 }
 
-const Eyebrow = ({ children }) => (
-  <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em]" style={{ color: 'var(--text-faint)' }}>
+function Figure({ label, value, suffix, line, tone }) {
+  return (
+    <div className="rounded-[16px] border p-4 sm:p-5" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
+      <p className="text-[12px] font-medium" style={{ color: 'var(--text-faint)' }}>
+        {label}
+      </p>
+      <p className="mt-1.5 text-[clamp(1.9rem,3.4vw,2.5rem)] font-semibold leading-none tracking-[-0.035em]" style={{ color: tone || 'var(--text)', fontVariantNumeric: 'proportional-nums' }}>
+        <Counting to={value} />
+        {suffix && <span className="ml-0.5 text-[0.55em] font-medium tracking-normal">{suffix}</span>}
+      </p>
+      <p className="mt-2 text-[12.5px]" style={{ color: 'var(--text-muted)' }}>
+        {line}
+      </p>
+    </div>
+  )
+}
+
+const Card = ({ title, aside, children, className = '' }) => (
+  <section className={`rounded-[20px] border ${className}`} style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
+    {title && (
+      <div className="flex flex-wrap items-baseline justify-between gap-2 px-5 pt-4 sm:px-6 sm:pt-5">
+        <h2 className="text-[15px] font-semibold tracking-[-0.01em]">{title}</h2>
+        {aside && (
+          <span className="text-[12px]" style={{ color: 'var(--text-faint)' }}>
+            {aside}
+          </span>
+        )}
+      </div>
+    )}
     {children}
-  </p>
+  </section>
 )
 
-export default function YouMap({ graphs, items = [], name = '', onOpen, locked = 0 }) {
+export default function YouMap({ graphs, items = [], attempts = [], name = '', onOpen, locked = 0, now }) {
   const [selectedId, setSelectedId] = useState(null)
-  const below = useRef(null)
 
   const overview = useMemo(() => {
     const nodes = new Map()
@@ -97,7 +98,6 @@ export default function YouMap({ graphs, items = [], name = '', onOpen, locked =
         kind: 'subject',
         subject,
         title: `${shortName(subject)}${level ? ` ${level}` : ''}`,
-        code: subjectCode(subject),
         parentId: 'you',
         childIds: top.childIds,
         depth: 1,
@@ -111,170 +111,166 @@ export default function YouMap({ graphs, items = [], name = '', onOpen, locked =
     return { subject: 'You', nodes, rootId: 'you' }
   }, [graphs, name])
 
+  const subjects = overview.nodes.get('you').childIds.map((id) => overview.nodes.get(id))
+  const selected = selectedId ? overview.nodes.get(selectedId) : null
+  const pickSubject = (id) => setSelectedId((cur) => (cur === id ? null : id))
+
   const bySubject = useMemo(() => {
     const out = {}
     for (const { subject } of graphs) out[subject] = items.filter((i) => i.subject === subject)
     return out
   }, [graphs, items])
   const counts = useMemo(() => Object.fromEntries(Object.entries(bySubject).map(([s, list]) => [s, count(list)])), [bySubject])
-  const all = useMemo(() => count(Object.values(bySubject).flat()), [bySubject])
 
-  const subjects = overview.nodes.get('you').childIds.map((id) => overview.nodes.get(id))
-  const selected = selectedId && overview.nodes.get(selectedId)
-  const c = selected ? counts[selected.subject] : all
-  const share = (n) => (n.tally?.assessed ? (n.tally.weak + n.tally.fading) / n.tally.assessed : 0)
-  const needsMost = [...subjects].filter((n) => n.tally?.weak + n.tally?.fading > 0).sort((a, b) => share(b) - share(a))[0]
-  const strongest = [...subjects].filter((n) => n.tally?.proved > 0 && n !== needsMost).sort((a, b) => b.tally.proved / b.tally.total - a.tally.proved / a.tally.total)[0]
+  const scopeItems = selected ? bySubject[selected.subject] || [] : items
+  const scopeAttempts = selected ? attempts.filter((a) => a.subject === selected.subject) : attempts
+  const c = count(scopeItems)
+  const answered = scopeAttempts.reduce((n, a) => n + (a.total_questions || 0), 0)
+  const week = scopeAttempts.filter((a) => now - new Date(a.created_at).getTime() < 7 * 86400000).reduce((n, a) => n + (a.total_questions || 0), 0)
+
+  const share = (n) => (counts[n.subject]?.tested ? counts[n.subject].weak / counts[n.subject].tested : 0)
+  const needsMost = [...subjects].filter((n) => counts[n.subject]?.weak > 0).sort((a, b) => share(b) - share(a))[0]
+  const strongest = [...subjects].filter((n) => counts[n.subject]?.proved > 0 && n !== needsMost).sort((a, b) => counts[b.subject].proved / counts[b.subject].total - counts[a.subject].proved / counts[a.subject].total)[0]
   const shown = selected ? [selected] : subjects
-
-  /* A subtopic's place in its subject's map (lib/subject-graph.js ids). */
   const openSubtopic = (row) => onOpen(row.subject, `s:${row.topic}::${row.unit || ''}::${row.subtopic}`)
 
-  const panel = (
-    <div className="flex flex-col gap-5">
-      <div>
-        {selected ? (
-          <>
-            <button type="button" onClick={() => setSelectedId(null)} className="mb-3 text-[12.5px] font-medium" style={{ color: 'var(--brand)' }}>
-              ← All of you
-            </button>
-            <Eyebrow>Subject</Eyebrow>
-            <h2 className="mt-1.5 text-[19px] font-semibold leading-tight tracking-[-0.02em]">{selected.subject}</h2>
-          </>
-        ) : (
-          <Eyebrow>You</Eyebrow>
-        )}
-        <p className="mt-2 flex items-baseline gap-2">
-          <span className="text-[32px] font-semibold leading-none tracking-[-0.03em] tabular-nums">
-            <Counting to={c.total ? Math.round((c.proved / c.total) * 100) : 0} />%
-          </span>
-          <span className="text-[12.5px]" style={{ color: 'var(--text-muted)' }}>
-            proved
-          </span>
-        </p>
-        <p className="mt-1.5 text-[12.5px] tabular-nums" style={{ color: 'var(--text-muted)' }}>
-          {c.proved.toLocaleString()} of {c.total.toLocaleString()} subtopics
-          {selected ? ` · ${statusLabel(selected.status)} overall` : ` across ${subjects.length} subject${subjects.length === 1 ? '' : 's'}`}
-        </p>
-      </div>
-
-      <Breakdown c={c} />
-
-      {selected ? (
-        <div className="flex flex-col gap-2">
-          <button type="button" onClick={() => onOpen(selected.subject)} className="btn btn-solid control-md">
-            Open its map
-          </button>
-          <button type="button" onClick={() => below.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })} className="btn btn-quiet control-md">
-            See every subtopic
-          </button>
+  return (
+    <div className="mx-auto w-full max-w-[1240px] px-4 pb-16 pt-6 sm:px-6 lg:px-8">
+      {/* Title, and the one choice that narrows everything below. */}
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <h1 className="text-[clamp(1.5rem,3vw,1.9rem)] font-semibold tracking-[-0.03em]">{selected ? selected.subject : 'Progress'}</h1>
+          <p className="mt-1 text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
+            {selected ? `${statusLabel(selected.status)} overall. Everything below is this subject.` : 'Where you stand in every subject, measured by what you have proved in quizzes.'}
+          </p>
         </div>
-      ) : (
-        <>
-          {(needsMost || strongest) && (
-            <div className="grid grid-cols-2 gap-2">
-              {[
-                ['Needs you most', needsMost],
-                ['Strongest', strongest],
-              ].map(([label, n]) =>
-                n ? (
-                  <button key={label} type="button" onClick={() => setSelectedId(n.id)} className="rounded-[12px] border p-3 text-left transition-colors hover:bg-[var(--surface-sunken)]" style={{ borderColor: 'var(--border)' }}>
-                    <span className="block text-[10px] font-semibold uppercase tracking-[0.12em]" style={{ color: 'var(--text-faint)' }}>
-                      {label}
-                    </span>
-                    <span className="mt-1 block truncate text-[13.5px] font-semibold">{n.title}</span>
-                  </button>
-                ) : null
-              )}
-            </div>
-          )}
-          <ul className="-mx-2 flex flex-col">
-            {subjects.map((n) => {
-              const sc = counts[n.subject]
+        {subjects.length > 1 && (
+          <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1" role="radiogroup" aria-label="Subject">
+            {[{ id: null, title: 'All subjects' }, ...subjects].map((n) => {
+              const on = selectedId === n.id
               return (
-                <li key={n.id}>
-                  <button type="button" onClick={() => setSelectedId(n.id)} className="flex w-full flex-col gap-1.5 rounded-[10px] px-2 py-2.5 text-left transition-colors hover:bg-[var(--surface-sunken)]">
-                    <span className="flex items-center justify-between gap-2 text-[13px]">
-                      <span className="truncate font-medium">{n.title}</span>
-                      <span className="shrink-0 text-[11.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
-                        {sc.total ? Math.round((sc.proved / sc.total) * 100) : 0}%
-                      </span>
-                    </span>
-                    <Bar c={sc} />
-                  </button>
-                </li>
+                <button
+                  key={n.id || 'all'}
+                  type="button"
+                  role="radio"
+                  aria-checked={on}
+                  onClick={() => setSelectedId(n.id)}
+                  className="shrink-0 rounded-full border px-3 py-1.5 text-[12.5px] font-medium transition-colors"
+                  style={on ? { background: 'var(--text)', color: 'var(--bg)', borderColor: 'var(--text)' } : { borderColor: 'var(--border-strong)', color: 'var(--text-muted)' }}
+                >
+                  {n.title}
+                </button>
               )
             })}
-          </ul>
+          </div>
+        )}
+      </div>
+
+      {/* The four numbers. */}
+      <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Figure label="Proved" value={pctOf(c.proved, c.total)} suffix="%" tone="var(--brand)" line={`${c.proved.toLocaleString()} of ${c.total.toLocaleString()} subtopics`} />
+        <Figure label="Tested" value={c.tested} line={`${pctOf(c.tested, c.total)}% of the syllabus has been quizzed`} />
+        <Figure label="Needs work" value={c.weak} tone={c.weak ? 'var(--status-weak)' : undefined} line={c.weak ? `${c.in_progress} weak, ${c.decaying} fading` : 'Nothing weak or fading'} />
+        <Figure label="Questions answered" value={answered} line={`${week.toLocaleString()} in the last 7 days`} />
+      </div>
+
+      {/* The constellation, and how it is changing. */}
+      <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+        <Card title={selected ? 'Its place among your subjects' : 'Your subjects'} aside="Double-click a subject to open its map">
+          <div className="relative h-[400px] sm:h-[440px]">
+            <OrbitCanvas graph={overview} focusId="you" selectedId={selectedId} onSelect={(id) => setSelectedId(id)} onEnter={(id) => onOpen(overview.nodes.get(id).subject)} onBackground={() => setSelectedId(null)} />
+          </div>
+        </Card>
+        <Card title="Over time" aside="Last 12 weeks">
+          <div className="px-5 pb-5 pt-3 sm:px-6">
+            <ProgressOverTime items={scopeItems} attempts={scopeAttempts} now={now} />
+          </div>
+        </Card>
+      </div>
+
+      {/* Every subject as numbers. */}
+      <Card title="By subject" aside={selected ? 'Click it again to see all of them' : 'Click one to look closer'} className="mt-3">
+        <div className="px-2 pb-2 pt-2 sm:px-3">
+          <div className="hidden grid-cols-[minmax(0,1.4fr)_5rem_minmax(0,2fr)_5.5rem_5.5rem_auto] gap-4 px-3 pb-2 text-[11px] font-medium md:grid" style={{ color: 'var(--text-faint)' }}>
+            <span>Subject</span>
+            <span className="text-right">Proved</span>
+            <span>Where each subtopic stands</span>
+            <span className="text-right">Tested</span>
+            <span className="text-right">Needs work</span>
+            <span />
+          </div>
+          {shown.map((n) => {
+            const sc = counts[n.subject] || count([])
+            const on = selectedId === n.id
+            return (
+              <div
+                key={n.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => pickSubject(n.id)}
+                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), pickSubject(n.id))}
+                className="grid cursor-pointer grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 rounded-[12px] px-3 py-3 transition-colors hover:bg-[var(--surface-sunken)] md:grid-cols-[minmax(0,1.4fr)_5rem_minmax(0,2fr)_5.5rem_5.5rem_auto]"
+                style={on ? { background: 'var(--brand-tint)' } : undefined}
+              >
+                <span className="min-w-0">
+                  <span className="block truncate text-[14px] font-semibold">{n.subject}</span>
+                  {(n === needsMost || n === strongest) && (
+                    <span className="mt-0.5 inline-block text-[11px] font-medium" style={{ color: n === needsMost ? 'var(--status-weak)' : 'var(--brand)' }}>
+                      {n === needsMost ? 'Needs you most' : 'Strongest'}
+                    </span>
+                  )}
+                </span>
+                <span className="text-right text-[20px] font-semibold tracking-[-0.02em] md:text-[18px]" style={{ color: 'var(--brand)', fontVariantNumeric: 'proportional-nums' }}>
+                  {pctOf(sc.proved, sc.total)}%
+                </span>
+                <span className="col-span-2 md:col-span-1">
+                  <StatusBar c={sc} />
+                </span>
+                <span className="hidden text-right text-[13px] tabular-nums md:block" style={{ color: 'var(--text-muted)' }}>
+                  {sc.tested} of {sc.total}
+                </span>
+                <span className="hidden text-right text-[13px] tabular-nums md:block" style={{ color: sc.weak ? 'var(--status-weak)' : 'var(--text-faint)' }}>
+                  {sc.weak || '–'}
+                </span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onOpen(n.subject)
+                  }}
+                  className="hidden rounded-full border px-3 py-1 text-[12px] font-medium transition-colors hover:bg-[var(--surface)] md:inline-block"
+                  style={{ borderColor: 'var(--border-strong)', color: 'var(--text-body)' }}
+                >
+                  Open map
+                </button>
+              </div>
+            )
+          })}
+          {/* The legend for the bars, once. */}
+          <div className="flex flex-wrap gap-x-4 gap-y-1 px-3 pb-2 pt-3 text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
+            {LADDER.map((s) => (
+              <span key={s} className="flex items-center gap-1.5">
+                <span className="h-[8px] w-[8px] rounded-full" style={{ background: TONE[s] }} />
+                {statusLabel(s)}
+              </span>
+            ))}
+          </div>
           {locked > 0 && (
-            <a href="/pricing" className="-mt-2 rounded-[12px] border border-dashed px-3 py-2.5 text-[12.5px] transition-colors hover:bg-[var(--surface-sunken)]" style={{ borderColor: 'var(--border-strong)', color: 'var(--text-muted)' }}>
-              Your other {locked} subject{locked === 1 ? '' : 's'} join the map with Basic. <span style={{ color: 'var(--brand)' }}>See plans</span>
+            <a href="/pricing" className="mx-3 mb-2 mt-1 block rounded-[12px] border border-dashed px-3 py-2.5 text-[12.5px] transition-colors hover:bg-[var(--surface-sunken)]" style={{ borderColor: 'var(--border-strong)', color: 'var(--text-muted)' }}>
+              Your other {locked} subject{locked === 1 ? '' : 's'} join Progress with Basic. <span style={{ color: 'var(--brand)' }}>See plans</span>
             </a>
           )}
-        </>
-      )}
-    </div>
-  )
-
-  return (
-    <div className="flex flex-col">
-      <div className="flex h-14 shrink-0 items-center gap-3 border-b px-4" style={{ borderColor: 'var(--border)' }}>
-        <h1 className="text-[15px] font-semibold tracking-[-0.01em]">Progress</h1>
-        <span className="hidden text-[12.5px] sm:inline" style={{ color: 'var(--text-faint)' }}>
-          You and every subject you take. Select one to look closer; double-click it to walk into its map.
-        </span>
-      </div>
-
-      <div className="flex flex-col border-b md:h-[min(72vh,700px)] md:flex-row" style={{ borderColor: 'var(--border)' }}>
-        <section className="relative h-[440px] min-w-0 shrink-0 md:h-auto md:flex-1" aria-label="You and your subjects" style={{ background: 'var(--bg)' }}>
-          <OrbitCanvas
-            graph={overview}
-            focusId="you"
-            selectedId={selectedId}
-            onSelect={setSelectedId}
-            onEnter={(id) => onOpen(overview.nodes.get(id).subject)}
-            onBackground={() => setSelectedId(null)}
-          />
-        </section>
-        <aside className="shrink-0 border-t p-5 md:w-[340px] md:overflow-y-auto md:border-l md:border-t-0" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
-          {panel}
-        </aside>
-      </div>
-
-      {/* Every subtopic, answering to the same selection as the orbit. */}
-      <section ref={below} className="scroll-mt-4 px-4 pb-16 pt-8 sm:px-6 lg:px-8">
-        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h2 className="text-[17px] font-semibold tracking-[-0.018em]">Every subtopic{selected ? ` in ${selected.title}` : ''}</h2>
-            <p className="mt-1 text-[13px]" style={{ color: 'var(--text-muted)' }}>
-              One square each, grouped by topic. Point at one to read it; click it to open it on the map.
-            </p>
-          </div>
-          {subjects.length > 1 && (
-            <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1" role="radiogroup" aria-label="Subject">
-              {[{ id: null, title: 'All' }, ...subjects].map((n) => {
-                const on = selectedId === n.id
-                return (
-                  <button
-                    key={n.id || 'all'}
-                    type="button"
-                    role="radio"
-                    aria-checked={on}
-                    onClick={() => setSelectedId(n.id)}
-                    className="shrink-0 rounded-full border px-3 py-1 text-[12.5px] font-medium transition-colors"
-                    style={on ? { background: 'var(--text)', color: 'var(--bg)', borderColor: 'var(--text)' } : { borderColor: 'var(--border-strong)', color: 'var(--text-muted)' }}
-                  >
-                    {n.title}
-                  </button>
-                )
-              })}
-            </div>
-          )}
         </div>
-        <div className={`grid gap-4 ${shown.length > 1 ? 'xl:grid-cols-2' : ''}`}>
-          {shown.map((n) =>
-            bySubject[n.subject]?.length ? <HeatmapSubject key={n.subject} subject={n.subject} items={bySubject[n.subject]} onPick={openSubtopic} /> : null
-          )}
+      </Card>
+
+      {/* Every subtopic. */}
+      <section className="mt-8">
+        <h2 className="text-[17px] font-semibold tracking-[-0.018em]">Every subtopic{selected ? ` in ${selected.title}` : ''}</h2>
+        <p className="mt-1 text-[13px]" style={{ color: 'var(--text-muted)' }}>
+          One square each, grouped by topic. Point at one to read it; click it to open it on the map.
+        </p>
+        <div className={`mt-4 grid gap-3 ${shown.length > 1 ? 'xl:grid-cols-2' : ''}`}>
+          {shown.map((n) => (bySubject[n.subject]?.length ? <HeatmapSubject key={n.subject} subject={n.subject} items={bySubject[n.subject]} onPick={openSubtopic} /> : null))}
         </div>
       </section>
     </div>

@@ -32,6 +32,10 @@ function SubjectMapPage() {
   const [profile, setProfile] = useState(null)
   const [rows, setRows] = useState([])
   const [progress, setProgress] = useState([])
+  // Quizzes, for Progress over time; and the moment the page loaded, so
+  // "this week" is read once rather than on every render.
+  const [attempts, setAttempts] = useState([])
+  const [loadedAt, setLoadedAt] = useState(0)
   const [loading, setLoading] = useState(true)
 
   const router = useRouter()
@@ -64,12 +68,15 @@ function SubjectMapPage() {
       setProfile(profileData)
       // The core has no subtopics to quiz, so it has no map. It has its page.
       const subjects = accessibleSubjects(profileData).filter((s) => !IB_CORE_SUBJECTS.includes(s))
-      const [syllabusRows, { data: progressRows }] = await Promise.all([
+      const [syllabusRows, { data: progressRows }, { data: attemptRows }] = await Promise.all([
         getSyllabus(supabase, subjects),
         supabase.from('progress').select('subject, subtopic, status, mastery_points, updated_at, last_correct_at').eq('user_id', user.id),
+        supabase.from('quiz_attempts').select('subject, subtopic, created_at, total_questions, score').eq('user_id', user.id).order('created_at').limit(5000),
       ])
       setRows(syllabusRows || [])
       setProgress(progressRows || [])
+      setAttempts(attemptRows || [])
+      setLoadedAt(Date.now())
       setLoading(false)
     }
     load()
@@ -92,7 +99,41 @@ function SubjectMapPage() {
   const graph = subject ? graphs.find((g) => g.subject === subject)?.graph || null : null
 
   // Every subtopic with its status, for the counts and the squares under the orbit.
-  const heatmap = useMemo(() => (subject ? [] : mergeSyllabusWithProgress(rows, buildEffectiveProgressMap(progress))), [subject, rows, progress])
+  const heatmap = useMemo(() => {
+    if (subject) return []
+    // When each subtopic was first tested (its first quiz, or failing that
+    // its progress row) and when it was last answered right, for the lines
+    // over time.
+    const firstQuiz = new Map()
+    for (const a of attempts) {
+      if (!a.subtopic) continue
+      const k = progressKey(a.subject, a.subtopic)
+      if (!firstQuiz.has(k)) firstQuiz.set(k, new Date(a.created_at).getTime())
+    }
+    const rowOf = new Map(progress.map((p) => [progressKey(p.subject, p.subtopic), p]))
+    const ms = (v) => (v ? new Date(v).getTime() : null)
+    return mergeSyllabusWithProgress(rows, buildEffectiveProgressMap(progress)).map((r) => {
+      const k = progressKey(r.subject, r.subtopic)
+      const p = rowOf.get(k)
+      const updated = ms(p?.updated_at)
+      const first = firstQuiz.get(k) ?? null
+      return { ...r, testedAt: first != null && updated != null ? Math.min(first, updated) : first ?? updated, provedAt: ms(p?.last_correct_at) ?? updated }
+    })
+  }, [subject, rows, progress, attempts])
+
+  // Today's standing, kept once a day so "proved" can be drawn from real
+  // daily figures as they build up (093-progress-snapshots.sql).
+  useEffect(() => {
+    if (subject || !heatmap.length || !profile?.id) return
+    const PROVED = new Set(['proficient', 'mastered'])
+    const row = (subjectName, list) => ({ user_id: profile.id, subject: subjectName, total: list.length, tested: list.filter((i) => i.status !== 'not_started').length, proved: list.filter((i) => PROVED.has(i.status)).length })
+    const bySubject = new Map()
+    for (const i of heatmap) bySubject.set(i.subject, [...(bySubject.get(i.subject) || []), i])
+    supabase
+      .from('progress_snapshots')
+      .upsert([row('', heatmap), ...[...bySubject].map(([s, list]) => row(s, list))], { onConflict: 'user_id,day,subject' })
+      .then(({ error }) => error && console.warn('progress snapshot:', error.message))
+  }, [subject, heatmap, profile?.id, supabase])
 
   if (loading) {
     return (
@@ -147,6 +188,8 @@ function SubjectMapPage() {
         <YouMap
           graphs={graphs}
           items={heatmap}
+          attempts={attempts}
+          now={loadedAt}
           name={profile.full_name || ''}
           locked={lockedCount}
           onOpen={(s, at) => router.push(`/dashboard/map?subject=${encodeURIComponent(s)}${at ? `&at=${encodeURIComponent(at)}` : ''}`)}
