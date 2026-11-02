@@ -81,6 +81,31 @@ export default function SubjectMap({ graph, subjects = [], onSubject, onOverview
   const [searching, setSearching] = useState(false)
   const [prefs, setPrefs] = useState(readPrefs)
   const [outlineMobile, setOutlineMobile] = useState(false)
+  // Full screen: the map alone on the whole display, panels out of the way
+  // until something is selected. Esc (the browser's own) leaves it.
+  // Where the browser will not (an iPhone, an embedded view), the map covers
+  // the window instead.
+  const root = useRef(null)
+  const [native, setNative] = useState(false)
+  const [cover, setCover] = useState(false)
+  const full = native || cover
+  useEffect(() => {
+    const sync = () => setNative(document.fullscreenElement === root.current)
+    const esc = (e) => e.key === 'Escape' && setCover(false)
+    document.addEventListener('fullscreenchange', sync)
+    document.addEventListener('keydown', esc)
+    return () => {
+      document.removeEventListener('fullscreenchange', sync)
+      document.removeEventListener('keydown', esc)
+    }
+  }, [])
+  const toggleFull = () => {
+    if (cover) return setCover(false)
+    if (document.fullscreenElement) return document.exitFullscreen?.()
+    const ask = root.current?.requestFullscreen?.()
+    if (!ask) return setCover(true)
+    ask.catch(() => setCover(true))
+  }
   const size = useRef({ w: 0, h: 0 })
   const framed = useRef(false)
   const saved = useRef(new Map())
@@ -311,7 +336,7 @@ export default function SubjectMap({ graph, subjects = [], onSubject, onOverview
   )
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    <div ref={root} className={`flex min-h-0 flex-col ${cover ? 'fixed inset-0 z-[80]' : 'h-full'}`} style={full ? { background: 'var(--bg)' } : undefined}>
       {/* Toolbar */}
       <div className="flex h-14 shrink-0 items-center gap-1.5 border-b px-3 sm:px-4" style={{ borderColor: 'var(--border)' }}>
         <IconButton label={prefs.outline ? 'Hide the outline' : 'Show the outline'} active={prefs.outline} onClick={() => setPref('outline', !prefs.outline)} className="hidden 2xl:flex">
@@ -392,11 +417,14 @@ export default function SubjectMap({ graph, subjects = [], onSubject, onOverview
         <IconButton label={prefs.inspector ? 'Hide details' : 'Show details'} active={prefs.inspector} onClick={() => setPref('inspector', !prefs.inspector)} className="hidden lg:flex">
           {svg(<><rect x="3.5" y="4.5" width="17" height="15" rx="2.5" /><path d="M15 4.5v15" /></>)}
         </IconButton>
+        <IconButton label={full ? 'Leave full screen' : 'Full screen'} active={full} onClick={toggleFull}>
+          {full ? svg(<path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" />) : svg(<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />)}
+        </IconButton>
       </div>
 
       <div className="relative flex min-h-0 flex-1">
         {/* Outline */}
-        {prefs.outline && (
+        {prefs.outline && !full && (
           <aside className="hidden w-[272px] shrink-0 border-r 2xl:block" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
             <Outline graph={graph} focusId={focusId} selectedId={selectedId} weakOnly={weakOnly} onWeakOnly={setWeakOnly} onGo={goTo} />
           </aside>
@@ -423,6 +451,7 @@ export default function SubjectMap({ graph, subjects = [], onSubject, onOverview
             onUp={() => (focus.parentId ? travel(focus.parentId) : onOverview?.())}
             upFromRoot={Boolean(onOverview)}
             onBackground={() => setSelectedId(null)}
+            insets={{ top: 64, bottom: 84 }}
           />
 
           {(focusId !== graph.rootId || onOverview) && (
@@ -477,7 +506,7 @@ export default function SubjectMap({ graph, subjects = [], onSubject, onOverview
         </section>
 
         {/* Details */}
-        {prefs.inspector && (
+        {prefs.inspector && (!full || selectedId) && (
           <aside className="hidden w-[340px] shrink-0 border-l lg:block" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
             {inspector}
           </aside>

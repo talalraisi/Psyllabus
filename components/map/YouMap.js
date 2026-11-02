@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import OrbitCanvas from '@/components/map/OrbitCanvas'
 import ProgressOverTime from '@/components/map/ProgressOverTime'
@@ -87,6 +87,49 @@ const Card = ({ title, aside, children, className = '' }) => (
     {children}
   </section>
 )
+
+/** A box that can take the whole screen, with its own button to do it. */
+function Expandable({ children, className = '' }) {
+  const box = useRef(null)
+  const [native, setNative] = useState(false)
+  // Where the browser will not go full screen (an iPhone), cover the window.
+  const [cover, setCover] = useState(false)
+  const full = native || cover
+  useEffect(() => {
+    const sync = () => setNative(document.fullscreenElement === box.current)
+    const esc = (e) => e.key === 'Escape' && setCover(false)
+    document.addEventListener('fullscreenchange', sync)
+    document.addEventListener('keydown', esc)
+    return () => {
+      document.removeEventListener('fullscreenchange', sync)
+      document.removeEventListener('keydown', esc)
+    }
+  }, [])
+  const toggle = () => {
+    if (cover) return setCover(false)
+    if (document.fullscreenElement) return document.exitFullscreen?.()
+    const ask = box.current?.requestFullscreen?.()
+    if (!ask) return setCover(true)
+    ask.catch(() => setCover(true))
+  }
+  return (
+    <div ref={box} className={cover ? 'fixed inset-0 z-[80]' : `relative ${native ? 'h-full' : className}`} style={full ? { background: 'var(--bg)' } : undefined}>
+      {children}
+      <button
+        type="button"
+        onClick={toggle}
+        aria-label={full ? 'Leave full screen' : 'Full screen'}
+        title={full ? 'Leave full screen (Esc)' : 'Full screen'}
+        className="absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-full border transition-colors hover:bg-[var(--surface-sunken)]"
+        style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)', color: 'var(--text-muted)' }}
+      >
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d={full ? 'M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5' : 'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5'} />
+        </svg>
+      </button>
+    </div>
+  )
+}
 
 export default function YouMap({ graphs, items = [], name = '', onOpen, locked = 0, now }) {
   const [selectedId, setSelectedId] = useState(null)
@@ -184,9 +227,9 @@ export default function YouMap({ graphs, items = [], name = '', onOpen, locked =
       {/* The constellation, and how it is changing. */}
       <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
         <Card title={selected ? 'Its place among your subjects' : 'Your subjects'} aside="Double-click a subject to open its map">
-          <div className="relative h-[400px] sm:h-[440px]">
+          <Expandable className="h-[400px] sm:h-[440px]">
             <OrbitCanvas graph={overview} focusId="you" selectedId={selectedId} onSelect={(id) => setSelectedId(id)} onEnter={(id) => onOpen(overview.nodes.get(id).subject)} onBackground={() => setSelectedId(null)} />
-          </div>
+          </Expandable>
         </Card>
         <div className="flex flex-col gap-3">
           <Card title="Proved over time" aside="Last 12 weeks">

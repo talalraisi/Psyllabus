@@ -17,8 +17,11 @@ import { statusLabel } from '@/lib/subject-graph'
  *            nobody has tested is a faint outline. Every star is named.
  *            Click to read about it, double-click to go into it.
  *
- * Flat: no glow, no pulse. Stars and lines draw in once when a level opens;
- * with reduced motion they are simply there.
+ * Flat, never glowing, but alive: the lines draw out from the centre and the
+ * stars appear along them when a level opens, the proved arc draws itself
+ * round, each star drifts a few pixels on its own rhythm, the centre
+ * breathes, the sky moves very slowly, a selection springs in. With reduced
+ * motion all of it is simply there, still.
  */
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v))
@@ -67,7 +70,12 @@ function sky(w, h, count) {
   return Array.from({ length: count }, () => ({ x: rand() * w, y: rand() * h, r: 0.5 + rand() * 1, o: 0.1 + rand() * 0.25 }))
 }
 
-export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = false, onSelect, onEnter, onUp, onBackground, upFromRoot = false, controls = null }) {
+/**
+ * insets: room kept clear at the top and bottom for what floats over the
+ * canvas (the back button, the Next strip), so no star sits under them.
+ * legend: the key to brightness, top right; off where there is no room.
+ */
+export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = false, onSelect, onEnter, onUp, onBackground, upFromRoot = false, controls = null, insets = {}, legend = true }) {
   const box = useRef(null)
   const [size, setSize] = useState({ w: 0, h: 0 })
 
@@ -85,17 +93,21 @@ export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = fal
   const layout = useMemo(() => {
     const { w, h } = size
     if (!w || !h) return null
-    const side = Math.min(w, h)
-    const s = clamp(side / 720, 0.6, 1.2)
+    const top = insets.top ?? 28
+    const bottom = insets.bottom ?? 28
+    const side = Math.min(w, h - top - bottom)
+    const s = clamp(side / 720, 0.6, 1.1)
     const cx = w / 2
-    const cy = h / 2
-    const hub = clamp(side * 0.1, 44, 72)
+    const cy = top + (h - top - bottom) / 2
+    const hub = clamp(side * 0.1, 40, 62)
     const n = children.length
     const narrow = w < 520
     const labelW = narrow ? 88 : clamp(w * 0.15, 96, 150)
     // One circle of stars for a few, two alternating for many, so names have room.
     const twoRings = n > 10
-    const R = Math.max(hub + 60 * s, Math.min(w / 2 - labelW / 2 - 8, h / 2 - 46))
+    // As large as fits with names at the top and bottom, and no larger: on a
+    // big screen a sprawling map reads as empty, not as more room.
+    const R = Math.max(hub + 56, Math.min(w / 2 - labelW / 2 - 8, (h - top - bottom) / 2 - 40, 250 * s))
     const planets = children.map((c, i) => {
       const a = -Math.PI / 2 + (i / Math.max(1, n)) * 2 * Math.PI
       const rr = twoRings && i % 2 ? R * 0.68 : R
@@ -110,7 +122,7 @@ export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = fal
       return { node: c, x, y, r, a, i, k, l1, l2, below }
     })
     return { cx, cy, hub, R, planets, s, labelW, stars: sky(w, h, Math.round((w * h) / 5200)) }
-  }, [size, children])
+  }, [size, children, insets.top, insets.bottom])
 
   const needsWork = (n) => (n.kind === 'subtopic' ? ['in_progress', 'decaying'].includes(n.status) : (n.tally?.weak || 0) + (n.tally?.fading || 0) > 0)
   const t = focus.tally || { total: 0, proved: 0, assessed: 0 }
@@ -132,16 +144,28 @@ export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = fal
         @keyframes orbit-hub { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
         @keyframes orbit-in { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
         @keyframes orbit-draw { from { stroke-dashoffset: var(--len); } to { stroke-dashoffset: 0; } }
-        @media (prefers-reduced-motion: reduce) { .orbit-hub, .orbit-planet, .orbit-line { animation: none; } }
+        .orbit-float { animation: orbit-float 7s ease-in-out infinite; }
+        .orbit-sel { transform-box: fill-box; transform-origin: center; animation: orbit-sel 420ms cubic-bezier(.34,1.56,.64,1) both; }
+        .orbit-arc { stroke-dasharray: 1; animation: orbit-arc 1.4s cubic-bezier(.16,1,.3,1) 250ms both; }
+        .orbit-breathe { animation: orbit-breathe 6s ease-in-out infinite; }
+        .orbit-sky { animation: orbit-sky 70s ease-in-out infinite alternate; }
+        @keyframes orbit-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+        @keyframes orbit-sel { from { opacity: 0; transform: scale(.5); } to { opacity: 1; transform: none; } }
+        @keyframes orbit-arc { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+        @keyframes orbit-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+        @keyframes orbit-sky { from { transform: translate(0, 0); } to { transform: translate(-18px, 10px); } }
+        @media (prefers-reduced-motion: reduce) { .orbit-hub, .orbit-planet, .orbit-line, .orbit-float, .orbit-sel, .orbit-arc, .orbit-breathe, .orbit-sky { animation: none; } }
         .orbit-dot { transition: transform 200ms cubic-bezier(.16,1,.3,1); transform-box: fill-box; transform-origin: center; }
         .orbit-hit:hover .orbit-dot, .orbit-hit:focus-visible .orbit-dot { transform: scale(1.18); }
       `}</style>
 
       {layout && (
         <svg className="absolute inset-0 h-full w-full" aria-hidden="false" role="group" aria-label={`${focus.title} and what it holds`}>
-          {layout.stars.map((st, i) => (
-            <circle key={i} cx={st.x} cy={st.y} r={st.r} fill="var(--text-faint)" opacity={st.o} data-bg />
-          ))}
+          <g className="orbit-sky">
+            {layout.stars.map((st, i) => (
+              <circle key={i} cx={st.x} cy={st.y} r={st.r} fill="var(--text-faint)" opacity={st.o} data-bg />
+            ))}
+          </g>
           {layout.planets.map((p) => {
             const len = Math.hypot(p.x - layout.cx, p.y - layout.cy)
             const sel = p.node.id === selectedId
@@ -188,7 +212,8 @@ export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = fal
                 }}
               >
                 <title>{`${n.title} · ${statusLabel(n.status)}${n.score != null ? ` · ${n.score}%` : ''}${leaf ? '' : ` · ${n.tally?.proved || 0} of ${n.tally?.total} proved`}`}</title>
-                {sel && <circle cx={p.x} cy={p.y} r={p.r + 6} fill="none" stroke="var(--brand)" strokeWidth="1.5" />}
+                <g className="orbit-float" style={{ animationDelay: `${-p.i * 1.1}s`, animationDuration: `${6 + (p.i % 4)}s` }}>
+                {sel && <circle className="orbit-sel" cx={p.x} cy={p.y} r={p.r + 6} fill="none" stroke="var(--brand)" strokeWidth="1.5" />}
                 <circle
                   className="orbit-dot"
                   cx={p.x}
@@ -207,12 +232,13 @@ export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = fal
                     </tspan>
                   )}
                 </text>
+                </g>
               </g>
             )
           })}
           {/* How much of this level is proved, as a thin arc round the centre. */}
           <circle cx={layout.cx} cy={layout.cy} r={layout.hub + 8} fill="none" stroke="var(--border)" strokeWidth="2" />
-          {proved > 0 && <path d={arc(layout.cx, layout.cy, layout.hub + 8, proved)} fill="none" stroke="var(--brand)" strokeWidth="2.5" strokeLinecap="round" />}
+          {proved > 0 && <path key={`arc-${focusId}`} className="orbit-arc" pathLength="1" d={arc(layout.cx, layout.cy, layout.hub + 8, proved)} fill="none" stroke="var(--brand)" strokeWidth="2.5" strokeLinecap="round" />}
         </svg>
       )}
 
@@ -222,7 +248,7 @@ export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = fal
             type="button"
             onClick={() => (isRoot && !upFromRoot ? onSelect?.(null) : onUp?.())}
             title={isRoot && !upFromRoot ? focus.title : isRoot ? 'Back to you' : 'Back up a level'}
-            className="relative flex h-full w-full flex-col items-center justify-center rounded-full text-center transition-[filter] hover:brightness-110"
+            className="orbit-breathe relative flex h-full w-full flex-col items-center justify-center rounded-full text-center transition-[filter] hover:brightness-110"
             style={{ padding: layout.hub * 0.2, background: 'var(--brand)', color: '#fff' }}
           >
             <span className={`font-semibold leading-tight tracking-[-0.01em] ${layout.hub >= 64 ? 'line-clamp-3' : 'line-clamp-2'}`} style={{ fontSize: clamp(layout.hub / 5.5, 11, 15) }}>
@@ -241,7 +267,7 @@ export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = fal
       )}
 
       {/* What brightness means, quiet and out of the way. */}
-      <div data-ui className="pointer-events-none absolute right-4 top-4 hidden items-center gap-3 text-[10.5px] sm:flex" style={{ color: 'var(--text-faint)' }}>
+      {legend && <div data-ui className="pointer-events-none absolute right-4 top-4 hidden items-center gap-3 text-[10.5px] sm:flex" style={{ color: 'var(--text-faint)' }}>
         <span className="flex items-center gap-1.5">
           <span className="h-[9px] w-[9px] rounded-full border" style={{ borderColor: 'var(--border-strong)' }} />
           Untested
@@ -254,7 +280,7 @@ export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = fal
           <span className="h-[11px] w-[11px] rounded-full" style={{ background: 'var(--brand)' }} />
           Proved
         </span>
-      </div>
+      </div>}
       {controls}
     </div>
   )
