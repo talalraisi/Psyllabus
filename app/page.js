@@ -176,10 +176,20 @@ export default async function Home() {
               <Reveal key={l} delay={i * 70}>
                 {/* Set like the headline above: the figure in the text colour,
                     the plus in the brand green, the words muted. */}
-                <p className="text-[clamp(2.2rem,4.2vw,3.2rem)] font-semibold leading-[0.98] tracking-[-0.038em]" style={{ color: 'var(--text)' }}>
-                  <CountUp to={v} suffix={<span style={{ color: 'var(--brand)' }}>+</span>} />
+                {/* Proportional figures: the default tabular ones are for columns,
+                    and at this size leave a gap after every 1 and a wide comma. */}
+                <p className="text-[clamp(2.4rem,4.6vw,3.5rem)] font-medium leading-none tracking-[-0.045em]" style={{ color: 'var(--text)' }}>
+                  <CountUp
+                    to={v}
+                    style={{ fontVariantNumeric: 'proportional-nums lining-nums' }}
+                    suffix={
+                      <span className="relative -top-[0.38em] ml-[0.06em] align-baseline text-[0.62em] font-medium tracking-normal" style={{ color: 'var(--brand)' }}>
+                        +
+                      </span>
+                    }
+                  />
                 </p>
-                <p className="mt-3 text-[15px] font-semibold tracking-[-0.01em]" style={{ color: 'var(--text-muted)' }}>
+                <p className="mt-3 text-[13.5px] font-medium tracking-[-0.005em]" style={{ color: 'var(--text-muted)' }}>
                   {l}
                 </p>
               </Reveal>
