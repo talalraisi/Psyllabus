@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import SymbolKeys from '@/components/SymbolKeys'
 import Link from 'next/link'
 import MathText from '@/components/MathText'
 import CodeText from '@/components/CodeText'
@@ -82,7 +83,8 @@ function Stimulus({ q, subject }) {
   )
 }
 
-function AnswerBox({ part, value, onChange, disabled }) {
+function AnswerBox({ part, value, onChange, disabled, subject }) {
+  const box = useRef(null)
   if (part.type === 'mcq') {
     return (
       <div className="mt-2 flex flex-col gap-2">
@@ -106,25 +108,33 @@ function AnswerBox({ part, value, onChange, disabled }) {
   }
   if (part.type === 'written') {
     return (
-      <textarea
-        value={value || ''}
-        disabled={disabled}
-        onChange={(e) => onChange(e.target.value)}
-        rows={part.marks >= 10 ? 14 : part.marks >= 4 ? 7 : 4}
-        placeholder={part.marks >= 10 ? 'Write your answer. Plan first: the marks are for analysis and evaluation, not length.' : 'Your answer'}
-        className="input mt-2 w-full resize-y py-3 text-[16px] leading-relaxed sm:text-[15px]"
-      />
+      <div className="mt-2 flex flex-wrap items-start gap-2">
+        <textarea
+          ref={box}
+          value={value || ''}
+          disabled={disabled}
+          onChange={(e) => onChange(e.target.value)}
+          rows={part.marks >= 10 ? 14 : part.marks >= 4 ? 7 : 4}
+          placeholder={part.marks >= 10 ? 'Write your answer. Plan first: the marks are for analysis and evaluation, not length.' : 'Your answer'}
+          className="input min-w-0 flex-1 resize-y py-3 text-[16px] leading-relaxed sm:text-[15px]"
+        />
+        <SymbolKeys target={box} value={value || ''} onChange={onChange} subject={subject} disabled={disabled} />
+      </div>
     )
   }
   return (
-    <input
-      value={value || ''}
-      disabled={disabled}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={part.type === 'numeric' ? 'Your answer, with working on paper' : 'Your answer'}
-      autoComplete="off"
-      className="input mt-2 h-11 w-full max-w-sm text-[16px] sm:text-[15px]"
-    />
+    <div className="mt-2 flex max-w-md flex-wrap gap-2">
+      <input
+        ref={box}
+        value={value || ''}
+        disabled={disabled}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={part.type === 'numeric' ? 'Your answer, with working on paper' : 'Your answer'}
+        autoComplete="off"
+        className="input h-11 min-w-0 flex-1 text-[16px] sm:text-[15px]"
+      />
+      <SymbolKeys target={box} value={value || ''} onChange={onChange} subject={subject} disabled={disabled} />
+    </div>
   )
 }
 
@@ -599,7 +609,7 @@ export default function PaperSitting({ paper, initial, onSave, backHref, backLab
                             [{p.marks}]
                           </span>
                         </p>
-                        {reading ? <ReadScheme part={p} /> : show && <AnswerBox part={p} value={answers[k]} disabled={marking} onChange={(v) => answer(k, v)} />}
+                        {reading ? <ReadScheme part={p} /> : show && <AnswerBox part={p} value={answers[k]} disabled={marking} onChange={(v) => answer(k, v)} subject={paper.subject} />}
                         {marking && <MarkPart part={p} response={answers[k]} mark={marks[k]?.marks} onMark={(m) => setMark(k, m)} />}
                       </div>
                     )

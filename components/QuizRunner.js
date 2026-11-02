@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import SymbolKeys from '@/components/SymbolKeys'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import CopyButton from '@/components/CopyButton'
@@ -164,6 +165,8 @@ export default function QuizRunner({
   paper = null,
   backHref = '/dashboard',
 }) {
+  // The typed-answer box, for the symbol keyboard to type into.
+  const answerRef = useRef(null)
   const [phase, setPhase] = useState(PHASE.loading)
   const [emptyMessage, setEmptyMessage] = useState('')
   const [questions, setQuestions] = useState([])
@@ -1110,8 +1113,9 @@ export default function QuizRunner({
                 (Done, or Enter), never because the box lost focus: clicking
                 away to think, or to the calculator, used to mark whatever was
                 half-typed. */}
-            <div className="mt-2 flex gap-2">
+            <div className="mt-2 flex flex-wrap gap-2">
               <input
+                ref={answerRef}
                 id="short-answer"
                 key={q.id}
                 type="text"
@@ -1128,6 +1132,7 @@ export default function QuizRunner({
                 placeholder={q.answer_kind === 'numeric' ? 'e.g. 9.81' : 'Type your answer'}
                 className="input min-w-0 flex-1"
               />
+              <SymbolKeys key={`keys-${q.id}`} target={answerRef} value={selected ?? ''} onChange={(v) => selectAnswer(q.id, v)} subject={q.subject} disabled={review === 'practice' && !!revealed[q.id]} />
               {review === 'practice' && !revealed[q.id] && (
                 <button
                   type="button"

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import SymbolKeys from '@/components/SymbolKeys'
 import MathText from '@/components/MathText'
 import CardMenu from '@/components/CardMenu'
 import { IconCheck, IconClose } from '@/components/Icons'
@@ -216,15 +217,18 @@ export default function FlashcardWrite({ cards, mode = 'write', onMark, onEdit, 
               </p>
             )}
 
-            <input
-              ref={inputRef}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              disabled={!!result}
-              placeholder={blank ? 'The missing word' : 'Type the answer'}
-              autoComplete="off"
-              className="input mt-7 w-full text-[16px]"
-            />
+            <div className="mt-7 flex flex-wrap gap-2">
+              <input
+                ref={inputRef}
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                disabled={!!result}
+                placeholder={blank ? 'The missing word' : 'Type the answer'}
+                autoComplete="off"
+                className="input min-w-0 flex-1 text-[16px]"
+              />
+              <SymbolKeys target={inputRef} value={value} onChange={setValue} subject={card.subject} disabled={!!result} />
+            </div>
 
             {!result && (
               <button onClick={submit} disabled={!value.trim()} className="btn btn-solid control-md mt-4 disabled:opacity-40">
