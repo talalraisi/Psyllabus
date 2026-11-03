@@ -5,7 +5,14 @@ import { statusLabel } from '@/lib/subject-graph'
 import { STATUS_VAR } from '@/components/map/MapCanvas'
 
 /**
- * The subject map as a constellation: where you are is the bright centre,
+ * The maps. Two looks:
+ *
+ * 'orbit' (Progress, every subject map, the dashboard card): one ring, or two
+ * when there are many, with a planet in its status colour for everything the
+ * level holds, and an outlined centre with the share proved. In a subject
+ * map the centre takes you back up a level.
+ *
+ * 'constellation' (no longer used by default): where you are is the bright centre,
  * and what it holds are stars around it, each joined to the centre by a fine
  * line. Nothing moves: the map is something to read, and a star never slides
  * out from under the pointer.
@@ -75,7 +82,7 @@ function sky(w, h, count) {
  * canvas (the back button, the Next strip), so no star sits under them.
  * legend: the key to brightness, top right; off where there is no room.
  */
-export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = false, onSelect, onEnter, onUp, onBackground, upFromRoot = false, controls = null, insets = {}, legend = true, variant = 'constellation' }) {
+export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = false, onSelect, onEnter, onUp, onBackground, upFromRoot = false, controls = null, insets = {}, legend = true, variant = 'orbit' }) {
   // 'orbit': one ring, planets in their status colours, an outlined centre
   // with the proved share (Progress). 'constellation': stars joined to the
   // centre (the subject maps).
@@ -108,7 +115,7 @@ export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = fal
     const narrow = w < 520
     const labelW = narrow ? 88 : clamp(w * 0.15, 96, 150)
     // One circle of stars for a few, two alternating for many, so names have room.
-    const twoRings = n > 10 && variant !== 'orbit'
+    const twoRings = n > 10
     // As large as fits with names at the top and bottom, and no larger: on a
     // big screen a sprawling map reads as empty, not as more room.
     const R = Math.max(hub + 56, Math.min(w / 2 - labelW / 2 - 8, (h - top - bottom) / 2 - 40, 250 * s))
@@ -119,13 +126,15 @@ export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = fal
       const y = cy + rr * Math.sin(a)
       const k = knownOf(c)
       // A star is never smaller than a fingertip can find; knowing it makes it grow.
-      const r = variant === 'orbit' ? clamp(15 * Math.max(s, 0.8), 12, 19) : clamp((narrow ? 7 : 8) + k * (narrow ? 9 : 13) * Math.max(s, 0.85), 7, 24)
+      // On a crowded ring planets shrink so neighbours never touch.
+      const room = (Math.PI * 2 * (twoRings ? R * 0.68 : R)) / Math.max(1, twoRings ? Math.ceil(n / 2) : n)
+      const r = variant === 'orbit' ? clamp(Math.min(15 * Math.max(s, 0.8), room * 0.3), 8, 19) : clamp((narrow ? 7 : 8) + k * (narrow ? 9 : 13) * Math.max(s, 0.85), 7, 24)
       const [l1, l2] = lines(c.title, Math.round(labelW / 6.4))
       // The name sits outward from the centre, so it never crosses a line.
       const below = Math.sin(a) > -0.25
       return { node: c, x, y, r, a, i, k, l1, l2, below }
     })
-    return { cx, cy, hub, R, planets, s, labelW, stars: sky(w, h, Math.round((w * h) / 5200)) }
+    return { cx, cy, hub, R, twoRings, planets, s, labelW, stars: sky(w, h, Math.round((w * h) / 5200)) }
   }, [size, children, insets.top, insets.bottom, variant])
 
   const needsWork = (n) => (n.kind === 'subtopic' ? ['in_progress', 'decaying'].includes(n.status) : (n.tally?.weak || 0) + (n.tally?.fading || 0) > 0)
@@ -173,8 +182,12 @@ export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = fal
           </g>}
           {orbitStyle && (
             <>
-              <circle className="orbit-ring" pathLength="1" cx={layout.cx} cy={layout.cy} r={layout.R} fill="none" stroke="var(--border-strong)" strokeWidth="1.2" />
-              <circle cx={layout.cx} cy={layout.cy} r={layout.hub + Math.max(18, (layout.R - layout.hub) * 0.32)} fill="none" stroke="var(--border-strong)" strokeOpacity="0.7" strokeDasharray="3 6" />
+              <circle key={`ring-${focusId}`} className="orbit-ring" pathLength="1" cx={layout.cx} cy={layout.cy} r={layout.R} fill="none" stroke="var(--border-strong)" strokeWidth="1.2" />
+              {layout.twoRings ? (
+                <circle key={`ring2-${focusId}`} className="orbit-ring" pathLength="1" cx={layout.cx} cy={layout.cy} r={layout.R * 0.68} fill="none" stroke="var(--border-strong)" strokeWidth="1.2" />
+              ) : (
+                <circle cx={layout.cx} cy={layout.cy} r={layout.hub + Math.max(18, (layout.R - layout.hub) * 0.32)} fill="none" stroke="var(--border-strong)" strokeOpacity="0.7" strokeDasharray="3 6" />
+              )}
             </>
           )}
           {!orbitStyle && layout.planets.map((p) => {
@@ -262,9 +275,9 @@ export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = fal
           {orbitStyle ? (
             <button
               type="button"
-              onClick={() => onSelect?.(null)}
-              title={`${focus.title}: ${Math.round(proved * 100)}% proved`}
-              className="orbit-breathe relative flex h-full w-full flex-col items-center justify-center rounded-full text-center"
+              onClick={() => (isRoot && !upFromRoot ? onSelect?.(null) : onUp?.())}
+              title={`${focus.title}: ${Math.round(proved * 100)}% proved${isRoot && !upFromRoot ? '' : isRoot ? ' · back to you' : ' · back up a level'}`}
+              className="orbit-breathe relative flex h-full w-full flex-col items-center justify-center rounded-full text-center transition-colors hover:bg-[var(--surface)]"
               style={{ background: 'var(--bg)', border: '3px solid var(--brand)', color: 'var(--text)' }}
             >
               <span className="font-semibold leading-none tracking-[-0.03em]" style={{ fontSize: clamp(layout.hub * 0.5, 20, 30), fontVariantNumeric: 'proportional-nums' }}>
@@ -273,6 +286,11 @@ export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = fal
               <span className="mt-1 text-[10.5px]" style={{ color: 'var(--text-faint)' }}>
                 proved
               </span>
+              {(!isRoot || upFromRoot) && layout.hub >= 52 && (
+                <span className="mt-0.5 text-[10px] font-semibold" style={{ color: 'var(--brand)' }}>
+                  ↑ {isRoot ? 'You' : 'Back'}
+                </span>
+              )}
             </button>
           ) : (
           <button

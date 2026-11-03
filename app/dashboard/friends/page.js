@@ -23,9 +23,10 @@ import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader, PageLoading } from '@/components/PageShell'
 import { ConfirmSheet, DotsMenu } from '@/components/flashcards/DeckDialogs'
 import Counting from '@/components/Counting'
-import { forgetFriends, summarise } from '@/lib/friends'
+import { PERIODS, forgetFriends, summarise } from '@/lib/friends'
 
-const hm = (m) => (m >= 60 ? `${Math.floor(m / 60)} h ${Math.round(m % 60)} min` : `${Math.round(m)} min`)
+// Short enough for a year's total in a narrow column: 45 min, 2h 5m, 123h.
+const hm = (m) => (m >= 600 ? `${Math.round(m / 60)}h` : m >= 60 ? `${Math.floor(m / 60)}h ${Math.round(m % 60)}m` : `${Math.round(m)} min`)
 
 function lastSeen(ms, now) {
   if (!ms) return 'Not studied yet'
@@ -65,6 +66,7 @@ export default function FriendsPage() {
   const [copied, setCopied] = useState(false)
   const [removing, setRemoving] = useState(null)
   const [now, setNow] = useState(0)
+  const [period, setPeriod] = useState(PERIODS[0])
   const router = useRouter()
   const supabase = useMemo(() => createClient(), [])
 
@@ -73,7 +75,7 @@ export default function FriendsPage() {
     if (!user) return router.push('/login')
     const p = await getProfile(supabase, user.id)
     if (!p) return router.push('/onboarding')
-    const since = new Date(Date.now() - 120 * 86400000).toISOString()
+    const since = new Date(Date.now() - 366 * 86400000).toISOString()
     const [{ data: c }, { data: list }, { data: acts }, { data: myAttempts }, { data: mySessions }] = await Promise.all([
       supabase.rpc('my_friend_code'),
       supabase.rpc('my_friends'),
@@ -151,7 +153,7 @@ export default function FriendsPage() {
     ...accepted.map((f) => ({ id: f.id, f, name: f.first_name, url: f.avatar_url, s: activity[f.friend] })),
   ]
     .filter((r) => r.s)
-    .sort((a, b) => b.s.weekMinutes - a.s.weekMinutes || b.s.current - a.s.current)
+    .sort((a, b) => b.s.minutes[period.key] - a.s.minutes[period.key] || b.s.current - a.s.current)
 
   return (
     <DashboardLayout profile={profile}>
@@ -237,13 +239,29 @@ export default function FriendsPage() {
           </section>
         )}
 
-        {/* This week, together. */}
+        {/* Study time together, over a span you pick. */}
         <section>
-          <div className="mb-3 flex items-baseline justify-between gap-3">
-            <h2 className="text-[15px] font-semibold tracking-[-0.01em]">This week</h2>
-            <span className="text-[12px]" style={{ color: 'var(--text-faint)' }}>
-              Study time over the last 7 days
-            </span>
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-[15px] font-semibold tracking-[-0.01em]">Leaderboard</h2>
+            <div role="tablist" aria-label="Study time over" className="-mx-1 flex max-w-full gap-1 overflow-x-auto px-1">
+              {PERIODS.map((p) => (
+                <button
+                  key={p.key}
+                  type="button"
+                  role="tab"
+                  aria-selected={p.key === period.key}
+                  onClick={() => setPeriod(p)}
+                  className="shrink-0 rounded-full border px-3 py-1.5 text-[12.5px] font-medium transition-colors"
+                  style={
+                    p.key === period.key
+                      ? { borderColor: 'var(--text)', background: 'var(--text)', color: 'var(--bg)' }
+                      : { borderColor: 'var(--border-strong)', color: 'var(--text-muted)' }
+                  }
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
           </div>
           {accepted.length === 0 ? (
             <div className="rounded-[18px] border border-dashed px-6 py-10 text-center" style={{ borderColor: 'var(--border-strong)' }}>
@@ -278,10 +296,10 @@ export default function FriendsPage() {
                       streak
                     </span>
                   </span>
-                  <span className="hidden w-24 text-right sm:block">
-                    <span className="block text-[15px] font-semibold tabular-nums">{hm(r.s.weekMinutes)}</span>
+                  <span className="w-[4.5rem] shrink-0 text-right sm:w-24">
+                    <span className="block text-[15px] font-semibold tabular-nums">{hm(r.s.minutes[period.key])}</span>
                     <span className="mt-0.5 block text-[11px]" style={{ color: 'var(--text-faint)' }}>
-                      this week
+                      {period.unit}
                     </span>
                   </span>
                   {/* The week, one dot a day: green for the goal, lighter for some study. */}
