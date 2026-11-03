@@ -12,6 +12,8 @@ import Link from 'next/link'
 import { QUESTIONS, METHODS, TYPES, resultOf } from '@/lib/study-style'
 import { METHODS as PLAN_METHODS, RHYTHMS } from '@/lib/study-plan'
 
+const ORDER_LABEL = { auto: 'The plan decides', questions: 'Questions first, then revise', learn: 'Learn or revise first, then test' }
+
 const Arrow = ({ back = false }) => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     {back ? <path d="M15 6l-6 6 6 6" /> : <path d="M5 12h14M13 6l6 6-6 6" />}
@@ -226,19 +228,26 @@ function Result({ answers, onRetake, onReview, onApply, applied, saving }) {
 
       <section className="app-enter mt-6 rounded-[16px] border p-5 sm:p-6" style={{ animationDelay: '200ms', borderColor: applied ? 'var(--brand)' : 'var(--border-strong)', background: 'var(--surface)' }}>
         <h2 className="text-[15px] font-semibold tracking-[-0.01em]">Your plan, set to match</h2>
+        <p className="mt-1 text-[13px]" style={{ color: 'var(--text-muted)' }}>
+          Built from your answers. Your subjects, exam dates and progress decide what goes in it each day.
+        </p>
         <dl className="mt-4 grid grid-cols-1 gap-x-6 gap-y-3 text-[13.5px] sm:grid-cols-2">
           {[
-            ['Sessions', rhythm ? `${rhythm.label} minutes · ${rhythm.hint}` : '25 / 5 minutes'],
-            ['Each day', r.setup.mix === 'focus' ? 'One or two subjects' : 'A few subjects, mixed'],
-            ['Methods', r.setup.methods.map((m) => PLAN_METHODS[m]).filter(Boolean).join(', ')],
-            ['Daily goal', `${r.setup.goal} minutes`],
-          ].map(([k, v]) => (
-            <div key={k}>
+            ['Sessions', rhythm ? `${rhythm.label} minutes` : `${r.setup.custom.work} / ${r.setup.custom.rest} minutes`, r.why.rhythm],
+            ['Each topic', ORDER_LABEL[r.setup.order], r.why.order],
+            ['Each day', r.setup.mix === 'focus' ? 'One or two subjects' : 'A few subjects, mixed', r.why.mix],
+            ['Daily goal', `${r.setup.goal} minutes`, r.why.goal],
+            ['Methods', r.setup.methods.map((m) => PLAN_METHODS[m]).filter(Boolean).join(', '), r.why.methods],
+          ].map(([k, v, why]) => (
+            <div key={k} className={k === 'Methods' ? 'sm:col-span-2' : ''}>
               <dt className="text-[11.5px] font-medium uppercase tracking-[0.08em]" style={{ color: 'var(--text-faint)' }}>
                 {k}
               </dt>
-              <dd className="mt-0.5" style={{ color: 'var(--text-body)' }}>
+              <dd className="mt-0.5 font-medium" style={{ color: 'var(--text)' }}>
                 {v}
+              </dd>
+              <dd className="mt-0.5 text-[12.5px] leading-snug" style={{ color: 'var(--text-muted)' }}>
+                {why}
               </dd>
             </div>
           ))}
