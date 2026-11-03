@@ -26,7 +26,7 @@ function Intro({ onStart }) {
       </p>
       <h1 className="text-[clamp(1.9rem,5vw,2.6rem)] font-semibold leading-[1.06] tracking-[-0.032em]">How do you study best?</h1>
       <p className="mx-auto mt-4 max-w-md text-[15px] leading-[1.6]" style={{ color: 'var(--text-body)' }}>
-        Nine quick questions about how you revise now. You get your study type, the methods that suit it, and your plan set up to match.
+        Nine quick questions about how you revise now. You get your study type, the habits worth changing, the methods that suit you, and your plan set up to match. Not sure what works for you? Every question has an answer for that.
       </p>
       <button type="button" onClick={onStart} className="btn btn-solid control-lg mt-8">
         Start
@@ -41,7 +41,10 @@ function Intro({ onStart }) {
 
 function Question({ index, question, value, onAnswer, onBack }) {
   const [picked, setPicked] = useState(() => (question.multi ? value || [] : value))
-  const toggle = (v) => setPicked((p) => (p.includes(v) ? p.filter((x) => x !== v) : [...p, v]))
+  // "Pick for me" stands alone: choosing it clears the rest, and the rest clear it.
+  const only = new Set(question.options.filter((o) => o.only).map((o) => o.v))
+  const toggle = (v) =>
+    setPicked((p) => (p.includes(v) ? p.filter((x) => x !== v) : only.has(v) ? [v] : [...p.filter((x) => !only.has(x)), v]))
   const choose = (v) => {
     setPicked(v)
     // A moment to see the choice land before the next question.
@@ -133,8 +136,54 @@ function Result({ answers, onRetake, onApply, applied, saving }) {
         </p>
       </div>
 
-      <section className="app-enter mt-12" style={{ animationDelay: '80ms' }}>
-        <h2 className="mb-3 text-[15px] font-semibold tracking-[-0.01em]">Your mix</h2>
+      {r.good.length > 0 && (
+        <section className="app-enter mt-10" style={{ animationDelay: '60ms' }}>
+          <h2 className="mb-3 text-[15px] font-semibold tracking-[-0.01em]">Already working for you</h2>
+          <div className="flex flex-wrap gap-2">
+            {r.good.map((g) => (
+              <span key={g} className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-medium" style={{ background: 'var(--brand-tint)', color: 'var(--text)' }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M5 12.5l4.5 4.5L19 7.5" />
+                </svg>
+                {g}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {r.bad.length > 0 && (
+        <section className="app-enter mt-10" style={{ animationDelay: '90ms' }}>
+          <div className="mb-3 flex items-baseline justify-between gap-3">
+            <h2 className="text-[15px] font-semibold tracking-[-0.01em]">Habits to change</h2>
+            <span className="text-[12px]" style={{ color: 'var(--text-faint)' }}>
+              They feel useful. They are not.
+            </span>
+          </div>
+          <div className="flex flex-col gap-3">
+            {r.bad.slice(0, 4).map((h) => (
+              <div key={h.name} className="rounded-[16px] border p-5" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
+                <h3 className="flex items-center gap-2.5 text-[15px] font-semibold">
+                  <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: 'var(--status-weak, #c4664a)' }} />
+                  {h.name}
+                </h3>
+                <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                  {h.why}
+                </p>
+                <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
+                  <span className="font-semibold" style={{ color: 'var(--brand)' }}>
+                    Instead:{' '}
+                  </span>
+                  {h.instead}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section className="app-enter mt-10" style={{ animationDelay: '120ms' }}>
+        <h2 className="mb-3 text-[15px] font-semibold tracking-[-0.01em]">{r.bad.length ? 'Your mix: what to do instead' : 'Your mix'}</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           {r.methods.map((k, i) => {
             const m = METHODS[k]
