@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light only" />
+    <title>Confirm your new email</title>
+  </head>
+  <body style="margin:0;padding:0;background:#f4f2ec;">
+    <!-- Supabase → Authentication → Emails → Templates. Subject: Confirm your new email for Psyllabus -->
+    <span style="display:none;max-height:0;overflow:hidden;opacity:0;">Confirm the change of email address.</span>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f2ec;padding:32px 16px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#ffffff;border-radius:16px;border:1px solid #e6e1d4;">
+            <tr>
+              <td style="padding:32px 32px 8px 32px;">
+                <img src="https://www.psyllabus.app/icon-192.png" width="44" height="44" alt="Psyllabus" style="display:block;border-radius:10px;" />
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:16px 32px 0 32px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,Helvetica,Arial,sans-serif;">
+                <h1 style="margin:0;font-size:22px;line-height:1.25;font-weight:600;color:#1d1a13;letter-spacing:-0.01em;">Confirm your new email</h1>
+                <p style="margin:12px 0 0 0;font-size:15px;line-height:1.6;color:#4a4537;">Your Psyllabus account is moving from {{ .Email }} to {{ .NewEmail }}. Confirm the new address to finish the change.</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:24px 32px 8px 32px;">
+                <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#2e664f;color:#ffffff;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,Helvetica,Arial,sans-serif;font-size:15px;font-weight:600;padding:13px 22px;border-radius:999px;">Confirm new email</a>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:16px 32px 32px 32px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,Helvetica,Arial,sans-serif;">
+                <p style="margin:0;font-size:13px;line-height:1.6;color:#7a7462;">If you did not ask to change your email, ignore this and nothing changes.</p>
+                <p style="margin:14px 0 0 0;font-size:12px;line-height:1.6;color:#9a9480;word-break:break-all;">If the button does not work, open this link:<br /><a href="{{ .ConfirmationURL }}" style="color:#2e664f;">{{ .ConfirmationURL }}</a></p>
+              </td>
+            </tr>
+          </table>
+          <p style="margin:18px 0 0 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,Helvetica,Arial,sans-serif;font-size:12px;color:#9a9480;">Project Syllabus · psyllabus.app · Muscat, Oman</p>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
