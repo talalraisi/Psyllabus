@@ -228,7 +228,7 @@ export default function YouMap({ graphs, items = [], name = '', onOpen, locked =
       <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
         <Card title={selected ? 'Its place among your subjects' : 'Your subjects'} aside="Double-click a subject to open its map">
           <Expandable className="h-[400px] sm:h-[440px]">
-            <OrbitCanvas graph={overview} focusId="you" selectedId={selectedId} onSelect={(id) => setSelectedId(id)} onEnter={(id) => onOpen(overview.nodes.get(id).subject)} onBackground={() => setSelectedId(null)} />
+            <OrbitCanvas variant="orbit" graph={overview} focusId="you" selectedId={selectedId} onSelect={(id) => setSelectedId(id)} onEnter={(id) => onOpen(overview.nodes.get(id).subject)} onBackground={() => setSelectedId(null)} />
           </Expandable>
         </Card>
         <div className="flex flex-col gap-3">
