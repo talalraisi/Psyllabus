@@ -54,8 +54,9 @@ function Question({ index, question, value, onAnswer, onBack }) {
   return (
     <div className="mx-auto max-w-xl">
       <div className="mb-8 flex items-center gap-3">
-        <button type="button" onClick={onBack} aria-label="Back" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-colors hover:bg-[var(--surface-sunken)]" style={{ borderColor: 'var(--border-strong)', color: 'var(--text-body)' }}>
+        <button type="button" onClick={onBack} className="flex h-9 shrink-0 items-center gap-1 rounded-full border pl-2.5 pr-3.5 text-[13px] font-medium transition-colors hover:bg-[var(--surface-sunken)]" style={{ borderColor: 'var(--border-strong)', color: 'var(--text-body)' }}>
           <Arrow back />
+          Back
         </button>
         <div className="h-1.5 flex-1 overflow-hidden rounded-full" style={{ background: 'var(--surface-sunken)' }}>
           <div className="h-full rounded-full transition-[width] duration-500" style={{ width: `${((index + 1) / QUESTIONS.length) * 100}%`, background: 'var(--brand)', transitionTimingFunction: 'cubic-bezier(.16,1,.3,1)' }} />
@@ -113,7 +114,7 @@ function Question({ index, question, value, onAnswer, onBack }) {
   )
 }
 
-function Result({ answers, onRetake, onApply, applied, saving }) {
+function Result({ answers, onRetake, onReview, onApply, applied, saving }) {
   const r = useMemo(() => resultOf(answers), [answers])
   const type = TYPES[r.type]
   const also = r.also && TYPES[r.also]
@@ -269,30 +270,103 @@ function Result({ answers, onRetake, onApply, applied, saving }) {
       </section>
 
       <p className="mt-8 text-center text-[13px]" style={{ color: 'var(--text-muted)' }}>
-        Changed how you study?{' '}
+        <button type="button" onClick={onReview} className="font-medium hover:underline" style={{ color: 'var(--brand)' }}>
+          Change an answer
+        </button>
+        <span className="mx-2" style={{ color: 'var(--text-faint)' }}>
+          ·
+        </span>
         <button type="button" onClick={onRetake} className="font-medium hover:underline" style={{ color: 'var(--brand)' }}>
-          Take it again
+          Start again
         </button>
       </p>
     </div>
   )
 }
 
+/** Every answer before the result, each one a tap away from changing. */
+function Review({ answers, onEdit, onBack, onDone }) {
+  const labelOf = (q) => {
+    const v = answers[q.key]
+    const vs = Array.isArray(v) ? v : [v]
+    return vs.map((x) => q.options.find((o) => o.v === x)?.label).filter(Boolean).join(', ') || 'Not answered'
+  }
+  const missing = QUESTIONS.some((q) => answers[q.key] == null || (Array.isArray(answers[q.key]) && !answers[q.key].length))
+  return (
+    <div className="app-enter mx-auto max-w-xl">
+      <div className="mb-8 flex items-center gap-3">
+        <button type="button" onClick={onBack} className="flex h-9 shrink-0 items-center gap-1 rounded-full border pl-2.5 pr-3.5 text-[13px] font-medium transition-colors hover:bg-[var(--surface-sunken)]" style={{ borderColor: 'var(--border-strong)', color: 'var(--text-body)' }}>
+          <Arrow back />
+          Back
+        </button>
+      </div>
+      <h2 className="text-[clamp(1.4rem,3.6vw,1.8rem)] font-semibold leading-tight tracking-[-0.025em]">Check your answers</h2>
+      <p className="mt-2 text-[14px]" style={{ color: 'var(--text-muted)' }}>
+        Tap any of them to change it.
+      </p>
+      <ol className="mt-6 flex flex-col gap-2">
+        {QUESTIONS.map((q, i) => (
+          <li key={q.key}>
+            <button
+              type="button"
+              onClick={() => onEdit(i)}
+              className="flex w-full items-start gap-3 rounded-[14px] border px-4 py-3 text-left transition-colors hover:bg-[var(--surface-sunken)]"
+              style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
+            >
+              <span className="mt-0.5 w-5 shrink-0 text-[12px] font-semibold tabular-nums" style={{ color: 'var(--text-faint)' }}>
+                {i + 1}
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[12.5px]" style={{ color: 'var(--text-muted)' }}>
+                  {q.q}
+                </span>
+                <span className="mt-0.5 block text-[14px] font-medium" style={{ color: 'var(--text)' }}>
+                  {labelOf(q)}
+                </span>
+              </span>
+              <span className="mt-0.5 shrink-0 text-[12.5px] font-medium" style={{ color: 'var(--brand)' }}>
+                Change
+              </span>
+            </button>
+          </li>
+        ))}
+      </ol>
+      <button type="button" onClick={onDone} disabled={missing} className="btn btn-solid control-lg mt-6 w-full disabled:opacity-50">
+        See my result
+        <Arrow />
+      </button>
+    </div>
+  )
+}
+
 export default function StudyStyle({ initialAnswers = null, initialApplied = false, onResult, onApply }) {
-  const [step, setStep] = useState(initialAnswers ? 'result' : null) // null intro, 0..n-1 a question, 'result'
+  // null intro, 0..n-1 a question, 'review' check your answers, 'result'
+  const [step, setStep] = useState(initialAnswers ? 'result' : null)
   const [answers, setAnswers] = useState(initialAnswers || {})
   const [applied, setApplied] = useState(initialApplied)
   const [saving, setSaving] = useState(false)
+  // Changing one answer from the review goes straight back to it.
+  const [editing, setEditing] = useState(false)
+
+  const go = (to) => {
+    setStep(to)
+    window.scrollTo({ top: 0 })
+  }
 
   const answer = (v) => {
-    const q = QUESTIONS[step]
-    const next = { ...answers, [q.key]: v }
+    const next = { ...answers, [QUESTIONS[step].key]: v }
     setAnswers(next)
-    if (step < QUESTIONS.length - 1) return setStep(step + 1)
+    if (editing || step === QUESTIONS.length - 1) {
+      setEditing(false)
+      return go('review')
+    }
+    go(step + 1)
+  }
+
+  const finish = () => {
     setApplied(false)
-    setStep('result')
-    window.scrollTo({ top: 0 })
-    onResult?.(next)
+    go('result')
+    onResult?.(answers)
   }
 
   const apply = async () => {
@@ -303,9 +377,33 @@ export default function StudyStyle({ initialAnswers = null, initialApplied = fal
 
   return (
     <>
-      {step === null && <Intro onStart={() => setStep(0)} />}
+      {step === null && <Intro onStart={() => go(0)} />}
       {typeof step === 'number' && (
-        <Question key={QUESTIONS[step].key} index={step} question={QUESTIONS[step]} value={answers[QUESTIONS[step].key]} onAnswer={answer} onBack={() => setStep(step === 0 ? null : step - 1)} />
+        <Question
+          key={QUESTIONS[step].key}
+          index={step}
+          question={QUESTIONS[step]}
+          value={answers[QUESTIONS[step].key]}
+          onAnswer={answer}
+          onBack={() => {
+            if (editing) {
+              setEditing(false)
+              return go('review')
+            }
+            go(step === 0 ? null : step - 1)
+          }}
+        />
+      )}
+      {step === 'review' && (
+        <Review
+          answers={answers}
+          onEdit={(i) => {
+            setEditing(true)
+            go(i)
+          }}
+          onBack={() => go(QUESTIONS.length - 1)}
+          onDone={finish}
+        />
       )}
       {step === 'result' && (
         <Result
@@ -313,9 +411,10 @@ export default function StudyStyle({ initialAnswers = null, initialApplied = fal
           applied={applied}
           saving={saving}
           onApply={apply}
+          onReview={() => go('review')}
           onRetake={() => {
             setAnswers({})
-            setStep(0)
+            go(0)
           }}
         />
       )}
