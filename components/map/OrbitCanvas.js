@@ -171,6 +171,9 @@ export default function OrbitCanvas({ graph, focusId, selectedId, weakOnly = fal
         @media (prefers-reduced-motion: reduce) { .orbit-hub, .orbit-planet, .orbit-line, .orbit-ring, .orbit-float, .orbit-sel, .orbit-arc, .orbit-breathe, .orbit-sky { animation: none; } }
         .orbit-dot { transition: transform 200ms cubic-bezier(.16,1,.3,1); transform-box: fill-box; transform-origin: center; }
         .orbit-hit:hover .orbit-dot, .orbit-hit:focus-visible .orbit-dot { transform: scale(1.18); }
+        /* No browser focus box round a planet on click; the keyboard still gets a ring. */
+        .orbit-hit:focus { outline: none; }
+        .orbit-hit:focus-visible .orbit-dot { stroke: var(--text); stroke-width: 2px; }
       `}</style>
 
       {layout && (
