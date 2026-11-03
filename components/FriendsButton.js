@@ -3,22 +3,35 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
-import { loadFriends } from '@/lib/friends'
+import { loadFriends, startPresence } from '@/lib/friends'
 
 /**
- * Friends at a glance, top right: who has studied today, as faces and a
- * count, and a short list on click (streak, and today's study). Only what
- * the Friends page shows; never grades, and nothing to type to anyone.
+ * Friends at a glance, top right: who is on now, as faces with a green dot
+ * and a count, and a short list on click (on now, streak, today's study).
+ * Only what the Friends page shows; never grades, and nothing to type to
+ * anyone. It also tells friends you are on (startPresence).
  */
 
-function Face({ name, url, size = 26, ring = false }) {
-  const style = { width: size, height: size, boxShadow: ring ? '0 0 0 2px var(--bg)' : undefined }
-  return url ? (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={url} alt="" className="shrink-0 rounded-full object-cover" style={style} />
-  ) : (
-    <span className="flex shrink-0 items-center justify-center rounded-full text-[11px] font-semibold" style={{ ...style, background: 'var(--brand-tint)', color: 'var(--brand)' }}>
-      {(name || '?').slice(0, 1).toUpperCase()}
+export function Face({ name, url, size = 26, ring = false, online = false, edge = 'var(--bg)' }) {
+  const style = { width: size, height: size, boxShadow: ring ? `0 0 0 2px ${edge}` : undefined }
+  const dot = Math.max(8, Math.round(size * 0.32))
+  return (
+    <span className="relative inline-flex shrink-0">
+      {url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={url} alt="" className="shrink-0 rounded-full object-cover" style={style} />
+      ) : (
+        <span className="flex shrink-0 items-center justify-center rounded-full text-[11px] font-semibold" style={{ ...style, background: 'var(--brand-tint)', color: 'var(--brand)' }}>
+          {(name || '?').slice(0, 1).toUpperCase()}
+        </span>
+      )}
+      {online && (
+        <span
+          aria-label="On now"
+          className="absolute -bottom-px -right-px rounded-full"
+          style={{ width: dot, height: dot, background: '#22c55e', boxShadow: `0 0 0 2px ${edge}` }}
+        />
+      )}
     </span>
   )
 }
@@ -31,11 +44,17 @@ export default function FriendsButton() {
 
   useEffect(() => {
     let live = true
-    loadFriends(supabase)
-      .then((d) => live && setData(d))
-      .catch(() => {})
+    startPresence(supabase)
+    const load = () =>
+      loadFriends(supabase)
+        .then((d) => live && setData(d))
+        .catch(() => {})
+    load()
+    // Who is on changes by the minute; the cache keeps this to one read.
+    const t = setInterval(load, 61_000)
     return () => {
       live = false
+      clearInterval(t)
     }
   }, [supabase])
 
@@ -53,9 +72,11 @@ export default function FriendsButton() {
 
   const friends = (data?.list || []).filter((f) => f.status === 'accepted').map((f) => ({ ...f, s: data.activity[f.friend] })).filter((f) => f.s)
   const incoming = (data?.list || []).filter((f) => f.status === 'pending' && f.incoming).length
-  const active = friends.filter((f) => f.s.studiedToday)
-  const shown = (active.length ? active : friends).slice(0, 3)
-  const sorted = [...friends].sort((a, b) => Number(b.s.studiedToday) - Number(a.s.studiedToday) || b.s.current - a.s.current)
+  const active = friends.filter((f) => f.s.online)
+  const sorted = [...friends].sort(
+    (a, b) => Number(b.s.online) - Number(a.s.online) || Number(b.s.studiedToday) - Number(a.s.studiedToday) || b.s.current - a.s.current
+  )
+  const shown = sorted.slice(0, 3)
 
   return (
     <div ref={box} className="relative">
@@ -64,14 +85,14 @@ export default function FriendsButton() {
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="dialog"
         aria-expanded={open}
-        aria-label={friends.length ? `${active.length} of ${friends.length} friends studied today` : 'Friends'}
+        aria-label={friends.length ? `${active.length} of ${friends.length} friends on now` : 'Friends'}
         className="flex h-9 items-center gap-2 rounded-full border pl-1.5 pr-3 text-[12.5px] font-medium transition-colors hover:bg-[var(--surface-sunken)]"
         style={{ borderColor: 'var(--border-strong)', color: 'var(--text-body)' }}
       >
         {shown.length ? (
           <span className="flex -space-x-2">
             {shown.map((f) => (
-              <Face key={f.id} name={f.first_name} url={f.avatar_url} ring />
+              <Face key={f.id} name={f.first_name} url={f.avatar_url} online={f.s.online} ring />
             ))}
           </span>
         ) : (
@@ -84,14 +105,7 @@ export default function FriendsButton() {
             </svg>
           </span>
         )}
-        {friends.length ? (
-          <span className="flex items-center gap-1.5">
-            {active.length > 0 && <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--brand)' }} />}
-            {active.length} active
-          </span>
-        ) : (
-          'Friends'
-        )}
+        {active.length ? `${active.length} on now` : 'Friends'}
         {incoming > 0 && (
           <span className="rounded-full px-1.5 text-[11px] font-semibold" style={{ background: 'var(--brand)', color: '#fff' }}>
             {incoming}
@@ -102,10 +116,10 @@ export default function FriendsButton() {
       {open && (
         <div role="dialog" aria-label="Friends today" className="pop-enter absolute right-0 top-11 z-50 w-72 overflow-hidden rounded-[14px] border" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
           <div className="flex items-baseline justify-between px-4 pb-2 pt-3">
-            <p className="text-[13px] font-semibold">Friends today</p>
+            <p className="text-[13px] font-semibold">Friends</p>
             {friends.length > 0 && (
               <p className="text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
-                {active.length} of {friends.length} studied
+                {active.length} of {friends.length} on now
               </p>
             )}
           </div>
@@ -122,11 +136,14 @@ export default function FriendsButton() {
             <ul className="max-h-72 overflow-y-auto px-2 pb-1">
               {sorted.map((f) => (
                 <li key={f.id} className="flex items-center gap-2.5 rounded-[10px] px-2 py-2">
-                  <Face name={f.first_name} url={f.avatar_url} size={30} />
+                  <Face name={f.first_name} url={f.avatar_url} size={30} online={f.s.online} edge="var(--surface)" />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-[13px] font-medium">{f.first_name}</span>
-                    <span className="block truncate text-[11.5px]" style={{ color: f.s.studiedToday ? 'var(--brand)' : 'var(--text-faint)' }}>
-                      {f.s.goalMet ? 'Goal met today' : f.s.studiedToday ? `${f.s.todayMinutes} min today` : 'Not yet today'}
+                    <span className="block truncate text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
+                      {f.s.online && <span style={{ color: '#16a34a' }}>On now · </span>}
+                      <span style={{ color: f.s.studiedToday ? 'var(--brand)' : undefined }}>
+                        {f.s.goalMet ? 'Goal met today' : f.s.studiedToday ? `${f.s.todayMinutes} min today` : 'Not studied yet today'}
+                      </span>
                     </span>
                   </span>
                   <span className="shrink-0 text-right text-[12.5px] font-semibold tabular-nums">

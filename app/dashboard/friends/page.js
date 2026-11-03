@@ -35,13 +35,19 @@ function lastSeen(ms, now) {
   return `Last studied ${days} days ago`
 }
 
-function Face({ name, url, size = 40 }) {
-  return url ? (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={url} alt="" width={size} height={size} className="shrink-0 rounded-full object-cover" style={{ width: size, height: size }} />
-  ) : (
-    <span className="flex shrink-0 items-center justify-center rounded-full text-[14px] font-semibold" style={{ width: size, height: size, background: 'var(--brand-tint)', color: 'var(--brand)' }}>
-      {(name || '?').slice(0, 1).toUpperCase()}
+function Face({ name, url, size = 40, online = false }) {
+  return (
+    <span className="relative inline-flex shrink-0">
+      {url ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={url} alt="" width={size} height={size} className="shrink-0 rounded-full object-cover" style={{ width: size, height: size }} />
+      ) : (
+        <span className="flex shrink-0 items-center justify-center rounded-full text-[14px] font-semibold" style={{ width: size, height: size, background: 'var(--brand-tint)', color: 'var(--brand)' }}>
+          {(name || '?').slice(0, 1).toUpperCase()}
+        </span>
+      )}
+      {/* On now: the app checked in within the last few minutes. */}
+      {online && <span aria-label="On now" className="absolute bottom-0 right-0 h-3 w-3 rounded-full" style={{ background: '#22c55e', boxShadow: '0 0 0 2px var(--surface)' }} />}
     </span>
   )
 }
@@ -253,10 +259,11 @@ export default function FriendsPage() {
                   <span className="w-5 shrink-0 text-center text-[13px] font-semibold tabular-nums" style={{ color: 'var(--text-faint)' }}>
                     {i + 1}
                   </span>
-                  <Face name={r.name} url={r.url} />
+                  <Face name={r.name} url={r.url} online={r.mine || r.s.online} />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-[14.5px] font-semibold">{r.name}</span>
                     <span className="block truncate text-[12px]" style={{ color: 'var(--text-faint)' }}>
+                      {!r.mine && r.s.online && <span style={{ color: '#16a34a' }}>On now · </span>}
                       {r.s.goalMet ? 'Goal met today' : r.s.studiedToday ? `${hm(r.s.todayMinutes)} of ${r.s.goal} today` : lastSeen(r.s.last, now)}
                     </span>
                   </span>
