@@ -38,6 +38,16 @@ export default function StudyStylePage() {
     }
   }, [router, supabase])
 
+  if (!profile) {
+    return (
+      <DashboardLayout profile={null}>
+        <PageLoading title="How you study" rows={3} />
+      </DashboardLayout>
+    )
+  }
+
+  // After the loading return: it reads profile.id, and the compiler works
+  // out what it depends on as soon as it is defined.
   // Read fresh each time: the plan page may have changed settings meanwhile.
   const save = async (change) => {
     const { data } = await supabase.from('profiles').select('plan_settings').eq('id', profile.id).maybeSingle()
@@ -47,14 +57,6 @@ export default function StudyStylePage() {
     invalidateProfile(profile.id)
     setProfile((p) => ({ ...p, plan_settings }))
     return true
-  }
-
-  if (!profile) {
-    return (
-      <DashboardLayout profile={null}>
-        <PageLoading title="How you study" rows={3} />
-      </DashboardLayout>
-    )
   }
 
   const saved = profile.plan_settings?.studyStyle
