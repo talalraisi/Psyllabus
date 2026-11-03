@@ -25,6 +25,11 @@ export async function GET(request) {
       new URL(`/login?error=${encodeURIComponent(String(reason).slice(0, 200))}`, requestUrl.origin)
     )
 
+  // An old-style email link that was already used or has run out. Emails now
+  // go to /auth/confirm, but links sent before that still land here.
+  if (oauthError && /invalid or has expired/i.test(oauthError))
+    return fail('That link has expired or was already used. If you already confirmed your email, sign in below.')
+
   // Google itself refused, so there is no code to exchange.
   if (oauthError) return fail(oauthError)
   if (!code) return fail('No sign-in code came back. Try again.')

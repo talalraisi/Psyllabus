@@ -4,11 +4,10 @@ import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { getAuthCallbackUrl, getCurrentUser } from '@/lib/auth'
-import Image from 'next/image'
-import logoMark from '@/public/logo-mark.svg'
 import PasswordField from '@/components/PasswordField'
 import AuthShell, { OrRule, GoogleButton, SubmitButton } from '@/components/marketing/AuthShell'
 import { CONSENT_TEXT } from '@/lib/consent'
+import CheckEmail from '@/components/marketing/CheckEmail'
 
 export default function Signup() {
   const [email, setEmail] = useState('')
@@ -24,8 +23,6 @@ export default function Signup() {
   const [termsOk, setTermsOk] = useState(false)
   const consented = guardianOk && termsOk
   const [awaitingConfirmation, setAwaitingConfirmation] = useState(false)
-  const [resending, setResending] = useState(false)
-  const [resent, setResent] = useState(false)
   /**
    * Whoever is already signed in on this device.
    *
@@ -105,18 +102,14 @@ export default function Signup() {
     }
   }
 
+  // Returns what went wrong, or nothing; CheckEmail shows it.
   const resendConfirmation = async () => {
-    if (resending) return
-    setResending(true)
-    setResent(false)
     const { error: resendError } = await supabase.auth.resend({
       type: 'signup',
-      email,
+      email: email.trim(),
       options: { emailRedirectTo: getAuthCallbackUrl('/onboarding') },
     })
-    if (resendError) setError(resendError.message)
-    else setResent(true)
-    setResending(false)
+    return resendError?.message || null
   }
 
   const handleGoogleSignup = async () => {
@@ -151,64 +144,14 @@ export default function Signup() {
 
   if (awaitingConfirmation) {
     return (
-      <main className="ground min-h-screen px-5 py-10 md:px-8 md:py-14">
-        <div className="mx-auto max-w-md">
-          <div className="mb-10 flex justify-center">
-            <Link href="/" aria-label="Project Syllabus home">
-              <Image src={logoMark} alt="Project Syllabus" sizes="120px" style={{ height: 38, width: 'auto', aspectRatio: '1472 / 613' }} priority />
-            </Link>
-          </div>
-
-          <div
-            className="rounded-[12px] border p-6 md:p-7"
-            style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
-          >
-            <p className="mb-3 text-[10.5px] font-semibold uppercase tracking-[0.16em]" style={{ color: 'var(--text-faint)' }}>
-              Almost there
-            </p>
-            <h1 className="mb-3 text-[26px] font-semibold leading-tight tracking-[-0.028em]">
-              Check your email
-            </h1>
-            <p className="mb-6 text-[14.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-              We sent a confirmation link to{' '}
-              <strong className="text-[var(--text)]">{email}</strong>. Open it to finish setting up. It can take a minute, so check spam.
-            </p>
-
-            {resent && (
-              <p className="mb-4 rounded-[var(--r-md)] border border-[var(--success-border)] bg-[var(--success-bg)] px-4 py-3 text-sm text-[var(--success-text)]">
-                Sent again. If it still does not arrive, the address may have a typo in it.
-              </p>
-            )}
-            {error && <div className="error-box mb-4">{error}</div>}
-
-            <div className="flex flex-col gap-3">
-              <button
-                onClick={resendConfirmation}
-                disabled={resending}
-                className="btn btn-quiet control-lg w-full text-base"
-              >
-                {resending ? 'Sending…' : 'Send it again'}
-              </button>
-              <button
-                onClick={() => {
-                  setAwaitingConfirmation(false)
-                  setError('')
-                }}
-                className="btn btn-quiet control-md w-full"
-              >
-                Use a different email
-              </button>
-            </div>
-          </div>
-
-          <p className="t-caption mt-6 text-center">
-            Already confirmed?{' '}
-            <Link href="/login" className="text-[var(--brand)] hover:underline">
-              Sign in
-            </Link>
-          </p>
-        </div>
-      </main>
+      <CheckEmail
+        email={email.trim()}
+        onResend={resendConfirmation}
+        onChangeEmail={() => {
+          setAwaitingConfirmation(false)
+          setError('')
+        }}
+      />
     )
   }
 
