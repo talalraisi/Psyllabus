@@ -266,3 +266,15 @@ export function IconFolder(props) {
     </svg>
   )
 }
+
+export function IconFriends(props) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+      strokeLinecap="round" strokeLinejoin="round" width="16" height="16" aria-hidden="true" {...props}>
+      <circle cx="9" cy="8" r="3.2" />
+      <path d="M3.5 19c.6-3.1 2.8-5 5.5-5s4.9 1.9 5.5 5" />
+      <circle cx="16.8" cy="9.2" r="2.5" />
+      <path d="M16.5 14c2.2.2 3.7 1.8 4.1 4.3" />
+    </svg>
+  )
+}

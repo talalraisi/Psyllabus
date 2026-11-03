@@ -15,6 +15,7 @@ import {
   IconTarget,
   IconCalendar,
   IconCards,
+  IconFriends,
   IconUser,
   IconLogout,
   IconMenu,
@@ -76,6 +77,7 @@ const NAV_GROUPS = [
     items: [
       { href: '/dashboard/map', label: 'Progress', Icon: IconOrbit, match: (p) => p === '/dashboard/map' || p === '/dashboard/progress' || p === '/dashboard/Heatmap' },
       { href: '/dashboard/analytics', label: 'Analytics', Icon: IconAnalytics, match: (p) => p === '/dashboard/analytics' },
+      { href: '/dashboard/friends', label: 'Friends', Icon: IconFriends, match: (p) => p === '/dashboard/friends' },
       { href: '/dashboard/prediction', label: 'Predicted Grade', Icon: IconTarget, match: (p) => p === '/dashboard/prediction' },
     ],
   },
