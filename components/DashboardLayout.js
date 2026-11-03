@@ -30,6 +30,7 @@ import SyllabiMark from '@/components/SyllabiMark'
 import { SyllabiProvider } from '@/components/syllabi/SyllabiDrawer'
 import ThemeToggle from '@/components/ThemeToggle'
 import { StreakChip } from '@/components/Streak'
+import FriendsButton from '@/components/FriendsButton'
 import { Chevron } from '@/components/Select'
 
 /**
@@ -48,6 +49,7 @@ const NAV_GROUPS = [
         Icon: ({ width, style }) => <SyllabiMark size={width} style={{ ...style, color: 'var(--brand)' }} />,
         match: (p) => p.startsWith('/dashboard/syllabi'),
       },
+      { href: '/dashboard/friends', label: 'Friends', Icon: IconFriends, match: (p) => p === '/dashboard/friends' },
     ],
   },
   {
@@ -77,7 +79,6 @@ const NAV_GROUPS = [
     items: [
       { href: '/dashboard/map', label: 'Progress', Icon: IconOrbit, match: (p) => p === '/dashboard/map' || p === '/dashboard/progress' || p === '/dashboard/Heatmap' },
       { href: '/dashboard/analytics', label: 'Analytics', Icon: IconAnalytics, match: (p) => p === '/dashboard/analytics' },
-      { href: '/dashboard/friends', label: 'Friends', Icon: IconFriends, match: (p) => p === '/dashboard/friends' },
       { href: '/dashboard/prediction', label: 'Predicted Grade', Icon: IconTarget, match: (p) => p === '/dashboard/prediction' },
     ],
   },
@@ -544,6 +545,9 @@ export default function DashboardLayout({ children, profile }) {
         <Link href="/dashboard" className="inline-block" aria-label="Dashboard">
           <Image src={logoMark} alt="Project Syllabus" sizes="70px" style={{ height: 28, width: 'auto', aspectRatio: '1472 / 613' }} priority />
         </Link>
+        <span className="ml-auto">
+          <FriendsButton />
+        </span>
       </header>
 
       {/* Mobile drawer. Always mounted so it can slide in and out rather
@@ -600,7 +604,14 @@ export default function DashboardLayout({ children, profile }) {
         {sidebar(expanded)}
       </aside>
 
-      <main className="min-w-0 flex-1">{children}</main>
+      <main className="min-w-0 flex-1">
+        {/* A slim bar along the top on a computer (a phone has its own),
+            for what is worth seeing from every page: friends, for now. */}
+        <div className="sticky top-0 z-30 hidden h-12 items-center justify-end gap-2 px-5 md:flex" style={{ background: 'var(--bg)' }}>
+          <FriendsButton />
+        </div>
+        {children}
+      </main>
 
       {/* Follows you out of the study plan so a running session stays visible. */}
       <TimerPill />

@@ -173,7 +173,7 @@ function SubjectMapPage() {
   return (
     <DashboardLayout profile={profile}>
       {graph ? (
-        <div className="h-[calc(100dvh-56px)] md:h-dvh">
+        <div className="app-full">
           <SubjectMap
             key={subject}
             graph={graph}

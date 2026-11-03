@@ -23,8 +23,7 @@ import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader, PageLoading } from '@/components/PageShell'
 import { ConfirmSheet, DotsMenu } from '@/components/flashcards/DeckDialogs'
 import Counting from '@/components/Counting'
-import { computeStreak, goalFor, restDaysFor } from '@/lib/streak'
-import { minutesPerDay, studyIntervals } from '@/lib/study-time'
+import { forgetFriends, summarise } from '@/lib/friends'
 
 const hm = (m) => (m >= 60 ? `${Math.floor(m / 60)} h ${Math.round(m % 60)} min` : `${Math.round(m)} min`)
 
@@ -45,15 +44,6 @@ function Face({ name, url, size = 40 }) {
       {(name || '?').slice(0, 1).toUpperCase()}
     </span>
   )
-}
-
-/** Everything a friend's card shows, from their raw activity. */
-function summarise({ attempts, sessions, plan, session_minutes }) {
-  const who = { plan_settings: plan || {}, session_minutes }
-  const days = minutesPerDay(studyIntervals({ attempts: attempts || [], sessions: sessions || [] }))
-  const s = computeStreak({ days, goal: goalFor(who), rest: restDaysFor(who) })
-  const ends = [...(attempts || []).map((a) => Date.parse(a.completed_at)), ...(sessions || []).map((x) => Date.parse(x.ended_at || x.started_at))].filter(Number.isFinite)
-  return { ...s, last: ends.length ? Math.max(...ends) : null }
 }
 
 export default function FriendsPage() {
@@ -107,17 +97,20 @@ export default function FriendsPage() {
     if (error || !data?.ok) return setNote({ bad: true, text: data?.error || 'That did not work. Try again in a moment.' })
     setNote({ bad: false, text: data.note })
     setEntry('')
+    forgetFriends()
     load()
   }
 
   const respond = async (f, accept) => {
     setFriends((list) => list.filter((x) => x.id !== f.id))
     await supabase.rpc('respond_friend', { p_id: f.id, p_accept: accept })
+    forgetFriends()
     load()
   }
 
   const remove = async (f) => {
     await supabase.rpc('remove_friend', { p_id: f.id })
+    forgetFriends()
     setFriends((list) => list.filter((x) => x.id !== f.id))
   }
 

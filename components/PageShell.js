@@ -837,7 +837,7 @@ function SkeletonHub() {
  */
 export function SkeletonSyllabi() {
   return (
-    <div className="app-enter mx-auto flex h-[calc(100dvh-56px)] w-full max-w-7xl flex-col px-4 pb-4 pt-4 md:h-dvh md:px-8 md:pb-5 md:pt-6">
+    <div className="app-enter mx-auto flex app-full w-full max-w-7xl flex-col px-4 pb-4 pt-4 md:px-8 md:pb-5 md:pt-6">
       <div className="mb-4 flex shrink-0 flex-wrap items-center justify-between gap-3">
         <h1 className="flex items-center gap-2.5 text-[22px] font-semibold tracking-[-0.025em]">
           <SkeletonLine width={66} height={36} className="mr-1 rounded-full lg:hidden" />
@@ -916,7 +916,7 @@ export function SkeletonSyllabi() {
  */
 export function SkeletonMap() {
   return (
-    <div className="flex h-[calc(100dvh-56px)] min-h-0 flex-col md:h-dvh">
+    <div className="app-full flex min-h-0 flex-col">
       <div className="flex h-14 shrink-0 items-center gap-1.5 border-b px-3 sm:px-4" style={{ borderColor: 'var(--border)' }} aria-hidden="true">
         <SkeletonCircle size={36} />
         <span className="skeleton block h-9 w-[9.5rem] shrink-0 rounded-full sm:w-[13rem]" />

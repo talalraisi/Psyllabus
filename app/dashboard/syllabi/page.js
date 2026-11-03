@@ -28,7 +28,7 @@ import { hasSyllabi } from '@/lib/access'
  */
 function Shell({ full, children }) {
   return full ? (
-    <div className="app-enter mx-auto flex h-[calc(100dvh-56px)] w-full max-w-7xl flex-col px-4 pb-4 pt-4 md:h-dvh md:px-8 md:pb-5 md:pt-6">{children}</div>
+    <div className="app-enter mx-auto flex app-full w-full max-w-7xl flex-col px-4 pb-4 pt-4 md:px-8 md:pb-5 md:pt-6">{children}</div>
   ) : (
     <Page width="wide">{children}</Page>
   )

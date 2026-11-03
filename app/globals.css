@@ -1762,6 +1762,14 @@ input[type='range'].slider:focus-visible::-moz-range-thumb {
 .burger[data-open] > span:nth-child(3) { transform: rotate(-45deg); }
 @media (prefers-reduced-motion: reduce) { .burger > span { transition: none; } }
 
+/* A page that fills the screen under the app's top bar: 56 px on a phone,
+   48 px on a computer. One rule, so the bar can change in one place. Zoom on
+   large screens multiplies dvh, so it is divided back out (--z). */
+.app-full { height: calc(100dvh - 56px); }
+@media (min-width: 768px) {
+  .app-full { height: calc(100dvh / var(--z, 1) - 48px); }
+}
+
 /* Large screens.
 
    On a big monitor the site kept its laptop size: a column in the middle and

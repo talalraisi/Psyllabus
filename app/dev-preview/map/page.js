@@ -62,7 +62,7 @@ function Preview() {
   return (
     <DashboardLayout profile={profile}>
       {graph ? (
-        <div className="h-[calc(100dvh-56px)] md:h-dvh">
+        <div className="app-full">
           <SubjectMap key={subject} graph={graph} subjects={SUBJECTS} initialAt={params.get('at')} onSubject={(s) => router.replace(`/dev-preview/map?subject=${encodeURIComponent(s)}`)} onOverview={() => router.push('/dev-preview/map')} />
         </div>
       ) : (
