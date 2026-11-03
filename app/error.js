@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function GlobalError({ error, reset }) {
   useEffect(() => {
@@ -16,6 +16,23 @@ export default function GlobalError({ error, reset }) {
       window.location.reload()
     }
   }, [error])
+
+  // Where it broke, for pasting to whoever is fixing it: the page, the
+  // message and the first lines of the stack. Nothing is sent anywhere.
+  const [copied, setCopied] = useState(false)
+  const copyDetails = async () => {
+    const text = [
+      `Page: ${window.location.pathname}${window.location.search}`,
+      `Error: ${error?.message || error}`,
+      ...(String(error?.stack || '').split('\n').slice(0, 12)),
+    ].join('\n')
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopied(true)
+    } catch {
+      window.prompt('Copy this:', text)
+    }
+  }
 
   const hardReload = () => {
     sessionStorage.removeItem('psyllabus_reloaded_after_error')
@@ -35,6 +52,9 @@ export default function GlobalError({ error, reset }) {
             {error.message}
           </p>
         )}
+        <button type="button" onClick={copyDetails} className="mb-3 text-xs font-medium text-[var(--brand)] hover:underline">
+          {copied ? 'Copied. Paste it to us.' : 'Copy details for support'}
+        </button>
         <div className="flex gap-2">
           <button
             onClick={reset}
