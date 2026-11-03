@@ -513,7 +513,7 @@ export default function ProfilePage() {
             {[
               ['Email', profile.email || 'Not available'],
               ['Curriculum', profile.curriculum || 'Not set'],
-              ['Graduation', profile.grad_year ? `Class of ${profile.grad_year}` : 'Not set'],
+              ['Exams', profile.exam_session ? `${profile.exam_session.startsWith('N') ? 'November' : 'May'} 20${profile.exam_session.slice(1)} (${profile.exam_session})` : profile.grad_year ? `Class of ${profile.grad_year}` : 'Not set'],
             ].map(([label, value]) => (
               <div key={label} className="min-w-0">
                 <dt className="text-[12.5px]" style={{ color: 'var(--text-faint)' }}>

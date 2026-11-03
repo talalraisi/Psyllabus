@@ -23,13 +23,28 @@ import {
 } from '@/lib/ib-points'
 
 
-const GRAD_YEARS = ['2027', '2028', '2029', '2030']
+// IB exam sessions: May (M) or November (N), and the year. The year is
+// kept as grad_year for everything that reads it.
+const SESSIONS = [
+  { key: 'N26', label: 'November 2026' },
+  { key: 'M27', label: 'May 2027' },
+  { key: 'N27', label: 'November 2027' },
+  { key: 'M28', label: 'May 2028' },
+  { key: 'N28', label: 'November 2028' },
+]
+const yearOf = (session) => `20${session.slice(1)}`
 
 export default function Onboarding() {
   const [step, setStep] = useState(1)
   // With one curriculum offered there is nothing to choose, so it starts chosen.
   const [curriculum, setCurriculum] = useState(() => (Object.keys(CURRICULUMS).length === 1 ? Object.keys(CURRICULUMS)[0] : ''))
   const [gradYear, setGradYear] = useState('')
+  const [session, setSession] = useState('')
+  // A school or invite code, offered again at the free-subject step: one
+  // that opens every subject makes the choice unnecessary.
+  const [code, setCode] = useState('')
+  const [codeBusy, setCodeBusy] = useState(false)
+  const [codeError, setCodeError] = useState('')
   const [selectedSubjects, setSelectedSubjects] = useState([])
   const [targetGrades, setTargetGrades] = useState({})
   // The grade predicted now, where the student has one. Optional.
@@ -145,7 +160,7 @@ export default function Onboarding() {
       }
       const { data: profile } = await supabase
         .from('profiles')
-        .select('subjects, curriculum, grad_year, target_grades, predicted_grades, free_subject, plan, is_admin, access_expires_at')
+        .select('subjects, curriculum, grad_year, exam_session, target_grades, predicted_grades, free_subject, plan, is_admin, access_expires_at')
         .eq('id', user.id)
         .maybeSingle()
       if (cancelled) return
@@ -182,6 +197,7 @@ export default function Onboarding() {
         setSkipFreePick(Boolean(everything || profile.free_subject))
         setCurriculum(profile.curriculum || '')
         setGradYear(profile.grad_year ? String(profile.grad_year) : '')
+        setSession(profile.exam_session || '')
         setSelectedSubjects(subjects.filter((s) => !IB_CORE_SUBJECTS.includes(s)))
         setTargetGrades(profile.target_grades || {})
         setPredictedGrades(profile.predicted_grades || {})
@@ -237,7 +253,7 @@ export default function Onboarding() {
       const { error } = editing
         ? await supabase
             .from('profiles')
-            .update({ curriculum, grad_year: gradYear, subjects: allSubjects, target_grades: targetGrades, predicted_grades: predictedGrades, updated_at: new Date().toISOString() })
+            .update({ curriculum, grad_year: gradYear, exam_session: session || null, subjects: allSubjects, target_grades: targetGrades, predicted_grades: predictedGrades, updated_at: new Date().toISOString() })
             .eq('id', user.id)
         : await supabase.from('profiles').upsert({
         id: user.id,
@@ -254,6 +270,7 @@ export default function Onboarding() {
           user.user_metadata?.guardian_consent_text || (needsConsent ? CONSENT_TEXT.en : null),
         curriculum,
         grad_year: gradYear,
+        exam_session: session || null,
         subjects: allSubjects,
         target_grades: targetGrades,
         predicted_grades: predictedGrades,
@@ -297,6 +314,22 @@ export default function Onboarding() {
       console.error(err)
       setLoading(false)
     }
+  }
+
+  const applyCode = async (e) => {
+    e.preventDefault()
+    if (!code.trim() || codeBusy) return
+    setCodeBusy(true)
+    setCodeError('')
+    const user = await getCurrentUser(supabase)
+    const { data, error } = await supabase.rpc('redeem_access_code', { p_code: code.trim() })
+    if (error || !data?.ok) {
+      setCodeBusy(false)
+      setCodeError(data?.error || 'That code did not work. Check it and try again.')
+      return
+    }
+    if (user) invalidateProfile(user.id)
+    router.push('/dashboard')
   }
 
   const saveFreeSubject = async () => {
@@ -480,16 +513,26 @@ export default function Onboarding() {
 
             <div className="mb-8">
               <p className="label" id="gradyear-label">
-                When do you graduate?
+                {curriculum === 'IB' || !curriculum ? 'Which exam session do you sit?' : 'When do you graduate?'}
               </p>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4" role="group" aria-labelledby="gradyear-label">
-                {GRAD_YEARS.map(y => (
-                  <button key={y} aria-pressed={gradYear === y} onClick={() => setGradYear(y)}
-                  className={`control-lg rounded-full border text-[13.5px] font-semibold tabular-nums transition-colors duration-150
-                  ${gradYear === y ? 'chip-active' : 'chip hover:border-border-strong'}`}>
-                    {y}
-                  </button>
-                ))}
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3" role="group" aria-labelledby="gradyear-label">
+                {SESSIONS.map((x) => {
+                  const on = session === x.key
+                  return (
+                    <button
+                      key={x.key}
+                      aria-pressed={on}
+                      onClick={() => {
+                        setSession(x.key)
+                        setGradYear(yearOf(x.key))
+                      }}
+                      className={`flex flex-col items-center justify-center rounded-[16px] border py-2.5 transition-colors duration-150 ${on ? 'chip-active' : 'chip hover:border-border-strong'}`}
+                    >
+                      <span className="text-[15px] font-semibold tabular-nums">{x.key}</span>
+                      <span className="text-[11.5px] font-normal opacity-80">{x.label}</span>
+                    </button>
+                  )
+                })}
               </div>
             </div>
 
@@ -937,9 +980,34 @@ export default function Onboarding() {
               </p>
             )}
 
-            <p className="t-caption mt-4 text-center">
-              Have a school code? Add it in your profile and every subject opens.
-            </p>
+            {/* A code instead: it opens every subject, so no choice is needed. */}
+            <div className="mt-7 border-t pt-6" style={{ borderColor: 'var(--border)' }}>
+              <p className="text-[13.5px] font-medium">Have a code?</p>
+              <p className="mt-1 text-[12.5px]" style={{ color: 'var(--text-muted)' }}>
+                A school or invite code opens every subject, so you can skip choosing one.
+              </p>
+              <form onSubmit={applyCode} className="mt-3 flex gap-2">
+                <input
+                  value={code}
+                  onChange={(e) => {
+                    setCode(e.target.value.toUpperCase())
+                    setCodeError('')
+                  }}
+                  placeholder="Your code"
+                  aria-label="Access code"
+                  autoComplete="off"
+                  className="input h-11 min-w-0 flex-1 text-[16px] uppercase"
+                />
+                <button type="submit" disabled={codeBusy || !code.trim()} className="btn btn-outline control-md shrink-0">
+                  {codeBusy ? 'Checking…' : 'Use code'}
+                </button>
+              </form>
+              {codeError && (
+                <p className="mt-2 text-[13px]" role="alert" style={{ color: 'var(--status-weak)' }}>
+                  {codeError}
+                </p>
+              )}
+            </div>
           </div>
         )}
         </div>

@@ -467,7 +467,7 @@ export default function DashboardLayout({ children, profile }) {
                 {/* The e-mail, not the programme: two accounts on one device can
                     carry the same name, and the address tells them apart. */}
                 <span className="t-caption block truncate" title={email || undefined}>
-                  {email || `${profile.curriculum} · Class of ${profile.grad_year}`}
+                  {email || `${profile.curriculum} · ${profile.exam_session || `Class of ${profile.grad_year}`}`}
                 </span>
               </span>
               <span className="mr-1 text-[var(--text-faint)] transition-opacity duration-150" style={{ opacity: open ? 1 : 0 }}>
