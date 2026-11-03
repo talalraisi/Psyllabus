@@ -72,6 +72,7 @@ const NAV_GROUPS = [
     items: [
       { href: '/dashboard/study-plan', label: 'Study Plan', Icon: IconStudyPlan, match: (p) => p === '/dashboard/study-plan' },
       { href: '/dashboard/calendar', label: 'Calendar', Icon: IconCalendar, match: (p) => p === '/dashboard/calendar' },
+      { href: '/dashboard/study-style', label: 'Study Type', Icon: IconStudyType, match: (p) => p === '/dashboard/study-style' },
     ],
   },
   {
@@ -83,6 +84,16 @@ const NAV_GROUPS = [
     ],
   },
 ]
+
+/** A head with a spark: how you study best. */
+function IconStudyType({ width = 17, height = 17, style }) {
+  return (
+    <svg width={width} height={height} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={style} aria-hidden="true">
+      <path d="M9 20v-2.5a6.5 6.5 0 1 1 7.5-6.4l1.3 2.6c.2.4-.1.8-.5.8H16v2a2 2 0 0 1-2 2h-1.5V20" />
+      <path d="M11.5 7.5l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z" />
+    </svg>
+  )
+}
 
 /** Bars and a trend line: analytics. */
 function IconAnalytics({ width = 17, height = 17, style }) {

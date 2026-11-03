@@ -391,6 +391,17 @@ export default function Dashboard() {
         <PageHeader
           title={`${now ? greeting(now) : 'Hello'}, ${firstName}`}
           subtitle={subtitle}
+          action={
+            // Until it is taken: two minutes that set the plan up to fit.
+            !profile.plan_settings?.studyStyle && (
+              <Link href="/dashboard/study-style" className="btn btn-outline control-md">
+                Find your study type
+                <span className="text-[12px] font-normal" style={{ color: 'var(--text-faint)' }}>
+                  2 min
+                </span>
+              </Link>
+            )
+          }
         />
 
         {/* One thing first, then reference.

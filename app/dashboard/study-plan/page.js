@@ -18,6 +18,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader, EmptyState, PageLoading, SkeletonActions } from '@/components/PageShell'
+import { TYPES } from '@/lib/study-style'
 import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { IconArrowRight, IconCheck, IconCalendar } from '@/components/Icons'
 import TodoList from '@/components/TodoList'
@@ -355,6 +356,10 @@ export default function StudyPlanPage() {
               )}
               <Link href="/dashboard/calendar" className="btn btn-outline control-md">
                 Calendar
+              </Link>
+              {/* The quiz sets rhythm, mix, methods and goal; one tap from here. */}
+              <Link href="/dashboard/study-style" className="btn btn-outline control-md">
+                {TYPES[profile.plan_settings?.studyStyle?.type]?.name || 'Find your study type'}
               </Link>
             </div>
           }
