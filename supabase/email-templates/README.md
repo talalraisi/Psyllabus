@@ -43,8 +43,18 @@ hit the limit and most would never get their confirmation email.
 | Change email address | Confirm your new email for Psyllabus | `change-email.html` |
 | Magic link | Your Psyllabus sign-in link | `magic-link.html` |
 
-5. Sign up with a spare email to check it arrives from `hello@psyllabus.app`
+5. **Authentication → Sign In / Providers → Email:** switch on **Confirm
+   email**. Without it nobody is sent a confirmation email at all.
+6. Sign up with a spare email to check it arrives from `hello@psyllabus.app`
    and the button lands you in onboarding.
+
+## About the templates
+
+Made by `node scripts/email-templates.mjs`; change the wording there, not in
+the `.html` files. They follow the reader's light or dark mode. The buttons
+go to `/auth/confirm` with a one-time token checked on the server, so they
+work in any browser, including the one inside a mail app. Site URL (step 2.3)
+must be `https://www.psyllabus.app`, since the links are built from it.
 
 ## 3. Your own hello@psyllabus.app
 
