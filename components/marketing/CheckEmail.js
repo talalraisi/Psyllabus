@@ -7,25 +7,13 @@ import AuthShell from '@/components/marketing/AuthShell'
 /**
  * After signing up with email: the link is on its way.
  *
- * One button to the inbox when we can tell which one it is, the steps in
- * order, and sending again on a short wait (Supabase allows one a minute, so
+ * The steps in order, and sending again on a short wait (Supabase allows one a minute, so
  * the button says how long rather than failing). Only the newest email's link
  * works, which is the thing people trip on, so it says that once it matters.
  */
 
 const FROM = 'hello@psyllabus.app'
 const WAIT = 60
-
-/** The webmail for an address, when it is one we know. */
-function inboxFor(email) {
-  const domain = email.split('@')[1]?.toLowerCase() || ''
-  if (/^(gmail|googlemail)\.com$/.test(domain))
-    return { name: 'Gmail', href: `https://mail.google.com/mail/u/0/#search/from%3A${encodeURIComponent(FROM)}+in%3Aanywhere` }
-  if (/^(outlook|hotmail|live|msn)\./.test(domain)) return { name: 'Outlook', href: 'https://outlook.live.com/mail/0/' }
-  if (/^(icloud|me|mac)\.com$/.test(domain)) return { name: 'iCloud Mail', href: 'https://www.icloud.com/mail' }
-  if (/^(yahoo|ymail)\./.test(domain)) return { name: 'Yahoo Mail', href: 'https://mail.yahoo.com' }
-  return null
-}
 
 const time = (d) => d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
 
@@ -34,7 +22,6 @@ export default function CheckEmail({ email, onResend, onChangeEmail }) {
   const [sending, setSending] = useState(false)
   const [sentAgain, setSentAgain] = useState(null)
   const [error, setError] = useState('')
-  const inbox = inboxFor(email)
 
   useEffect(() => {
     if (wait <= 0) return
@@ -101,21 +88,6 @@ export default function CheckEmail({ email, onResend, onChangeEmail }) {
           </li>
         ))}
       </ol>
-
-      {inbox && (
-        <a
-          href={inbox.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3.5 text-[14.5px] font-semibold text-white transition-transform duration-150 hover:-translate-y-px"
-          style={{ background: 'var(--brand-solid)' }}
-        >
-          Open {inbox.name}
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M7 17 17 7M9 7h8v8" />
-          </svg>
-        </a>
-      )}
 
       <div className="mt-6 border-t pt-5" style={{ borderColor: 'var(--border)' }}>
         <p className="text-[13px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
