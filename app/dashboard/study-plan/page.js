@@ -18,7 +18,6 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader, EmptyState, PageLoading, SkeletonActions } from '@/components/PageShell'
-import { TYPES } from '@/lib/study-style'
 import { startLoading, stopLoading } from '@/components/LoadingBar'
 import { IconArrowRight, IconCheck, IconCalendar } from '@/components/Icons'
 import TodoList from '@/components/TodoList'
@@ -27,6 +26,7 @@ import ReminderWatcher from '@/components/ReminderWatcher'
 import PlanSettings from '@/components/plan/PlanSettings'
 import TodayPlan from '@/components/plan/TodayPlan'
 import StudyTypePanel from '@/components/plan/StudyTypePanel'
+import StudyTypeCard from '@/components/plan/StudyTypeCard'
 import { getSlugForSubject } from '@/lib/subject-map'
 import { displaySubtopic, STATUS_COLORS } from '@/lib/progress'
 import { accessibleSubjects, hasAllSubjects } from '@/lib/access'
@@ -363,10 +363,6 @@ export default function StudyPlanPage() {
               <Link href="/dashboard/calendar" className="btn btn-outline control-md">
                 Calendar
               </Link>
-              {/* The quiz sets rhythm, mix, methods and goal, right here. */}
-              <button type="button" onClick={() => setTypeOpen((v) => !v)} className="btn btn-outline control-md" aria-expanded={typeOpen}>
-                {TYPES[profile.plan_settings?.studyStyle?.type]?.name || 'Find your study type'}
-              </button>
             </div>
           }
         />
@@ -382,7 +378,12 @@ export default function StudyPlanPage() {
           </div>
         )}
 
-        {typeOpen && <StudyTypePanel supabase={supabase} profile={profile} onProfile={setProfile} onClose={() => setTypeOpen(false)} />}
+        {/* Your study type, on the page: what it set and why. The quiz opens in its place. */}
+        {typeOpen ? (
+          <StudyTypePanel supabase={supabase} profile={profile} onProfile={setProfile} fresh={typeOpen === 'fresh'} onClose={() => setTypeOpen(false)} />
+        ) : (
+          <StudyTypeCard profile={profile} onOpen={() => setTypeOpen(true)} onRetake={() => setTypeOpen('fresh')} />
+        )}
 
         {(!configured || editing) && <div className="mb-10">{settingsPanel}</div>}
 

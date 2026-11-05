@@ -178,9 +178,9 @@ export default async function Home() {
               // 9,431 counts every curriculum; anon cannot count by subject, so
               // this is set here and rounded down. Raise it when subjects open.
               [5300, 'subtopics mapped'],
-              // Rounded down to the thousand, so the figure is always true: a fixed
-              // floor of 50,000 claimed more than the bank held.
-              [floorTo(counts?.questions ?? 49000, 1000), 'practice questions'],
+              // 50,000+ by choice (the bank was 49,691 in November 2026, and is
+              // growing): at least 50,000, rounded down to the thousand above it.
+              [Math.max(50000, floorTo(counts?.questions ?? 50000, 1000)), 'practice questions'],
               [floorTo(counts?.flashcards ?? 80000, 5000), 'flashcards'],
             ].map(([v, l], i) => (
               <Reveal key={l} delay={i * 70}>

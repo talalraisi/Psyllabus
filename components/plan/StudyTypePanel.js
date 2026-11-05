@@ -13,7 +13,7 @@ import { invalidateProfile } from '@/lib/cache'
 import StudyStyle from '@/components/StudyStyle'
 import { resultOf, applyTo } from '@/lib/study-style'
 
-export default function StudyTypePanel({ supabase, profile, onProfile, onClose }) {
+export default function StudyTypePanel({ supabase, profile, onProfile, onClose, fresh = false }) {
   // Read fresh each time: the plan's own settings may have changed meanwhile.
   const save = async (change) => {
     const { data } = await supabase.from('profiles').select('plan_settings').eq('id', profile.id).maybeSingle()
@@ -37,8 +37,8 @@ export default function StudyTypePanel({ supabase, profile, onProfile, onClose }
         </button>
       </div>
       <StudyStyle
-        initialAnswers={saved?.answers || null}
-        initialApplied={Boolean(saved?.applied)}
+        initialAnswers={fresh ? null : saved?.answers || null}
+        initialApplied={!fresh && Boolean(saved?.applied)}
         onResult={(answers) => save((ps) => ({ ...ps, studyStyle: { answers, type: resultOf(answers).type, at: new Date().toISOString() } }))}
         onApply={(answers) =>
           save((ps) => {
