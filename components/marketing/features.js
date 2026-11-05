@@ -450,7 +450,7 @@ const FEATURE_MODULES = [
   {
     label: 'Review',
     title: 'A mistake bank that schedules itself',
-    body: 'Every question you get wrong comes back straight away, then after a day, then five, then a week. Keep getting it right and it leaves the bank for good; get it wrong and the schedule restarts. You end up drilling your own gaps rather than a deck somebody else wrote.',
+    body: 'Every question you get wrong comes back straight away, then after a day, then three days, then five. Keep getting it right and it leaves the bank for good; get it wrong and the schedule restarts. You end up drilling your own gaps rather than a deck somebody else wrote.',
     Graphic: GraphicMistakes,
   },
   {

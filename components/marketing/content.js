@@ -49,7 +49,7 @@ export const WHY = [
   },
   {
     title: 'Because your own mistakes beat anyone else’s',
-    body: 'A question you got wrong is worth more than ten you got right. Each one returns after a day, then five, then a week, until you have proved it sticks.',
+    body: 'A question you got wrong is worth more than ten you got right. Each one returns after a day, then three days, then five, until you have proved it sticks.',
   },
   {
     title: 'Because knowing what to do is most of the battle',
@@ -92,7 +92,7 @@ export const FAQ = [
   },
   {
     q: 'What does it cost?',
-    a: 'One subject is free, for good, with no card. Basic opens every subject you take; Premium adds Syllabi and the subject map. Yearly plans cost ten months for twelve. If your school or a friend gave you a code, it can open Premium for a while or for good.',
+    a: 'One subject is free, for good, with no card. Basic opens every subject you take; Premium adds Syllabi. Yearly plans cost ten months for twelve. If your school or a friend gave you a code, it can open Premium for a while or for good.',
   },
   {
     q: 'Who made it?',
@@ -140,7 +140,7 @@ export const FEATURE_DETAIL = [
   {
     label: 'The map',
     detail: [
-      'A level is a running total of evidence, not a count of attempts. Every question carries a difficulty, that difficulty is banded into five heat levels, and the heat decides what a correct answer is worth — half a point for recall and one step, a point and a half at the hardest end of the paper. Ten points is mastery. Below five you are Weak, five to seven Developing, seven to nine Proficient, nine and above Mastered.',
+      'A level is a running total of evidence, not a count of attempts. Every question carries a difficulty, that difficulty is banded into five heat levels, and the heat decides what a correct answer is worth — half a point for recall and one step, a point and a half at the hardest end of the paper. Nine points is mastery: below five you are Weak, five to seven Developing, seven to nine Proficient, nine and above Mastered.',
       'Which means an easy run cannot reach the top. Ten of the simplest questions is five points, and five points is Developing. The only route into the highest band is questions that were genuinely hard for you, which is the whole reason the engine prices by heat instead of counting right answers. A subtopic nobody has asked you about stays grey rather than green, because zero points and never attempted are the same state and deserve the same colour.',
     ],
     title: 'A heatmap you cannot fake',
@@ -170,7 +170,7 @@ export const FEATURE_DETAIL = [
   {
     label: 'Review',
     detail: [
-      'Every question you get wrong is kept against the subtopic it came from and returned to you on a widening gap: after a day, then five days, then a week. Answer it correctly each time and it leaves the bank for good. Get it wrong once and the schedule restarts from the beginning, because a question you have just missed is not one you nearly know.',
+      'Every question you get wrong is kept against the subtopic it came from and returned to you on a widening gap: after a day, then three days, then five days. Answer it correctly each time and it leaves the bank for good. Get it wrong once and the schedule restarts from the beginning, because a question you have just missed is not one you nearly know.',
       'The questions come back inside ordinary sessions rather than as a separate chore, so revision and review are the same act. The bank only ever holds questions you actually attempted — it is a record of the mistakes you made, not a model of the mistakes you might make.',
     ],
     title: 'A mistake bank that schedules itself',

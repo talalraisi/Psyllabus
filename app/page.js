@@ -10,7 +10,7 @@ import { Reveal, ScrollBar, CountUp } from '@/components/marketing/scroll'
 import SiteNav from '@/components/marketing/SiteNav'
 import { FeatureModules } from '@/components/marketing/features'
 import FloatingSubjects, { FloatingSubjectsRow } from '@/components/marketing/FloatingSubjects'
-import { coursesIn } from '@/lib/catalogue'
+import { coursesIn, CURRICULUMS } from '@/lib/catalogue'
 import SubjectOrbit from '@/components/marketing/SubjectOrbit'
 import Everything from '@/components/marketing/Everything'
 
@@ -31,6 +31,9 @@ export const metadata = {
  */
 /** Down to a round figure, so every number can honestly carry a "+". */
 const floorTo = (n, step) => Math.floor(Number(n) / step) * step
+
+/** Every IB subject sign-up offers, HL and SL counted apart (lib/catalogue.js). */
+const IB_OFFERED = (CURRICULUMS.IB?.groups || []).flatMap((g) => g.subjects)
 
 async function bankCounts() {
   try {
@@ -167,8 +170,14 @@ export default async function Home() {
         <Section tint>
           <div className="mx-auto grid max-w-4xl grid-cols-2 gap-x-8 gap-y-12 text-center md:grid-cols-4">
             {[
-              [floorTo(counts?.subjects ?? 160, 10), 'subjects'],
-              [floorTo(counts?.subtopics ?? 9400, 100), 'subtopics mapped'],
+              // What a student can actually pick at sign-up: IB subjects at HL and
+              // SL. The bank's own count (169) includes AP, A-Level and IB
+              // courses not offered yet, which nobody visiting could choose.
+              [floorTo(IB_OFFERED.length, 10), 'IB subjects, HL and SL'],
+              // Subtopics in those subjects (5,393 in November 2026). The bank's
+              // 9,431 counts every curriculum; anon cannot count by subject, so
+              // this is set here and rounded down. Raise it when subjects open.
+              [5300, 'subtopics mapped'],
               // At least 50,000: the bank is past it now, rounding down to 45,000 undersells it.
               [Math.max(50000, floorTo(counts?.questions ?? 50000, 5000)), 'practice questions'],
               [floorTo(counts?.flashcards ?? 80000, 5000), 'flashcards'],
@@ -291,7 +300,7 @@ export default async function Home() {
           </div>
 
           <p className="mx-auto mt-9 max-w-xl text-center text-[15px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-            Ten points is mastery. Leave a subtopic alone and it fades back, because that is what happens to it.
+            Nine points is mastery. Leave a subtopic alone and it fades back, because that is what happens to it.
           </p>
         </Section>
 
