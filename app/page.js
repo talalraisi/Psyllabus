@@ -17,7 +17,7 @@ import Everything from '@/components/marketing/Everything'
 export const metadata = {
   title: 'Project Syllabus',
   description:
-    'Project Syllabus maps your IB Diploma course topic by topic, tests what you know, plans what to study, and gives you Syllabi, an AI tutor that marks your drafts and turns your notes into flashcards.',
+    'Project Syllabus maps your IB Diploma course topic by topic, tests what you know, plans what to study, and gives you Syllabi, an AI tutor that gives feedback on your drafts and turns your notes into flashcards.',
 }
 
 /**
@@ -178,8 +178,9 @@ export default async function Home() {
               // 9,431 counts every curriculum; anon cannot count by subject, so
               // this is set here and rounded down. Raise it when subjects open.
               [5300, 'subtopics mapped'],
-              // At least 50,000: the bank is past it now, rounding down to 45,000 undersells it.
-              [Math.max(50000, floorTo(counts?.questions ?? 50000, 5000)), 'practice questions'],
+              // Rounded down to the thousand, so the figure is always true: a fixed
+              // floor of 50,000 claimed more than the bank held.
+              [floorTo(counts?.questions ?? 49000, 1000), 'practice questions'],
               [floorTo(counts?.flashcards ?? 80000, 5000), 'flashcards'],
             ].map(([v, l], i) => (
               <Reveal key={l} delay={i * 70}>
@@ -300,7 +301,7 @@ export default async function Home() {
           </div>
 
           <p className="mx-auto mt-9 max-w-xl text-center text-[15px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-            Nine points is mastery. Leave a subtopic alone and it fades back, because that is what happens to it.
+            Eight points is mastery. Leave a subtopic alone and it fades back, because that is what happens to it.
           </p>
         </Section>
 

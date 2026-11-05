@@ -172,9 +172,15 @@ export default function PredictionPage() {
                   {prediction.predictedTotal}
                 </span>
                 <span className="text-[17px]" style={{ color: 'var(--text-faint)' }}>
-                  / {rules.maxSubjectPoints}
+                  / {prediction.predictedMax ?? rules.maxSubjectPoints}
                 </span>
               </p>
+              {prediction.predictedCount != null && prediction.predictedCount < prediction.subjectCount && (
+                <p className="mt-3 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+                  From the {prediction.predictedCount} of {prediction.subjectCount} subjects you have studied.
+                  The others join the total once you take a quiz in them.
+                </p>
+              )}
 
               <div
                 className="mt-8 flex flex-wrap gap-x-12 gap-y-5 border-t pt-6"
@@ -182,12 +188,12 @@ export default function PredictionPage() {
               >
                 <div>
                   <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
-                    Your target
+                    {prediction.predictedCount < prediction.subjectCount ? 'Your target for these' : 'Your target'}
                   </p>
                   <p className="mt-1.5 text-[22px] font-semibold leading-none tracking-[-0.025em] tabular-nums">
-                    {prediction.targetTotal}
+                    {prediction.comparedTarget ?? prediction.targetTotal}
                     <span className="text-[14px] font-normal" style={{ color: 'var(--text-faint)' }}>
-                      {' '}/ {rules.maxSubjectPoints}
+                      {' '}/ {prediction.predictedMax ?? rules.maxSubjectPoints}
                     </span>
                   </p>
                 </div>
@@ -275,7 +281,9 @@ export default function PredictionPage() {
                             {s.subject}
                           </p>
                           <p className="t-caption mt-1">
-                            {s.tested} of {s.total} subtopics tested
+                            {s.tested
+                              ? `Based on the ${s.tested} of ${s.total} subtopics you have tested`
+                              : 'Not studied yet, so not predicted'}
                             {s.confidence === 'low' && ' · low confidence'}
                           </p>
                         </div>
@@ -500,7 +508,7 @@ export default function PredictionPage() {
         </Section>
 
         <p className="t-caption">
-              From quiz accuracy across your syllabus. A study aid, not a forecast. TOK and the EE use your targets until that work is marked.
+              From your quiz results on the subtopics you have studied; anything not yet tested is left out rather than counted as zero. A study aid, not a forecast. TOK and the EE use your targets until that work is marked.
         </p>
       </Page>
     </DashboardLayout>

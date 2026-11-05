@@ -321,15 +321,29 @@ export default function Calculator({ open, onClose }) {
     setInput('')
   }, [mode, input, result, degrees, ans])
 
+  // The parent passes a new onClose on every render (the quiz clock renders
+  // it every second), so it is read through a ref. With it in the effect's
+  // dependencies the effect re-ran each render and pulled focus back into the
+  // calculator, so you could not click into your answer while it was open.
+  const onCloseRef = useRef(onClose)
+  useEffect(() => {
+    onCloseRef.current = onClose
+  })
+
+  // Focus the box once, when it opens. After that the student decides where
+  // the cursor goes.
+  useEffect(() => {
+    if (open) inputRef.current?.focus()
+  }, [open])
+
   useEffect(() => {
     if (!open) return
     const onKey = (e) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') onCloseRef.current()
     }
     document.addEventListener('keydown', onKey)
-    inputRef.current?.focus()
     return () => document.removeEventListener('keydown', onKey)
-  }, [open, onClose])
+  }, [open])
 
   if (!open) return null
 

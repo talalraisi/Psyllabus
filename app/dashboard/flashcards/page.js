@@ -13,6 +13,7 @@ import { scheduleAfter, studyOrder } from '@/lib/flashcards'
 import FlashcardReview from '@/components/FlashcardReview'
 import FlashcardWrite from '@/components/FlashcardWrite'
 import FlashcardTest from '@/components/FlashcardTest'
+import { useStudyClock } from '@/lib/use-study-clock'
 import FlashcardsView from '@/components/flashcards/FlashcardsView'
 
 /**
@@ -337,6 +338,7 @@ export default function FlashcardsPage() {
     const exit = () => setReviewing(null)
     return (
       <DashboardLayout profile={profile}>
+        <StudyClock cards={reviewing.cards} />
         {reviewing.mode === 'flip' ? (
           <FlashcardReview cards={reviewing.cards} onMark={markCard} onDelete={deleteCard} onExit={exit} />
         ) : reviewing.mode === 'test' ? (
@@ -370,4 +372,19 @@ export default function FlashcardsPage() {
       />
     </DashboardLayout>
   )
+}
+
+/**
+ * Time on cards counts as study time: the streak, the day's minutes and
+ * analytics. Mounted for as long as a deck is being studied, and saved when
+ * the student leaves it (or closes the tab), idle stretches left out.
+ */
+function StudyClock({ cards }) {
+  const subjects = [...new Set((cards || []).map((c) => c.subject).filter(Boolean))]
+  const subtopics = [...new Set((cards || []).map((c) => c.subtopic).filter(Boolean))]
+  useStudyClock({
+    subject: subjects.length === 1 ? subjects[0] : null,
+    subtopic: subjects.length === 1 && subtopics.length === 1 ? subtopics[0] : null,
+  })
+  return null
 }

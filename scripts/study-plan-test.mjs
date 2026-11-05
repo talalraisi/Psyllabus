@@ -101,7 +101,8 @@ check('fading near its drop to Weak is worth more than fading that has just begu
       { subject: 'History SL', topic: 'Topic 4', subtopic: 'old', position: 1, status: 'decaying' },
       { subject: 'History SL', topic: 'Topic 4', subtopic: 'new', position: 2, status: 'decaying' },
     ],
-    details: { 'History SL::old': { updatedAt: lastCorrect(32) }, 'History SL::new': { updatedAt: lastCorrect(15) } },
+    // Developing holds 14 days and fades for 14 (decay.js), so day 25 has 3 left.
+    details: { 'History SL::old': { status: 'confident', updatedAt: lastCorrect(25) }, 'History SL::new': { status: 'confident', updatedAt: lastCorrect(15) } },
     profile, settings, predicted, subjectSizes: sizes, now: NOW,
   })
   assert.equal(c[0].subtopic, 'old')

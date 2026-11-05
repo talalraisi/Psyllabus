@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useStudyClock } from '@/lib/use-study-clock'
 import SymbolKeys from '@/components/SymbolKeys'
 import Link from 'next/link'
 import MathText from '@/components/MathText'
@@ -279,6 +280,8 @@ function MarkPart({ part, response, mark, onMark }) {
 }
 
 export default function PaperSitting({ paper, initial, onSave, backHref, backLabel = 'Back' }) {
+  // Time on a paper counts as study time (lib/use-study-clock.js).
+  useStudyClock({ subject: paper?.subject || null })
   const content = paper.content || {}
   const sections = useMemo(() => content.sections || [], [content.sections])
   // An unfinished sitting opens on the intro, which offers to carry on or start again.

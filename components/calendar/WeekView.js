@@ -60,7 +60,7 @@ function lanes(items) {
   return sorted
 }
 
-export default function WeekView({ weekStart, today, busy = [], blocks = [], events = [], selected, onSelectDay, onShiftWeek, onToday }) {
+export default function WeekView({ weekStart, today, busy = [], blocks = [], events = [], todos = [], selected, onSelectDay, onShiftWeek, onToday }) {
   const days = useMemo(
     () => Array.from({ length: 7 }, (_, i) => new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + i)),
     [weekStart]
@@ -122,8 +122,14 @@ export default function WeekView({ weekStart, today, busy = [], blocks = [], eve
         for (const p of onDays(days, start, new Date(start.getTime() + 60 * 60000))) timed[p.i].push({ ...p, layer: 'date', title: e.title, kind: e.kind })
       }
     }
+    // Open to-dos sit with the day's all-day items, after its tests.
+    for (const t of todos) {
+      if (t.done || !t.due_on) continue
+      const i = days.findIndex((d) => dayKey(d) === t.due_on)
+      if (i >= 0) allDay[i].push({ layer: 'todo', title: t.title })
+    }
     return { timed: timed.map(lanes), allDay }
-  }, [days, busy, blocks, events])
+  }, [days, busy, blocks, events, todos])
 
   const studyMinutes = blocks
     .filter((b) => {
@@ -166,6 +172,9 @@ export default function WeekView({ weekStart, today, busy = [], blocks = [], eve
         <span className="flex items-center gap-1.5">
           <span className="h-2.5 w-2.5 rounded-[3px]" style={{ background: 'var(--status-weak)' }} /> Tests and deadlines
         </span>
+        <span className="flex items-center gap-1.5">
+          <span className="h-2.5 w-2.5 rounded-[3px] border border-dashed" style={{ borderColor: 'var(--border-strong)' }} /> To-dos
+        </span>
       </div>
 
       <div className="overflow-x-auto rounded-[12px] border" style={{ borderColor: 'var(--border)' }}>
@@ -203,10 +212,12 @@ export default function WeekView({ weekStart, today, busy = [], blocks = [], eve
                         style={
                           x.layer === 'date'
                             ? { background: `color-mix(in srgb, ${KIND_COLOR[x.kind] || 'var(--status-weak)'} 16%, transparent)`, color: KIND_COLOR[x.kind] || 'var(--status-weak)' }
-                            : { background: 'var(--surface-sunken)', color: 'var(--text-muted)' }
+                            : x.layer === 'todo'
+                              ? { border: '1px dashed var(--border-strong)', color: 'var(--text-body)' }
+                              : { background: 'var(--surface-sunken)', color: 'var(--text-muted)' }
                         }
                       >
-                        {x.layer === 'date' ? `${KIND_LABEL[x.kind] || 'Event'}: ` : ''}
+                        {x.layer === 'date' ? `${KIND_LABEL[x.kind] || 'Event'}: ` : x.layer === 'todo' ? '☐ ' : ''}
                         {x.title}
                       </span>
                     ))}

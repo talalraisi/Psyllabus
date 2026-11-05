@@ -26,7 +26,7 @@ export const HOW_IT_WORKS = [
 
 export const FEATURES = [
   ['Heatmap you cannot fake', 'Five levels, from Weak to Mastered, every one set by a quiz rather than by how you feel.', 'mastered'],
-  ['Topics that fade', 'Nail something, leave it two weeks untouched and it starts fading. Leave it another three and it counts as not known.', 'fading'],
+  ['Topics that fade', 'Master something, leave it four weeks untouched and it starts fading. Leave it longer and it slips a level, then another.', 'fading'],
   ['Mistake bank', 'Questions you got wrong come back on a spaced schedule, so you drill your own gaps.', 'weak'],
   ['Timed papers', 'Build a paper from any mix of topics and sit it against a live marks-per-minute clock.', 'developing'],
   ['Calendar and reminders', 'Put your tests and IA deadlines in, and the planner moves that subject up as they get close.', 'proficient'],
@@ -41,7 +41,7 @@ export const WHY = [
   },
   {
     title: 'Because forgetting is the default, not the exception',
-    body: 'Memory decays unless it is used, and the gap between October and May is where most marks quietly disappear. Anything you proved starts fading after two weeks, and drops to Weak after five.',
+    body: 'Memory decays unless it is used, and the gap between October and May is where most marks quietly disappear. Something you mastered holds for four weeks, fades for two, then slips a level a week at a time, the way memory does.',
   },
   {
     title: 'Because testing is studying, not just measuring',
@@ -140,7 +140,7 @@ export const FEATURE_DETAIL = [
   {
     label: 'The map',
     detail: [
-      'A level is a running total of evidence, not a count of attempts. Every question carries a difficulty, that difficulty is banded into five heat levels, and the heat decides what a correct answer is worth — half a point for recall and one step, a point and a half at the hardest end of the paper. Nine points is mastery: below five you are Weak, five to seven Developing, seven to nine Proficient, nine and above Mastered.',
+      'A level is a running total of evidence, not a count of attempts. Every question carries a difficulty, that difficulty is banded into five heat levels, and the heat decides what a correct answer is worth — half a point for recall and one step, a point and a half at the hardest end of the paper. Eight points is mastery: below 3.5 you are Weak, 3.5 to 6 Developing, 6 to 8 Proficient, 8 and above Mastered. A subtopic with only a few questions asks for less, so every one can be mastered.',
       'Which means an easy run cannot reach the top. Ten of the simplest questions is five points, and five points is Developing. The only route into the highest band is questions that were genuinely hard for you, which is the whole reason the engine prices by heat instead of counting right answers. A subtopic nobody has asked you about stays grey rather than green, because zero points and never attempted are the same state and deserve the same colour.',
     ],
     title: 'A heatmap you cannot fake',
@@ -156,13 +156,13 @@ export const FEATURE_DETAIL = [
     label: 'Decay',
     detail: [
       'Fading is measured from your last correct answer, not from the last time the row was touched. That distinction matters: any quiz on a subtopic updates it, including one where every answer was wrong, so without the rule a fading topic could be cleared by sitting a quiz and failing it. Retention has to be re-proved, not revisited.',
-      'Fourteen days without a correct answer and a subtopic starts fading. Twenty-one days after that — five weeks in total — it stops counting as known and returns to Weak. Only Mastered and Proficient fade, because something you never proved cannot quietly un-prove itself. One correct answer clears the whole thing, however long it has been.',
+      'Memory fades on a curve, and the better you knew something the longer it lasts. A Mastered subtopic holds for four weeks without a correct answer, shows as Fading in weeks five and six, drops to Developing for week seven and then to Weak. Proficient holds three weeks and Developing two. One correct answer clears the fade, however long it has been.',
     ],
     title: 'Topics that fade on their own',
     lede: 'Prove something, leave it, and it quietly goes back on the list.',
     how: [
-      'Two weeks untouched and it starts fading',
-      'Three weeks more and it counts as not known',
+      'Mastered holds four weeks, then fades for two',
+      'Then Developing for a week, then Weak',
       'One correct answer puts it back',
     ],
     limit: 'It cannot know you revised something on paper. If you worked on a topic away from here, test it here and the fade clears.',

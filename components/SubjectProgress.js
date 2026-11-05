@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { displaySubtopic, STATUS_LABELS, progressKey } from '@/lib/progress'
-import { daysOfFadeLeft, DECAY_DAYS, FADE_DAYS } from '@/lib/decay'
+import { daysOfFadeLeft } from '@/lib/decay'
 
 /**
  * Where you stand, as something worth looking at.
@@ -200,8 +200,8 @@ function Ladder({ items }) {
 /**
  * What is about to stop counting.
  *
- * Fading now runs out: two weeks untouched and a subtopic starts fading, three
- * weeks after that it drops to Weak. That deadline is the most useful thing on
+ * Fading runs out: a Mastered subtopic left four weeks starts fading, and two
+ * weeks after that it drops a level (lib/decay.js has the whole curve). That deadline is the most useful thing on
  * this page and it was invisible — you could only find it by opening a subject,
  * finding the row and reading a tooltip.
  *
