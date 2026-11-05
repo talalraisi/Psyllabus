@@ -485,8 +485,8 @@ const FEATURE_MODULES = [
   },
   {
     label: 'Marking',
-    title: 'Drafts and answers, marked',
-    body: 'Paste an IA, an EE, a TOK essay or a Paper 1 or 2 answer and get marks on the real criteria, each one explained, with your own sentences highlighted.',
+    title: 'Feedback on drafts and answers',
+    body: 'Paste an IA, an EE, a TOK essay or a Paper 1 or 2 answer and get feedback against each criterion, with an estimated mark, the reasons for it, and your own sentences highlighted.',
     Graphic: GraphicMarking,
   },
   {

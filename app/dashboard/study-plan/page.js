@@ -26,6 +26,7 @@ import NotesDrawer from '@/components/NotesDrawer'
 import ReminderWatcher from '@/components/ReminderWatcher'
 import PlanSettings from '@/components/plan/PlanSettings'
 import TodayPlan from '@/components/plan/TodayPlan'
+import StudyTypePanel from '@/components/plan/StudyTypePanel'
 import { getSlugForSubject } from '@/lib/subject-map'
 import { displaySubtopic, STATUS_COLORS } from '@/lib/progress'
 import { accessibleSubjects, hasAllSubjects } from '@/lib/access'
@@ -46,6 +47,11 @@ const fmt = (m) => (m >= 60 ? `${Math.floor(m / 60)}h ${String(m % 60).padStart(
 
 export default function StudyPlanPage() {
   const [profile, setProfile] = useState(null)
+  // The study type quiz, open in place. /dashboard/study-style and the home
+  // page's "Find your study type" arrive with ?type=1. Read once on the
+  // client; nothing renders it until the profile has loaded, so the server
+  // and client markup agree.
+  const [typeOpen, setTypeOpen] = useState(() => typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('type'))
   // The calendar write in flight, so a second one waits for it.
   const writingBlocks = useRef(null)
   const [items, setItems] = useState([])
@@ -357,10 +363,10 @@ export default function StudyPlanPage() {
               <Link href="/dashboard/calendar" className="btn btn-outline control-md">
                 Calendar
               </Link>
-              {/* The quiz sets rhythm, mix, methods and goal; one tap from here. */}
-              <Link href="/dashboard/study-style" className="btn btn-outline control-md">
+              {/* The quiz sets rhythm, mix, methods and goal, right here. */}
+              <button type="button" onClick={() => setTypeOpen((v) => !v)} className="btn btn-outline control-md" aria-expanded={typeOpen}>
                 {TYPES[profile.plan_settings?.studyStyle?.type]?.name || 'Find your study type'}
-              </Link>
+              </button>
             </div>
           }
         />
@@ -375,6 +381,8 @@ export default function StudyPlanPage() {
             </button>
           </div>
         )}
+
+        {typeOpen && <StudyTypePanel supabase={supabase} profile={profile} onProfile={setProfile} onClose={() => setTypeOpen(false)} />}
 
         {(!configured || editing) && <div className="mb-10">{settingsPanel}</div>}
 
@@ -451,7 +459,7 @@ export default function StudyPlanPage() {
                   </div>
 
                   {/* The evening's other half: everything that is not a subtopic. */}
-                  <TodoList className="mb-12 mt-12" title="Also today" subjects={accessibleSubjects(profile)} />
+                  <TodoList className="mb-12 mt-12" title="Also today" day={dateKey(new Date())} subjects={accessibleSubjects(profile)} />
 
                   {events.length === 0 && (
                     <Link href="/dashboard/calendar" className="flex items-center gap-3 border-t py-4 text-[14px] font-medium" style={{ borderColor: 'var(--border)' }}>

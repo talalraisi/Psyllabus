@@ -25,6 +25,8 @@ export default function MonthGrid({
   today = new Date(),
   selected,
   eventsByDay,
+  /** Open to-dos by day (lib/todos.js todosByDay), shown under the events. */
+  todosByDay = null,
   onSelect,
   onShiftMonth,
   onToday,
@@ -155,6 +157,11 @@ export default function MonthGrid({
                 {hidden > 0 && (
                   <span className="text-[10px]" style={{ color: 'var(--text-faint)' }}>
                     +{hidden} more
+                  </span>
+                )}
+                {todosByDay?.get(key)?.length > 0 && (
+                  <span className="truncate text-[10.5px]" style={{ color: 'var(--text-muted)' }} title={todosByDay.get(key).map((t) => t.title).join(', ')}>
+                    ☐ {todosByDay.get(key).length === 1 ? todosByDay.get(key)[0].title : `${todosByDay.get(key).length} to-dos`}
                   </span>
                 )}
               </button>

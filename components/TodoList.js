@@ -1,53 +1,57 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { createClient } from '@/lib/supabase'
-import { getCurrentUser } from '@/lib/auth'
-import { IconCheck, IconClose, IconPlus } from '@/components/Icons'
+import { useState, useRef } from 'react'
+import Link from 'next/link'
+import { IconCheck, IconClose, IconPlus, IconArrowRight } from '@/components/Icons'
 import { SkeletonLine } from '@/components/PageShell'
-import { parseTodoInput, bucketFor, BUCKET_LABELS, BUCKET_ORDER } from '@/lib/todo-parse'
 import Select from '@/components/Select'
+import { parseTodoInput, bucketFor, BUCKET_LABELS, BUCKET_ORDER, dayKey } from '@/lib/todo-parse'
+import { useTodos, addTodo, patchTodo, patchTodos, toggleTodo, removeTodo, undoRemove, clearTodoError } from '@/lib/todos'
+import { getSlugForSubject } from '@/lib/subject-map'
 
 /**
  * The list of things that are not a test.
  *
  * The calendar holds dated things the planner reacts to — a mock on the 11th
  * moves that subject up the queue. This holds everything else: print the lab
- * sheet, email the coordinator, finish the bibliography. Those do not belong
- * on a study planner and they do not belong nowhere, which is where they were.
+ * sheet, email the coordinator, finish the bibliography.
  *
- * It is deliberately small. A title, a tick, and optionally a day. Priorities,
- * tags, sub-tasks and recurrence are what turn a list you use into an app you
- * maintain.
+ * One list everywhere (lib/todos.js): the home page, the study plan, the
+ * calendar and the To-do page all show the same tasks, so something added or
+ * ticked in one is already right in the others. A task with a subject has a
+ * way into that subject, so "revise kinematics #physics" is one tap from
+ * practising it, not a note about practising it.
  *
- * Every change is applied on screen before the database is asked, and rolled
- * back if the database refuses. A to-do list that waits for Singapore before
- * the tick appears is a to-do list nobody uses twice.
+ * Kept small on purpose: a title, a tick, and optionally a day, a subject and
+ * a note. Priorities, tags and sub-tasks are what turn a list you use into an
+ * app you maintain.
  */
 
-/** A local calendar day as YYYY-MM-DD, which is what the column stores. */
-function dayKey(date = new Date()) {
-  const d = new Date(date)
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+const addDays = (n) => {
+  const d = new Date()
+  d.setDate(d.getDate() + n)
+  return dayKey(d)
 }
 
 function relativeDay(due, todayKey) {
   if (!due) return null
-  if (due === todayKey) return 'today'
-  const diff = Math.round(
-    (new Date(`${due}T00:00`).getTime() - new Date(`${todayKey}T00:00`).getTime()) / 86400000
-  )
-  if (diff === 1) return 'tomorrow'
-  if (diff === -1) return 'yesterday'
-  if (diff < 0) return `${Math.abs(diff)}d overdue`
-  if (diff < 7) return `in ${diff}d`
+  if (due === todayKey) return 'Today'
+  const diff = Math.round((new Date(`${due}T00:00`).getTime() - new Date(`${todayKey}T00:00`).getTime()) / 86400000)
+  if (diff === 1) return 'Tomorrow'
+  if (diff === -1) return 'Yesterday'
+  if (diff < 0) return `${Math.abs(diff)}d late`
+  if (diff < 7) return new Date(`${due}T00:00`).toLocaleDateString(undefined, { weekday: 'short' })
   return new Date(`${due}T00:00`).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
 }
 
+const shortSubject = (s) => String(s || '').replace(/ (SL|HL)$/, '')
+
 export default function TodoList({
-  /** Prefills the day on anything added here. Used by the calendar. */
+  /** Prefills the day on anything added here. */
   defaultDue = null,
-  /** Show only what is outstanding, and at most this many. For side panels. */
+  /** Only the tasks due on this day (and, for today, anything overdue). Used by the calendar. */
+  day = null,
+  /** Outstanding only, at most `limit`, with a link to the full list. For the home page. */
   compact = false,
   limit = null,
   title = 'To-do',
@@ -55,300 +59,197 @@ export default function TodoList({
   /** The student's subjects, so "#physics" in the box can match one. */
   subjects = [],
 }) {
-  const [todos, setTodos] = useState([])
-  const [loading, setLoading] = useState(true)
+  const { todos, loaded, userId, error, removed } = useTodos()
   const [draft, setDraft] = useState('')
-  const [error, setError] = useState('')
   const [showDone, setShowDone] = useState(false)
-  // Which row is open for editing. One at a time: this is a list, not a form.
   const [openId, setOpenId] = useState(null)
-  const [userId, setUserId] = useState(null)
-  const supabase = createClient()
+  const [subjectFilter, setSubjectFilter] = useState(null)
   const inputRef = useRef(null)
-  const todayKey = dayKey()
+  const todayKey = dayKey(new Date())
+  const due = day || defaultDue
 
-  useEffect(() => {
-    let cancelled = false
-    async function load() {
-      const user = await getCurrentUser(supabase)
-      if (cancelled) return
-      if (!user) {
-        setLoading(false)
-        return
-      }
-      setUserId(user.id)
-      const { data, error: loadError } = await supabase
-        .from('todos')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('position', { ascending: true })
-        .order('created_at', { ascending: false })
-      if (cancelled) return
-      if (loadError) setError(loadError.message)
-      else setTodos(data || [])
-      setLoading(false)
-    }
-    load()
-    return () => {
-      cancelled = true
-    }
-  }, [supabase])
-
-  const add = useCallback(async () => {
+  const add = async () => {
     const text = draft.trim().slice(0, 200)
-    if (!text || !userId) return
-
+    if (!text) return
     // "lab report friday #physics" is one thing to type. The day and subject
     // come out of it; the words that named them come out of the title.
     const parsed = parseTodoInput(text, { subjects })
-    const cleanTitle = parsed.title || text
-
-    // On screen first. The id is provisional until the insert comes back.
-    const provisional = {
-      id: `pending-${Date.now()}`,
-      user_id: userId,
-      title: cleanTitle,
-      done: false,
-      due_on: parsed.due_on || defaultDue,
-      subject: parsed.subject,
-      position: todos.length ? Math.min(...todos.map((t) => t.position)) - 1 : 0,
-      pending: true,
-    }
-    setTodos((prev) => [provisional, ...prev])
     setDraft('')
-    setError('')
-
-    const { data, error: insertError } = await supabase
-      .from('todos')
-      .insert({
-        user_id: userId,
-        title: cleanTitle,
-        due_on: parsed.due_on || defaultDue,
-        subject: parsed.subject,
-        position: provisional.position,
-      })
-      .select()
-      .single()
-
-    if (insertError) {
-      setTodos((prev) => prev.filter((t) => t.id !== provisional.id))
-      setDraft(text)
-      setError(insertError.message)
-      return
-    }
-    setTodos((prev) => prev.map((t) => (t.id === provisional.id ? data : t)))
-  }, [draft, userId, defaultDue, todos, supabase, subjects])
-
-  const toggle = useCallback(
-    async (todo) => {
-      const next = !todo.done
-      setTodos((prev) => prev.map((t) => (t.id === todo.id ? { ...t, done: next } : t)))
-      const { error: updateError } = await supabase
-        .from('todos')
-        .update({ done: next })
-        .eq('id', todo.id)
-      if (updateError) {
-        setTodos((prev) => prev.map((t) => (t.id === todo.id ? { ...t, done: todo.done } : t)))
-        setError(updateError.message)
-      }
-    },
-    [supabase]
-  )
-
-  const patch = useCallback(
-    async (todo, changes) => {
-      const before = todo
-      setTodos((prev) => prev.map((t) => (t.id === todo.id ? { ...t, ...changes } : t)))
-      const { error: updateError } = await supabase.from('todos').update(changes).eq('id', todo.id)
-      if (updateError) {
-        setTodos((prev) => prev.map((t) => (t.id === todo.id ? before : t)))
-        setError(updateError.message)
-      }
-    },
-    [supabase]
-  )
-
-  const remove = useCallback(
-    async (todo) => {
-      const before = todos
-      setTodos((prev) => prev.filter((t) => t.id !== todo.id))
-      const { error: deleteError } = await supabase.from('todos').delete().eq('id', todo.id)
-      if (deleteError) {
-        setTodos(before)
-        setError(deleteError.message)
-      }
-    },
-    [todos, supabase]
-  )
-
-  const open = todos.filter((t) => !t.done)
-  const done = todos.filter((t) => t.done)
-  const shown = compact ? open.slice(0, limit || 5) : showDone ? todos : open
-  const overdue = open.filter((t) => t.due_on && t.due_on < todayKey).length
-
-  /**
-   * Overdue, today, this week, later, no date.
-   *
-   * Compact panels stay a flat list: five rows in a sidebar do not need
-   * headings, and the dashboard has little enough room as it is.
-   */
-  const grouped = compact
-    ? [{ bucket: 'today', items: shown }]
-    : BUCKET_ORDER.map((bucket) => ({
-        bucket,
-        items: shown.filter((t) => !t.done && bucketFor(t.due_on, todayKey) === bucket),
-      }))
-        .filter((g) => g.items.length)
-        .concat(
-          showDone && shown.some((t) => t.done)
-            ? [{ bucket: 'done', items: shown.filter((t) => t.done) }]
-            : []
-        )
-
-  /** One row. Shared by every group, so they cannot drift apart. */
-  const renderRow = (todo) => {
-            const due = relativeDay(todo.due_on, todayKey)
-            const late = todo.due_on && todo.due_on < todayKey && !todo.done
-            return (
-              <li
-                key={todo.id}
-                className="group flex items-center gap-3 border-b py-2.5 last:border-b-0"
-                style={{ borderColor: 'var(--border)', opacity: todo.pending ? 0.55 : 1 }}
-              >
-                <button
-                  onClick={() => toggle(todo)}
-                  aria-pressed={todo.done}
-                  aria-label={todo.done ? `Mark "${todo.title}" as not done` : `Mark "${todo.title}" as done`}
-                  className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[5px] border transition-colors duration-150"
-                  style={{
-                    borderColor: todo.done ? 'var(--brand)' : 'var(--border-hover)',
-                    background: todo.done ? 'var(--brand)' : 'transparent',
-                    color: '#fff',
-                  }}
-                >
-                  {todo.done && <IconCheck width={11} height={11} />}
-                </button>
-
-                <button
-                  onClick={() => setOpenId(openId === todo.id ? null : todo.id)}
-                  className="min-w-0 flex-1 text-left text-[14px] leading-snug"
-                  style={{
-                    color: todo.done ? 'var(--text-faint)' : 'var(--text-body)',
-                    textDecoration: todo.done ? 'line-through' : undefined,
-                  }}
-                  title="Open for a date, a subject and notes"
-                >
-                  {todo.title}
-                  {todo.note && (
-                    <span className="ml-2 text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
-                      ·
-                    </span>
-                  )}
-                </button>
-
-                {todo.subject && (
-                  <span
-                    className="shrink-0 truncate text-[11.5px]"
-                    style={{ color: 'var(--text-faint)', maxWidth: 120 }}
-                  >
-                    {todo.subject}
-                  </span>
-                )}
-
-                {due && (
-                  <span
-                    className="shrink-0 text-[12px] tabular-nums"
-                    style={{ color: late ? 'var(--status-fading)' : 'var(--text-faint)' }}
-                  >
-                    {due}
-                  </span>
-                )}
-
-                {!compact && (
-                  <button
-                    onClick={() => remove(todo)}
-                    aria-label={`Delete "${todo.title}"`}
-                    className="shrink-0 opacity-0 transition-opacity duration-150 focus:opacity-100 group-hover:opacity-100"
-                    style={{ color: 'var(--text-faint)' }}
-                  >
-                    <IconClose width={13} height={13} />
-                  </button>
-                )}
-              </li>
-            )
+    const ok = await addTodo({ title: parsed.title || text, due_on: parsed.due_on || due, subject: parsed.subject || subjectFilter })
+    if (!ok) setDraft(text)
+    inputRef.current?.focus()
   }
 
-  /**
-   * The detail, under the row that opened it.
-   *
-   * A date, a subject and a note — the three things that were either being
-   * crammed into the title or lost. Written on change rather than behind a
-   * Save button, because a panel with a Save button is a form again.
-   */
+  // What this list shows.
+  let pool = todos
+  if (day) pool = pool.filter((t) => t.due_on === day || (day === todayKey && !t.done && t.due_on && t.due_on < todayKey))
+  const subjectsInUse = [...new Set(pool.map((t) => t.subject).filter(Boolean))]
+  if (subjectFilter) pool = pool.filter((t) => t.subject === subjectFilter)
+  const open = pool.filter((t) => !t.done)
+  const done = pool.filter((t) => t.done)
+  const overdueList = open.filter((t) => t.due_on && t.due_on < todayKey)
+
+  // The home page leads with what is due: overdue, today, then the rest.
+  const byUrgency = [...open].sort((a, b) => {
+    const rank = (t) => BUCKET_ORDER.indexOf(bucketFor(t.due_on, todayKey))
+    return rank(a) - rank(b) || String(a.due_on || '9').localeCompare(String(b.due_on || '9')) || a.position - b.position
+  })
+  const shown = compact ? byUrgency.slice(0, limit || 5) : day ? [...open, ...(showDone ? done : [])] : showDone ? pool : open
+
+  const grouped =
+    compact || day
+      ? [{ bucket: 'all', items: shown }]
+      : BUCKET_ORDER.map((bucket) => ({ bucket, items: shown.filter((t) => !t.done && bucketFor(t.due_on, todayKey) === bucket) }))
+          .filter((g) => g.items.length)
+          .concat(showDone && shown.some((t) => t.done) ? [{ bucket: 'done', items: shown.filter((t) => t.done) }] : [])
+
+  const renderRow = (todo) => {
+    const when = relativeDay(todo.due_on, todayKey)
+    const late = todo.due_on && todo.due_on < todayKey && !todo.done
+    const isOpen = openId === todo.id
+    return (
+      <li key={todo.id} className="flex items-center gap-3 border-b py-2.5" style={{ borderColor: 'var(--border)', opacity: todo.pending ? 0.55 : 1 }}>
+        <button
+          onClick={() => toggleTodo(todo)}
+          aria-pressed={todo.done}
+          aria-label={todo.done ? `Mark "${todo.title}" as not done` : `Mark "${todo.title}" as done`}
+          className="flex h-[20px] w-[20px] shrink-0 items-center justify-center rounded-[6px] border transition-colors duration-150"
+          style={{ borderColor: todo.done ? 'var(--brand)' : 'var(--border-hover)', background: todo.done ? 'var(--brand)' : 'transparent', color: '#fff' }}
+        >
+          {todo.done && <IconCheck width={12} height={12} />}
+        </button>
+
+        <button
+          onClick={() => setOpenId(isOpen ? null : todo.id)}
+          aria-expanded={isOpen}
+          className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-0.5 text-left"
+          title="Open to edit"
+        >
+          <span
+            className="min-w-0 text-[14px] leading-snug"
+            style={{ color: todo.done ? 'var(--text-faint)' : 'var(--text-body)', textDecoration: todo.done ? 'line-through' : undefined }}
+          >
+            {todo.title}
+          </span>
+          {todo.note && (
+            <span className="text-[11.5px]" style={{ color: 'var(--text-faint)' }} aria-label="Has a note">
+              ✎
+            </span>
+          )}
+        </button>
+
+        {todo.subject && (
+          <span className="hidden shrink-0 truncate rounded-full px-2 py-0.5 text-[11px] font-medium sm:inline" style={{ background: 'var(--surface-sunken)', color: 'var(--text-muted)', maxWidth: 130 }}>
+            {shortSubject(todo.subject)}
+          </span>
+        )}
+        {when && (
+          <span className="shrink-0 text-[12px] tabular-nums" style={{ color: late ? 'var(--status-fading)' : when === 'Today' ? 'var(--brand)' : 'var(--text-faint)', fontWeight: late || when === 'Today' ? 600 : 400 }}>
+            {when}
+          </span>
+        )}
+      </li>
+    )
+  }
+
+  /** Everything about one task, under its row. Saved as you change it. */
   const renderDetail = (todo) => (
-    <li
-      key={`${todo.id}-detail`}
-      className="pop-enter border-b px-1 pb-4 pt-1"
-      style={{ borderColor: 'var(--border)' }}
-    >
-      <div className="flex flex-wrap items-center gap-2">
+    <li key={`${todo.id}-detail`} className="pop-enter flex flex-col gap-3 border-b px-1 pb-4 pt-2" style={{ borderColor: 'var(--border)' }}>
+      <input
+        defaultValue={todo.title}
+        maxLength={200}
+        aria-label="Title"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') e.currentTarget.blur()
+        }}
+        onBlur={(e) => {
+          const value = e.target.value.trim()
+          if (value && value !== todo.title) patchTodo(todo, { title: value })
+          else e.target.value = todo.title
+        }}
+        className="input control-sm w-full px-3 text-[16px] sm:text-[13.5px]"
+      />
+      <div className="flex flex-wrap items-center gap-1.5">
+        {[
+          ['Today', todayKey],
+          ['Tomorrow', addDays(1)],
+          ['Next week', addDays(7)],
+        ].map(([label, value]) => (
+          <button
+            key={label}
+            onClick={() => patchTodo(todo, { due_on: value })}
+            aria-pressed={todo.due_on === value}
+            className="rounded-full border px-3 py-1 text-[12.5px] font-medium transition-colors"
+            style={todo.due_on === value ? { borderColor: 'var(--brand)', color: 'var(--brand)', background: 'var(--brand-tint)' } : { borderColor: 'var(--border)', color: 'var(--text-muted)' }}
+          >
+            {label}
+          </button>
+        ))}
         <input
           type="date"
           value={todo.due_on || ''}
-          onChange={(e) => patch(todo, { due_on: e.target.value || null })}
+          onChange={(e) => patchTodo(todo, { due_on: e.target.value || null })}
           aria-label="Due date"
-          className="input control-sm px-3 text-[16px] sm:text-[13px]"
+          className="input control-sm px-3 text-[16px] sm:text-[12.5px]"
           style={{ width: 150 }}
         />
-        {subjects.length > 0 && (
-          <Select
-            value={todo.subject || ''}
-            onChange={(e) => patch(todo, { subject: e.target.value || null })}
-            aria-label="Subject"
-            className="input control-sm px-3 text-[16px] sm:text-[13px]"
-            style={{ width: 190 }}
-          >
-            <option value="">No subject</option>
-            {subjects.map((subject) => (
-              <option key={subject} value={subject}>
-                {subject}
-              </option>
-            ))}
-          </Select>
+        {todo.due_on && (
+          <button onClick={() => patchTodo(todo, { due_on: null })} className="px-2 text-[12.5px] font-medium" style={{ color: 'var(--text-faint)' }}>
+            No date
+          </button>
         )}
-        <button
-          onClick={() => patch(todo, { due_on: dayKey() })}
-          className="btn btn-quiet control-sm"
-        >
-          Today
-        </button>
-        <button
-          onClick={() => {
-            const d = new Date()
-            d.setDate(d.getDate() + 1)
-            patch(todo, { due_on: dayKey(d) })
-          }}
-          className="btn btn-quiet control-sm"
-        >
-          Tomorrow
-        </button>
       </div>
-
+      {subjects.length > 0 && (
+        <Select
+          value={todo.subject || ''}
+          onChange={(e) => patchTodo(todo, { subject: e.target.value || null })}
+          aria-label="Subject"
+          className="input control-sm px-3 text-[16px] sm:text-[13px]"
+          style={{ width: 220, maxWidth: '100%' }}
+        >
+          <option value="">No subject</option>
+          {subjects.map((subject) => (
+            <option key={subject} value={subject}>
+              {subject}
+            </option>
+          ))}
+        </Select>
+      )}
       <textarea
         rows={2}
         defaultValue={todo.note || ''}
         onBlur={(e) => {
           const value = e.target.value.trim()
-          if (value !== (todo.note || '')) patch(todo, { note: value || null })
+          if (value !== (todo.note || '')) patchTodo(todo, { note: value || null })
         }}
         placeholder="Notes: what it needs, where it is, who asked for it"
-        className="input mt-2 w-full resize-y px-3 text-[16px] sm:text-[13px]"
+        className="input w-full resize-y px-3 text-[16px] sm:text-[13px]"
         style={{ height: 'auto', padding: '8px 12px' }}
       />
+      <div className="flex flex-wrap items-center gap-2">
+        {todo.subject && (
+          <Link href={`/dashboard/syllabus/${getSlugForSubject(todo.subject)}`} className="btn btn-outline control-sm">
+            Practise {shortSubject(todo.subject)}
+            <IconArrowRight width={13} height={13} />
+          </Link>
+        )}
+        <div className="flex-1" />
+        <button
+          onClick={() => {
+            setOpenId(null)
+            removeTodo(todo)
+          }}
+          className="btn btn-quiet control-sm"
+          style={{ color: 'var(--danger)' }}
+        >
+          <IconClose width={12} height={12} />
+          Delete
+        </button>
+      </div>
     </li>
   )
 
-  if (loading) {
+  if (!loaded) {
     return (
       <div className={className} aria-hidden="true">
         <SkeletonLine width={120} height={13} />
@@ -361,104 +262,129 @@ export default function TodoList({
     )
   }
 
+  const allOpen = todos.filter((t) => !t.done).length
+
   return (
     <div className={className}>
-      <div
-        className="mb-4 flex items-baseline justify-between gap-4 border-b pb-3"
-        style={{ borderColor: 'var(--border)' }}
-      >
+      <div className="mb-3 flex items-baseline justify-between gap-4 border-b pb-3" style={{ borderColor: 'var(--border)' }}>
         <h2 className="text-[15px] font-semibold tracking-[-0.012em]">{title}</h2>
-        <span className="text-[12px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
-          {open.length} open
-          {overdue > 0 && <span style={{ color: 'var(--status-fading)' }}> · {overdue} overdue</span>}
+        <span className="flex items-baseline gap-3 text-[12px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
+          <span>
+            {open.length} open
+            {overdueList.length > 0 && <span style={{ color: 'var(--status-fading)' }}> · {overdueList.length} late</span>}
+          </span>
+          {(compact || day) && (
+            <Link href="/dashboard/todo" className="font-medium text-[var(--brand)] hover:underline">
+              {compact && allOpen > shown.length ? `All ${allOpen}` : 'All to-dos'}
+            </Link>
+          )}
         </span>
       </div>
 
-      {!compact && !userId && (
+      {!userId ? (
         <p className="py-6 text-[13.5px]" style={{ color: 'var(--text-faint)' }}>
           Sign in to keep a list.
         </p>
-      )}
-
-      {!compact && userId && (
-        <div className="mb-2 flex items-center gap-2">
+      ) : (
+        <form
+          className="mb-2 flex items-center gap-2"
+          onSubmit={(e) => {
+            e.preventDefault()
+            add()
+          }}
+        >
           <input
             ref={inputRef}
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault()
-                add()
-              }
-            }}
             maxLength={200}
-            placeholder={defaultDue ? 'Add something for this day' : 'Lab report friday #physics'}
+            placeholder={day ? 'Add something for this day' : 'Lab report friday #physics'}
             aria-label="New to-do"
-            className="input control-md flex-1 px-3.5 text-[16px] sm:text-[13.5px]"
+            className={`input ${compact ? 'control-sm' : 'control-md'} min-w-0 flex-1 px-3.5 text-[16px] sm:text-[13.5px]`}
           />
-          <button
-            onClick={add}
-            disabled={!draft.trim()}
-            className="btn btn-solid control-md shrink-0 disabled:opacity-40"
-          >
+          <button type="submit" disabled={!draft.trim()} className={`btn btn-solid ${compact ? 'control-sm' : 'control-md'} shrink-0 disabled:opacity-40`} aria-label="Add to-do">
             <IconPlus width={15} height={15} />
-            Add
+            {!compact && 'Add'}
           </button>
+        </form>
+      )}
+      {!compact && userId && !draft && (
+        <p className="mb-3 text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
+          Type a day (friday, tomorrow, 12 nov) and a #subject and they are filled in for you.
+        </p>
+      )}
+
+      {/* Filter by subject, once there is more than one to filter by. */}
+      {!compact && !day && subjectsInUse.length > 1 && (
+        <div className="mb-3 flex flex-wrap gap-1.5">
+          {[null, ...subjectsInUse].map((s) => (
+            <button
+              key={s || 'all'}
+              onClick={() => setSubjectFilter(s)}
+              aria-pressed={subjectFilter === s}
+              className="rounded-full border px-3 py-1 text-[12px] font-medium transition-colors"
+              style={subjectFilter === s ? { borderColor: 'var(--brand)', color: 'var(--brand)', background: 'var(--brand-tint)' } : { borderColor: 'var(--border)', color: 'var(--text-muted)' }}
+            >
+              {s ? shortSubject(s) : 'All'}
+            </button>
+          ))}
         </div>
       )}
 
       {error && (
-        <p
-          className="mb-3 border-l-2 pl-3 text-[13px]"
-          style={{ borderColor: 'var(--danger)', color: 'var(--danger)' }}
-        >
+        <p className="mb-3 flex items-center justify-between gap-3 border-l-2 pl-3 text-[13px]" style={{ borderColor: 'var(--danger)', color: 'var(--danger)' }}>
           {error}
+          <button onClick={clearTodoError} aria-label="Dismiss" style={{ color: 'var(--text-faint)' }}>
+            <IconClose width={12} height={12} />
+          </button>
         </p>
       )}
 
-      {/* Grouped by when, not by when it was typed: a flat list of eleven
-          things hides the two that are for today. */}
+      {removed && (
+        <div className="mb-3 flex items-center justify-between gap-3 rounded-[10px] px-3 py-2 text-[13px]" style={{ background: 'var(--surface-sunken)', color: 'var(--text-body)' }} role="status">
+          <span className="min-w-0 truncate">Deleted “{removed.todo.title}”</span>
+          <button onClick={undoRemove} className="shrink-0 font-semibold text-[var(--brand)] hover:underline">
+            Undo
+          </button>
+        </div>
+      )}
+
       {shown.length === 0 ? (
         <p className="py-6 text-[13.5px]" style={{ color: 'var(--text-faint)' }}>
-          {open.length === 0 && done.length > 0
-            ? 'Everything here is done.'
-            : compact
-              ? 'Nothing outstanding.'
-              : 'Nothing yet. Type above and press enter.'}
+          {open.length === 0 && done.length > 0 ? 'Everything here is done.' : day ? 'Nothing for this day.' : compact ? 'Nothing outstanding.' : 'Nothing yet. Type above and press enter.'}
         </p>
       ) : (
-        <div className="stagger flex flex-col">
+        <div className="flex flex-col">
           {grouped.map(({ bucket, items }) => (
             <section key={bucket}>
-              {!compact && grouped.length > 1 && (
-                <p
-                  className="mb-1 mt-5 text-[10.5px] font-semibold uppercase tracking-[0.14em] first:mt-0"
-                  style={{
-                    color: bucket === 'overdue' ? 'var(--status-fading)' : 'var(--text-faint)',
-                  }}
-                >
-                  {bucket === 'done' ? 'Done' : BUCKET_LABELS[bucket]}
-                </p>
+              {grouped.length > 1 && (
+                <div className="mb-1 mt-5 flex items-center justify-between gap-3 first:mt-0">
+                  <p className="text-[10.5px] font-semibold uppercase tracking-[0.14em]" style={{ color: bucket === 'overdue' ? 'var(--status-fading)' : 'var(--text-faint)' }}>
+                    {bucket === 'done' ? 'Done' : BUCKET_LABELS[bucket]}
+                  </p>
+                  {bucket === 'overdue' && (
+                    <button onClick={() => patchTodos(items, { due_on: todayKey })} className="text-[12px] font-medium text-[var(--brand)] hover:underline">
+                      Move all to today
+                    </button>
+                  )}
+                </div>
               )}
               <ul className="flex flex-col">
-                {items.flatMap((todo) =>
-                  openId === todo.id && !compact
-                    ? [renderRow(todo), renderDetail(todo)]
-                    : [renderRow(todo)]
-                )}
+                {items.flatMap((todo) => (openId === todo.id ? [renderRow(todo), renderDetail(todo)] : [renderRow(todo)]))}
               </ul>
             </section>
           ))}
         </div>
       )}
 
+      {compact && overdueList.length > 0 && (
+        <button onClick={() => patchTodos(overdueList, { due_on: todayKey })} className="mt-3 text-[12.5px] font-medium text-[var(--brand)] hover:underline">
+          Move {overdueList.length} late to today
+        </button>
+      )}
+
       {!compact && done.length > 0 && (
-        <button
-          onClick={() => setShowDone((v) => !v)}
-          className="mt-4 text-[12.5px] font-medium underline underline-offset-2"
-          style={{ color: 'var(--text-muted)' }}
-        >
+        <button onClick={() => setShowDone((v) => !v)} className="mt-4 text-[12.5px] font-medium underline underline-offset-2" style={{ color: 'var(--text-muted)' }}>
           {showDone ? 'Hide' : 'Show'} {done.length} done
         </button>
       )}

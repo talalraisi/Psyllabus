@@ -394,7 +394,7 @@ export default function Dashboard() {
           action={
             // Until it is taken: two minutes that set the plan up to fit.
             !profile.plan_settings?.studyStyle && (
-              <Link href="/dashboard/study-style" className="btn btn-outline control-md">
+              <Link href="/dashboard/study-plan?type=1" className="btn btn-outline control-md">
                 Find your study type
                 <span className="text-[12px] font-normal" style={{ color: 'var(--text-faint)' }}>
                   2 min

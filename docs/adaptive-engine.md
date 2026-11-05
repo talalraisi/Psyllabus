@@ -33,24 +33,30 @@ levels, and the heat decides the points a correct answer earns.
 
 Two consequences worth stating, because both are deliberate:
 
-- **An easy run cannot reach the top.** Ten Low questions is 5 points, which is
-  Developing. Mastery is not available to somebody who only answers questions
-  they find easy, and that is the point of pricing by heat rather than counting
-  right answers.
+- **An easy run is the slow way up.** Eight Low questions is 4 points, which is
+  Developing; Mastered takes sixteen Low questions against about eleven Medium
+  or six Burning. Harder questions get you there faster, which is the point
+  of pricing by heat rather than counting right answers.
 - **Burning is meant to be rare.** If a generated bank is full of Burning
   questions, the bank is wrong, not the student.
 
 ## 2. Levels — what the colour means
 
-Owned by `lib/progress.js`. `MASTERY_TARGET` is **10** points.
+Owned by `lib/progress.js`. `MASTERY_TARGET` is **8** points.
 
 | points | level | shown as |
 | ---: | --- | --- |
 | 0 | Untested | grey |
-| 0–5 | Weak | red |
-| 5–7 | Developing | amber |
-| 7–9 | Proficient | green |
-| 9+ | Mastered | purple |
+| 0–3.5 | Weak | red |
+| 3.5–6 | Developing | amber |
+| 6–8 | Proficient | green |
+| 8+ | Mastered | purple |
+
+**The line moves for thin subtopics.** Those are the numbers for a subtopic
+with plenty of questions. Where the bank holds fewer, Mastered is 80% of what
+that subtopic's questions are worth, never under 3 or over 8 (`masteryTarget`), and the
+other levels keep their shares of it (Proficient 75%, Developing 45%). At a
+fixed 10 points only about a quarter of IB subtopics could be mastered at all.
 
 **Untested is not a level.** It is the absence of one, and it is grey rather
 than green so that a map never claims a student is fine at something nobody has
@@ -68,13 +74,18 @@ written. Any quiz touching a subtopic bumps `updated_at`, including one where
 every answer was wrong, so a Fading subtopic could otherwise be cleared by
 sitting a quiz and failing it. Retention has to be re-proved, not revisited.
 
-| days since last correct answer | state |
-| --- | --- |
-| 0 – 14 | holds |
-| 14 – 35 | **Fading** — back in the plan for a short retest |
-| 35+ | **Weak** — treated as not known |
+Memory fades on a curve, and what was learned better lasts longer. Days since
+the last correct answer:
 
-Constants: `DECAY_DAYS = 14`, `FADE_DAYS = 21`.
+| level | holds | Fading | then Developing | then |
+| --- | ---: | ---: | ---: | --- |
+| Mastered | 28 | 14 | 7 | Weak |
+| Proficient | 21 | 14 | 7 | Weak |
+| Developing | 14 | 14 | 0 | Weak |
+
+So a Mastered subtopic holds for four weeks, shows as **Fading** in weeks five
+and six (back in the plan for a short retest), drops to **Developing** for week
+seven and then to **Weak**. Constants: `SCHEDULE` in `lib/decay.js`.
 
 **What can fade:** Mastered, Proficient, **and Developing**. Developing was
 added because the previous rule implied a half-learned topic left for a month

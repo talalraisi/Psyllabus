@@ -17,7 +17,7 @@ import Everything from '@/components/marketing/Everything'
 export const metadata = {
   title: 'Project Syllabus',
   description:
-    'Project Syllabus maps your IB Diploma course topic by topic, tests what you know, plans what to study, and gives you Syllabi, an AI tutor that marks your drafts and turns your notes into flashcards.',
+    'Project Syllabus maps your IB Diploma course topic by topic, tests what you know, plans what to study, and gives you Syllabi, an AI tutor that gives feedback on your drafts and turns your notes into flashcards.',
 }
 
 /**
@@ -169,8 +169,9 @@ export default async function Home() {
             {[
               [floorTo(counts?.subjects ?? 160, 10), 'subjects'],
               [floorTo(counts?.subtopics ?? 9400, 100), 'subtopics mapped'],
-              // At least 50,000: the bank is past it now, rounding down to 45,000 undersells it.
-              [Math.max(50000, floorTo(counts?.questions ?? 50000, 5000)), 'practice questions'],
+              // Rounded down to the thousand, so the figure is always true: a fixed
+              // floor of 50,000 claimed more than the bank held.
+              [floorTo(counts?.questions ?? 49000, 1000), 'practice questions'],
               [floorTo(counts?.flashcards ?? 80000, 5000), 'flashcards'],
             ].map(([v, l], i) => (
               <Reveal key={l} delay={i * 70}>

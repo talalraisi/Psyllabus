@@ -9,6 +9,8 @@ import QuestionMenu from '@/components/QuestionMenu'
 import MathText from '@/components/MathText'
 import CodeText from '@/components/CodeText'
 import Calculator from '@/components/Calculator'
+import QuizBrief from '@/components/QuizBrief'
+import { useStudyClock } from '@/lib/use-study-clock'
 import MarkScheme from '@/components/MarkScheme'
 import CountUp from '@/components/CountUp'
 import HeatBadge from '@/components/HeatBadge'
@@ -21,6 +23,7 @@ import { gradeAnswer, feedbackFor } from '@/lib/grading'
 import { createClient } from '@/lib/supabase'
 import {
   statusFromPoints,
+  masteryTarget,
   pointsForQuestion,
   pointsToNextLevel,
   masteryFraction,
@@ -174,6 +177,10 @@ export default function QuizRunner({
   // Which of this quiz's questions are here because you got them wrong before.
   const [redemptionIds, setRedemptionIds] = useState(() => new Set())
   const [calcOpen, setCalcOpen] = useState(false)
+  // Paused: the clock stops and the question is hidden until Resume.
+  const [paused, setPaused] = useState(false)
+  // The in-page "leave or finish?" panel (the viewer has no confirm()).
+  const [leaving, setLeaving] = useState(false)
   // Drawn once the result screen is on the page, so the ring closes in front
   // of the student rather than being already closed when they arrive.
   const [ringLive, setRingLive] = useState(false)
@@ -193,14 +200,17 @@ export default function QuizRunner({
 
   // A paper is sat under exam conditions by definition.
   const timed = mode === 'mock' || mode === 'paper' || timedProp
-  // Test mode's stopwatch: seconds since the paper started.
+  // Test mode's stopwatch: seconds spent on the paper, pauses left out.
   const [watch, setWatch] = useState(0)
   useEffect(() => {
-    if (phase !== PHASE.quiz || sit !== 'test') return
-    const t0 = Date.now()
-    const id = setInterval(() => setWatch(Math.floor((Date.now() - t0) / 1000)), 1000)
+    if (phase !== PHASE.quiz || sit !== 'test' || paused || leaving) return
+    const id = setInterval(() => setWatch((w) => w + 1), 1000)
     return () => clearInterval(id)
-  }, [phase, sit])
+  }, [phase, sit, paused, leaving])
+  // Time on this quiz counts toward study time even if it is never finished:
+  // leaving part-way saves what was spent (lib/use-study-clock.js). A finished
+  // quiz records its own length, so that one is discarded instead.
+  const clock = useStudyClock({ running: phase === PHASE.quiz && !paused && !leaving, subject: subject || null, subtopic: subtopic || null })
   const [curriculumId, setCurriculumId] = useState('IB')
   const paperDefinition = mode === 'paper' && paper ? paperById(subject, curriculumId, paper) : null
   const timeLimitRef = useRef(null)
@@ -476,7 +486,7 @@ export default function QuizRunner({
    * are the answer.
    */
   useEffect(() => {
-    if (phase !== PHASE.quiz) return
+    if (phase !== PHASE.quiz || paused || leaving) return
     const onKey = (e) => {
       const el = document.activeElement
       const typing =
@@ -533,12 +543,35 @@ export default function QuizRunner({
     }
     setCurrentIndex(0)
     setAnswers({})
+    setWatch(0)
+    setPaused(false)
+    setLeaving(false)
     setPhase(PHASE.quiz)
   }
 
-  // Countdown for timed mocks, auto-submits at zero.
+  /** Stop the clock and hide the paper. Time on the current question stops too. */
+  const pauseQuiz = () => {
+    commitTime(questions[currentIndex]?.id)
+    lastSwitchRef.current = null
+    setCalcOpen(false)
+    setPaused(true)
+  }
+
+  const resumeQuiz = () => {
+    lastSwitchRef.current = Date.now()
+    setPaused(false)
+    setLeaving(false)
+  }
+
+  /** Leave without marking. The time spent still counts as study. */
+  const leaveQuiz = () => {
+    clock.save()
+    router.push(backHref)
+  }
+
+  // Countdown for timed mocks, auto-submits at zero. Stops while paused.
   useEffect(() => {
-    if (phase !== PHASE.quiz || !timed) return
+    if (phase !== PHASE.quiz || !timed || paused || leaving) return
     const interval = setInterval(() => {
       setSecondsLeft((s) => {
         if (s <= 1) {
@@ -550,7 +583,7 @@ export default function QuizRunner({
       })
     }, 1000)
     return () => clearInterval(interval)
-  }, [phase, timed])
+  }, [phase, timed, paused, leaving])
 
   const commitTime = useCallback((questionId) => {
     const now = Date.now()
@@ -613,13 +646,24 @@ export default function QuizRunner({
     setRevealed((prev) => ({ ...prev, [question.id]: graded }))
   }
 
-  const finishQuiz = useCallback(async () => {
+  /**
+   * Mark the paper. `early` is "finish here": only the questions answered so
+   * far are marked and counted, so stopping at 12 of 20 gives a result out of
+   * 12, not 12 right and 8 wrong for questions never seen.
+   */
+  const finishQuiz = useCallback(async (opts) => {
     if (!userId || submitting) return
-    setSubmitting(true)
-    commitTime(questions[currentIndex]?.id)
-
+    const early = opts?.early === true
     const currentAnswers = answersRef.current
-    const graded = questions.map((q) => {
+    const answeredOne = (q) => currentAnswers[q.id] != null && String(currentAnswers[q.id]).trim() !== ''
+    const sat = early ? questions.filter(answeredOne) : questions
+    if (!sat.length) return
+    setSubmitting(true)
+    setPaused(false)
+    setLeaving(false)
+    if (lastSwitchRef.current != null) commitTime(questions[currentIndex]?.id)
+
+    const graded = sat.map((q) => {
       const selected = currentAnswers[q.id] ?? null
       const { correct } = gradeAnswer(q, selected)
       return {
@@ -631,12 +675,13 @@ export default function QuizRunner({
     })
 
     const score = graded.filter((g) => g.correct).length
-    const total = questions.length
+    const total = sat.length
     const accuracy = total ? score / total : 0
-    const totalMarks = questions.reduce((sum, q) => sum + (q.marks || 1), 0)
+    const totalMarks = sat.reduce((sum, q) => sum + (q.marks || 1), 0)
     const elapsed = timed
       ? timeLimitRef.current - Math.max(0, secondsLeft ?? 0)
-      : graded.reduce((sum, g) => sum + g.timeSpent, 0)
+      : // Every question you spent time on, including ones left unanswered.
+        Object.values(questionTimesRef.current).reduce((sum, t) => sum + t, 0)
     // Nothing asks for one any more; the column stays so old rows still read.
     const prediction = null
 
@@ -666,8 +711,12 @@ export default function QuizRunner({
       .select('id')
       .single()
 
-    // The streak and today's minutes, everywhere they show, read again.
-    if (attempt) markStudied()
+    // The streak and today's minutes, everywhere they show, read again. The
+    // attempt carries this quiz's length, so the clock's copy is dropped.
+    if (attempt) {
+      clock.discard()
+      markStudied()
+    }
 
     if (attempt) {
       await supabase.from('question_responses').insert(
@@ -764,7 +813,23 @@ export default function QuizRunner({
         ])
       )
 
+      // What each subtopic's questions are worth in all, which sets its
+      // Mastered line (lib/progress.js masteryTarget): a subtopic with eight
+      // questions cannot ask for the points of one with forty.
+      const { data: bankRows } = await supabase
+        .from('questions')
+        .select('subject, subtopic, difficulty')
+        .eq('verified', true)
+        .in('subject', [...new Set([...meta.values()].map((m) => m.subject))])
+        .in('subtopic', touched.map((k) => k.split('|||')[1]))
+      const available = new Map()
+      for (const q of bankRows || []) {
+        const key = `${q.subject}|||${q.subtopic}`
+        available.set(key, (available.get(key) || 0) + pointsForQuestion(q.difficulty))
+      }
+
       const now = new Date().toISOString()
+      const targets = new Map(touched.map((key) => [key, masteryTarget(available.get(key))]))
       const rows = touched.map((key) => {
         const m = meta.get(key)
         const points = +(totals.get(key) || 0).toFixed(2)
@@ -774,7 +839,7 @@ export default function QuizRunner({
           topic: m.topic || '',
           subtopic: m.subtopic,
           mastery_points: points,
-          status: statusFromPoints(points),
+          status: statusFromPoints(points, targets.get(key)),
           updated_at: now,
         }
         if (gotSomethingRight.has(key)) row.last_correct_at = now
@@ -791,6 +856,7 @@ export default function QuizRunner({
         subtopic: r.subtopic,
         points: r.mastery_points,
         status: r.status,
+        target: targets.get(`${r.subject}|||${r.subtopic}`),
         gained: +(r.mastery_points - (before.get(`${r.subject}|||${r.subtopic}`) || 0)).toFixed(2),
       }))
     }
@@ -870,7 +936,7 @@ export default function QuizRunner({
     })
     setPhase(PHASE.results)
     setSubmitting(false)
-  }, [userId, submitting, questions, currentIndex, secondsLeft, mode, subject, topic, subtopic, timed, mistakeRowsById, commitTime, supabase])
+  }, [userId, submitting, questions, currentIndex, secondsLeft, mode, subject, topic, subtopic, timed, mistakeRowsById, commitTime, supabase, clock])
 
   /**
    * Sit the ones you got wrong again, now.
@@ -890,6 +956,8 @@ export default function QuizRunner({
     questionTimesRef.current = {}
     lastSwitchRef.current = Date.now()
     setCurrentIndex(0)
+    setWatch(0)
+    setPaused(false)
     setPhase(PHASE.quiz)
   }, [results])
 
@@ -919,9 +987,8 @@ export default function QuizRunner({
       ? minutes ||
         Math.round(questions.reduce((s, q) => s + (q.time_budget_seconds || 90), 0) / 60)
       : null
-    const totalMarks = questions.reduce((s, q) => s + (q.marks || 1), 0)
-    const eyebrow = paperDefinition
-      ? `${paperDefinition.name} · ${subject}`
+    const kind = paperDefinition
+      ? paperDefinition.name
       : mode === 'mock'
         ? 'Timed mock'
         : mode === 'mistakes'
@@ -931,60 +998,36 @@ export default function QuizRunner({
             : mode === 'topic'
               ? 'Topic test'
               : 'Mini-quiz'
-
-    const facts = [
-      ['Questions', String(questions.length)],
-      ['Marks', String(totalMarks)],
-      timed ? ['Time limit', `${totalMinutes} min`] : ['Timing', 'Untimed'],
-    ]
+    const eyebrow = subject && mode !== 'mistakes' ? `${kind} · ${subject}` : kind
 
     return (
-      <div>
-        <p
-          className="mb-3 text-[10.5px] font-semibold uppercase tracking-[0.16em]"
-          style={{ color: 'var(--text-faint)' }}
-        >
-          {eyebrow}
-        </p>
-        <h1 className="text-[clamp(1.7rem,3.4vw,2.3rem)] font-semibold leading-[1.1] tracking-[-0.03em]">
-          {paperDefinition
+      <QuizBrief
+        eyebrow={eyebrow}
+        title={
+          paperDefinition
             ? paperDefinition.blurb
             : mode === 'mistakes'
               ? 'Your past mistakes'
               : mode === 'topic'
                 ? topic
-                : subtopic || subject}
-        </h1>
-
-        <dl
-          className="mt-8 flex flex-wrap gap-x-12 gap-y-5 border-t pt-6"
-          style={{ borderColor: 'var(--border)' }}
-        >
-          {facts.map(([label, value]) => (
-            <div key={label}>
-              <dt className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
-                {label}
-              </dt>
-              <dd className="mt-1.5 text-[22px] font-semibold leading-none tracking-[-0.025em] tabular-nums">
-                {value}
-              </dd>
-            </div>
-          ))}
-        </dl>
-
-        {paperDefinition && paperDefinition.minutes && (
-          <p className="mt-5 text-[13px] leading-relaxed" style={{ color: 'var(--text-faint)' }}>
-            The real {paperDefinition.name} runs {paperDefinition.minutes} minutes. This one is
-            timed from the questions it actually contains.
-          </p>
-        )}
-
-        <div className="mt-10">
-          <button onClick={startQuiz} className="btn btn-solid control-lg">
-            {timed ? 'Start timed mock' : 'Start quiz'}
-          </button>
-        </div>
-      </div>
+                : displaySubtopic(subtopic) || subject
+        }
+        questions={questions}
+        timed={timed}
+        totalMinutes={totalMinutes}
+        sit={sit || (review === 'practice' ? 'practice' : timed ? 'exam' : null)}
+        review={review}
+        hintsAllowed={hintsAllowed}
+        redemptionCount={redemptionIds.size}
+        paperNote={
+          paperDefinition && paperDefinition.minutes
+            ? `The real ${paperDefinition.name} runs ${paperDefinition.minutes} minutes. This one is timed from the questions it actually contains.`
+            : null
+        }
+        startLabel={timed ? 'Start timed mock' : sit === 'test' ? 'Start test' : 'Start quiz'}
+        onStart={startQuiz}
+        backHref={backHref}
+      />
     )
   }
 
@@ -1046,8 +1089,92 @@ export default function QuizRunner({
       )
     }
 
+    const clocked = timed || sit === 'test'
+    const finishLabel = `Finish here and mark ${answeredCount === 1 ? 'the 1 question' : `the ${answeredCount} questions`} answered`
+
+    /* Paused, or deciding whether to leave. The paper is off the screen while
+       the clock is stopped, so a pause is not extra time to read ahead. */
+    if (paused || leaving) {
+      return (
+        <div className="mx-auto max-w-xl py-6">
+          <p className="mb-3 text-[10.5px] font-semibold uppercase tracking-[0.16em]" style={{ color: 'var(--text-faint)' }}>
+            {paused ? 'Paused' : 'Leave this test?'}
+          </p>
+          <h2 className="text-[clamp(1.5rem,3vw,2rem)] font-semibold leading-[1.15] tracking-[-0.03em]">
+            {paused
+              ? timed
+                ? `${formatClock(secondsLeft ?? 0)} left on the clock`
+                : sit === 'test'
+                  ? `${formatClock(watch)} so far`
+                  : 'Take a break'
+              : `You have answered ${answeredCount} of ${questions.length}`}
+          </h2>
+          <p className="mt-3 text-[14.5px] leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+            {paused
+              ? 'The clock is stopped and the questions are hidden until you come back.'
+              : 'Finish here to get your result for the questions you did. Either way, the time you spent counts toward your study time and streak.'}
+          </p>
+          <div className="mt-8 flex flex-col gap-2.5">
+            {paused && (
+              <button onClick={resumeQuiz} className="btn btn-solid control-lg">
+                Resume
+              </button>
+            )}
+            {answeredCount > 0 && (
+              <button
+                onClick={() => finishQuiz({ early: true })}
+                disabled={submitting}
+                className={`btn ${paused ? 'btn-quiet' : 'btn-solid'} control-lg flex items-center justify-center gap-2 disabled:opacity-40`}
+              >
+                {submitting ? <Spinner /> : null}
+                {submitting ? 'Marking' : finishLabel}
+              </button>
+            )}
+            {!paused && (
+              <button onClick={resumeQuiz} className="btn btn-quiet control-lg">
+                Keep going
+              </button>
+            )}
+            <button onClick={leaveQuiz} className="btn btn-quiet control-lg" style={{ color: 'var(--text-muted)' }}>
+              Leave without marking
+            </button>
+          </div>
+        </div>
+      )
+    }
+
     return (
       <div>
+        {/* Pause, finish early, leave. Pause only where there is a clock to stop. */}
+        <div className="mb-4 flex flex-wrap items-center justify-end gap-1.5">
+          {clocked && (
+            <button onClick={pauseQuiz} className="btn btn-quiet control-sm" aria-label="Pause the test">
+              <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+                <rect x="2.5" y="2" width="2.4" height="8" rx="0.8" fill="currentColor" />
+                <rect x="7.1" y="2" width="2.4" height="8" rx="0.8" fill="currentColor" />
+              </svg>
+              Pause
+            </button>
+          )}
+          {answeredCount > 0 && answeredCount < questions.length && (
+            <button onClick={() => finishQuiz({ early: true })} disabled={submitting} className="btn btn-quiet control-sm disabled:opacity-40">
+              Finish here
+            </button>
+          )}
+          <button
+            onClick={() => {
+              commitTime(questions[currentIndex]?.id)
+              lastSwitchRef.current = null
+              setCalcOpen(false)
+              setLeaving(true)
+            }}
+            className="btn btn-quiet control-sm"
+            style={{ color: 'var(--text-muted)' }}
+          >
+            Leave
+          </button>
+        </div>
+
         {/* Where you are, as a rail rather than a sentence. Every question is
             one segment: filled if it has an answer, brand if it is the one on
             screen, and each is a button so you can go back to the one you
@@ -1663,7 +1790,7 @@ export default function QuizRunner({
             <h2 className="mb-4 text-[15px] font-semibold tracking-[-0.012em]">Mastery</h2>
             <ul className="stagger flex flex-col gap-4">
               {results.earned.map((e) => {
-                const next = pointsToNextLevel(e.points)
+                const next = pointsToNextLevel(e.points, e.target)
                 return (
                   <li key={e.subtopic}>
                     <div className="flex items-baseline justify-between gap-3">
@@ -1688,7 +1815,7 @@ export default function QuizRunner({
                     >
                       <div
                         className={`bar-fill h-full rounded-full ${STATUS_COLORS[e.status]}`}
-                        style={{ width: `${masteryFraction(e.points) * 100}%` }}
+                        style={{ width: `${masteryFraction(e.points, e.target) * 100}%` }}
                       />
                     </div>
                   </li>
@@ -1709,7 +1836,8 @@ export default function QuizRunner({
               >
                 A question pays by heat, from Low 0.5 up to Burning 1.5, and only when you get it
                 right. Each question pays once, so the same easy one cannot be farmed.
-                {MASTERY_TARGET} points is Mastered.
+                Mastered is {MASTERY_TARGET} points, or less for a subtopic with only a few
+                questions: 80% of what its questions are worth, and never under 3.
               </p>
             </details>
           </section>

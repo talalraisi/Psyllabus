@@ -15,6 +15,7 @@ import WeekView from '@/components/calendar/WeekView'
 import CalendarConnections from '@/components/calendar/CalendarConnections'
 import TestSuggestions from '@/components/calendar/TestSuggestions'
 import TodoList from '@/components/TodoList'
+import { useTodos, todosByDay } from '@/lib/todos'
 import { accessibleSubjects } from '@/lib/access'
 import { AskSyllabi } from '@/components/syllabi/SyllabiDrawer'
 import {
@@ -44,6 +45,8 @@ const emptyDraft = (dateKey) => ({
 
 export default function CalendarPage() {
   const [profile, setProfile] = useState(null)
+  // The same to-dos as everywhere else, drawn on the days they are due.
+  const { todos } = useTodos()
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -506,6 +509,7 @@ export default function CalendarPage() {
               busy={imported}
               blocks={blocks}
               events={events}
+              todos={todos}
               selected={selected}
               onSelectDay={setSelected}
               onShiftWeek={(n) => setWeekStart((w) => new Date(w.getFullYear(), w.getMonth(), w.getDate() + 7 * n))}
@@ -517,6 +521,7 @@ export default function CalendarPage() {
               today={today}
               selected={selected}
               eventsByDay={byDay}
+              todosByDay={todosByDay(todos)}
               onSelect={setSelected}
               onShiftMonth={shiftMonth}
               onToday={() => setCursor(new Date(today.getFullYear(), today.getMonth(), 1))}
@@ -574,10 +579,9 @@ export default function CalendarPage() {
             dates the task to whichever day is selected above. */}
         <TodoList
           className="mb-12"
-          title="To-do"
-          defaultDue={selected}
+          title={selected === localDateKey(new Date()) ? 'To-do today' : 'To-do this day'}
+          day={selected}
           subjects={subjects}
-          key={selected}
         />
         </div>
 

@@ -25,6 +25,7 @@ import { planLabel, hasAllSubjects } from '@/lib/access'
 import { clearCache } from '@/lib/cache'
 import TimerPill from '@/components/TimerPill'
 import { stopTimerForSignOut } from '@/lib/session-timer'
+import { useTodos, dueNowCount } from '@/lib/todos'
 import FeedbackButton from '@/components/FeedbackButton'
 import SyllabiMark from '@/components/SyllabiMark'
 import { SyllabiProvider } from '@/components/syllabi/SyllabiDrawer'
@@ -72,7 +73,7 @@ const NAV_GROUPS = [
     items: [
       { href: '/dashboard/study-plan', label: 'Study Plan', Icon: IconStudyPlan, match: (p) => p === '/dashboard/study-plan' },
       { href: '/dashboard/calendar', label: 'Calendar', Icon: IconCalendar, match: (p) => p === '/dashboard/calendar' },
-      { href: '/dashboard/study-style', label: 'Study Type', Icon: IconStudyType, match: (p) => p === '/dashboard/study-style' },
+      { href: '/dashboard/todo', label: 'To-do', Icon: IconTodo, match: (p) => p === '/dashboard/todo', badge: 'todo' },
     ],
   },
   {
@@ -85,12 +86,13 @@ const NAV_GROUPS = [
   },
 ]
 
-/** A head with a spark: how you study best. */
-function IconStudyType({ width = 17, height = 17, style }) {
+/** A ticked list: the to-do. */
+function IconTodo({ width = 17, height = 17, style }) {
   return (
-    <svg width={width} height={height} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={style} aria-hidden="true">
-      <path d="M9 20v-2.5a6.5 6.5 0 1 1 7.5-6.4l1.3 2.6c.2.4-.1.8-.5.8H16v2a2 2 0 0 1-2 2h-1.5V20" />
-      <path d="M11.5 7.5l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z" />
+    <svg width={width} height={height} viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={style}>
+      <path d="M3.5 5.5l1.5 1.5 2.5-3" />
+      <path d="M3.5 13l1.5 1.5 2.5-3" />
+      <path d="M10.5 5.5h6M10.5 13h6" />
     </svg>
   )
 }
@@ -162,6 +164,10 @@ function Avatar({ profile, size = 32 }) {
 
 export default function DashboardLayout({ children, profile }) {
   const pathname = usePathname()
+  // Shared with every to-do list on the page (lib/todos.js), so ticking one
+  // updates the count at once.
+  const { todos } = useTodos()
+  const todoCount = dueNowCount(todos)
   const router = useRouter()
   const supabase = createClient()
   // Which account this actually is. It lives on the auth user rather than the
@@ -393,8 +399,9 @@ export default function DashboardLayout({ children, profile }) {
                 style={{ gridTemplateRows: folded ? '0fr' : '1fr' }}
               >
                 <ul className="flex min-h-0 flex-col gap-px overflow-hidden" inert={folded || undefined}>
-                  {items.map(({ href, label, Icon, match }) => {
+                  {items.map(({ href, label, Icon, match, badge }) => {
                     const active = match(pathname)
+                    const count = badge === 'todo' ? todoCount : 0
                     return (
                       <li key={href}>
                         <Link
@@ -423,6 +430,16 @@ export default function DashboardLayout({ children, profile }) {
                           >
                             {label}
                           </span>
+                          {/* Due today or late, so the list is seen without opening it. */}
+                          {count > 0 && (
+                            <span
+                              className={`ml-auto flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1.5 text-[10.5px] font-semibold tabular-nums ${open ? '' : 'absolute right-1 top-1 h-[14px] min-w-[14px] px-1 text-[9px]'}`}
+                              style={{ background: 'var(--brand)', color: '#fff' }}
+                              aria-label={`${count} due`}
+                            >
+                              {count}
+                            </span>
+                          )}
                         </Link>
                       </li>
                     )

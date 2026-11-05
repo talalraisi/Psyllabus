@@ -400,7 +400,10 @@ export default function ProfilePage() {
     invalidateProfile(profile.id)
     setProfile((p) => ({
       ...p,
-      plan: 'premium',
+      // A code with an end date opens Premium until then without changing
+      // the plan (099); a standing licence sets the plan, as the server does.
+      plan: data.expires ? p?.plan : 'premium',
+      access_expires_at: data.expires || p?.access_expires_at || null,
       access_source: data.label,
       is_admin: p?.is_admin || data.admin,
     }))

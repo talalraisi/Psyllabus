@@ -42,7 +42,8 @@ function Intro({ onStart }) {
 }
 
 function Question({ index, question, value, onAnswer, onBack }) {
-  const [picked, setPicked] = useState(() => (question.multi ? value || [] : value))
+  // A result saved before this question took several answers holds one value.
+  const [picked, setPicked] = useState(() => (question.multi ? (Array.isArray(value) ? value : value != null ? [value] : []) : value))
   // "Pick for me" stands alone: choosing it clears the rest, and the rest clear it.
   const only = new Set(question.options.filter((o) => o.only).map((o) => o.v))
   const toggle = (v) =>

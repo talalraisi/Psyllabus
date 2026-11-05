@@ -286,7 +286,7 @@ export default function PricingPage() {
               ],
               [
                 'What is Syllabi?',
-                'Your tutor for every subject. Ask it anything, send a photo of a question or a link, and it explains, sets practice and marks your answers. It marks IA, EE and TOK drafts and Paper 1 and Paper 2 answers against the criteria with a likely grade, suggests research questions and plans your week. It keeps your chats and markings so you can see your progress, and it comments on your work but never writes it.',
+                'Your tutor for every subject. Ask it anything, send a photo of a question or a link, and it explains, sets practice and marks your answers. It gives feedback on IA, EE and TOK drafts and Paper 1 and Paper 2 answers against the criteria, with an estimated grade, suggests research questions and plans your week. It keeps your chats and markings so you can see your progress, and it comments on your work but never writes it.',
               ],
               [
                 'Can I change subject on the free plan?',

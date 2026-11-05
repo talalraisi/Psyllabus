@@ -14,7 +14,7 @@
 
 import fs from 'node:fs'
 import { POINT_BANDS, MASTERY_TARGET, HEAT_LEVELS, statusFromPoints } from '../lib/progress.js'
-import { DECAY_DAYS, FADE_DAYS } from '../lib/decay.js'
+import { SCHEDULE } from '../lib/decay.js'
 import { SUBTOPIC_QUESTION_COUNT } from '../lib/quiz.js'
 
 const doc = fs.readFileSync(new URL('../docs/adaptive-engine.md', import.meta.url), 'utf8')
@@ -52,27 +52,30 @@ for (const [label, key] of [
 }
 
 // --- §2 the ladder ---------------------------------------------------------
-is(MASTERY_TARGET, stated(/`MASTERY_TARGET` is \*\*(\d+)\*\*/, 'MASTERY_TARGET'), 'MASTERY_TARGET')
+is(MASTERY_TARGET, stated(/`MASTERY_TARGET` is \*\*([0-9.]+)\*\*/, 'MASTERY_TARGET'), 'MASTERY_TARGET')
 for (const [status, re] of [
-  ['mastered', /\| (\d+)\+ \| Mastered \|/],
+  ['mastered', /\| ([0-9.]+)\+ \| Mastered \|/],
   // The lower bound of each band is the threshold, so capture the first
   // number in "7–9", not the second. Getting this backwards is what the test
   // caught on its first run, which is a fair advertisement for having it.
-  ['proficient', /\| (\d+)–\d+ \| Proficient \|/],
-  ['confident', /\| (\d+)–\d+ \| Developing \|/],
+  ['proficient', /\| ([0-9.]+)–[0-9.]+ \| Proficient \|/],
+  ['confident', /\| ([0-9.]+)–[0-9.]+ \| Developing \|/],
 ]) {
   const want = stated(re, `${status} threshold`)
   if (want !== null) is(POINT_BANDS.find((b) => b.status === status).min, want, `${status} threshold`)
 }
 
 // --- §3 forgetting ---------------------------------------------------------
-is(DECAY_DAYS, stated(/`DECAY_DAYS = (\d+)`/, 'DECAY_DAYS'), 'DECAY_DAYS')
-is(FADE_DAYS, stated(/`FADE_DAYS = (\d+)`/, 'FADE_DAYS'), 'FADE_DAYS')
-is(
-  DECAY_DAYS + FADE_DAYS,
-  stated(/\| (\d+)\+ \| \*\*Weak\*\*/, 'the day a subtopic lapses'),
-  'the lapse boundary matches DECAY_DAYS + FADE_DAYS'
-)
+for (const [status, label] of [['mastered', 'Mastered'], ['proficient', 'Proficient'], ['confident', 'Developing']]) {
+  const row = doc.match(new RegExp(`\\| ${label} \\| (\\d+) \\| (\\d+) \\| (\\d+) \\|`))
+  if (!row) {
+    console.log(`  FAIL  the spec no longer states the ${label} schedule`)
+    failed++
+    continue
+  }
+  const s = SCHEDULE[status]
+  is([s.holds, s.fades, s.slips].join(','), row.slice(1, 4).join(','), `${label} hold, fade and slip days`)
+}
 
 // --- §6 quizzes ------------------------------------------------------------
 is(
@@ -83,8 +86,8 @@ is(
 
 // --- the two claims the spec makes about behaviour, not constants ----------
 is(statusFromPoints(0), 'not_started', 'zero points reads as Untested, not Weak')
-// "Ten Low questions is 5 points, which is Developing."
-is(statusFromPoints(10 * HEAT_LEVELS[0].points), 'confident', 'an all-Low run tops out at Developing')
+// "Eight Low questions is 4 points, which is Developing."
+is(statusFromPoints(8 * HEAT_LEVELS[0].points), 'confident', 'eight Low questions is Developing')
 
 console.log(
   failed ? `\n${failed} failed — the spec and the code disagree` : 'the spec and the code agree on every number'

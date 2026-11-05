@@ -26,7 +26,7 @@ import {
   groupByUnit,
   sortTopics,
 } from '@/lib/progress'
-import { buildProgressDetailMap, effectiveStatus, isDecayed, daysSince, daysOfFadeLeft } from '@/lib/decay'
+import { buildProgressDetailMap, effectiveStatus, isDecayed, daysSince, daysOfFadeLeft, dropsTo } from '@/lib/decay'
 
 export default function SyllabusPage() {
   const { slug } = useParams()
@@ -345,7 +345,7 @@ export default function SyllabusPage() {
                                           progressDetail[key]?.status,
                                           progressDetail[key]?.updatedAt
                                         ) ?? 0
-                                      } days left before it drops to Weak. One correct answer resets it.`
+                                      } days left before it drops to ${STATUS_LABELS[dropsTo(progressDetail[key]?.status)]}. One correct answer resets it.`
                                     : 'Status is set by quiz results only'
                                 }
                               >

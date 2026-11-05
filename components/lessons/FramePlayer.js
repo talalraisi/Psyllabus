@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useStudyClock } from '@/lib/use-study-clock'
 import Link from 'next/link'
 import MathText from '@/components/MathText'
 import QuestionFigure from '@/components/QuestionFigure'
@@ -338,6 +339,8 @@ function Report({ onSend, onClose }) {
 }
 
 export default function FramePlayer({ lesson, met = [], onProgress, onAddCards, onReport, practiseHref, backHref, backLabel = 'Back' }) {
+  // Time on a lesson counts as study time (lib/use-study-clock.js).
+  useStudyClock({ subject: lesson?.subject || null, subtopic: lesson?.subtopic || null })
   const body = lesson.body || {}
   const screens = body.version === 3 ? body.screens || [] : (body.frames || []).map((f) => ({ title: '', blocks: [f] }))
   const outcomes = lesson.outcomes || []

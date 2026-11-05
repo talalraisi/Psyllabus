@@ -41,7 +41,7 @@ export const WHY = [
   },
   {
     title: 'Because forgetting is the default, not the exception',
-    body: 'Memory decays unless it is used, and the gap between October and May is where most marks quietly disappear. Anything you proved starts fading after two weeks, and drops to Weak after five.',
+    body: 'Memory decays unless it is used, and the gap between October and May is where most marks quietly disappear. Something you mastered holds for four weeks, fades for two, then slips a level a week at a time, the way memory does.',
   },
   {
     title: 'Because testing is studying, not just measuring',
@@ -156,7 +156,7 @@ export const FEATURE_DETAIL = [
     label: 'Decay',
     detail: [
       'Fading is measured from your last correct answer, not from the last time the row was touched. That distinction matters: any quiz on a subtopic updates it, including one where every answer was wrong, so without the rule a fading topic could be cleared by sitting a quiz and failing it. Retention has to be re-proved, not revisited.',
-      'Fourteen days without a correct answer and a subtopic starts fading. Twenty-one days after that — five weeks in total — it stops counting as known and returns to Weak. Only Mastered and Proficient fade, because something you never proved cannot quietly un-prove itself. One correct answer clears the whole thing, however long it has been.',
+      'Memory fades on a curve, and the better you knew something the longer it lasts. A Mastered subtopic holds for four weeks without a correct answer, shows as Fading in weeks five and six, drops to Developing for week seven and then to Weak. Proficient holds three weeks and Developing two. One correct answer clears the fade, however long it has been.',
     ],
     title: 'Topics that fade on their own',
     lede: 'Prove something, leave it, and it quietly goes back on the list.',
