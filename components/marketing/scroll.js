@@ -184,24 +184,33 @@ export function ScrollBar() {
 /** Counts up the first time it is seen, rather than on page load where nobody is looking. */
 export function CountUp({ to, suffix = '', prefix = '', duration = 1100, className = '', style }) {
   const [ref, seen] = useInView({ threshold: 0.6 })
-  const [n, setN] = useState(0)
-
-  /**
-   * The number has to be right even if the count never runs.
-   *
-   * Everything that starts the animation depends on the observer reporting,
-   * and when it does not the figure sits at zero — a homepage claiming "0
-   * subjects covered", which is worse than no animation at all. This is the
-   * backstop: if nothing has moved it shortly after mount, show the real value.
-   * Same rule as the reveals. Decoration may fail; the content may not.
-   */
+  // The real figure on the server and in the first paint, so the page's own
+  // HTML says "160+", not "0+": link previews, search engines, slow phones
+  // and anything reading the page before scripts run all saw zeros. On the
+  // first scroll, if it is still below the screen, it drops to zero, ready to
+  // count up as it comes into view; if it is already showing, it stays. Not
+  // decided on load: the page above is still settling then, and the figures
+  // look on screen when they are not.
+  const [n, setN] = useState(to)
+  const [armed, setArmed] = useState(false)
   useEffect(() => {
-    const backstop = setTimeout(() => setN((current) => (current === 0 ? to : current)), 1800)
-    return () => clearTimeout(backstop)
-  }, [to])
+    const el = ref.current
+    if (!el || typeof IntersectionObserver === 'undefined' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const first = () => {
+      window.removeEventListener('scroll', first)
+      if (el.getBoundingClientRect().top >= window.innerHeight) {
+        setN(0)
+        setArmed(true)
+      }
+    }
+    window.addEventListener('scroll', first, { passive: true })
+    return () => window.removeEventListener('scroll', first)
+  }, [ref])
 
+  // The number has to be right even if the count never runs: it starts as
+  // the real figure, and the count below always lands on it (settle).
   useEffect(() => {
-    if (!seen) return
+    if (!seen || !armed) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return setN(to)
 
     const start = performance.now()
@@ -225,7 +234,7 @@ export function CountUp({ to, suffix = '', prefix = '', duration = 1100, classNa
       cancelAnimationFrame(raf)
       clearTimeout(settle)
     }
-  }, [seen, to, duration])
+  }, [seen, armed, to, duration])
 
   return (
     <span ref={ref} className={`tabular-nums ${className}`} style={style}>
