@@ -290,7 +290,7 @@ export default function PricingPage() {
               ],
               [
                 'Can I change subject on the free plan?',
-                'No. You choose it once, when you set up your account. Otherwise a free account could read the whole syllabus a subject at a time, and there would be nothing to pay for.',
+                'Yes, up to five times, from My Subjects. Your progress in each subject is kept, so switching back picks up where you left off. After five switches, unlocking every subject is the way to open another.',
               ],
               [
                 'Does my school see my results?',

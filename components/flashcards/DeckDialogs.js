@@ -87,7 +87,7 @@ export function NameSheet({ title, sub, initial = '', placeholder, action = 'Sav
   )
 }
 
-export function ConfirmSheet({ title, body, action = 'Delete', onConfirm, onClose }) {
+export function ConfirmSheet({ title, body, action = 'Delete', tone = 'danger', onConfirm, onClose }) {
   const [busy, setBusy] = useState(false)
   return (
     <Sheet title={title} onClose={onClose}>
@@ -107,7 +107,7 @@ export function ConfirmSheet({ title, body, action = 'Delete', onConfirm, onClos
             onClose()
           }}
           className="btn control-md"
-          style={{ background: 'var(--danger)', color: '#fff' }}
+          style={{ background: tone === 'danger' ? 'var(--danger)' : 'var(--brand-solid)', color: '#fff' }}
         >
           {busy ? 'Working…' : action}
         </button>

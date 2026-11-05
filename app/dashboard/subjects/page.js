@@ -13,7 +13,8 @@ import { getSlugForSubject } from '@/lib/subject-map'
 import { progressKey, STATUS_LABELS } from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
-import { claimFreeSubject } from '@/lib/free-claim'
+import { claimFreeSubject, switchFreeSubject } from '@/lib/free-claim'
+import { ConfirmSheet } from '@/components/flashcards/DeckDialogs'
 import {
   isSubjectLocked,
   hasAllSubjects,
@@ -48,6 +49,7 @@ export default function SubjectsPage() {
     return () => stopLoading()
   }, [loading])
   const [switching, setSwitching] = useState('')
+  const [confirming, setConfirming] = useState(null)
   const [claimError, setClaimError] = useState('')
   const router = useRouter()
   const supabase = createClient()
@@ -98,20 +100,21 @@ export default function SubjectsPage() {
   }, [router, supabase])
 
   /**
-   * Accounts that predate the picker have no free subject recorded, so they
-   * choose one here. Everybody else chose at the end of onboarding, and that
-   * is the whole of it — there is no switching.
+   * The first choice is a claim, with its checks (accounts that predate the
+   * picker make it here). After that it is a switch, five in all, asked
+   * about first because each one counts.
    */
   const chooseFreeSubject = async (subject) => {
     if (switching) return
-    if (!canSwitchFreeSubject(profile).allowed) return
+    const can = canSwitchFreeSubject(profile)
+    if (!can.allowed) return
 
     setSwitching(subject)
     setClaimError('')
-    const res = await claimFreeSubject(supabase, subject)
+    const res = can.first ? await claimFreeSubject(supabase, subject) : await switchFreeSubject(supabase, subject)
     if (res.ok) {
       invalidateProfile(profile.id)
-      setProfile((p) => ({ ...p, free_subject: subject }))
+      setProfile((p) => ({ ...p, free_subject: subject, free_switches: can.first ? p.free_switches || 0 : (p.free_switches || 0) + 1 }))
     } else {
       setClaimError(res.error)
     }
@@ -226,11 +229,11 @@ export default function SubjectsPage() {
           <div className="mt-auto">
             {canSwitch.allowed ? (
               <button
-                onClick={() => chooseFreeSubject(subject)}
+                onClick={() => (canSwitch.first ? chooseFreeSubject(subject) : setConfirming(subject))}
                 disabled={!!switching}
                 className="btn btn-outline control-md w-full disabled:opacity-40"
               >
-                {switching === subject ? 'Setting up' : 'Make this my free subject'}
+                {switching === subject ? 'Setting up' : canSwitch.first ? 'Make this my free subject' : 'Switch my free subject to this'}
               </button>
             ) : (
               <p className="text-[12.5px]" style={{ color: 'var(--text-faint)' }}>
@@ -271,9 +274,11 @@ export default function SubjectsPage() {
               style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
             >
               <p className="text-[13px]" style={{ color: 'var(--text-body)' }}>
-                {canSwitch.allowed
+                {canSwitch.first
                   ? 'Your free account studies one subject. Choose which below.'
-                  : `Your free account studies ${freeSubjectName || 'one subject'}. The rest open together.`}
+                  : canSwitch.allowed
+                    ? `Your free account studies ${freeSubjectName || 'one subject'}. You can switch it ${canSwitch.left} more time${canSwitch.left === 1 ? '' : 's'}; your progress in every subject is kept.`
+                    : `Your free account studies ${freeSubjectName || 'one subject'}. You have used all five switches; the rest open together.`}
               </p>
               <Link href="/dashboard/profile#unlock" className="btn btn-outline control-sm shrink-0">
                 Unlock every subject
@@ -292,6 +297,16 @@ export default function SubjectsPage() {
 
         </Section>
 
+        {confirming && (
+          <ConfirmSheet
+            title={`Switch your free subject to ${confirming}?`}
+            body={`${freeSubjectName || 'Your current subject'} locks, with all its progress kept, and ${confirming} opens. ${canSwitch.left - 1 === 0 ? 'This is your last switch.' : `You will have ${canSwitch.left - 1} switch${canSwitch.left - 1 === 1 ? '' : 'es'} left.`}`}
+            action="Switch"
+            tone="brand"
+            onConfirm={() => chooseFreeSubject(confirming)}
+            onClose={() => setConfirming(null)}
+          />
+        )}
       </Page>
     </DashboardLayout>
   )
