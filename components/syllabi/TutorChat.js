@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase'
 import MathText from '@/components/MathText'
 import SyllabiMark from '@/components/SyllabiMark'
 import { subjectCode, shortName } from '@/lib/subject-short'
+import RateAnswer from '@/components/syllabi/RateAnswer'
 import { prepare, linksIn, host, MAX_FILES, ACCEPT, FileProblem } from '@/components/syllabi/files'
 import { ArrowUp, Stop, Paperclip, Copy, Check, Chevron, FileIcon, LinkIcon, Close } from '@/components/syllabi/icons'
 import Select from '@/components/Select'
@@ -748,8 +749,10 @@ export default function TutorChat({
                             </button>
                           )}
                           {!(busy && i === messages.length - 1) && !FAILED.test(m.content) && (
-                            <div className="mt-2 -ml-2 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+                            <div className="mt-2 -ml-2 flex flex-wrap items-start gap-1 transition-opacity md:opacity-0 md:group-hover:opacity-100 md:focus-within:opacity-100">
                               <CopyButton text={m.content} />
+                              {/* Was it any good? Kept open on a phone, where nothing hovers. */}
+                              <RateAnswer task="tutor" subject={subject} answer={m.content} />
                             </div>
                           )}
                         </>

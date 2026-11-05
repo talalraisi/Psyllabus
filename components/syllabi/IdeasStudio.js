@@ -6,6 +6,7 @@ import { getSyllabus } from '@/lib/cache'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 import { progressKey, displaySubtopic } from '@/lib/progress'
 import { shortName } from '@/lib/subject-short'
+import RateAnswer from '@/components/syllabi/RateAnswer'
 import { ArrowUp, Copy, Check, Sparkle } from '@/components/syllabi/icons'
 import Select from '@/components/Select'
 
@@ -435,6 +436,8 @@ export default function IdeasStudio({ subjects = [], userId, onTalk }) {
         </div>
       )}
 
+      {result?.ideas && <RateAnswer key={result.ideas[0]?.question} className="mt-3" task="ideas" subject={subject} label="Were these ideas useful?" answer={`Research ideas: ${result.ideas.map((x) => x.question).join(' / ')}`} />}
+
       {/* A plan for the week. */}
       {result?.steps && (
         <div className="sy-rise mt-6 rounded-[20px] border p-5 sm:p-6" style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}>
@@ -473,7 +476,8 @@ export default function IdeasStudio({ subjects = [], userId, onTalk }) {
               {result.avoid}
             </p>
           )}
-          <div className="mt-4 flex justify-end">
+          <div className="mt-4 flex flex-wrap items-start justify-between gap-2">
+            <RateAnswer key={result.headline} task="ideas" subject={subject} label="Useful?" answer={`Study plan: ${result.headline} ${result.steps.map((x) => x.title).join(' / ')}`} />
             <button
               type="button"
               onClick={() => onTalk?.({ subject, text: `Here's my study plan for ${subject} this week: ${result.headline} Can you help me start on step 1: ${result.steps[0]?.title}?` })}

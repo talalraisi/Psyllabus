@@ -26,6 +26,8 @@ const KIND_LABEL = {
   confusing: 'Confusing',
   idea: 'An idea',
   other: 'Something else',
+  ai_good: 'Syllabi: good',
+  ai_bad: 'Syllabi: bad',
 }
 
 const KIND_TONE = {
@@ -33,6 +35,8 @@ const KIND_TONE = {
   confusing: 'var(--status-developing)',
   idea: 'var(--brand)',
   other: 'var(--text-faint)',
+  ai_good: 'var(--status-proficient)',
+  ai_bad: 'var(--status-weak)',
 }
 
 function ago(when) {
@@ -134,6 +138,9 @@ export default function FeedbackPage() {
                 { label: 'broke', value: byKind('problem'), tone: 'var(--status-weak)' },
                 { label: 'confusing', value: byKind('confusing'), tone: 'var(--status-developing)' },
                 { label: 'ideas', value: byKind('idea') },
+                // The thumbs on Syllabi's answers (components/syllabi/RateAnswer.js).
+                { label: 'Syllabi bad', value: byKind('ai_bad'), tone: 'var(--status-weak)' },
+                { label: 'Syllabi good', value: byKind('ai_good'), tone: 'var(--status-proficient)' },
               ]}
             />
 

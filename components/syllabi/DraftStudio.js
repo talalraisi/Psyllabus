@@ -8,6 +8,7 @@ import { KINDS, rubricFor, isPaper } from '@/lib/criteria'
 import { segments } from '@/lib/draft-review'
 import { senseCheck, MIN_WORDS } from '@/lib/sense-check'
 import { shortName } from '@/lib/subject-short'
+import RateAnswer from '@/components/syllabi/RateAnswer'
 import { Chevron, Copy, Check, Download, Collapse, Refresh, FileIcon } from '@/components/syllabi/icons'
 import Select from '@/components/Select'
 import { readDraft, readPdfWithSyllabi, pdfHasImages, DraftFileProblem, DRAFT_ACCEPT, looksWrapped, reflow } from '@/components/syllabi/draftFile'
@@ -692,6 +693,14 @@ export default function DraftStudio({ subjects = [] }) {
                 {review.overview}
               </p>
             )}
+
+            {/* Was the marking right? The mark and grade go with it, never the draft. */}
+            <RateAnswer
+              task="draft"
+              subject={subject}
+              label="Was this marking fair?"
+              answer={`${KINDS.find((k) => k.key === kind)?.label || kind}: ${total} of ${outOf}, grade ${review.grade_estimate || '?'}. ${review.criteria.map((c) => `${c.id} ${c.score}/${c.max}`).join(', ')}`}
+            />
 
             {/* Every marking of this draft, so a redraft shows what it gained. */}
             {history.length > 0 && (
