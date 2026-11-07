@@ -7,6 +7,7 @@ import { PriceCompare } from '@/components/marketing/visuals'
 import { IconCheck, IconArrowRight, IconClose } from '@/components/Icons'
 import { PLANS, SCHOOL_PLAN, COMPARISON } from '@/lib/plans'
 import { billingLive } from '@/lib/billing'
+import NotifyPremium from '@/components/NotifyPremium'
 
 /**
  * Three plans and a footnote.
@@ -157,6 +158,7 @@ export default function PricingPage() {
             ? 'Pay monthly or yearly, cancel any time. Payment is handled by Lemon Squeezy.'
             : 'Psyllabus is in beta and paid plans are not open yet. Sign up free and you will be the first to be offered one.'}
         </p>
+        {!billingLive && <NotifyPremium className="mt-4 max-w-sm" />}
 
         {/* Row by row, where the eye can travel across. */}
         <section className="mt-20">

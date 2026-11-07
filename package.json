@@ -23,7 +23,8 @@
     "reports": "node scripts/reports.mjs",
     "recheck": "node scripts/recheck.mjs",
     "pick-model": "node scripts/pick-model.mjs",
-    "billing-ids": "node scripts/billing-variants.mjs"
+    "billing-ids": "node scripts/billing-variants.mjs",
+    "premium-interest": "node scripts/premium-interest.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.117.1",

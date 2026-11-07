@@ -54,3 +54,6 @@ guides/ib/
 
 # Content pipeline state, reports and spend ledger (scripts/build-content.mjs)
 content-runs/
+
+# who asked to hear when Premium opens (scripts/premium-interest.mjs)
+premium-interest.csv

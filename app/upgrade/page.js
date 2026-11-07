@@ -11,6 +11,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import PageShell from '@/components/marketing/PageShell'
 import { createClient } from '@/lib/supabase'
+import NotifyPremium from '@/components/NotifyPremium'
 import { getCurrentUser } from '@/lib/auth'
 import { PLANS } from '@/lib/plans'
 import { billingLive } from '@/lib/billing'
@@ -88,9 +89,12 @@ function Upgrade() {
         </div>
 
         {!billingLive ? (
-          <p className="mt-6 text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
-            Psyllabus is in beta, so paid plans are not open yet. Make a free account now and you can upgrade from your profile the day they open.
-          </p>
+          <>
+            <p className="mt-6 text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
+              Psyllabus is in beta, so paid plans are not open yet. Make a free account now and you can upgrade from your profile the day they open.
+            </p>
+            <NotifyPremium plan={plan.id === 'basic' ? 'basic' : 'premium'} cycle={cycle} className="mt-4" />
+          </>
         ) : user === null ? (
           <div className="mt-6">
             <p className="text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
