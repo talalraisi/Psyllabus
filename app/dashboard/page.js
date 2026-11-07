@@ -27,7 +27,7 @@ import {
 } from '@/lib/progress'
 import { buildEffectiveProgressMap } from '@/lib/decay'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
-import { hasAllSubjects, isSubjectLocked, accessibleSubjects, hasSyllabi, canUse } from '@/lib/access'
+import { hasAllSubjects, isSubjectLocked, accessibleSubjects, canOpenSyllabi, canUse } from '@/lib/access'
 import StudyHeatmap from '@/components/StudyHeatmap'
 import { studyIntervals, minutesPerDay } from '@/lib/study-time'
 import { primeStudyDays, restDaysFor } from '@/lib/streak'
@@ -415,7 +415,7 @@ export default function Dashboard() {
           <WelcomeTour
             profile={profile}
             firstName={firstName}
-            syllabi={hasSyllabi(profile)}
+            syllabi={canOpenSyllabi(profile)}
             subjectHref={singleFree ? startHref : null}
             subjectName={firstSubject}
           />

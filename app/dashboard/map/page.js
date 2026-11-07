@@ -26,7 +26,7 @@ import { progressKey, mergeSyllabusWithProgress } from '@/lib/progress'
 import { buildEffectiveProgressMap, buildProgressDetailMap } from '@/lib/decay'
 import { buildGraph } from '@/lib/subject-graph'
 import { IB_CORE_SUBJECTS } from '@/lib/ib-points'
-import { accessibleSubjects, canUse, hasSyllabi } from '@/lib/access'
+import { accessibleSubjects, canUse, canOpenSyllabi } from '@/lib/access'
 
 function SubjectMapPage() {
   const [profile, setProfile] = useState(null)
@@ -178,7 +178,7 @@ function SubjectMapPage() {
             key={subject}
             graph={graph}
             subjects={graphs.map((g) => g.subject)}
-            syllabi={hasSyllabi(profile)}
+            syllabi={canOpenSyllabi(profile)}
             initialAt={initialAt}
             onSubject={(s) => router.replace(`/dashboard/map?subject=${encodeURIComponent(s)}`, { scroll: false })}
             onOverview={() => router.push('/dashboard/map', { scroll: false })}

@@ -155,7 +155,7 @@ export default function PricingPage() {
         <p className="mt-5 text-[13px]" style={{ color: 'var(--text-muted)' }}>
           {billingLive
             ? 'Pay monthly or yearly, cancel any time. Payment is handled by Lemon Squeezy.'
-            : 'Paid plans are not live yet. Sign up free and you will be the first to be offered one.'}
+            : 'Psyllabus is in beta and paid plans are not open yet. Sign up free and you will be the first to be offered one.'}
         </p>
 
         {/* Row by row, where the eye can travel across. */}
@@ -286,7 +286,7 @@ export default function PricingPage() {
               ],
               [
                 'What is Syllabi?',
-                'Your tutor for every subject. Ask it anything, send a photo of a question or a link, and it explains, sets practice and marks your answers. It gives feedback on IA, EE and TOK drafts and Paper 1 and Paper 2 answers against the criteria, with an estimated grade, suggests research questions and plans your week. It keeps your chats and markings so you can see your progress, and it comments on your work but never writes it.',
+                'Your tutor for every subject. Ask it anything, send a photo of a question or a link, and it explains, sets practice and marks your answers. It gives feedback on IA, EE and TOK drafts and Paper 1 and Paper 2 answers against the criteria, with an estimated grade, suggests research questions and plans your week. It keeps your chats and markings so you can see your progress, and it comments on your work but never writes it. Every account can try it: 10 messages and 1 marking, free.',
               ],
               [
                 'Can I change subject on the free plan?',

@@ -116,16 +116,18 @@ export async function POST(request) {
 
   // Syllabi is the thing Premium buys, so the check is here rather than only
   // on the button: an endpoint that trusts the UI to hide it is not gated.
+  // Without Premium, one draft marking is free (103-syllabi-trial.sql: the
+  // claim below counts it); the other tasks are Premium only.
   const { data: profile } = await supabase
     .from('profiles')
     .select('plan, is_admin, access_expires_at, subjects')
     .eq('id', user.id)
     .maybeSingle()
 
-  if (!hasSyllabi(profile)) {
+  if (!hasSyllabi(profile) && task !== 'draft_feedback') {
     return NextResponse.json(
       {
-        error: 'Syllabi is part of Premium.',
+        error: 'Ideas from Syllabi come with Premium.',
         code: 'upgrade_required',
       },
       { status: 402 }
@@ -277,6 +279,6 @@ export async function POST(request) {
   }
 
   return NextResponse.json(
-    review ? { review: parsed, saved, remaining: claimed.remaining } : { result: parsed, saved, remaining: claimed.remaining }
+    review ? { review: parsed, saved, remaining: claimed.remaining, trial: claimed.trial } : { result: parsed, saved, remaining: claimed.remaining, trial: claimed.trial }
   )
 }

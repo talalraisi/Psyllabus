@@ -22,7 +22,8 @@
     "spot-check": "node scripts/spot-check.mjs",
     "reports": "node scripts/reports.mjs",
     "recheck": "node scripts/recheck.mjs",
-    "pick-model": "node scripts/pick-model.mjs"
+    "pick-model": "node scripts/pick-model.mjs",
+    "billing-ids": "node scripts/billing-variants.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.117.1",

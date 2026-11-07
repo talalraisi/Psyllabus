@@ -323,6 +323,9 @@ export default function DraftStudio({ subjects = [] }) {
   const [step, setStep] = useState(0)
   const [error, setError] = useState('')
   const [remaining, setRemaining] = useState(null)
+  // A marking on the free trial: there is no "left today", only what is left of the trial.
+  const [trial, setTrial] = useState(false)
+  const [upgrade, setUpgrade] = useState(false)
   const [tab, setTab] = useState('marks')
   const [active, setActive] = useState(null)
   const [only, setOnly] = useState(null)
@@ -445,6 +448,7 @@ export default function DraftStudio({ subjects = [] }) {
     setBusy(true)
     setStep(0)
     setError('')
+    setUpgrade(false)
     setSheet(true)
     setPanel(true)
     const sentText = text
@@ -457,11 +461,13 @@ export default function DraftStudio({ subjects = [] }) {
       const data = await res.json().catch(() => ({}))
       if (!res.ok || !data.review) {
         setError(data.code === 'not_configured' ? 'Syllabi is being switched on. Try again soon.' : data.error || 'That did not work.')
+        setUpgrade(data.code === 'upgrade_required')
       } else {
         setReview(data.review)
         setMarkedText(sentText)
         setMarkedFor(forKey)
         setRemaining(data.remaining ?? null)
+        setTrial(Boolean(data.trial))
         if (data.saved) {
           setMarkId(data.saved.id)
           const total = data.review.criteria.reduce((a, c) => a + c.score, 0)
@@ -1041,7 +1047,12 @@ export default function DraftStudio({ subjects = [] }) {
     <div className="shrink-0 border-t px-5 py-4" style={{ borderColor: 'var(--border)' }}>
       {error && (
         <p className="sy-rise mb-3 text-[12.5px]" style={{ color: 'var(--status-weak)' }} role="alert">
-          {error}
+          {error}{' '}
+          {upgrade && (
+            <a href="/pricing" className="font-medium underline underline-offset-2">
+              Get Premium
+            </a>
+          )}
         </p>
       )}
       <div className="flex items-end justify-between gap-3">
@@ -1057,7 +1068,7 @@ export default function DraftStudio({ subjects = [] }) {
           </span>
           <p className="mt-1.5 text-[12px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
             {text.length.toLocaleString()} characters · {words.toLocaleString()} words
-            {remaining !== null && ` · ${remaining} left today`}
+            {remaining !== null && (trial ? ` · ${remaining ? `${remaining} free marking left` : 'that was your free marking'}` : ` · ${remaining} left today`)}
           </p>
         </div>
         <button

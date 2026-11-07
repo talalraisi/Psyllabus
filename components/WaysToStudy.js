@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import SyllabiMark from '@/components/SyllabiMark'
 import { IconTest, IconCards, IconCheck, IconReview, IconArrowRight } from '@/components/Icons'
-import { hasSyllabi, canUse } from '@/lib/access'
+import { canOpenSyllabi, canUse } from '@/lib/access'
 import { getSlugForSubject } from '@/lib/subject-map'
 import { displaySubtopic } from '@/lib/progress'
 
@@ -60,7 +60,7 @@ const quizHref = (focus, extra) => {
 }
 
 export default function WaysToStudy({ profile, focus }) {
-  const syllabi = hasSyllabi(profile)
+  const syllabi = canOpenSyllabi(profile)
   const notesHref = focus?.subject ? `/dashboard/syllabus/${getSlugForSubject(focus.subject)}` : '/dashboard/subjects'
 
   const ways = [

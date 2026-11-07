@@ -32,6 +32,7 @@ import { SyllabiProvider } from '@/components/syllabi/SyllabiDrawer'
 import ThemeToggle from '@/components/ThemeToggle'
 import { StreakChip } from '@/components/Streak'
 import FriendsButton from '@/components/FriendsButton'
+import BetaBadge from '@/components/BetaBadge'
 import { Chevron } from '@/components/Select'
 
 /**
@@ -329,6 +330,7 @@ export default function DashboardLayout({ children, profile }) {
             }}
           />
         </Link>
+        {open && <BetaBadge className="ml-2" />}
         {!mobile && (
           <button
             onClick={togglePinned}
@@ -573,6 +575,7 @@ export default function DashboardLayout({ children, profile }) {
         <Link href="/dashboard" className="inline-block" aria-label="Dashboard">
           <Image src={logoMark} alt="Project Syllabus" sizes="70px" style={{ height: 28, width: 'auto', aspectRatio: '1472 / 613' }} priority />
         </Link>
+        <BetaBadge className="ml-2" />
         <span className="ml-auto">
           <FriendsButton />
         </span>

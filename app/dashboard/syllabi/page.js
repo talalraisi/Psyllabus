@@ -19,7 +19,7 @@ import TutorChat from '@/components/syllabi/TutorChat'
 import IdeasStudio from '@/components/syllabi/IdeasStudio'
 import DraftStudio from '@/components/syllabi/DraftStudio'
 import ChatHistory from '@/components/syllabi/ChatHistory'
-import { hasSyllabi } from '@/lib/access'
+import { hasSyllabi, canOpenSyllabi, SYLLABI_TRIAL } from '@/lib/access'
 
 /**
  * Ask fills the screen so the box sits at the bottom of it; Ideas scrolls
@@ -51,6 +51,45 @@ const TABS = [
   ['ideas', 'Ideas'],
 ]
 
+/**
+ * What is left of the free trial, above the tools, with the way to Premium
+ * beside it. Asked again whenever the page says something was used.
+ */
+function TrialBar({ bump }) {
+  const [supabase] = useState(() => createClient())
+  const [left, setLeft] = useState(null)
+  useEffect(() => {
+    let live = true
+    supabase.rpc('syllabi_trial_left').then(({ data }) => live && setLeft(data || null))
+    return () => {
+      live = false
+    }
+  }, [supabase, bump])
+  if (!left || left.premium) return null
+  const msgs = left.messages ?? SYLLABI_TRIAL.messages
+  const mark = left.marking ?? SYLLABI_TRIAL.marking
+  return (
+    <div
+      className="mb-4 flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 rounded-[14px] border px-4 py-3 text-[13px]"
+      style={{ borderColor: 'color-mix(in oklab, var(--brand) 40%, transparent)', background: 'color-mix(in oklab, var(--brand) 8%, transparent)' }}
+    >
+      <span className="font-semibold" style={{ color: 'var(--brand)' }}>
+        Free trial
+      </span>
+      {left.eligible === false ? (
+        <span style={{ color: 'var(--text-muted)' }}>Choose your free subject first, then try Syllabi.</span>
+      ) : (
+        <span className="tabular-nums" style={{ color: 'var(--text-muted)' }}>
+          {msgs} of {SYLLABI_TRIAL.messages} free messages left · {mark ? `${mark} free draft marking left` : 'free marking used'}
+        </span>
+      )}
+      <a href="/pricing" className="btn btn-solid control-sm ml-auto">
+        Get Premium
+      </a>
+    </div>
+  )
+}
+
 function Syllabi() {
   const params = useSearchParams()
   const [profile, setProfile] = useState(null)
@@ -62,6 +101,8 @@ function Syllabi() {
   const [chatsLoading, setChatsLoading] = useState(true)
   const [open, setOpen] = useState({ n: 0, chat: null })
   const [historyOpen, setHistoryOpen] = useState(false)
+  // Asks the trial bar to count again after something was used.
+  const [bump, setBump] = useState(0)
   const router = useRouter()
   const supabase = createClient()
 
@@ -135,6 +176,7 @@ function Syllabi() {
 
   const saved = useCallback((meta) => {
     remember(meta.id)
+    setBump((b) => b + 1)
     // A chat keeps its folder as it is saved.
     setChats((list) => [{ ...meta, folder_id: list.find((c) => c.id === meta.id)?.folder_id ?? null }, ...list.filter((c) => c.id !== meta.id)])
   }, [])
@@ -195,7 +237,10 @@ function Syllabi() {
   }
 
   const subjects = profile.subjects || []
-  const allowed = hasSyllabi(profile)
+  // Everyone can open Syllabi; without Premium it is the free trial, and
+  // Ideas stays Premium only.
+  const allowed = canOpenSyllabi(profile)
+  const full = hasSyllabi(profile)
   const tabStyle = (on) =>
     on ? { background: 'var(--surface)', color: 'var(--text)', boxShadow: '0 1px 3px rgb(0 0 0 / 0.12)' } : { color: 'var(--text-muted)' }
 
@@ -242,6 +287,7 @@ function Syllabi() {
           )}
         </div>
 
+        {allowed && !full && <TrialBar bump={`${bump}-${tab}`} />}
         {!allowed ? (
           <LockedPanel
             plan="Premium"
@@ -275,6 +321,12 @@ function Syllabi() {
           </div>
         ) : tab === 'draft' ? (
           <DraftStudio subjects={subjects} />
+        ) : !full ? (
+          <LockedPanel
+            plan="Premium"
+            title="Ideas for your IA and EE"
+            blurb="Research questions that fit your subject and interests, and study advice built from what you are weak at."
+          />
         ) : (
           <IdeasStudio
             subjects={subjects}

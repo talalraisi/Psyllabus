@@ -4,7 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState } f
 import Link from 'next/link'
 import SyllabiMark from '@/components/SyllabiMark'
 import TutorChat from '@/components/syllabi/TutorChat'
-import { hasSyllabi } from '@/lib/access'
+import { canOpenSyllabi } from '@/lib/access'
 import { Close } from '@/components/syllabi/icons'
 
 /**
@@ -25,7 +25,8 @@ const SyllabiContext = createContext({ available: false, open: () => {} })
 export const useSyllabi = () => useContext(SyllabiContext)
 
 export function SyllabiProvider({ profile, children }) {
-  const available = hasSyllabi(profile)
+  // Premium in full, everyone else on the free trial (lib/access.js).
+  const available = canOpenSyllabi(profile)
   const [state, setState] = useState(null)
   const count = useRef(0)
 

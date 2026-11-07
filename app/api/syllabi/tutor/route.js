@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { supabaseFor, fromOurOwnSite } from '@/lib/request-supabase'
-import { hasSyllabi } from '@/lib/access'
 import { MODELS, claim, settle } from '@/lib/ai-cost'
 import { tutorSystem } from '@/lib/tutor-prompt'
 import { toBlocks, AttachmentError } from '@/lib/attachments'
@@ -86,9 +85,9 @@ export async function POST(request) {
     .select('plan, is_admin, access_expires_at, subjects, curriculum')
     .eq('id', user.id)
     .maybeSingle()
-  if (!hasSyllabi(profile)) {
-    return NextResponse.json({ error: 'Syllabi is part of Premium.', code: 'upgrade_required' }, { status: 402 })
-  }
+  // No plan check here: every account has ten free messages, and the claim
+  // below decides (103-syllabi-trial.sql), where it cannot be skipped.
+  if (!profile) return NextResponse.json({ error: 'Finish setting up your account first.' }, { status: 403 })
 
   const body = await request.json().catch(() => null)
   const { messages, error, status } = conversation(body?.messages)
@@ -211,6 +210,7 @@ export async function POST(request) {
       'content-type': 'text/plain; charset=utf-8',
       'cache-control': 'no-store',
       'x-syllabi-remaining': String(claimed.remaining ?? ''),
+      'x-syllabi-trial': claimed.trial ? '1' : '0',
     },
   })
 }

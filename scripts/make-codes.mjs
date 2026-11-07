@@ -11,6 +11,7 @@
  *
  *   npm run codes -- --list
  *   npm run codes -- --revoke ABA2026
+ *   npm run codes -- --revoke-batch PILOT-2026   (every unused code in a batch)
  *
  * Codes avoid characters people misread when copying off a slide: no O/0,
  * no I/1/l, no 5/S.
@@ -63,6 +64,22 @@ try {
       console.log('\nBatches:')
       for (const b of batches) console.log(`  ${b.batch}: ${b.used}/${b.total} used`)
     }
+    process.exit(0)
+  }
+
+  if (has('revoke-batch')) {
+    // Kills the codes nobody has used yet. Used ones keep working for whoever
+    // redeemed them; revoke those one by one if that is the intent.
+    const batch = flag('revoke-batch')
+    if (!batch) {
+      console.error('Which batch? npm run codes -- --revoke-batch PILOT-2026')
+      process.exit(1)
+    }
+    const { rowCount } = await client.query(
+      'UPDATE access_codes SET active = false WHERE batch = $1 AND redemptions = 0 AND active',
+      [batch]
+    )
+    console.log(`Switched off ${rowCount} unused code${rowCount === 1 ? '' : 's'} in ${batch}.`)
     process.exit(0)
   }
 

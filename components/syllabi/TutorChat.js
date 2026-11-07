@@ -229,6 +229,8 @@ export default function TutorChat({
   const [streaming, setStreaming] = useState(false)
   const [notice, setNotice] = useState(null)
   const [remaining, setRemaining] = useState(null)
+  // On the free trial the count is of free messages left, not today's.
+  const [trial, setTrial] = useState(false)
   const [menu, setMenu] = useState(false)
   const [dragging, setDragging] = useState(false)
   const abortRef = useRef(null)
@@ -374,6 +376,7 @@ export default function TutorChat({
       }
       const left = res.headers.get('x-syllabi-remaining')
       if (left) setRemaining(Number(left))
+      setTrial(res.headers.get('x-syllabi-trial') === '1')
       setStreaming(true)
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
@@ -586,8 +589,8 @@ export default function TutorChat({
 
           <div className="flex-1" />
           {remaining !== null && (
-            <span className="hidden text-[11.5px] tabular-nums sm:inline" style={{ color: 'var(--text-faint)' }}>
-              {remaining} left today
+            <span className={`text-[11.5px] tabular-nums ${trial ? '' : 'hidden sm:inline'}`} style={{ color: trial ? 'var(--brand)' : 'var(--text-faint)' }}>
+              {trial ? `${remaining} free message${remaining === 1 ? '' : 's'} left` : `${remaining} left today`}
             </span>
           )}
           {busy ? (
@@ -618,8 +621,8 @@ export default function TutorChat({
         <p className="sy-rise mt-2 px-2 text-[12.5px]" style={{ color: 'var(--status-weak)' }} role="alert">
           {notice.text}{' '}
           {notice.upgrade && (
-            <a href="/pricing" className="underline underline-offset-2">
-              See the plans
+            <a href="/pricing" className="font-medium underline underline-offset-2">
+              Get Premium
             </a>
           )}
         </p>

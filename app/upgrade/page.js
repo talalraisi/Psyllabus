@@ -89,7 +89,7 @@ function Upgrade() {
 
         {!billingLive ? (
           <p className="mt-6 text-[13.5px]" style={{ color: 'var(--text-muted)' }}>
-            Paid plans open soon. Make a free account now and you can upgrade from your profile the day they do.
+            Psyllabus is in beta, so paid plans are not open yet. Make a free account now and you can upgrade from your profile the day they open.
           </p>
         ) : user === null ? (
           <div className="mt-6">
