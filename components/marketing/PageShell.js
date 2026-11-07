@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import logoMark from '@/public/logo-mark.svg'
 import ThemeToggle from '@/components/ThemeToggle'
+import { WithBeta } from '@/components/BetaBadge'
 import SiteNav from '@/components/marketing/SiteNav'
 import { operatorLine } from '@/lib/legal'
 
@@ -27,13 +28,15 @@ export default function PageShell({ children }) {
         <div className="mx-auto flex max-w-6xl px-5 py-3 md:px-8">
           <SiteNav>
             <Link href="/" aria-label="Project Syllabus home" className="shrink-0">
-              <Image
-                src={logoMark}
-                alt="Project Syllabus"
-                sizes="140px"
-                style={{ height: 34, width: 'auto', aspectRatio: '1472 / 613' }}
-                priority
-              />
+              <WithBeta>
+                <Image
+                  src={logoMark}
+                  alt="Project Syllabus"
+                  sizes="140px"
+                  style={{ height: 34, width: 'auto', aspectRatio: '1472 / 613' }}
+                  priority
+                />
+              </WithBeta>
             </Link>
           </SiteNav>
         </div>

@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Select from '@/components/Select'
 import Logo from '@/components/Logo'
+import { WithBeta } from '@/components/BetaBadge'
 import { splitLevel, coursesOf, defaultLevel } from '@/lib/course-levels'
 import { getCurrentUser } from '@/lib/auth'
 import { realismNote, curriculumOf } from '@/lib/curriculum'
@@ -358,7 +359,7 @@ export default function Onboarding() {
       <div className="mx-auto max-w-2xl">
         <div className="mb-12 flex justify-center">
           <Link href="/">
-            <Logo width={320} height={96} priority className="h-auto w-[240px] md:w-[280px]" />
+            <WithBeta square><Logo width={320} height={96} priority className="h-auto w-[240px] md:w-[280px]" /></WithBeta>
           </Link>
         </div>
         {children}
@@ -422,7 +423,7 @@ export default function Onboarding() {
       <div className="mx-auto max-w-2xl">
         <div className="mb-12 flex justify-center">
           <Link href="/">
-            <Logo width={320} height={96} priority className="h-auto w-[240px] md:w-[280px]" />
+            <WithBeta square><Logo width={320} height={96} priority className="h-auto w-[240px] md:w-[280px]" /></WithBeta>
           </Link>
         </div>
 

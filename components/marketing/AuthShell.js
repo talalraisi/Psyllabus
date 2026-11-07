@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import logoMark from '@/public/logo-mark.svg'
+import { WithBeta } from '@/components/BetaBadge'
 
 /**
  * The frame every sign-in and sign-up screen sits in.
@@ -36,13 +37,15 @@ export default function AuthShell({ eyebrow, title, intro, children, footer }) {
           aria-label="Project Syllabus home"
           className="app-enter press inline-block"
         >
-          <Image
-            src={logoMark}
-            alt="Project Syllabus"
-            sizes="120px"
-            style={{ height: 38, width: 'auto', aspectRatio: '1472 / 613' }}
-            priority
-          />
+          <WithBeta>
+            <Image
+              src={logoMark}
+              alt="Project Syllabus"
+              sizes="120px"
+              style={{ height: 38, width: 'auto', aspectRatio: '1472 / 613' }}
+              priority
+            />
+          </WithBeta>
         </Link>
 
         <div className="app-enter mt-12 w-full text-center md:mt-16" style={{ animationDelay: '60ms' }}>
