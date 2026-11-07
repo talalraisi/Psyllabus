@@ -4,7 +4,6 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import Logo from '@/components/Logo'
-import { WithBeta } from '@/components/BetaBadge'
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('')
@@ -38,7 +37,7 @@ export default function ForgotPassword() {
       <div className="mx-auto max-w-md">
         <div className="mb-8 flex justify-center">
           <Link href="/">
-            <WithBeta square><Logo width={180} height={54} priority className="h-auto w-[160px]" /></WithBeta>
+            <Logo width={180} height={54} priority className="h-auto w-[160px]" />
           </Link>
         </div>
 
