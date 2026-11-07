@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import Logo from '@/components/Logo'
+import { WithBeta } from '@/components/BetaBadge'
 import PasswordField from '@/components/PasswordField'
 
 /**
@@ -81,7 +82,7 @@ export default function ResetPassword() {
       <div className="mx-auto max-w-md">
         <div className="mb-8 flex justify-center">
           <Link href="/">
-            <Logo width={180} height={54} priority className="h-auto w-[160px]" />
+            <WithBeta square><Logo width={180} height={54} priority className="h-auto w-[160px]" /></WithBeta>
           </Link>
         </div>
 

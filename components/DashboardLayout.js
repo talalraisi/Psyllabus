@@ -32,7 +32,7 @@ import { SyllabiProvider } from '@/components/syllabi/SyllabiDrawer'
 import ThemeToggle from '@/components/ThemeToggle'
 import { StreakChip } from '@/components/Streak'
 import FriendsButton from '@/components/FriendsButton'
-import BetaBadge from '@/components/BetaBadge'
+import BetaBadge, { WithBeta } from '@/components/BetaBadge'
 import { Chevron } from '@/components/Select'
 
 /**
@@ -313,7 +313,7 @@ export default function DashboardLayout({ children, profile }) {
             before the Y), then the rest of the word as it widens.
             Above the fold on every page, so it loads eagerly with its aspect
             ratio declared. */}
-        <Link href="/dashboard" className="inline-block shrink-0" aria-label="Dashboard">
+        <Link href="/dashboard" className="relative inline-block shrink-0" aria-label="Dashboard">
           <Image
             src={logoMark}
             alt="Project Syllabus"
@@ -329,8 +329,9 @@ export default function DashboardLayout({ children, profile }) {
               transition: 'clip-path 220ms cubic-bezier(0.16, 1, 0.3, 1)',
             }}
           />
+          {/* At the corner of the whole word, so only while the word shows. */}
+          <BetaBadge style={{ opacity: open ? 1 : 0, transition: 'opacity 160ms' }} />
         </Link>
-        {open && <BetaBadge className="ml-2" />}
         {!mobile && (
           <button
             onClick={togglePinned}
@@ -573,9 +574,10 @@ export default function DashboardLayout({ children, profile }) {
           <IconMenu />
         </button>
         <Link href="/dashboard" className="inline-block" aria-label="Dashboard">
-          <Image src={logoMark} alt="Project Syllabus" sizes="70px" style={{ height: 28, width: 'auto', aspectRatio: '1472 / 613' }} priority />
+          <WithBeta>
+            <Image src={logoMark} alt="Project Syllabus" sizes="70px" style={{ height: 28, width: 'auto', aspectRatio: '1472 / 613' }} priority />
+          </WithBeta>
         </Link>
-        <BetaBadge className="ml-2" />
         <span className="ml-auto">
           <FriendsButton />
         </span>
