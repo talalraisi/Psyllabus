@@ -1,6 +1,6 @@
 /**
- * "Beta", at the top right of the word in the logo, like a superscript,
- * wherever the logo shows.
+ * "Beta", at the top right of the logo, its top level with the top of the
+ * cap, wherever the logo shows.
  *
  *   <WithBeta><Image src={logoMark} … /></WithBeta>
  *   <WithBeta square><Logo … /></WithBeta>      the square logo
@@ -8,12 +8,10 @@
  * When the beta ends, make WithBeta return its children and nothing else.
  */
 export default function BetaBadge({ square = false, style }) {
-  // Placed against the letters, not the box: in the wordmark (logo-mark.svg)
-  // "SYLLABUS" runs from 71% to 97% of the height and ends at the right edge;
-  // in the square logo (logo.svg) it runs from 57% to 64% and ends at 87%.
-  const place = square
-    ? { left: '88%', top: '55%', transform: 'translateY(-50%)' }
-    : { left: '100%', top: '62%', transform: 'translate(3px, -50%)' }
+  // Its top level with the top of the cap. In the wordmark (logo-mark.svg)
+  // the cap starts 4% down and the word ends at the right edge; in the square
+  // logo (logo.svg) the cap starts 36% down and the word ends at 87%.
+  const place = square ? { left: '88%', top: '36%' } : { left: '100%', top: '4%', transform: 'translateX(3px)' }
   return (
     <span
       aria-label="Beta"
