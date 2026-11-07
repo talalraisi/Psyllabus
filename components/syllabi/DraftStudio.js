@@ -323,7 +323,7 @@ export default function DraftStudio({ subjects = [] }) {
   const [step, setStep] = useState(0)
   const [error, setError] = useState('')
   const [remaining, setRemaining] = useState(null)
-  // A marking on the free trial: there is no "left today", only what is left of the trial.
+  // Without Premium there is no "left today", only what is left of the plan's one marking.
   const [trial, setTrial] = useState(false)
   const [upgrade, setUpgrade] = useState(false)
   const [tab, setTab] = useState('marks')
@@ -1068,7 +1068,7 @@ export default function DraftStudio({ subjects = [] }) {
           </span>
           <p className="mt-1.5 text-[12px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
             {text.length.toLocaleString()} characters · {words.toLocaleString()} words
-            {remaining !== null && (trial ? ` · ${remaining ? `${remaining} free marking left` : 'that was your free marking'}` : ` · ${remaining} left today`)}
+            {remaining !== null && (trial ? ` · ${remaining ? `${remaining} marking left on your plan` : 'that was the marking your plan includes'}` : ` · ${remaining} left today`)}
           </p>
         </div>
         <button

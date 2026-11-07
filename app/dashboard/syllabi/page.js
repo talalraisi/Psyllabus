@@ -52,7 +52,7 @@ const TABS = [
 ]
 
 /**
- * What is left of the free trial, above the tools, with the way to Premium
+ * What is left of the Syllabi a free account comes with, above the tools, with the way to Premium
  * beside it. Asked again whenever the page says something was used.
  */
 function TrialBar({ bump }) {
@@ -74,17 +74,17 @@ function TrialBar({ bump }) {
       style={{ borderColor: 'color-mix(in oklab, var(--brand) 40%, transparent)', background: 'color-mix(in oklab, var(--brand) 8%, transparent)' }}
     >
       <span className="font-semibold" style={{ color: 'var(--brand)' }}>
-        Free trial
+        Included with your plan
       </span>
       {left.eligible === false ? (
-        <span style={{ color: 'var(--text-muted)' }}>Choose your free subject first, then try Syllabi.</span>
+        <span style={{ color: 'var(--text-muted)' }}>Choose your free subject first, then Syllabi is yours to use.</span>
       ) : (
         <span className="tabular-nums" style={{ color: 'var(--text-muted)' }}>
-          {msgs} of {SYLLABI_TRIAL.messages} free messages left · {mark ? `${mark} free draft marking left` : 'free marking used'}
+          {msgs} of {SYLLABI_TRIAL.messages} messages left · {mark ? `${mark} draft marking left` : 'draft marking used'}
         </span>
       )}
       <a href="/pricing" className="btn btn-solid control-sm ml-auto">
-        Get Premium
+        Unlimited with Premium
       </a>
     </div>
   )

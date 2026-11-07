@@ -229,7 +229,7 @@ export default function TutorChat({
   const [streaming, setStreaming] = useState(false)
   const [notice, setNotice] = useState(null)
   const [remaining, setRemaining] = useState(null)
-  // On the free trial the count is of free messages left, not today's.
+  // Without Premium the count is of the plan's messages left, not today's.
   const [trial, setTrial] = useState(false)
   const [menu, setMenu] = useState(false)
   const [dragging, setDragging] = useState(false)
@@ -590,7 +590,7 @@ export default function TutorChat({
           <div className="flex-1" />
           {remaining !== null && (
             <span className={`text-[11.5px] tabular-nums ${trial ? '' : 'hidden sm:inline'}`} style={{ color: trial ? 'var(--brand)' : 'var(--text-faint)' }}>
-              {trial ? `${remaining} free message${remaining === 1 ? '' : 's'} left` : `${remaining} left today`}
+              {trial ? `${remaining} message${remaining === 1 ? '' : 's'} left on your plan` : `${remaining} left today`}
             </span>
           )}
           {busy ? (
