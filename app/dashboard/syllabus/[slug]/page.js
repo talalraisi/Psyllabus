@@ -25,7 +25,11 @@ import {
   groupByTopic,
   groupByUnit,
   sortTopics,
+  evidenceConfidence,
+  evidenceSentence,
+  CONFIDENCE_LABELS,
 } from '@/lib/progress'
+import { getSubtopicCounts, subtopicCountLabel, COVERAGE_TONE } from '@/lib/coverage'
 import { buildProgressDetailMap, effectiveStatus, isDecayed, daysSince, daysOfFadeLeft, dropsTo } from '@/lib/decay'
 
 export default function SyllabusPage() {
@@ -49,6 +53,9 @@ export default function SyllabusPage() {
   const [expandedTopics, setExpandedTopics] = useState({})
   const [progressDetail, setProgressDetail] = useState({})
   const [hasQuestions, setHasQuestions] = useState(false)
+  // "subject::subtopic" → verified questions, so each row can say how much is
+  // behind it. null until loaded, or if the count could not be read.
+  const [counts, setCounts] = useState(null)
   // subtopic → lesson id, for the subtopics that have a lesson.
   const [lessonIds, setLessonIds] = useState({})
   const [drawerItem, setDrawerItem] = useState(null)
@@ -88,7 +95,7 @@ export default function SyllabusPage() {
 
       setSubjectName(resolved)
 
-      const [syllabus, { data: userProgress }, { count: questionCount }, { data: lessonRows }] =
+      const [syllabus, { data: userProgress }, { count: questionCount }, { data: lessonRows }, subtopicCounts] =
         await Promise.all([
           getSyllabus(supabase, [resolved]),
           supabase
@@ -104,6 +111,7 @@ export default function SyllabusPage() {
           // Only the checked ones are readable, so a subtopic without a
           // finished lesson simply has no button.
           supabase.from('lessons').select('id, subtopic').eq('subject', resolved),
+          getSubtopicCounts(supabase),
         ])
 
       const progressMap = buildProgressMap(userProgress)
@@ -111,6 +119,7 @@ export default function SyllabusPage() {
       setProgress(progressMap)
       setProgressDetail(buildProgressDetailMap(userProgress))
       setHasQuestions((questionCount || 0) > 0)
+      setCounts(subtopicCounts)
       setLessonIds(Object.fromEntries((lessonRows || []).map((l) => [l.subtopic, l.id])))
 
       // Everything starts closed. A syllabus is 40 to 300 subtopics, and
@@ -224,6 +233,9 @@ export default function SyllabusPage() {
               const topicMastered = subtopics.filter(
                 (s) => progress[progressKey(subjectName, s.subtopic)] === 'mastered'
               ).length
+              const covered = counts
+                ? subtopics.filter((s) => counts.get(progressKey(subjectName, s.subtopic))).length
+                : null
               const expanded = !!expandedTopics[topic]
               const topicUnits = new Set(subtopics.map((s) => s.unit).filter(Boolean)).size
 
@@ -251,6 +263,14 @@ export default function SyllabusPage() {
                           {topicUnits ? `${topicUnits} unit${topicUnits !== 1 ? 's' : ''} · ` : ''}
                           {subtopics.length} subtopic{subtopics.length !== 1 ? 's' : ''} ·{' '}
                           {topicMastered} mastered
+                          {covered != null && (
+                            <>
+                              {' · '}
+                              {covered === subtopics.length
+                                ? 'questions for every subtopic'
+                                : `${covered} of ${subtopics.length} have questions`}
+                            </>
+                          )}
                         </span>
                       </span>
                     </button>
@@ -293,6 +313,9 @@ export default function SyllabusPage() {
                         )
                           ? 'decaying'
                           : progress[key] || 'not_started'
+                        const detail = progressDetail[key]
+                        const bank = counts ? subtopicCountLabel(counts.get(key) || 0) : null
+                        const conf = evidenceConfidence(detail?.answered || 0, counts ? counts.get(key) || 0 : null)
 
                         return (
                           <li
@@ -334,6 +357,21 @@ export default function SyllabusPage() {
                                   HL depth
                                 </span>
                               )}
+                              {bank && (
+                                <span
+                                  className="mt-0.5 block text-[12px]"
+                                  style={{ color: COVERAGE_TONE[bank.tone] }}
+                                  title={
+                                    bank.empty
+                                      ? 'Nothing to quiz on here yet. Questions are being written.'
+                                      : bank.thin
+                                        ? 'Few questions so far, so quizzes here repeat sooner and a level rests on less.'
+                                        : 'Verified questions in this subtopic'
+                                  }
+                                >
+                                  {bank.label}
+                                </span>
+                              )}
                             </div>
                             <div className="flex shrink-0 items-center gap-4">
                               <span
@@ -346,10 +384,17 @@ export default function SyllabusPage() {
                                           progressDetail[key]?.updatedAt
                                         ) ?? 0
                                       } days left before it drops to ${STATUS_LABELS[dropsTo(progressDetail[key]?.status)]}. One correct answer resets it.`
-                                    : 'Status is set by quiz results only'
+                                    : `Set by quiz results only. ${evidenceSentence(detail)}`
                                 }
                               >
                                 {STATUS_LABELS[currentStatus]}
+                                {/* How much the level rests on, so a Mastered
+                                    from three answers reads as provisional. */}
+                                {conf.level !== 'none' && (
+                                  <span className="block text-[11px] font-normal" style={{ color: 'var(--text-faint)' }}>
+                                    {CONFIDENCE_LABELS[conf.level].toLowerCase()}
+                                  </span>
+                                )}
                               </span>
                               {lessonIds[item.subtopic] && (
                                 <Link
@@ -362,12 +407,21 @@ export default function SyllabusPage() {
                               {/* Five questions, marked as you go. The long
                                   version is a click further on, in the test
                                   builder; this is the one that gets done. */}
-                              <Link
-                                href={`/dashboard/quiz?subject=${encodeURIComponent(subjectName)}&topic=${encodeURIComponent(item.topic)}&subtopic=${encodeURIComponent(item.subtopic)}&count=5&review=practice&back=${encodeURIComponent(slugPath)}`}
-                                className="btn btn-outline control-sm"
-                              >
-                                Quick 5
-                              </Link>
+                              {bank?.empty ? (
+                                <span
+                                  className="btn btn-outline control-sm pointer-events-none opacity-40"
+                                  aria-disabled="true"
+                                >
+                                  Quick 5
+                                </span>
+                              ) : (
+                                <Link
+                                  href={`/dashboard/quiz?subject=${encodeURIComponent(subjectName)}&topic=${encodeURIComponent(item.topic)}&subtopic=${encodeURIComponent(item.subtopic)}&count=5&review=practice&back=${encodeURIComponent(slugPath)}`}
+                                  className="btn btn-outline control-sm"
+                                >
+                                  Quick 5
+                                </Link>
+                              )}
                             </div>
                           </li>
                         )

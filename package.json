@@ -16,6 +16,8 @@
     "resources:import": "node scripts/import-resources.mjs",
     "codes": "node scripts/make-codes.mjs",
     "audit": "node scripts/audit-questions.mjs",
+    "coverage": "node scripts/coverage.mjs",
+    "validate-mastery": "node --no-warnings=MODULE_TYPELESS_PACKAGE_JSON scripts/validate-mastery.mjs",
     "check-subjects": "node scripts/check-subjects.mjs",
     "build-bank": "node scripts/build-bank.mjs",
     "verify-selftest": "node scripts/verify-selftest.mjs",

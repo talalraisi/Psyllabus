@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase'
 import { AskSyllabi } from '@/components/syllabi/SyllabiDrawer'
 import { statusLabel, leavesOf, related, neighbours, pathTo } from '@/lib/subject-graph'
-import { STATUS_DESCRIPTIONS } from '@/lib/progress'
+import { STATUS_DESCRIPTIONS, evidenceConfidence, CONFIDENCE_LABELS } from '@/lib/progress'
 import { getSlugForSubject } from '@/lib/subject-map'
 import { STATUS_VAR, progressLine } from '@/components/map/MapCanvas'
 
@@ -192,6 +192,13 @@ export default function Inspector({ graph, node, subject, onGo, onEnter, onClose
               .filter(Boolean)
               .join(' · ')}
           </p>
+          {!branch && node.answered > 0 && (
+            <p className="mt-1 text-[12px]" style={{ color: 'var(--text-faint)' }}>
+              {CONFIDENCE_LABELS[evidenceConfidence(node.answered, bank).level]}: {node.answered} answer
+              {node.answered === 1 ? '' : 's'}
+              {node.recentTotal ? `, ${node.recentCorrect} of the last ${node.recentTotal} right` : ''}.
+            </p>
+          )}
           {!branch && STATUS_DESCRIPTIONS?.[node.status] && (
             <p className="mt-1 text-[12px]" style={{ color: 'var(--text-faint)' }}>
               {STATUS_DESCRIPTIONS[node.status]}

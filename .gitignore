@@ -57,3 +57,4 @@ content-runs/
 
 # who asked to hear when Premium opens (scripts/premium-interest.mjs)
 premium-interest.csv
+coverage.csv

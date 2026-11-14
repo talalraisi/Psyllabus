@@ -103,6 +103,8 @@ export default function TestBuilderPage() {
   const [pickedSubtopics, setPickedSubtopics] = useState({})
   const [openTopic, setOpenTopic] = useState(null)
   const [unitBySubtopic, setUnitBySubtopic] = useState({})
+  // topic → its subtopics in the guide, with or without questions.
+  const [syllabusSubtopics, setSyllabusSubtopics] = useState({})
   // 'questions' | 'marks' | 'minutes' — how the length is counted out.
   const [lengthMetric, setLengthMetric] = useState('questions')
   // 'practice' | 'test' | 'exam': how the paper is sat (components/TestBuilder).
@@ -169,7 +171,7 @@ export default function TestBuilderPage() {
         getSyllabus(supabase, [subject]),
         supabase
           .from('questions')
-          .select('id, topic, subtopic, difficulty, marks, time_budget_seconds')
+          .select('id, topic, subtopic, difficulty, marks, time_budget_seconds, question_type')
           .eq('subject', subject)
           .eq('verified', true),
         supabase.from('progress').select('*').eq('user_id', profile.id).eq('subject', subject),
@@ -195,6 +197,11 @@ export default function TestBuilderPage() {
         units[row.subtopic] = { unit: row.unit || null, code: row.code || null, position: row.position }
       }
 
+      // Every subtopic in the guide, so one with no questions yet is shown
+      // (and cannot be ticked) rather than silently missing.
+      const listed = {}
+      for (const row of syllabus || []) (listed[row.topic] ||= []).push(row.subtopic)
+      setSyllabusSubtopics(listed)
       setUnitBySubtopic(units)
       setTopics(ordered)
       setHlBySubtopic(hlMap)
@@ -243,15 +250,20 @@ export default function TestBuilderPage() {
     })
   }, [pool, selected, pickedSubtopics, focusMode, difficulty, statusBySubtopic, level, hlBySubtopic, qtype])
 
-  /** Subtopic → how many questions exist, grouped under its topic. */
+  /** Subtopic → how many questions exist, grouped under its topic. 0 for a
+   *  subtopic the guide lists but nobody has written questions for yet. */
   const subtopicsByTopic = useMemo(() => {
     const out = {}
+    for (const [t, subs] of Object.entries(syllabusSubtopics)) {
+      out[t] = {}
+      for (const sub of subs) out[t][sub] = 0
+    }
     for (const q of pool) {
       ;(out[q.topic] ||= {})
       out[q.topic][q.subtopic] = (out[q.topic][q.subtopic] || 0) + 1
     }
     return out
-  }, [pool])
+  }, [pool, syllabusSubtopics])
 
   /** Every subtopic actually being drawn from, or null for "whole topics". */
   const effectiveSubtopics = useMemo(() => {

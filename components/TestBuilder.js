@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { IconClock, IconCheck, IconChevronRight, IconArrowLeft, IconArrowRight } from '@/components/Icons'
 import { SkeletonLine } from '@/components/PageShell'
 import { displaySubtopic } from '@/lib/progress'
+import { THIN_SUBTOPIC } from '@/lib/coverage'
 
 /**
  * One decision at a time.
@@ -187,6 +188,13 @@ export default function TestBuilder({
 }) {
   const [step, setStep] = useState(0)
   const [furthest, setFurthest] = useState(0)
+  const [topicQuery, setTopicQuery] = useState('')
+  const query = topicQuery.trim().toLowerCase()
+  const has = (text) => String(text || '').toLowerCase().includes(query)
+  const subtopicMatches = (name) =>
+    has(name) || has(displaySubtopic(name)) || has(unitBySubtopic[name]?.unit) || has(unitBySubtopic[name]?.code)
+  const topicMatches = (topic) =>
+    !query || has(topic) || Object.keys(subtopicsByTopic[topic] || {}).some(subtopicMatches)
 
   const canLeave = {
     subject: !!subject,
@@ -316,13 +324,31 @@ export default function TestBuilder({
             </p>
           ) : (
             <div className="flex flex-col gap-2">
-              {topics.map((topic) => {
+              <input
+                type="search"
+                value={topicQuery}
+                onChange={(e) => setTopicQuery(e.target.value)}
+                placeholder="Search topics and subtopics"
+                aria-label="Search topics and subtopics"
+                className="mb-2 h-11 w-full rounded-[12px] border bg-transparent px-4 text-[14px] outline-none focus:border-[var(--brand)]"
+                style={{ borderColor: 'var(--border-strong)' }}
+              />
+              {query && !topics.some(topicMatches) && (
+                <p className="py-3 text-[14px]" style={{ color: 'var(--text-muted)' }}>
+                  Nothing in this subject matches “{topicQuery.trim()}”.
+                </p>
+              )}
+              {topics.filter(topicMatches).map((topic) => {
                 const n = perTopicCounts[topic] || 0
                 const isSelected = selected.includes(topic)
                 const within = subtopicsByTopic[topic] || {}
                 // Guide order, not alphabetical: kinematics comes before
                 // momentum in every class and on every paper.
-                const names = Object.keys(within).sort(
+                // Searching: a topic found by its own name shows all of its
+                // subtopics; one found through a subtopic shows only the hits.
+                const names = Object.keys(within)
+                  .filter((name) => !query || has(topic) || subtopicMatches(name))
+                  .sort(
                   (a, b) =>
                     (unitBySubtopic[a]?.position ?? Number.MAX_SAFE_INTEGER) -
                       (unitBySubtopic[b]?.position ?? Number.MAX_SAFE_INTEGER) ||
@@ -338,7 +364,7 @@ export default function TestBuilder({
                   else unitRuns.push({ unit, code: unitBySubtopic[name]?.code || null, names: [name] })
                 }
                 const picked = pickedSubtopics[topic] || []
-                const isOpen = openTopic === topic
+                const isOpen = openTopic === topic || (!!query && !has(topic))
 
                 return (
                   <div
@@ -368,7 +394,7 @@ export default function TestBuilder({
                         <span className="min-w-0 flex-1 truncate text-[14.5px]">{topic}</span>
                       </button>
                       <span className="shrink-0 text-[12.5px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
-                        {picked.length ? `${picked.length}/${names.length}` : n > 0 ? n : '·'}
+                        {picked.length ? `${picked.length}/${names.filter((x) => within[x] > 0).length}` : n > 0 ? n : '·'}
                       </span>
                       {names.length > 0 && (
                         <button
@@ -409,12 +435,16 @@ export default function TestBuilder({
                             <ul className="flex flex-col">
                         {unitNames.map((name) => {
                           const on = picked.includes(name)
+                          const count = within[name] || 0
+                          const empty = count === 0
                           return (
                             <li key={name}>
                               <button
                                 onClick={() => onToggleSubtopic(topic, name)}
                                 aria-pressed={on}
-                                className="flex w-full items-center gap-4 py-2.5 text-left"
+                                disabled={empty}
+                                title={empty ? 'No questions here yet. They are being written.' : undefined}
+                                className="flex w-full items-center gap-4 py-2.5 text-left disabled:cursor-not-allowed disabled:opacity-50"
                               >
                                 <span
                                   className="flex h-4 w-4 shrink-0 items-center justify-center rounded-[4px] border"
@@ -429,8 +459,12 @@ export default function TestBuilder({
                                 <span className="min-w-0 flex-1 truncate text-[13px]" style={{ color: 'var(--text-muted)' }}>
                                   {displaySubtopic(name)}
                                 </span>
-                                <span className="shrink-0 text-[12px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
-                                  {within[name]}
+                                <span
+                                  className="shrink-0 text-[12px] tabular-nums"
+                                  style={{ color: !empty && count < THIN_SUBTOPIC ? 'var(--status-developing)' : 'var(--text-faint)' }}
+                                  title={!empty && count < THIN_SUBTOPIC ? 'Thin: few questions here so far' : undefined}
+                                >
+                                  {empty ? 'No questions yet' : count}
                                 </span>
                               </button>
                             </li>

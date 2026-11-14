@@ -141,13 +141,15 @@ export const FEATURE_DETAIL = [
     label: 'The map',
     detail: [
       'A level is a running total of evidence, not a count of attempts. Every question carries a difficulty, that difficulty is banded into five heat levels, and the heat decides what a correct answer is worth — half a point for recall and one step, a point and a half at the hardest end of the paper. Eight points is mastery: below 3.5 you are Weak, 3.5 to 6 Developing, 6 to 8 Proficient, 8 and above Mastered. A subtopic with only a few questions asks for less, so every one can be mastered.',
-      'Which means an easy run cannot reach the top. Ten of the simplest questions is five points, and five points is Developing. The only route into the highest band is questions that were genuinely hard for you, which is the whole reason the engine prices by heat instead of counting right answers. A subtopic nobody has asked you about stays grey rather than green, because zero points and never attempted are the same state and deserve the same colour.',
+      'Which means an easy run cannot reach the top. Ten of the simplest questions is five points, and five points is Developing. The only route into the highest band is questions that were genuinely hard for you, which is the whole reason the engine prices by heat instead of counting right answers.',
+      'Wrong answers count too. Points get you to a level, and your last twelve answers in that subtopic have to hold it: once there are five or more, Mastered needs three in four of them right, Proficient 60%, Developing 40%, and below that it reads Weak. A subtopic you sat and got nothing right in is Weak, not grey. Every level also says how much it rests on, low confidence under five answers and high from twelve, so a Mastered built on three questions looks provisional rather than finished.',
     ],
     title: 'A heatmap you cannot fake',
     lede: 'Every subtopic of your course, coloured by what you proved.',
     how: [
       'Every subtopic of your course, from the official outline',
-      'Five levels, each set by questions you got right or did not',
+      'Five levels, set by right answers and held by recent accuracy',
+      'Every level shows how many answers it rests on',
       'No confidence slider. Anywhere. Ever.',
     ],
     limit: 'A subtopic you have never been tested on is grey, not green. The map will not flatter you by assuming the parts you skipped are fine.',

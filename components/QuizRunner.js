@@ -32,6 +32,11 @@ import {
   STATUS_COLORS,
   STATUS_TEXT_COLORS,
   displaySubtopic,
+  evidenceConfidence,
+  CONFIDENCE_LABELS,
+  ACCURACY_FLOORS,
+  RECENT_WINDOW,
+  MIN_RECENT_FOR_CAP,
 } from '@/lib/progress'
 import { getCurrentUser } from '@/lib/auth'
 import { getSyllabus, getProfile } from '@/lib/cache'
@@ -828,19 +833,50 @@ export default function QuizRunner({
         available.set(key, (available.get(key) || 0) + pointsForQuestion(q.difficulty))
       }
 
+      // What each level rests on: every answer in the subtopic, and how many
+      // of the latest ones were right (106-mastery-accuracy.sql). Read after
+      // this attempt's responses went in, so they count. Wrong answers now
+      // pull a level down here.
+      const evidence = new Map()
+      const bySubject = new Map()
+      for (const m of meta.values()) {
+        if (!bySubject.has(m.subject)) bySubject.set(m.subject, [])
+        bySubject.get(m.subject).push(m.subtopic)
+      }
+      await Promise.all(
+        [...bySubject].map(async ([subj, subs]) => {
+          const { data } = await supabase.rpc('subtopic_accuracy', { p_subject: subj, p_subtopics: subs })
+          for (const r of data || []) {
+            evidence.set(`${subj}|||${r.subtopic}`, {
+              answered: r.answered,
+              recentCorrect: r.recent_correct,
+              recentTotal: r.recent_total,
+            })
+          }
+        })
+      )
+
       const now = new Date().toISOString()
       const targets = new Map(touched.map((key) => [key, masteryTarget(available.get(key))]))
       const rows = touched.map((key) => {
         const m = meta.get(key)
         const points = +(totals.get(key) || 0).toFixed(2)
+        const ev = evidence.get(key)
         const row = {
           user_id: userId,
           subject: m.subject,
           topic: m.topic || '',
           subtopic: m.subtopic,
           mastery_points: points,
-          status: statusFromPoints(points, targets.get(key)),
+          status: statusFromPoints(points, targets.get(key), ev || null),
           updated_at: now,
+        }
+        // Left off when the read failed (or before 106 is applied), so an
+        // older database still takes the upsert.
+        if (ev) {
+          row.answered = ev.answered
+          row.recent_correct = ev.recentCorrect
+          row.recent_total = ev.recentTotal
         }
         if (gotSomethingRight.has(key)) row.last_correct_at = now
         return row
@@ -856,6 +892,11 @@ export default function QuizRunner({
         subtopic: r.subtopic,
         points: r.mastery_points,
         status: r.status,
+        // The level points alone would give; differs when accuracy held it.
+        earnedStatus: statusFromPoints(r.mastery_points, targets.get(`${r.subject}|||${r.subtopic}`)),
+        answered: r.answered ?? null,
+        recentCorrect: r.recent_correct ?? null,
+        recentTotal: r.recent_total ?? null,
         target: targets.get(`${r.subject}|||${r.subtopic}`),
         gained: +(r.mastery_points - (before.get(`${r.subject}|||${r.subtopic}`) || 0)).toFixed(2),
       }))
@@ -1791,6 +1832,8 @@ export default function QuizRunner({
             <ul className="stagger flex flex-col gap-4">
               {results.earned.map((e) => {
                 const next = pointsToNextLevel(e.points, e.target)
+                const held = e.earnedStatus && e.earnedStatus !== e.status && e.recentTotal > 0
+                const conf = e.answered != null ? evidenceConfidence(e.answered).level : 'none'
                 return (
                   <li key={e.subtopic}>
                     <div className="flex items-baseline justify-between gap-3">
@@ -1818,6 +1861,13 @@ export default function QuizRunner({
                         style={{ width: `${masteryFraction(e.points, e.target) * 100}%` }}
                       />
                     </div>
+                    {(held || conf !== 'none') && (
+                      <p className="mt-1.5 text-[12px]" style={{ color: 'var(--text-faint)' }}>
+                        {held
+                          ? `Held at ${STATUS_LABELS[e.status]}: ${e.recentCorrect} of your last ${e.recentTotal} right. Points alone would make it ${STATUS_LABELS[e.earnedStatus]}.`
+                          : `${CONFIDENCE_LABELS[conf]}: based on ${e.answered} answer${e.answered === 1 ? '' : 's'}${e.recentTotal ? `, ${e.recentCorrect} of your last ${e.recentTotal} right` : ''}.`}
+                      </p>
+                    )}
                   </li>
                 )
               })}
@@ -1838,6 +1888,17 @@ export default function QuizRunner({
                 right. Each question pays once, so the same easy one cannot be farmed.
                 Mastered is {MASTERY_TARGET} points, or less for a subtopic with only a few
                 questions: 80% of what its questions are worth, and never under 3.
+              </p>
+              <p
+                className="mt-2 text-[12.5px] leading-relaxed"
+                style={{ color: 'var(--text-faint)' }}
+              >
+                Wrong answers count too. Once you have {MIN_RECENT_FOR_CAP} or more answers in a
+                subtopic, your last {RECENT_WINDOW} have to hold the level: Mastered needs{' '}
+                {Math.round(ACCURACY_FLOORS.mastered * 100)}% of them right, Proficient{' '}
+                {Math.round(ACCURACY_FLOORS.proficient * 100)}%, Developing{' '}
+                {Math.round(ACCURACY_FLOORS.confident * 100)}%. Confidence says how many answers a
+                level rests on: low under {MIN_RECENT_FOR_CAP}, high from {RECENT_WINDOW}.
               </p>
             </details>
           </section>
