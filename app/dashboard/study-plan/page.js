@@ -30,6 +30,7 @@ import StudyTypeCard from '@/components/plan/StudyTypeCard'
 import { getSlugForSubject } from '@/lib/subject-map'
 import { displaySubtopic, STATUS_COLORS } from '@/lib/progress'
 import { accessibleSubjects, hasAllSubjects } from '@/lib/access'
+import StudyTimer from '@/components/StudyTimer'
 import { dateKey, WEEKDAYS } from '@/lib/study-plan'
 import { readSnapshot, writeSnapshot, snapshotFor, loadPlanInputs, loadBusy, computePlan, isTaskDone } from '@/lib/plan-data'
 import {
@@ -461,6 +462,8 @@ export default function StudyPlanPage() {
 
                   {/* The evening's other half: everything that is not a subtopic. */}
                   <TodoList className="mb-12 mt-12" title="Also today" day={dateKey(new Date())} subjects={accessibleSubjects(profile)} />
+                  {/* Study the plan did not set still counts. */}
+                  <StudyTimer subjects={accessibleSubjects(profile)} className="mb-12" />
 
                   {events.length === 0 && (
                     <Link href="/dashboard/calendar" className="flex items-center gap-3 border-t py-4 text-[14px] font-medium" style={{ borderColor: 'var(--border)' }}>

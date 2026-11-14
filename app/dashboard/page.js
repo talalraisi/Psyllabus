@@ -33,7 +33,7 @@ import { studyIntervals, minutesPerDay } from '@/lib/study-time'
 import { primeStudyDays, restDaysFor } from '@/lib/streak'
 import { StreakCard } from '@/components/Streak'
 import WaysToStudy from '@/components/WaysToStudy'
-import BookTimer from '@/components/BookTimer'
+import StudyTimer from '@/components/StudyTimer'
 import WelcomeTour, { tourDone, resetTour } from '@/components/WelcomeTour'
 import MapPreview from '@/components/map/MapPreview'
 
@@ -557,7 +557,7 @@ export default function Dashboard() {
         </Section>
 
         {/* Revision that happens off the screen still counts. */}
-        <BookTimer subjects={allSubjects} className="mb-12" />
+        <StudyTimer subjects={allSubjects} className="mb-12" />
 
         {/* The numbers, once there are any. On a new account these are all
             zero, which says nothing and looks like a broken page. */}

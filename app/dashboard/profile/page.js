@@ -581,6 +581,13 @@ export default function ProfilePage() {
                     ? 'Every subject and feature is unlocked.'
                     : `Free accounts track ${FREE_SUBJECT_LIMIT} subject.`}
                 </p>
+                {/* The beta's inbox. all_feedback() refuses anyone not flagged
+                    admin, so this link is a shortcut, not the lock. */}
+                {profile?.is_admin && (
+                  <Link href="/dashboard/feedback" className="mt-2 inline-block text-[13px] font-medium text-[var(--brand)] hover:underline">
+                    Feedback from students
+                  </Link>
+                )}
               </div>
               {premium && (
                 <span
