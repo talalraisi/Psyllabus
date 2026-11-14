@@ -7,7 +7,7 @@ import { IconArrowRight, IconCheck } from '@/components/Icons'
 export const metadata = {
   title: 'Features',
   description:
-    'Eight things Project Syllabus does, shown rather than listed: a heatmap set by testing, topics that fade, a mistake bank that schedules itself, timed papers, and a plan built for the time you actually have tonight.',
+    'Everything Project Syllabus does, shown rather than listed: a heatmap set by testing, topics that fade, a mistake bank that schedules itself, timed papers, and a plan built for the time you actually have tonight.',
 }
 
 export default function FeaturesPage() {
@@ -15,7 +15,7 @@ export default function FeaturesPage() {
     <PageShell>
       <PageHead
         eyebrow="Features"
-        title="All eight, in detail"
+        title="Every feature, in detail"
         intro="The front page shows these one at a time, which is the right amount to decide whether to keep reading and the wrong amount to decide whether to sign up. This is how each one actually works, in full, with the numbers it runs on — and where each one stops."
       />
 

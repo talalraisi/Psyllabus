@@ -44,6 +44,16 @@ function relativeDay(due, todayKey) {
   return new Date(`${due}T00:00`).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
 }
 
+/** "16:30:00" as the student's clock writes it: 4:30 pm, or 16:30. */
+function clockTime(t) {
+  if (!t) return null
+  const d = new Date(`2000-01-01T${String(t).slice(0, 5)}`)
+  return Number.isNaN(d.getTime()) ? null : d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+}
+
+/** Clearing the day clears the hour with it; the hour is only named when there is one to clear. */
+const dayChange = (todo, due_on) => (!due_on && todo.due_time ? { due_on: null, due_time: null } : { due_on })
+
 const shortSubject = (s) => String(s || '').replace(/ (SL|HL)$/, '')
 
 export default function TodoList({
@@ -61,6 +71,10 @@ export default function TodoList({
 }) {
   const { todos, loaded, userId, error, removed } = useTodos()
   const [draft, setDraft] = useState('')
+  // The day, hour and subject can be picked as well as typed.
+  const [draftDue, setDraftDue] = useState('')
+  const [draftTime, setDraftTime] = useState('')
+  const [draftSubject, setDraftSubject] = useState('')
   const [showDone, setShowDone] = useState(false)
   const [openId, setOpenId] = useState(null)
   const [subjectFilter, setSubjectFilter] = useState(null)
@@ -75,8 +89,14 @@ export default function TodoList({
     // come out of it; the words that named them come out of the title.
     const parsed = parseTodoInput(text, { subjects })
     setDraft('')
-    const ok = await addTodo({ title: parsed.title || text, due_on: parsed.due_on || due, subject: parsed.subject || subjectFilter })
+    // What was typed wins over what was picked: it is the more recent thought.
+    const due_on = parsed.due_on || draftDue || due || (draftTime ? todayKey : null)
+    const ok = await addTodo({ title: parsed.title || text, due_on, due_time: draftTime || null, subject: parsed.subject || draftSubject || subjectFilter })
     if (!ok) setDraft(text)
+    else {
+      setDraftDue('')
+      setDraftTime('')
+    }
     inputRef.current?.focus()
   }
 
@@ -146,6 +166,7 @@ export default function TodoList({
         {when && (
           <span className="shrink-0 text-[12px] tabular-nums" style={{ color: late ? 'var(--status-fading)' : when === 'Today' ? 'var(--brand)' : 'var(--text-faint)', fontWeight: late || when === 'Today' ? 600 : 400 }}>
             {when}
+            {todo.due_time && clockTime(todo.due_time) ? ` · ${clockTime(todo.due_time)}` : ''}
           </span>
         )}
       </li>
@@ -188,13 +209,21 @@ export default function TodoList({
         <input
           type="date"
           value={todo.due_on || ''}
-          onChange={(e) => patchTodo(todo, { due_on: e.target.value || null })}
+          onChange={(e) => patchTodo(todo, dayChange(todo, e.target.value || null))}
           aria-label="Due date"
           className="input control-sm px-3 text-[16px] sm:text-[12.5px]"
           style={{ width: 150 }}
         />
+        <input
+          type="time"
+          value={todo.due_time ? String(todo.due_time).slice(0, 5) : ''}
+          onChange={(e) => patchTodo(todo, { due_time: e.target.value || null, ...(todo.due_on ? {} : { due_on: todayKey }) })}
+          aria-label="Due time"
+          className="input control-sm px-3 text-[16px] sm:text-[12.5px]"
+          style={{ width: 120 }}
+        />
         {todo.due_on && (
-          <button onClick={() => patchTodo(todo, { due_on: null })} className="px-2 text-[12.5px] font-medium" style={{ color: 'var(--text-faint)' }}>
+          <button onClick={() => patchTodo(todo, dayChange(todo, null))} className="px-2 text-[12.5px] font-medium" style={{ color: 'var(--text-faint)' }}>
             No date
           </button>
         )}
@@ -308,9 +337,64 @@ export default function TodoList({
           </button>
         </form>
       )}
+      {!compact && userId && (
+        <div className="mb-2 flex flex-wrap items-center gap-1.5">
+          {!day && (
+            <>
+              {[
+                ['Today', todayKey],
+                ['Tomorrow', addDays(1)],
+              ].map(([label, value]) => (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => setDraftDue(draftDue === value ? '' : value)}
+                  aria-pressed={draftDue === value}
+                  className="rounded-full border px-3 py-1 text-[12.5px] font-medium transition-colors"
+                  style={draftDue === value ? { borderColor: 'var(--brand)', color: 'var(--brand)', background: 'var(--brand-tint)' } : { borderColor: 'var(--border)', color: 'var(--text-muted)' }}
+                >
+                  {label}
+                </button>
+              ))}
+              <input
+                type="date"
+                value={draftDue}
+                onChange={(e) => setDraftDue(e.target.value)}
+                aria-label="Due date for the new to-do"
+                className="input control-sm px-3 text-[16px] sm:text-[12.5px]"
+                style={{ width: 150 }}
+              />
+            </>
+          )}
+          <input
+            type="time"
+            value={draftTime}
+            onChange={(e) => setDraftTime(e.target.value)}
+            aria-label="Due time for the new to-do"
+            className="input control-sm px-3 text-[16px] sm:text-[12.5px]"
+            style={{ width: 120 }}
+          />
+          {subjects.length > 0 && (
+            <Select
+              value={draftSubject}
+              onChange={(e) => setDraftSubject(e.target.value)}
+              aria-label="Subject for the new to-do"
+              className="input control-sm px-3 text-[16px] sm:text-[12.5px]"
+              style={{ width: 180, maxWidth: '100%' }}
+            >
+              <option value="">No subject</option>
+              {subjects.map((subject) => (
+                <option key={subject} value={subject}>
+                  {subject}
+                </option>
+              ))}
+            </Select>
+          )}
+        </div>
+      )}
       {!compact && userId && !draft && (
         <p className="mb-3 text-[11.5px]" style={{ color: 'var(--text-faint)' }}>
-          Type a day (friday, tomorrow, 12 nov) and a #subject and they are filled in for you.
+          Pick a day, a time and a subject, or just type them: “lab report friday #physics”.
         </p>
       )}
 

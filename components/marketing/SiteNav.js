@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { Chevron } from '@/components/Select'
 
 /**
@@ -51,12 +51,29 @@ const MORE = [
 /** Down, and up when the drawer is open. A rotated chevron rather than a
  *  glyph, which is a font's idea of an arrow and never matches the weight of
  *  the word beside it. */
+/**
+ * Is somebody signed in on this browser?
+ *
+ * Read from the session cookie, with no request: the site pages stay as fast
+ * for a visitor as they were. It only chooses what the account corner says,
+ * so a stale cookie costs one extra press, and the dashboard checks properly.
+ *
+ * Without this, a student who came back to psyllabus.app saw "Log in" and
+ * "Get started" and reasonably concluded they had been signed out.
+ */
+const noSubscribe = () => () => {}
+const hasSession = () => /(^|;\s*)sb-[^=;]*-auth-token/.test(document.cookie)
+function useSignedIn() {
+  return useSyncExternalStore(noSubscribe, hasSession, () => false)
+}
+
 function Caret({ open }) {
   return <Chevron open={open} style={{ opacity: 0.65 }} />
 }
 
 export default function SiteNav({ children }) {
   const [more, setMore] = useState(false)
+  const signedIn = useSignedIn()
   const [mobile, setMobile] = useState(false)
   const ref = useRef(null)
   const leaving = useRef(null)
@@ -195,16 +212,24 @@ export default function SiteNav({ children }) {
       {/* Everything left of this is navigation; everything here is the
           account. They are separate columns because they are separate jobs. */}
       <div className="nav-drop col-start-3 flex shrink-0 items-center justify-end gap-6">
-        <Link
-          href="/login"
-          className="nav-word hidden whitespace-nowrap text-[13.5px] font-medium sm:inline-block"
-          style={{ color: 'var(--text-body)' }}
-        >
-          Log in
-        </Link>
-        <Link href="/signup" className="btn btn-solid control-sm whitespace-nowrap">
-          Get started
-        </Link>
+        {signedIn ? (
+          <Link href="/dashboard" className="btn btn-solid control-sm whitespace-nowrap">
+            Open dashboard
+          </Link>
+        ) : (
+          <>
+            <Link
+              href="/login"
+              className="nav-word hidden whitespace-nowrap text-[13.5px] font-medium sm:inline-block"
+              style={{ color: 'var(--text-body)' }}
+            >
+              Log in
+            </Link>
+            <Link href="/signup" className="btn btn-solid control-sm whitespace-nowrap">
+              Get started
+            </Link>
+          </>
+        )}
 
         {/* Phone: three bare lines to the right of Get started, no outline or
             fill, that fold into a cross while the menu is down. */}
@@ -277,14 +302,22 @@ export default function SiteNav({ children }) {
           ))}
         </div>
 
-        <div className="site-menu-item mt-7 grid grid-cols-2 gap-2" style={{ '--i': 5 }}>
-          <Link href="/login" onClick={() => setMobile(false)} className="btn btn-outline control-md justify-center">
-            Log in
-          </Link>
-          <Link href="/signup" onClick={() => setMobile(false)} className="btn btn-solid control-md justify-center">
-            Get started
-          </Link>
-        </div>
+        {signedIn ? (
+          <div className="site-menu-item mt-7 grid" style={{ '--i': 5 }}>
+            <Link href="/dashboard" onClick={() => setMobile(false)} className="btn btn-solid control-md justify-center">
+              Open dashboard
+            </Link>
+          </div>
+        ) : (
+          <div className="site-menu-item mt-7 grid grid-cols-2 gap-2" style={{ '--i': 5 }}>
+            <Link href="/login" onClick={() => setMobile(false)} className="btn btn-outline control-md justify-center">
+              Log in
+            </Link>
+            <Link href="/signup" onClick={() => setMobile(false)} className="btn btn-solid control-md justify-center">
+              Get started
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   )

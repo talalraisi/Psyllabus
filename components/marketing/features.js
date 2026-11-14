@@ -140,8 +140,8 @@ function GraphicMistakes({ shown }) {
         {[
           ['due now', 'weak'],
           ['in 1 day', 'developing'],
-          ['in 5 days', 'proficient'],
-          ['in a week', 'mastered'],
+          ['in 3 days', 'proficient'],
+          ['in 5 days', 'mastered'],
         ].map(([when, tone], i) => (
           <div
             key={when}

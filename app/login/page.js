@@ -3,7 +3,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { getAuthCallbackUrl } from '@/lib/auth'
+import { getAuthCallbackUrl, getSafeNextPath } from '@/lib/auth'
 import PasswordField from '@/components/PasswordField'
 import AuthShell, { OrRule, GoogleButton, SubmitButton } from '@/components/marketing/AuthShell'
 
@@ -25,6 +25,25 @@ function Login() {
     const reason = params.get('error')
     if (reason) setError(reason === 'auth' ? 'Sign-in did not complete. Try again.' : reason)
   }, [params])
+
+  // Already signed in: this page has nothing to ask. Checked with the server
+  // (getUser), not the stored token, so an expired session stays here and
+  // signs in again, and cannot bounce between this page and the dashboard.
+  useEffect(() => {
+    if (params.get('error')) return
+    let live = true
+    supabase.auth
+      .getUser()
+      .then(({ data }) => {
+        if (live && data?.user?.id) router.replace(getSafeNextPath(params.get('next')))
+      })
+      .catch(() => {})
+    return () => {
+      live = false
+    }
+    // Once, on arrival.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleLogin = async (e) => {
     e.preventDefault()

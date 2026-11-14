@@ -20,6 +20,7 @@ import IdeasStudio from '@/components/syllabi/IdeasStudio'
 import DraftStudio from '@/components/syllabi/DraftStudio'
 import ChatHistory from '@/components/syllabi/ChatHistory'
 import { hasSyllabi, canOpenSyllabi, SYLLABI_TRIAL } from '@/lib/access'
+import { useStudyClock } from '@/lib/use-study-clock'
 
 /**
  * Ask fills the screen so the box sits at the bottom of it; Ideas scrolls
@@ -92,6 +93,9 @@ function TrialBar({ bump }) {
 
 function Syllabi() {
   const params = useSearchParams()
+  // Time with Syllabi is study time: it counts towards the streak and the
+  // day's minutes like a quiz does, while the tab is in front and in use.
+  useStudyClock()
   const [profile, setProfile] = useState(null)
   const [rows, setRows] = useState([])
   const [tab, setTab] = useState(() => (TABS.some(([k]) => k === params.get('tab')) ? params.get('tab') : 'ask'))
