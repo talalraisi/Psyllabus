@@ -3,22 +3,10 @@ import { NextResponse } from 'next/server'
 import { cookieOptionsFor } from '@/lib/cookie-domain'
 
 export async function proxy(request) {
-  // The front page, for somebody already signed in, is their dashboard.
-  //
-  // A student who closed the tab and typed psyllabus.app again landed on the
-  // marketing page, saw "Log in", and took it that they had been signed out.
-  // They had not: the session was there, the page just never looked. Only the
-  // cookie's presence is checked, so a visitor's front page still costs no
-  // round trip; /dashboard verifies it properly. `?home` shows the front page
-  // anyway.
-  if (request.nextUrl.pathname === '/') {
-    const signedIn = request.cookies.getAll().some((c) => /^sb-.*-auth-token/.test(c.name))
-    if (signedIn && !request.nextUrl.searchParams.has('home')) {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
-    }
-    return NextResponse.next({ request })
-  }
-
+  // The front page stays the front page when signed in: the site nav reads the
+  // session cookie and offers "Open dashboard" instead of "Log in", which is
+  // what the redirect that used to be here was for (components/marketing/
+  // SiteNav.js). Students want to be able to look at it.
   let supabaseResponse = NextResponse.next({ request })
 
   const cookieOptions = cookieOptionsFor(request.nextUrl.hostname)
@@ -62,5 +50,5 @@ export const config = {
   // Only the routes that actually need a session. This used to match every
   // request, so opening the marketing pages cost a round trip to Supabase in
   // Singapore before anything could render.
-  matcher: ['/', '/dashboard/:path*', '/onboarding/:path*'],
+  matcher: ['/dashboard/:path*', '/onboarding/:path*'],
 }

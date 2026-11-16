@@ -386,6 +386,18 @@ export default function StudyPlanPage() {
           <StudyTypeCard profile={profile} onOpen={() => setTypeOpen(true)} onRetake={() => setTypeOpen('fresh')} />
         )}
 
+        {/* An empty week grid: the plan is guessing your free time. Say so. */}
+        {configured && !editing && settings.noFreeTime && (
+          <div className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-[12px] border px-4 py-3" style={{ borderColor: 'var(--brand)', background: 'var(--brand-tint)' }}>
+            <p className="text-[13px]" style={{ color: 'var(--text-body)' }}>
+              No free time is marked, so the plan is assuming {settings.week[1]} minutes on school days. Mark when you are actually free and it fits around you.
+            </p>
+            <button type="button" onClick={() => setEditing(true)} className="btn btn-solid control-sm shrink-0">
+              Mark free time
+            </button>
+          </div>
+        )}
+
         {(!configured || editing) && <div className="mb-10">{settingsPanel}</div>}
 
         {configured && candidates.length === 0 && plan.days[0].tasks.length === 0 ? (

@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
 import Counting from '@/components/Counting'
 import SyllabiMark from '@/components/SyllabiMark'
+import FriendsButton from '@/components/FriendsButton'
 
 /**
  * Layout primitives. Every dashboard page composes these rather than
@@ -35,7 +36,7 @@ export function Page({ children, width = 'default' }) {
   )
 }
 
-export function PageHeader({ title, subtitle, action, eyebrow }) {
+export function PageHeader({ title, subtitle, action, eyebrow, friends = true }) {
   return (
     <header className="mb-10 flex flex-wrap items-end justify-between gap-4">
       <div className="min-w-0">
@@ -56,7 +57,16 @@ export function PageHeader({ title, subtitle, action, eyebrow }) {
           </p>
         )}
       </div>
-      {action && <div className="shrink-0">{action}</div>}
+      {/* Friends, top right of every dashboard page on a computer; on a
+          phone it is in the header bar already. */}
+      <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+        {action}
+        {friends && (
+          <span className="hidden md:block">
+            <FriendsButton />
+          </span>
+        )}
+      </div>
     </header>
   )
 }

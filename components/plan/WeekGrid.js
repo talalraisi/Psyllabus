@@ -73,15 +73,29 @@ export default function WeekGrid({ value, onChange }) {
     return [col, row]
   }
 
+  // Every cell in the rectangle from the last cell to this one. Pointer moves
+  // arrive every few pixels, and a quick drag crosses several half-hours
+  // between two of them: painting only the cell under each sample left gaps,
+  // so a drag drew separate thin bars instead of one block.
+  const last = useRef(null)
   const apply = (hit) => {
     if (!hit || !mode.current || !working.current) return
-    const [d, row] = hit
-    const had = working.current[d].has(row)
-    if ((mode.current === 'add') === had) return
+    const [d1, r1] = last.current || hit
+    const [d2, r2] = hit
+    last.current = hit
     const next = [...working.current]
-    next[d] = new Set(next[d])
-    if (had) next[d].delete(row)
-    else next[d].add(row)
+    let changed = false
+    for (let d = Math.min(d1, d2); d <= Math.max(d1, d2); d++) {
+      for (let r = Math.min(r1, r2); r <= Math.max(r1, r2); r++) {
+        const had = next[d].has(r)
+        if ((mode.current === 'add') === had) continue
+        if (next[d] === working.current[d]) next[d] = new Set(next[d])
+        if (had) next[d].delete(r)
+        else next[d].add(r)
+        changed = true
+      }
+    }
+    if (!changed) return
     working.current = next
     setDraft(next)
   }
@@ -92,6 +106,7 @@ export default function WeekGrid({ value, onChange }) {
     e.currentTarget.setPointerCapture?.(e.pointerId)
     working.current = cells.map((s) => new Set(s))
     mode.current = working.current[hit[0]].has(hit[1]) ? 'clear' : 'add'
+    last.current = null
     apply(hit)
   }
   const onMove = (e) => mode.current && apply(cellAt(e))
@@ -100,6 +115,7 @@ export default function WeekGrid({ value, onChange }) {
     const next = working.current
     mode.current = null
     working.current = null
+    last.current = null
     setDraft(null)
     onChange(toSlots(next))
   }

@@ -285,6 +285,16 @@ export default function DashboardLayout({ children, profile }) {
     }
   }, [mobileOpen])
 
+  // A page still loading after twenty seconds is stuck, not slow: without a
+  // profile the sidebar has no account corner, so there was no way out but
+  // closing the tab. Offer one.
+  const [stuck, setStuck] = useState(false)
+  useEffect(() => {
+    if (profile) return
+    const t = setTimeout(() => setStuck(true), 20000)
+    return () => clearTimeout(t)
+  }, [profile])
+
   const handleLogout = async () => {
     if (signingOut) return
     setSigningOut(true)
@@ -638,11 +648,24 @@ export default function DashboardLayout({ children, profile }) {
       </aside>
 
       <main className="min-w-0 flex-1">
-        {/* A slim bar along the top on a computer (a phone has its own),
-            for what is worth seeing from every page: friends, for now. */}
-        <div className="sticky top-0 z-30 hidden h-12 items-center justify-end gap-2 px-5 md:flex" style={{ background: 'var(--bg)' }}>
-          <FriendsButton />
-        </div>
+        {stuck && !profile && (
+          <div role="alert" className="mx-4 mt-4 flex flex-wrap items-center justify-between gap-3 rounded-[12px] border px-4 py-3 md:mx-8" style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}>
+            <p className="text-[13px]" style={{ color: 'var(--text-body)' }}>
+              This is taking longer than it should.
+            </p>
+            <div className="flex gap-2">
+              <button type="button" onClick={() => window.location.reload()} className="btn btn-solid control-sm">
+                Reload
+              </button>
+              <button type="button" onClick={handleLogout} disabled={signingOut} className="btn btn-outline control-sm">
+                {signingOut ? 'Signing out…' : 'Sign out'}
+              </button>
+            </div>
+          </div>
+        )}
+        {/* Friends sits in each page's title row on a computer (PageHeader),
+            not in a bar of its own, which stacked on top of full-screen
+            pages' toolbars. A phone has it in the header above. */}
         {children}
       </main>
 
