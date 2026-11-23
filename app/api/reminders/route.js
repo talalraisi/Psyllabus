@@ -65,11 +65,11 @@ export async function GET(request) {
 
   for (const c of people) {
     const r = pickReminder(c, now)
-    if (!r || (!r.email && !r.push)) continue
+    if (!r || (!r.email && !r.sendPush)) continue
     summary.nudges[r.kind] = (summary.nudges[r.kind] || 0) + 1
     if (!live) {
       if (r.email && emailReady) summary.emails++
-      if (r.push && pushReady) summary.pushes++
+      if (r.sendPush && pushReady) summary.pushes++
       continue
     }
 
@@ -84,11 +84,11 @@ export async function GET(request) {
       }
     }
 
-    if (r.push && pushReady) {
+    if (r.sendPush && pushReady) {
       let sent = false
       for (const sub of c.push_subs) {
         try {
-          await webpush.sendNotification(sub, JSON.stringify({ title: r.title, body: r.body, url: r.url, tag: r.kind }), { TTL: 6 * 3600 })
+          await webpush.sendNotification(sub, JSON.stringify({ title: r.push.title, body: r.push.body, url: r.url, tag: r.kind }), { TTL: 6 * 3600 })
           sent = true
         } catch (e) {
           // The browser threw the subscription away: so do we.

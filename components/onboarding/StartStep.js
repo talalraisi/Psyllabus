@@ -31,7 +31,7 @@ export function upcomingSessions(now = new Date()) {
 
 // Every curriculum a student might say. Only those in CURRICULUMS have a
 // syllabus here; the others are told so and can ask to hear when it arrives.
-export const CURRICULUM_CHOICES = ['IB', 'A-Level', 'AP', 'IGCSE / GCSE', 'Other']
+export const CURRICULUM_CHOICES = ['IB', 'A-Level', 'AP']
 
 export default function StartStep({ curriculum, offered, gradYear, session, email, onCurriculum, onYear, onSession, onWaitlist, onContinue, now }) {
   const [sessions] = useState(() => upcomingSessions(now))
@@ -43,7 +43,7 @@ export default function StartStep({ curriculum, offered, gradYear, session, emai
       <p className="label" id="curriculum-label">
         Which curriculum are you studying?
       </p>
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3" role="group" aria-labelledby="curriculum-label">
+      <div className="grid grid-cols-3 gap-2" role="group" aria-labelledby="curriculum-label">
         {CURRICULUM_CHOICES.map((c) => (
           <button
             key={c}
@@ -121,7 +121,7 @@ export default function StartStep({ curriculum, offered, gradYear, session, emai
       <div className="step-enter rounded-[14px] border p-5" style={{ borderColor: 'var(--border)', background: 'var(--surface-sunken)' }}>
         <p className="text-[14.5px] font-semibold">Psyllabus covers the IB for now</p>
         <p className="mt-1.5 text-[13.5px] leading-relaxed" style={{ color: 'var(--text-body)' }}>
-          {curriculum === 'Other' ? 'Your curriculum' : curriculum} is not here yet. We can email {email || 'you'} the day it is.
+          {curriculum} is not here yet. We can email {email || 'you'} the day it is.
         </p>
         {waitlist === 'sent' ? (
           <p className="mt-4 text-[13.5px] font-medium" role="status" style={{ color: 'var(--brand)' }}>

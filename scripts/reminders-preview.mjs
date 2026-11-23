@@ -63,7 +63,7 @@ for (const c of rows) {
   if (!r) continue
   tally[r.kind] = (tally[r.kind] || 0) + 1
   if (r.email) email++
-  if (r.push) push++
+  if (r.sendPush) push++
 }
 console.log({
   students: rows.length,
