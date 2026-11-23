@@ -13,6 +13,7 @@ import { splitLevel, coursesOf, defaultLevel } from '@/lib/course-levels'
 import { getCurrentUser } from '@/lib/auth'
 import { realismNote, curriculumOf } from '@/lib/curriculum'
 import { claimFreeSubject } from '@/lib/free-claim'
+import StartStep from '@/components/onboarding/StartStep'
 import { invalidateProfile } from '@/lib/cache'
 import {
   IB_CORE_SUBJECTS,
@@ -24,21 +25,11 @@ import {
 } from '@/lib/ib-points'
 
 
-// IB exam sessions: May (M) or November (N), and the year. The year is
-// kept as grad_year for everything that reads it.
-const SESSIONS = [
-  { key: 'N26', label: 'November 2026' },
-  { key: 'M27', label: 'May 2027' },
-  { key: 'N27', label: 'November 2027' },
-  { key: 'M28', label: 'May 2028' },
-  { key: 'N28', label: 'November 2028' },
-]
-const yearOf = (session) => `20${session.slice(1)}`
-
 export default function Onboarding() {
   const [step, setStep] = useState(1)
-  // With one curriculum offered there is nothing to choose, so it starts chosen.
-  const [curriculum, setCurriculum] = useState(() => (Object.keys(CURRICULUMS).length === 1 ? Object.keys(CURRICULUMS)[0] : ''))
+  // Asked first, even with one curriculum offered: a student on another one
+  // should hear that now, not after picking subjects that are not theirs.
+  const [curriculum, setCurriculum] = useState('')
   const [gradYear, setGradYear] = useState('')
   const [session, setSession] = useState('')
   // A school or invite code, offered again at the free-subject step: one
@@ -491,58 +482,28 @@ export default function Onboarding() {
               Tell us about your curriculum so we can map your exact syllabus.
             </p>
 
-            {Object.keys(CURRICULUMS).length > 1 && (
-            <div className="mb-6">
-              <p className="label" id="curriculum-label">
-                Which curriculum are you studying?
-              </p>
-              <div className="grid grid-cols-3 gap-3" role="group" aria-labelledby="curriculum-label">
-                {Object.keys(CURRICULUMS).map(c => (
-                  <button key={c} aria-pressed={curriculum === c} onClick={() => {
-                    setCurriculum(c)
-                    setSelectedSubjects([])
-                    setTargetGrades({})
-                  }}
-                  className={`rounded-full border py-3.5 text-[13.5px] font-semibold transition-colors duration-150
-                  ${curriculum === c ? 'chip-active' : 'chip hover:border-border-strong'}`}>
-                    {c}
-                  </button>
-                ))}
-              </div>
-            </div>
-            )}
-
-            <div className="mb-8">
-              <p className="label" id="gradyear-label">
-                {curriculum === 'IB' || !curriculum ? 'Which exam session do you sit?' : 'When do you graduate?'}
-              </p>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3" role="group" aria-labelledby="gradyear-label">
-                {SESSIONS.map((x) => {
-                  const on = session === x.key
-                  return (
-                    <button
-                      key={x.key}
-                      aria-pressed={on}
-                      onClick={() => {
-                        setSession(x.key)
-                        setGradYear(yearOf(x.key))
-                      }}
-                      className={`flex flex-col items-center justify-center rounded-[16px] border py-2.5 transition-colors duration-150 ${on ? 'chip-active' : 'chip hover:border-border-strong'}`}
-                    >
-                      <span className="text-[15px] font-semibold tabular-nums">{x.key}</span>
-                      <span className="text-[11.5px] font-normal opacity-80">{x.label}</span>
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-
-            <button
-              onClick={() => setStep(2)}
-              disabled={!curriculum || !gradYear}
-              className="btn btn-solid control-lg w-full text-base">
-              Continue
-            </button>
+            <StartStep
+              curriculum={curriculum}
+              offered={Boolean(currentCurriculum)}
+              gradYear={gradYear}
+              session={session}
+              email={account?.email}
+              onCurriculum={(c) => {
+                setCurriculum(c)
+                setSelectedSubjects([])
+                setTargetGrades({})
+              }}
+              onYear={(year, first) => {
+                setGradYear(year)
+                setSession(first)
+              }}
+              onSession={setSession}
+              onWaitlist={async (message) => {
+                const { error } = await supabase.from('feedback').insert({ user_id: account?.id, kind: 'waitlist', message, path: '/onboarding' })
+                return !error
+              }}
+              onContinue={() => setStep(2)}
+            />
           </div>
         )}
 

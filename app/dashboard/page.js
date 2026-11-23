@@ -34,6 +34,7 @@ import { primeStudyDays, restDaysFor } from '@/lib/streak'
 import { StreakCard } from '@/components/Streak'
 import WaysToStudy from '@/components/WaysToStudy'
 import StudyTimer from '@/components/StudyTimer'
+import { ReminderPrompt } from '@/components/Reminders'
 import WelcomeTour, { tourDone, resetTour } from '@/components/WelcomeTour'
 import MapPreview from '@/components/map/MapPreview'
 
@@ -555,6 +556,9 @@ export default function Dashboard() {
         <Section title="Ways to study">
           <WaysToStudy profile={profile} focus={studyFocus} />
         </Section>
+
+        {/* After the first study, not before: a reason to come back. */}
+        {hasActivity && <ReminderPrompt profile={profile} className="mb-12" />}
 
         {/* Revision that happens off the screen still counts. */}
         <StudyTimer subjects={allSubjects} className="mb-12" />

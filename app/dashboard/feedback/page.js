@@ -28,6 +28,7 @@ const KIND_LABEL = {
   other: 'Something else',
   ai_good: 'Syllabi: good',
   ai_bad: 'Syllabi: bad',
+  waitlist: 'Wants another curriculum',
 }
 
 const KIND_TONE = {

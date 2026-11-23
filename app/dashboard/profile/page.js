@@ -12,6 +12,7 @@ import DashboardLayout from '@/components/DashboardLayout'
 import { Page, PageHeader, Section, PageLoading, Spinner } from '@/components/PageShell'
 import { hasAllSubjects, hasSyllabi, planLabel, FREE_SUBJECT_LIMIT } from '@/lib/access'
 import { billingLive } from '@/lib/billing'
+import { ReminderSettings } from '@/components/Reminders'
 
 // Only a guard against someone picking a RAW file; the cropper re-encodes
 // everything to a small square before it is uploaded.
@@ -568,6 +569,10 @@ export default function ProfilePage() {
           <Link href="/onboarding?edit=subjects" className="btn btn-outline control-md">
             Change my subjects
           </Link>
+        </Section>
+
+        <Section title="Reminders">
+          <ReminderSettings profile={profile} onChange={(patch) => setProfile((p) => ({ ...p, ...patch }))} />
         </Section>
 
         {/* Access */}
