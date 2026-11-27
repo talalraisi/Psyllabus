@@ -92,6 +92,17 @@ function best(lines, starts, nextHeading) {
 }
 
 /**
+ * Units whose name in the app is not a heading in the guide, and the heading
+ * that holds their content. Keyed by guide file.
+ */
+const ALIASES = {
+  'classical-languages': [
+    [/prescribed texts|writing about literature/i, 'Prescribed core texts'],
+    [/dossier/i, 'Research dossier'],
+  ],
+}
+
+/**
  * The guide's text for one syllabus row: {subject, code, unit, topic}.
  * Returns {text, how} or null.
  */
@@ -108,7 +119,9 @@ export function guideSection({ subject, code, unit, topic }) {
     if (text) return { text, how: `code ${code}` }
   }
 
-  for (const name of [unit, topic].filter(Boolean)) {
+  const base = path.basename(file, '.txt')
+  const alias = (ALIASES[base] || []).find(([re]) => re.test(unit || topic || ''))?.[1]
+  for (const name of [alias, unit, topic].filter(Boolean)) {
     const words = name.replace(/^[A-Z0-9.]+\s+/, '').trim()
     if (words.length < 4) continue
     const heading = new RegExp(`^\\s*(?:[A-Z0-9.]+\\s+)?${escape(words)}\\s*$`, 'i')
@@ -149,7 +162,6 @@ export async function mapUnits(subject, units, ask) {
   if (start === -1) start = 300
   let end = find(/^\s*(Assessment in the Diploma Programme|Assessment objectives|External assessment)\s*$/i, start + 50)
   if (end === -1) end = lines.length
-  const body = lines.slice(start, end).map((l, i) => `${start + i}: ${l}`).join('\n').slice(0, 600000)
 
   const schema = {
     type: 'object',
@@ -170,20 +182,35 @@ export async function mapUnits(subject, units, ask) {
       },
     },
   }
-  const res = await ask(
-    `Below is the syllabus section of the IB ${subject.replace(/ (SL|HL)$/, '')} subject guide, with line numbers. For each unit listed, give the line number of the heading where that unit's content (its understandings, content statements or learning outcomes) begins. Use the line where the content starts, not the contents page. -1 if the unit is not in the guide.
+  const pass = async (list, from, to, where) => {
+    const body = lines.slice(from, to).map((l, i) => `${from + i}: ${l}`).join('\n').slice(0, 600000)
+    const res = await ask(
+      `Below is ${where} of the IB ${subject.replace(/ (SL|HL)$/, '')} subject guide, with line numbers. For each unit listed, give the line number of the heading where that unit's content (its understandings, content statements, learning outcomes, topics of study or requirements) begins. Use the line where the content starts, not the contents page. -1 if the unit is not in the guide.
 
 UNITS:
-${units.map((u) => `- key "${u.key}": ${[u.code, u.unit, u.topic].filter(Boolean).join(' · ')}${u.examples ? ` (subtopics such as: ${u.examples})` : ''}`).join('\n')}
+${list.map((u) => `- key "${u.key}": ${[u.code, u.unit, u.topic].filter(Boolean).join(' · ')}${u.examples ? ` (subtopics such as: ${u.examples})` : ''}`).join('\n')}
 
 GUIDE:
 ${body}`,
-    schema
-  )
-  const found = (res?.units || []).filter((u) => u.line >= start && u.line < end).sort((a, b) => a.line - b.line)
+      schema
+    )
+    return (res?.units || []).filter((u) => u.line >= from && u.line < to)
+  }
+
+  // First the syllabus part. Then, for what is still missing, the whole
+  // guide: some put the real topic lists in an appendix after assessment
+  // (Social and Cultural Anthropology), or a unit is the internal assessment.
+  let found = await pass(units, start, end, 'the syllabus section')
+  const missing = units.filter((u) => !found.some((f) => f.key === u.key))
+  if (missing.length && (start > 300 || end < lines.length)) {
+    found = found.concat(await pass(missing, 300, lines.length, 'the whole text'))
+  }
+  // Each section runs to the next found heading after it, wherever it is.
+  const heads = [...new Set(found.map((u) => u.line))].sort((x, y) => x - y)
   const out = {}
-  found.forEach((u, i) => {
-    const stop = Math.min(found[i + 1]?.line ?? end, u.line + 400)
+  for (const u of found) {
+    const next = heads.find((h) => h > u.line)
+    const stop = Math.min(next ?? lines.length, u.line + 400)
     const text = lines
       .slice(u.line, stop > u.line ? stop : u.line + 120)
       .join('\n')
@@ -191,6 +218,6 @@ ${body}`,
       .slice(0, MAX)
       .trim()
     if (text.length > 200) out[u.key] = { text, how: `mapped line ${u.line}` }
-  })
+  }
   return out
 }

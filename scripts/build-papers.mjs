@@ -71,6 +71,8 @@ function resolve(course) {
     const key = { 'A: Literature': 'Language A: Literature', 'A: Language & Literature': 'Language A: Language & Literature', B: 'Language B', 'ab initio': 'Language ab initio' }[lang[2]]
     return { key, base: course, language: lang[1], examFrom: null }
   }
+  // Latin and Classical Greek share one guide and one paper format.
+  if (/^Classical Languages: /.test(course)) return { key: 'Classical Languages', base: course, language: 'English', examFrom: null }
   if (course === 'History 2028') return { key: 'History (exams from 2028)', base: 'History', language: 'English', examFrom: 2028 }
   if (!BLUEPRINTS[course]) throw new Error(`No blueprint for "${course}".`)
   return { key: course, base: course, language: 'English', examFrom: null }

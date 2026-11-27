@@ -44,8 +44,15 @@ const REST = [
   'Digital Society', 'Design Technology', 'Sports, Exercise, and Health Science',
   'Dance', 'Film', 'Music',
 ]
+// The last IB courses, held back until now (lib/catalogue.js HIDDEN_COURSES).
+const LAST = [
+  'Global Politics', 'Philosophy', 'Social and Cultural Anthropology', 'World Religions',
+  'Classical Languages: Latin', 'Classical Languages: Classical Greek',
+  'Mandarin A: Language & Literature', 'Literature and Performance',
+]
 // Papers: every course with written exams. History for exams from 2028.
-const NO_PAPERS = new Set(['Theatre', 'Visual Arts', 'Dance', 'Film', 'Music'])
+// Literature and Performance has no guide on file to take a paper format from.
+const NO_PAPERS = new Set(['Theatre', 'Visual Arts', 'Dance', 'Film', 'Music', 'Literature and Performance'])
 const paperName = (c) => (c === 'History' ? 'History 2028' : c)
 
 const caps = ['--claude-cap', CLAUDE_CAP, '--gemini-cap', GEMINI_CAP]
@@ -69,6 +76,8 @@ const allJobs = [
   ...PILOT.filter((c) => !NO_PAPERS.has(c)).map((c) => ({ name: `papers: ${c}`, steps: papers(c) })),
   ...REST.map((c) => ({ name: `content: ${c}`, steps: content(c) })),
   ...REST.filter((c) => !NO_PAPERS.has(c)).map((c) => ({ name: `papers: ${c}`, steps: papers(c) })),
+  ...LAST.map((c) => ({ name: `content: ${c}`, steps: content(c) })),
+  ...LAST.filter((c) => !NO_PAPERS.has(c)).map((c) => ({ name: `papers: ${c}`, steps: papers(c) })),
 ]
 // --only "content: Music,papers: Computer Science" runs just those jobs.
 // Job names are split only before "content:" or "papers:", since a course
