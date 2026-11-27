@@ -7,8 +7,10 @@ import { getCurrentUser } from '@/lib/auth'
 import { IconClose, IconCheck } from '@/components/Icons'
 import { Spinner } from '@/components/PageShell'
 
-/** Enough to say what happened; the database holds the same line. */
-const MIN_CHARS = 50
+/** A few words is a report. It was 50 characters, and most real reports
+    ("the answer to Q3 is wrong") never got past the greyed-out button. The
+    database holds the same line (scripts/108-reports-fix.sql). */
+const MIN_CHARS = 3
 
 /**
  * The way back from a beta tester.
@@ -172,11 +174,9 @@ export default function FeedbackButton() {
                 className="input w-full resize-y"
                 style={{ height: 'auto', padding: '10px 12px', lineHeight: 1.55 }}
               />
-              {message.trim().length < MIN_CHARS && (
-                <p className="mt-1.5 text-[12px] tabular-nums" style={{ color: 'var(--text-faint)' }}>
-                  {MIN_CHARS - message.trim().length} more characters
-                </p>
-              )}
+              <p className="mt-1.5 text-[12px]" style={{ color: 'var(--text-faint)' }}>
+                A few words is enough. We see which page you were on.
+              </p>
 
               {error && (
                 <p className="mt-2 text-[12.5px]" style={{ color: 'var(--danger)' }}>

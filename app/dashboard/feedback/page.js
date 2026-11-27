@@ -29,6 +29,8 @@ const KIND_LABEL = {
   ai_good: 'Syllabi: good',
   ai_bad: 'Syllabi: bad',
   waitlist: 'Wants another curriculum',
+  lesson: 'Lesson',
+  question: 'Question report',
 }
 
 const KIND_TONE = {
@@ -38,6 +40,7 @@ const KIND_TONE = {
   other: 'var(--text-faint)',
   ai_good: 'var(--status-proficient)',
   ai_bad: 'var(--status-weak)',
+  question: 'var(--status-weak)',
 }
 
 function ago(when) {
@@ -137,6 +140,8 @@ export default function FeedbackPage() {
               stats={[
                 { label: 'unread', value: unhandled.length, tone: 'var(--brand)' },
                 { label: 'broke', value: byKind('problem'), tone: 'var(--status-weak)' },
+                // Reports on single questions (components/ReportQuestion.js).
+                { label: 'questions', value: byKind('question'), tone: 'var(--status-weak)' },
                 { label: 'confusing', value: byKind('confusing'), tone: 'var(--status-developing)' },
                 { label: 'ideas', value: byKind('idea') },
                 // The thumbs on Syllabi's answers (components/syllabi/RateAnswer.js).
