@@ -11,6 +11,12 @@
  *   node scripts/run-build.mjs --claude-cap 187 --gemini-cap 28
  *
  * Progress: content-runs/build-status.json; each job's log in content-runs/logs.
+ *
+ *   node scripts/run-build.mjs --grow --claude-cap 330 --gemini-cap 35
+ *
+ * --grow: the subjects students actually take, bank doubled from the half
+ * size they were first built at. Only the new slots are written, and publish
+ * adds them beside the questions already live (no --retire-old).
  */
 
 import fs from 'node:fs'
@@ -68,10 +74,25 @@ const papers = (c) => [
   ['scripts/build-papers.mjs', '--course', paperName(c), '--stage', 'publish', ...caps],
 ]
 
+// Most-picked first, so if a cap is reached the subjects most students take are done.
+const GROW = [
+  'English A: Language & Literature', 'Math Analysis & Approaches', 'Physics', 'Business Management',
+  'Chemistry', 'Math Applications & Interpretation', 'Environmental Systems and Societies',
+  'Arabic B', 'French B', 'Computer Science', 'Spanish ab initio',
+]
+const grow = (c) => {
+  // Physics A.1–A.3 were the pilot, already full size: only the rest grows.
+  const runs = c === 'Physics' ? [['--run', 'physics-rest', '--exclude-codes', 'A.1,A.2,A.3']] : [[]]
+  return runs.flatMap((extra) => [
+    ['scripts/build-content.mjs', '--course', c, '--grow', '1', '--audit', '20', ...extra, ...caps],
+    ['scripts/build-content.mjs', '--course', c, '--stage', 'publish', ...extra, ...caps],
+  ])
+}
+
 // Subjects held back, e.g. while their subtopic lists are being updated.
 const SKIP = new Set(String(arg('skip', '')).split(',').map((x) => x.trim()).filter(Boolean))
 
-const allJobs = [
+const allJobs = process.argv.includes('--grow') ? GROW.map((c) => ({ name: `grow: ${c}`, steps: grow(c) })) : [
   ...PILOT.map((c) => ({ name: `content: ${c}`, steps: content(c) })),
   ...PILOT.filter((c) => !NO_PAPERS.has(c)).map((c) => ({ name: `papers: ${c}`, steps: papers(c) })),
   ...REST.map((c) => ({ name: `content: ${c}`, steps: content(c) })),
@@ -82,8 +103,8 @@ const allJobs = [
 // --only "content: Music,papers: Computer Science" runs just those jobs.
 // Job names are split only before "content:" or "papers:", since a course
 // name can hold commas ("Sports, Exercise, and Health Science").
-const ONLY = arg('only') ? new Set(String(arg('only')).split(/,(?=\s*(?:content|papers):)/).map((x) => x.trim())) : null
-const jobs = allJobs.filter((j) => !SKIP.has(j.name.replace(/^(content|papers): /, '')) && (!ONLY || ONLY.has(j.name)))
+const ONLY = arg('only') ? new Set(String(arg('only')).split(/,(?=\s*(?:content|papers|grow):)/).map((x) => x.trim())) : null
+const jobs = allJobs.filter((j) => !SKIP.has(j.name.replace(/^(content|papers|grow): /, '')) && (!ONLY || ONLY.has(j.name)))
 
 const status = Object.fromEntries(jobs.map((j) => [j.name, 'waiting']))
 const write = () => fs.writeFileSync(STATUS, JSON.stringify({ updated: new Date().toISOString(), status }, null, 1))

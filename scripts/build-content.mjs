@@ -24,6 +24,8 @@
  *   node scripts/build-content.mjs --course Physics --codes A.1,A.2,A.3
  *   node scripts/build-content.mjs --course Physics --stage publish --retire-old
  *
+ *   node scripts/build-content.mjs --course Physics --grow 1   (half bank → full)
+ *
  * Options: --stage <name|all>  --direct (full price, no batch wait)
  *          --claude-cap 60  --gemini-cap 25  --audit 40  --limit <subtopics>
  *          --run <name> (a separate state file, for trial runs)
@@ -905,6 +907,17 @@ function report() {
 const STAGES = { plan, questions, repair, blind, rule, audit, lessons, cards, publish }
 // This build has no lessons: decks come from the cards stage instead.
 const WITH_LESSONS = Boolean(arg('lessons', false))
+// --grow 1: a bigger bank on a course already built. The counts are raised on
+// the saved plan, in its own order, so every question already written keeps
+// its slot and only the new slots are written. Planning again from the
+// database could reorder subtopics under the work already paid for.
+const GROW = arg('grow') ? Number(arg('grow')) : null
+if (GROW && state.subtopics) {
+  const before = state.subtopics.reduce((a, s) => a + s.total, 0)
+  state.subtopics = planCounts(state.subtopics, state.group, GROW)
+  save()
+  log(`grow: ${before} → ${state.subtopics.reduce((a, s) => a + s.total, 0)} questions planned`)
+}
 try {
   if (STAGE === 'all') {
     // Planning again would renumber the slots under work already paid for.
